@@ -13,7 +13,7 @@ description: Comprehensive patterns, conventions, and code examples for developi
 4. **ALWAYS** use Pinia `defineStore()` with **setup function syntax** (not options syntax).
 5. **ALWAYS** use scoped styles: `<style scoped>`.
 6. **ALWAYS** use CSS custom properties from `src/styles/variables.css` for colors, spacing, and typography.
-7. **NEVER** import from another module's internals. Only import from `@/shared/` or the current module.
+7. **NEVER** import from another module's internals. Only import from `@/core/` or the current module.
 
 ---
 
@@ -22,7 +22,7 @@ description: Comprehensive patterns, conventions, and code examples for developi
 ```
 src/
 ├── app/              # Application shell (router, layouts, main.ts)
-├── shared/           # Shared Kernel (cross-cutting concerns)
+├── core/           # Shared Kernel (cross-cutting concerns)
 │   ├── api/          # HTTP client, error handling, generated types
 │   ├── auth/         # Auth store, route guards
 │   ├── components/   # Design system primitives (AppButton, AppModal, etc.)
@@ -311,41 +311,24 @@ export const useStore = defineStore('name', {
 
 ## Pattern 3: Composable (Use Case Hook)
 
-Composables orchestrate: API call → Mapper → Store update → Side effects.
+Composables orchestrate: API call → Mapper → Returned reactive state (via TanStack Query).
 
 ```typescript
 // modules/payment-requests/composables/usePaymentRequests.ts
-import { onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { usePaymentRequestStore } from '../stores/payment-requests.store'
+import { useApiQuery } from '@/core/composables/useApiQuery'
 import { paymentRequestApi } from '../api/payment-requests.api'
 import { toViewModel } from '../mappers/payment-request.mapper'
 
 export function usePaymentRequests() {
-  const store = usePaymentRequestStore()
-  const { requests, isLoading, error } = storeToRefs(store)
-
-  async function fetchRequests() {
-    store.setLoading(true)
-    store.setError(null)
-    try {
+  const { data: requests, isLoading, error } = useApiQuery(
+    ['payment-requests'],
+    async () => {
       const dtos = await paymentRequestApi.list()
-      store.setRequests(dtos.map(toViewModel))
-    } catch (e: unknown) {
-      store.setError(e instanceof Error ? e.message : 'Failed to load')
-    } finally {
-      store.setLoading(false)
-    }
-  }
+      return dtos.map(toViewModel)
+    },
+  )
 
-  onMounted(fetchRequests)
-
-  return {
-    requests,
-    isLoading,
-    error,
-    refresh: fetchRequests,
-  }
+  return { requests, isLoading, error }
 }
 ```
 
@@ -353,29 +336,26 @@ export function usePaymentRequests() {
 
 ```typescript
 // modules/payment-requests/composables/useSubmitRequest.ts
-import { usePaymentRequestStore } from '../stores/payment-requests.store'
+import { useApiMutation } from '@/core/composables/useApiMutation'
 import { paymentRequestApi } from '../api/payment-requests.api'
 import { toViewModel } from '../mappers/payment-request.mapper'
-import { eventBus } from '@/shared/event-bus/event-bus'
+import { eventBus } from '@/core/event-bus/event-bus'
 
 export function useSubmitRequest() {
-  const store = usePaymentRequestStore()
-
-  async function submit(id: string) {
-    // 1. Call action endpoint
-    const dto = await paymentRequestApi.submit(id)
-
-    // 2. Map and update store
-    const vm = toViewModel(dto)
-    store.updateRequest(vm)
-
-    // 3. Notify other modules via Event Bus
-    eventBus.emit('payment-request:submitted', { id })
-
-    return vm
-  }
-
-  return { submit }
+  return useApiMutation(
+    async (id: string) => {
+      // 1. Call action endpoint
+      const dto = await paymentRequestApi.submit(id)
+      return toViewModel(dto)
+    },
+    {
+      onSuccess: (vm) => {
+        // 2. Notify other modules
+        eventBus.emit('payment-request:submitted', { id: vm.id })
+      },
+      invalidateKeys: [['payment-requests']], // Invalidate list query
+    }
+  )
 }
 ```
 
@@ -385,7 +365,7 @@ export function useSubmitRequest() {
 
 ```typescript
 // modules/payment-requests/api/payment-requests.api.ts
-import { httpClient } from '@/shared/api/http-client'
+import { httpClient } from '@/core/api/http-client'
 import type {
   PaymentRequestDTO,
   PaymentRequestCreateDTO,
@@ -426,8 +406,8 @@ Mappers are pure functions: DTO in → ViewModel out. No side effects.
 
 ```typescript
 // modules/payment-requests/mappers/payment-request.mapper.ts
-import { Money } from '@/shared/domain/money'
-import { formatDate } from '@/shared/utils/date'
+import { Money } from '@/core/domain/money'
+import { formatDate } from '@/core/utils/date'
 import type { PaymentRequestDTO } from '../types/api.types'
 import type { PaymentRequestViewModel } from '../types/view.types'
 
@@ -511,7 +491,7 @@ export interface PaymentRequestPayDTO {
 ```typescript
 // modules/payment-requests/types/view.types.ts
 // These are what Vue components consume — UI-optimized
-import type { Money } from '@/shared/domain/money'
+import type { Money } from '@/core/domain/money'
 
 export interface PaymentRequestViewModel {
   id: string
@@ -622,7 +602,7 @@ function handleCreate() {
 ## Pattern 9: Shared Kernel Value Object
 
 ```typescript
-// shared/domain/money.ts
+// core/domain/money.ts
 export enum Currency {
   ETB = 'ETB',
   USD = 'USD',
@@ -680,8 +660,8 @@ export class Money {
 ## Pattern 10: Typed Event Bus
 
 ```typescript
-// shared/event-bus/event-bus.ts
-import type { Money } from '@/shared/domain/money'
+// core/event-bus/event-bus.ts
+import type { Money } from '@/core/domain/money'
 
 export type EventMap = {
   'payment-request:submitted': { id: string }
@@ -815,10 +795,10 @@ Always use these path aliases:
 
 ```typescript
 // ✅ Correct imports
-import { Money } from '@/shared/domain/money'
-import { httpClient } from '@/shared/api/http-client'
-import { eventBus } from '@/shared/event-bus/event-bus'
-import { useAuthStore } from '@/shared/auth/auth.store'
+import { Money } from '@/core/domain/money'
+import { httpClient } from '@/core/api/http-client'
+import { eventBus } from '@/core/event-bus/event-bus'
+import { useAuthStore } from '@/core/auth/auth.store'
 
 // ✅ Module-internal (relative)
 import { usePaymentRequestStore } from '../stores/payment-requests.store'
