@@ -5,21 +5,15 @@
 
 ---
 
-## 1. Core Principle: One Store Per Module
+## 1. Dual-State Philosophy
 
-Each bounded context gets exactly **one** Pinia store. This mirrors the backend's schema-per-module approach.
+We distinguish between two types of state to ensure high performance and reliability:
 
-| Module | Store | Manages |
-|---|---|---|
-| `identity` | `identity.store.ts` | Current tenant, user list, role assignments |
-| `accounting` | `accounting.store.ts` | Accounts, journal entries, active filters |
-| `payment-requests` | `payment-requests.store.ts` | Payment request list, stats, active filters |
-| `banking` | `banking.store.ts` | Bank accounts, transactions, reconciliation state |
-| `reporting` | `reporting.store.ts` | Dashboard data, chart configurations |
-| `workflows` | `workflows.store.ts` | Approval templates, pending approvals |
-| `webhooks` | `webhooks.store.ts` | Webhook subscriptions, delivery logs |
+1.  **Server State (TanStack Query)**: Data that lives on the server and is fetched via API (e.g., Accounts, Payment Requests). TanStack Query handles caching, refetching, and optimistic updates.
+2.  **Client State (Pinia)**: Ephemeral UI state (e.g., "is sidebar open") or cross-cutting configuration (e.g., "current tenant").
 
-**Exception:** The `auth` store lives in `shared/auth/auth.store.ts` because authentication is a cross-cutting concern, not a bounded context.
+### 1.1 Store Boundaries
+Each module has a dedicated Pinia store for its **Client State**. Server State is co-located with components or orchestrated via module-level composables using TanStack Query.
 
 ---
 

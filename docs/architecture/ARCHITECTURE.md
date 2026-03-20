@@ -110,12 +110,15 @@ graph TD
 
 | Layer | Technology | Rationale |
 |---|---|---|
-| **Framework** | Vue 3 (Composition API) | SFC colocation, `provide/inject` mirrors backend DI, opinionated conventions |
-| **Build** | Vite | Sub-second HMR, native ESM, per-module code splitting |
-| **State** | Pinia | TypeScript-first, modular by default, one store = one bounded context |
-| **Language** | TypeScript (strict) | Compile-time safety, discriminated unions for state machines |
+| **Framework** | Vue 3 (Composition API) | SFC colocation, perfect mapping for backend Use Cases |
+| **Build** | Vite | Sub-second HMR, native ESM, Tailwind v4 native support |
+| **UI Components** | **PrimeVue Volt** | **Code Ownership model** (copy-paste), elite DataTable engine, Tailwind v4 |
+| **Server State** | **TanStack Query** | Caching, background refetch, optimistic updates, pagination engine |
+| **Form State** | **TanStack Form** | Headless, granular performance, type-safe validation (Zod) |
+| **Client State** | Pinia | Modular, bounded-context scoped (auth, UI settings) |
+| **Styling** | **Tailwind CSS v4** | Modern, performant, utility-first CSS |
+| **Language** | TypeScript (strict) | Compile-time safety, strict branded types |
 | **HTTP** | Axios | Interceptors for auth, idempotency keys, and error envelopes |
-| **Routing** | Vue Router | Lazy-loaded module routes, route guards for feature gates |
 
 ### 3.2 Development & Quality
 
