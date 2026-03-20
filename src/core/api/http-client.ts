@@ -1,6 +1,5 @@
 import axios from 'axios'
 import type { AxiosRequestConfig } from 'axios'
-import { v4 as uuidv4 } from 'crypto'
 
 /**
  * Abren ERP — Shared HTTP Client

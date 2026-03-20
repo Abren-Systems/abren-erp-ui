@@ -6,7 +6,9 @@ import { RouterView } from 'vue-router'
   <div class="min-h-screen bg-surface-50 flex">
     <!-- Sidebar placeholder -->
     <aside class="w-64 bg-surface-900 text-white p-4 hidden lg:block">
-      <div class="text-xl font-bold mb-8">Abren ERP</div>
+      <div class="text-xl font-bold mb-8">
+        Abren ERP
+      </div>
       <nav class="space-y-2">
         <RouterLink
           to="/app"

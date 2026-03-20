@@ -10,7 +10,7 @@ import { useRouter } from 'vue-router'
  *
  * Usage:
  *   const { isEnabled, guardRoute } = useFeatureGate('webhooks')
- *   if (!isEnabled.value) { /* hide UI */ }
+ *   if (!isEnabled.value) {  // hide UI  }
  */
 export function useFeatureGate(feature: string) {
   const authStore = useAuthStore()

@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-import PrimeVue from 'primevue/config'
 
 import App from './App.vue'
 import { router } from './app/router'
@@ -24,11 +23,6 @@ app.use(VueQueryPlugin, {
       },
     },
   },
-})
-
-// ── PrimeVue (Unstyled / Volt mode) ───────────────────
-app.use(PrimeVue, {
-  unstyled: true,
 })
 
 // ── Router ────────────────────────────────────────────

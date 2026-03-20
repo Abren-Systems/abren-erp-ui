@@ -32,7 +32,6 @@ export default defineConfig({
             '@tanstack/vue-table',
             '@tanstack/vue-virtual',
           ],
-          'vendor-primevue': ['primevue', '@primevue/core'],
         },
       },
     },
