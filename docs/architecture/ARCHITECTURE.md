@@ -118,7 +118,7 @@ graph TD
 | **Server State** | **TanStack Query** | Caching, background refetch, optimistic updates |
 | **Form State** | **TanStack Form** + **Zod** | Headless, type-safe validation |
 | **Client State** | Pinia | Bounded-context scoped (auth, UI ephemeral state) |
-| **Styling** | **Tailwind CSS v4** | `@theme` design tokens, utility-first CSS |
+| **Styling** | **Tailwind CSS v4** | `@theme` design tokens, utility-first CSS. *(See [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md))* |
 | **Language** | TypeScript (strict) | Compile-time safety, `noUncheckedIndexedAccess` |
 | **HTTP** | Axios | Interceptors for auth, idempotency, error envelopes |
 
