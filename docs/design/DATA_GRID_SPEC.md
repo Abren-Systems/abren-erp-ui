@@ -33,13 +33,15 @@
 
 ## 2.1 Row & Cell Metrics
 
-```text
-Row height:        30px
-Header height:     30px
-Cell padding:      6px 8px
-Font size:         12.5px
-Line height:       1.3
-```
+We adhere to the **3-tier density system** defined in `DESIGN_SYSTEM.md`. The grid defaults to **Compact** mode for ERP power users.
+
+| Metric | Compact (Default) | Comfortable | Touch |
+| --- | --- | --- | --- |
+| Row Height | 30px | 40px | 48px |
+| Header Height | 30px | 40px | 48px |
+| Cell Padding | 6px 8px | 8px 12px | 12px 16px |
+| Font Size | 12.5px | 13px | 14px |
+| Line Height | 1.3 | 1.4 | 1.5 |
 
 ---
 
@@ -149,12 +151,13 @@ Each column must support:
 | ↑ ↓    | Move rows   |
 | ← →    | Move cells  |
 | TAB    | Next cell   |
-| ENTER  | Edit cell   |
+| ENTER  | Edit cell (or open Drawer) |
 | ESC    | Cancel edit |
+| ⌘K / Ctrl+K | **Command Palette** (Context-aware grid actions) |
 | CTRL+C | Copy        |
 | CTRL+V | Paste       |
 
-👉 This is non-negotiable for ERP usability
+👉 This is non-negotiable for ERP usability. The **Command Palette (⌘K)** specifically must intercept standard typing to provide instant filtering or bulk action dispatching on selected rows.
 
 ---
 
@@ -171,13 +174,16 @@ Each column must support:
 
 ## 6.1 Editing Modes
 
-### Cell Mode (default)
+### Cell Mode (Fastest)
 
-* Edit one cell at a time
+* Edit one cell at a time directly inline.
+* Best for rapid data entry (e.g., updating statuses or amounts).
 
-### Row Mode (optional)
+### Drawer Mode (Context-Preserving)
 
-* Edit full row
+* Slide-out panel from the right edge (40-50% width).
+* Best for complex records.
+* **Never use full page reloads or center modals** for grid record editing, as they destroy the user's filtered background context.
 
 ---
 
@@ -464,12 +470,17 @@ src/core/ui/data-grid/
 │   ├── DateRangeFilter.vue
 │   └── StatusFilter.vue
 │
+├── Overlays/ [PHASE 2]
+│   ├── DataGridDrawer.vue          ← Right-edge context editor
+│   └── DataGridCommandPalette.vue  ← ⌘K global action overlay
+│
 └── Editors/ [PHASE 2]
     ├── TextEditor.vue
     ├── NumberEditor.vue
     ├── CurrencyEditor.vue
     ├── DateEditor.vue
     └── StatusEditor.vue
+
 
 src/core/composables/
 └── useDataGrid.ts            ← State factory (BUILT)

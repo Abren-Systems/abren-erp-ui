@@ -9,86 +9,145 @@
 
 @theme {
   /*
-   * Colors
+   * ── Brand / Primary — Indigo ──────────────────────────────────
+   * Changed from sky (playful) to indigo (authoritative/financial).
+   * Radix Indigo scale — mathematically derived, WCAG-tested.
    */
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-200: #bae6fd;
-  --color-primary-300: #7dd3fc;
-  --color-primary-400: #38bdf8;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-800: #075985;
-  --color-primary-900: #0c4a6e;
-  
-  --color-neutral-50: #f9fafb;
-  --color-neutral-100: #f3f4f6;
-  --color-neutral-200: #e5e7eb;
-  --color-neutral-300: #d1d5db;
-  --color-neutral-400: #9ca3af;
-  --color-neutral-500: #6b7280;
-  --color-neutral-600: #4b5563;
-  --color-neutral-700: #37414a;
-  --color-neutral-800: #1f2937;
-  --color-neutral-900: #111827;
-  
+  --color-primary-50:  #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;  /* ← Main CTA color */
+  --color-primary-700: #4338ca;  /* ← Hover state */
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+
+  /*
+   * ── Neutrals — Radix Slate ────────────────────────────────────
+   * Changed from Tailwind gray (cold blue-cast) to Radix Slate
+   * (warm blue-gray). Reads premium at high information density.
+   */
+  --color-neutral-50:  #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /*
+   * ── Semantic Status Colors ────────────────────────────────────
+   * Full scales for tinted backgrounds (50/100) + deep text (700).
+   */
+  --color-success-50:  #ecfdf5;
+  --color-success-100: #d1fae5;
   --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+
+  --color-warning-50:  #fffbeb;
+  --color-warning-100: #fef3c7;
   --color-warning-500: #f59e0b;
-  --color-danger-500: #ef4444;
-  --color-info-500: #3b82f6;
-  
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+
+  --color-danger-50:   #fef2f2;
+  --color-danger-100:  #fee2e2;
+  --color-danger-500:  #ef4444;
+  --color-danger-600:  #dc2626;
+  --color-danger-700:  #b91c1c;
+
+  --color-info-50:     #eff6ff;
+  --color-info-100:    #dbeafe;
+  --color-info-500:    #3b82f6;
+  --color-info-600:    #2563eb;
+  --color-info-700:    #1d4ed8;
+
   /*
-   * Spacing (Design System Tokens)
+   * ── Data Visualization — IBM Carbon Categorical ───────────────
+   * 8-color colorblind-tested palette for charts and dashboards.
+   * Used ONLY for data series — not for UI status.
    */
-  --ds-spacing-xs: 0.25rem;    /* 4px */
-  --ds-spacing-sm: 0.5rem;     /* 8px */
-  --ds-spacing-md: 1rem;       /* 16px */
-  --ds-spacing-lg: 1.5rem;     /* 24px */
-  --ds-spacing-xl: 2rem;       /* 32px */
-  --ds-spacing-2xl: 3rem;      /* 48px */
-  
+  --chart-1: #6929c4;   /* Purple        — primary series */
+  --chart-2: #1192e8;   /* Cyan          — secondary series */
+  --chart-3: #005d5d;   /* Teal          — tertiary series */
+  --chart-4: #9f1853;   /* Magenta       */
+  --chart-5: #fa4d56;   /* Red           */
+  --chart-6: #570408;   /* Dark red      */
+  --chart-7: #198038;   /* Green         */
+  --chart-8: #002d9c;   /* Blue          */
+
   /*
-   * Border Radius
-   */
-  --radius-sm: 0.25rem;     /* 4px */
-  --radius-md: 0.5rem;      /* 8px */
-  --radius-lg: 0.75rem;     /* 12px */
-  --radius-xl: 1rem;        /* 16px */
-  
-  /*
-   * Typography
+   * ── ERP Type Scale ────────────────────────────────────────────
+   * Semantic names over raw sizes. Components reference roles,
+   * not arbitrary pixel values.
+   *
+   * --text-[role]: font-size / font-weight / letter-spacing
    */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  
-  --text-xs: 0.75rem;       /* 12px */
-  --text-sm: 0.875rem;      /* 14px */
-  --text-base: 1rem;        /* 16px */
-  --text-lg: 1.125rem;      /* 18px */
-  --text-xl: 1.25rem;       /* 20px */
-  --text-2xl: 1.5rem;       /* 24px */
-  --text-3xl: 1.875rem;     /* 30px */
-  --text-4xl: 2.25rem;      /* 36px */
-  
-  /*
-   * Shadows
-   */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-  
-  /*
-   * Z-index
-   */
-  --z-dropdown: 1000;
-  --z-modal: 1050;
-  --z-overlay: 1100;
+
+  /* Raw size scale (kept for Tailwind utility classes) */
+  --text-xs:   0.6875rem;  /* 11px  — micro / timestamps */
+  --text-sm:   0.8125rem;  /* 13px  — secondary body */
+  --text-base: 0.875rem;   /* 14px  — primary body */
+  --text-lg:   1rem;       /* 16px  — card headings */
+  --text-xl:   1.125rem;   /* 18px  — section headings */
+  --text-2xl:  1.25rem;    /* 20px  — page sub-headings */
+  --text-3xl:  1.5rem;     /* 24px  — module headings */
+  --text-4xl:  2rem;       /* 32px  — display / hero */
+
+  /* Semantic type role tokens */
+  --text-display:  2rem;    /* 32px 700 -0.02em — page hero, rare */
+  --text-heading:  1.5rem;  /* 24px 700 -0.01em — module headings */
+  --text-title:    1.125rem;/* 18px 600 0       — section/panel headings */
+  --text-body:     0.875rem;/* 14px 400 0       — standard content */
+  --text-body-sm:  0.8125rem;/* 13px 400 0      — secondary content */
+  --text-label:    0.6875rem;/* 11px 600 +0.04em — table headers, ALL CAPS */
+  --text-code:     0.78125rem;/* 12.5px 400      — IDs, codes, amounts */
+  --text-micro:    0.6875rem;/* 11px 400 +0.02em — timestamps, metadata */
 
   /*
-   * Data Grid — semantic surface tokens (light mode defaults)
-   * Dark mode overrides are defined below under .dark / prefers-color-scheme.
+   * ── Spacing ───────────────────────────────────────────────────
+   */
+  --ds-spacing-xs:  0.25rem;   /* 4px */
+  --ds-spacing-sm:  0.5rem;    /* 8px */
+  --ds-spacing-md:  1rem;      /* 16px */
+  --ds-spacing-lg:  1.5rem;    /* 24px */
+  --ds-spacing-xl:  2rem;      /* 32px */
+  --ds-spacing-2xl: 3rem;      /* 48px */
+
+  /*
+   * ── Border Radius ─────────────────────────────────────────────
+   */
+  --radius-sm: 0.25rem;    /* 4px */
+  --radius-md: 0.375rem;   /* 6px */
+  --radius-lg: 0.5rem;     /* 8px */
+  --radius-xl: 0.75rem;    /* 12px */
+
+  /*
+   * ── Shadows ───────────────────────────────────────────────────
+   */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+
+  /*
+   * ── Z-index ───────────────────────────────────────────────────
+   */
+  --z-dropdown: 1000;
+  --z-modal:    1050;
+  --z-overlay:  1100;
+
+  /*
+   * ── Data Grid — semantic surface tokens (light mode defaults) ─
+   * Dark mode overrides are defined below under .dark / @media.
    */
   --color-grid-bg:                 var(--color-neutral-50);
   --color-grid-row-hover:          var(--color-neutral-100);
@@ -105,12 +164,12 @@
   --color-grid-skeleton-shine:     var(--color-neutral-100);
 
   /*
-   * Breakpoints
+   * ── Breakpoints ───────────────────────────────────────────────
    */
-  --breakpoint-sm: 640px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1024px;
-  --breakpoint-xl: 1280px;
+  --breakpoint-sm:  640px;
+  --breakpoint-md:  768px;
+  --breakpoint-lg:  1024px;
+  --breakpoint-xl:  1280px;
   --breakpoint-2xl: 1536px;
 
 }
