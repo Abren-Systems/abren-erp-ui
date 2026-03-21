@@ -5,7 +5,8 @@ import { Button } from '@/core/ui/button'
 import { 
   LayoutDashboard, 
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-vue-next'
 
 const route = useRoute()

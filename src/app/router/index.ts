@@ -14,7 +14,7 @@ const router = createRouter({
   routes: [
     {
       path: '/login',
-      component: () => import('./layouts/PublicLayout.vue'),
+      component: () => import('../layouts/PublicLayout.vue'),
       children: [
         {
           path: '',
@@ -25,7 +25,7 @@ const router = createRouter({
     },
     {
       path: '/app',
-      component: () => import('./layouts/AuthenticatedLayout.vue'),
+      component: () => import('../layouts/AuthenticatedLayout.vue'),
       beforeEnter: [authGuard],
       children: [
         {
