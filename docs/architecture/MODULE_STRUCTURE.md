@@ -36,10 +36,11 @@ src/modules/{category}/{module}/
 │   ├── {module}.mapper.ts   # DTO Conversion
 │   └── {module}.adapter.ts  # API Communication
 │
-└── ui/                      # [Presentation] SFCs
-    ├── components/
-    ├── pages/
-    └── utils/               # Display formatters
+└── ui/                      # [Presentation] SFCs & Display Logic
+    ├── components/          # Tier 3 (Stateless)
+    ├── pages/               # Tier 4 (Orchestrators)
+    ├── grids/               # Grid Configurations
+    └── utils/               # UI Logic (Formatters)
 ```
 
 ---
