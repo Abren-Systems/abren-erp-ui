@@ -7,28 +7,18 @@
 
 ## 1. Architecture Overview
 
-The API integration layer sits between the backend's REST endpoints and the frontend's Pinia stores. It consists of three sub-layers:
-
-```
-Backend (API)
-    ↓  HTTP (JSON)
-┌────────────────────────────┐
-│  Core HTTP Client          │  ← Axios instance, interceptors, error handler
-│  (core/api/)               │
-└────────────┬───────────────┘
+    ↓  HTTP (JSON Response)
+┌─────────────────────────────────────────────────────┐
+│  Core HTTP Client (core/api/)                       │ ← Response Envelope Unwrap
+├─────────────────────────────────────────────────────┤
+│  Adapter (infrastructure/{m}.adapter.ts)            │ ← Fetches **DTOs** from API
+├─────────────────────────────────────────────────────┤
+│  Mapper (infrastructure/{m}.mapper.ts)              │ ← Converts **DTO** → **Domain Type**
+├─────────────────────────────────────────────────────┤
+│  Application (application/composables/use*.ts)      │ ← Orchestrates via **TanStack Query**
+└─────────────────────────────────────────────────────┘
              ↓
-┌────────────────────────────┐
-│  Module API Client         │  ← Typed methods per endpoint
-│  (modules/{m}/api/)        │
-└────────────┬───────────────┘
-             ↓
-┌────────────────────────────┐
-│  Mapper (ACL)              │  ← DTO → ViewModel transformation
-│  (modules/{m}/mappers/)    │
-└────────────┬───────────────┘
-             ↓
-   TanStack Query / Composable
-```
+    Vue components (SFC)
 
 ---
 
@@ -140,27 +130,24 @@ export interface PaginatedResponse<T> {
 
 Each module has a typed API client that wraps the shared HTTP client with module-specific endpoint methods.
 
-### 3.1 Pattern
-
-```typescript
-// modules/payment-requests/api/payment-requests.api.ts
+// modules/business/finance/ap/payment-requests/infrastructure/payment_request_adapter.ts
 import { httpClient } from '@/core/api/http-client'
-import type {
-  PaymentRequestDTO,
-  PaymentRequestCreateDTO,
-  PaymentRequestPayDTO,
-} from '../types/api.types'
+import type { 
+  PaymentRequestRead, 
+  PaymentRequestCreate, 
+  PaymentRequestUpdate 
+} from '@/core/api/generated.types'
 
 const BASE = '/payment-requests'
 
-export const paymentRequestApi = {
+export const paymentRequestAdapter = {
   // GET /api/v1/payment-requests
-  async list(): Promise<PaymentRequestDTO[]> {
+  async list(): Promise<PaymentRequestRead[]> {
     return httpClient.get(BASE)
   },
 
   // GET /api/v1/payment-requests/:id
-  async get(id: string): Promise<PaymentRequestDTO> {
+  async get(id: string): Promise<PaymentRequestRead> {
     return httpClient.get(`${BASE}/${id}`)
   },
 
@@ -240,19 +227,19 @@ export function useApiMutation<TData, TVariables>(
 **Usage in a module composable:**
 
 ```typescript
-// modules/payment-requests/composables/usePaymentRequests.ts
-import { useApiQuery } from '@/core/composables/useApiQuery'
-import { paymentRequestApi } from '../api/payment-requests.api'
-import { toViewModel } from '../mappers/payment-request.mapper'
+// modules/business/finance/ap/payment-requests/application/composables/usePaymentRequests.ts
+import { useQuery } from '@tanstack/vue-query'
+import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
+import { mapPaymentRequest } from '../infrastructure/payment_request.mapper'
 
 export function usePaymentRequests() {
-  const { data, isLoading, error } = useApiQuery(
-    ['payment-requests'],
-    async () => {
-      const dtos = await paymentRequestApi.list()
-      return dtos.map(toViewModel)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['payment-requests'],
+    queryFn: async () => {
+      const dtos = await paymentRequestAdapter.list()
+      return dtos.map(mapPaymentRequest)
     },
-  )
+  })
 
   return { requests: data, isLoading, error }
 }

@@ -13,7 +13,7 @@ We distinguish between two types of state to ensure high performance and reliabi
 2.  **Client State (Pinia)**: Ephemeral UI state (e.g., "is sidebar open") or cross-cutting configuration (e.g., "current tenant").
 
 ### 1.1 Store Boundaries
-Each module has a dedicated Pinia store for its **Client State**. Server State is co-located with components or orchestrated via module-level composables using TanStack Query.
+Each module uses **TanStack Query** for all domain data fetching and caching. Pinia is reserved ONLY for ephemeral UI state (e.g. "is the filter panel expanded").
 
 ---
 
@@ -122,19 +122,19 @@ sequenceDiagram
 ### 3.1 Composable with TanStack Query
 
 ```typescript
-// modules/payment-requests/composables/usePaymentRequests.ts
-import { useApiQuery } from '@/core/composables/useApiQuery'
-import { paymentRequestApi } from '../api/payment-requests.api'
-import { toViewModel } from '../mappers/payment-request.mapper'
+// modules/business/finance/ap/payment-requests/application/composables/usePaymentRequests.ts
+import { useQuery } from '@tanstack/vue-query'
+import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
+import { mapPaymentRequest } from '../infrastructure/payment_request.mapper'
 
 export function usePaymentRequests() {
-  const { data: requests, isLoading, error } = useApiQuery(
-    ['payment-requests'],
-    async () => {
-      const dtos = await paymentRequestApi.list()
-      return dtos.map(toViewModel)
+  const { data: requests, isLoading, error } = useQuery({
+    queryKey: ['payment-requests'],
+    queryFn: async () => {
+      const dtos = await paymentRequestAdapter.list()
+      return dtos.map(mapPaymentRequest)
     },
-  )
+  })
 
   return { requests, isLoading, error }
 }
@@ -165,10 +165,10 @@ export function usePayRequest() {
   return { payRequest }
 }
 
-// modules/accounting/composables/useJournalEntries.ts
-// Subscribes to the event — refreshes its own data
+// modules/business/finance/ledger/application/composables/useLedgerAccounts.ts
+// Subscribes to the event — refreshes its own caches
 eventBus.on('payment-request:paid', () => {
-  fetchJournalEntries()  // Refresh accounting data
+  queryClient.invalidateQueries(['ledger-accounts']) 
 })
 ```
 

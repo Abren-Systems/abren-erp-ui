@@ -98,30 +98,29 @@ npm run dev
 |---|---|---|
 | Directories | kebab-case | `payment-requests/` |
 | Vue components | PascalCase | `PaymentRequestForm.vue` |
-| Composables | camelCase with `use` prefix | `useSubmitRequest.ts` |
-| Stores | kebab-case with `.store` suffix | `payment-requests.store.ts` |
-| Types | PascalCase | `PaymentRequestViewModel` |
-| API clients | kebab-case with `.api` suffix | `payment-requests.api.ts` |
-| Mappers | kebab-case with `.mapper` suffix | `payment-request.mapper.ts` |
-| Constants | UPPER_SNAKE_CASE | `STATUS_COLORS` |
+| Composables | camelCase | `usePaymentRequests.ts` |
+| Adapters | snake_case | `ledger_adapter.ts` |
+| Mappers | dot-suffix | `ledger.mapper.ts` |
+| Types | dot-suffix | `account.types.ts` |
+| Formatters | kebab-case | `account-formatter.ts` |
 
 ### 4.4 Import Order
 
 ```typescript
 // 1. Vue/framework imports
-import { ref, computed, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
+import { ref, computed } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 
 // 2. Core infrastructure imports
 import { Money } from '@/core/domain/money'
-import { useApiQuery } from '@/core/composables/useApiQuery'
+import { Button } from '@/core/ui/button'
 
-// 3. Module-internal imports
-import { usePaymentRequestStore } from '../stores/payment-requests.store'
-import { toViewModel } from '../mappers/payment-request.mapper'
+// 3. Module orchestration (Application)
+import { useLedgerAccounts } from '../application/composables/useLedgerAccounts'
 
-// 4. Type-only imports
-import type { PaymentRequestDTO } from '../types/api.types'
+// 4. Domain & Infrastructure
+import type { Account } from '../domain/account.types'
+import { ledgerAdapter } from '../infrastructure/ledger_adapter'
 ```
 
 ---

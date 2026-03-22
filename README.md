@@ -39,24 +39,21 @@ npm run generate-types
 ```
 src/
 ├── app/              # Application shell (router, layouts)
-├── core/             # Infrastructure (NO domain logic)
+├── core/             # Shared Kernel (NO business logic)
 │   ├── api/          # Axios client, typed helpers
-│   ├── auth/         # Auth store (JWT, tenant, features)
-│   ├── composables/  # useApiQuery, useApiMutation, useFeatureGate
+│   ├── auth/         # Auth engine (JWT, tenant scoping)
 │   ├── domain/       # Money VO, Currency, branded types
-│   ├── event-bus/    # Typed cross-module communication
-│   ├── types/        # ModuleDefinition, shared contracts
-│   └── ui/           # Custom Design System (components, patterns, primitives)
-├── modules/          # Bounded Contexts (one per backend module)
-│   ├── identity/     # Login, users, tenants
-│   ├── accounting/   # Chart of accounts, journal entries
-│   ├── payment-requests/
-│   ├── banking/
-│   ├── reporting/
-│   ├── workflows/
-│   ├── webhooks/
-│   └── system/
-└── assets/           # Tailwind v4 entry + @theme design tokens
+│   ├── ui/           # Custom Design System (standard components)
+│   └── types/        # Cross-module types & registry
+├── modules/          # Bounded Contexts (Monolith Modules)
+│   ├── business/     # [Applications] High-value business domains
+│   │   └── finance/
+│   │       ├── ledger/
+│   │       └── bank/
+│   └── platform/     # [Engines] Infrastructure & Platform services
+│       ├── core/     # Identity & Management
+│       └── workflows/# State Machine & Approvals
+└── assets/           # Tailwind v4 entry + @theme tokens
 ```
 
 ## Documentation

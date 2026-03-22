@@ -51,37 +51,30 @@ Navigate by concern:
 The frontend mirrors the backend's bounded contexts as self-contained modules:
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        CORE ENGINE MODULES                          │
-├──────────────────┬──────────────────────┬───────────────────────────┤
-│  Identity        │   Workflows          │   Accounting              │
-│  (modules/       │  (modules/           │  (modules/                │
-│   identity)      │   workflows)         │   accounting)             │
-├──────────────────┼──────────────────────┼───────────────────────────┤
-│  Login, Tenants  │  Approval UIs        │  Chart of Accounts        │
-│  Users, Roles    │  Policy config       │  Journal Entries          │
-└──────────────────┴──────────────────────┴───────────────────────────┘
-                                │
-                    ┌───────────┴───────────┐
-                    │   BUSINESS MODULES    │
-          ┌─────────┴─────────┬────────────┴────────────┐
-          │  Payment Requests │    Banking              │
-          │  (modules/        │    (modules/            │
-          │   payment-        │     banking)            │
-          │   requests)       │                         │
-          └───────────────────┴─────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│               PLATFORM ENGINES (Infra)              │
+├──────────────────┬──────────────────┬───────────────┤
+│  Core / ID       │  Workflows       │  Reporting    │
+│  (platform/core) │ (platform/wf)    │ (platform/rep)│
+└──────────────────┴──────────────────┴───────────────┘
+                        │
+          ┌─────────────┴─────────────┐
+          │     BUSINESS APPS (Value) │
+          ├──────────────────┬────────┴───────┐
+          │      Finance     │      Sales     │
+          │ (business/fin)   │ (business/sale)│
+          └──────────────────┴────────────────┘
 ```
 
-| Module | Backend API Prefix | Status | Description |
-|--------|-------------------|--------|-------------|
-| `identity` | `/api/v1/core` | 🔲 Planned | Tenant management, Login, User admin |
-| `accounting` | `/api/v1/accounting` | 🔲 Planned | Chart of Accounts, Journal Entry forms |
-| `workflows` | `/api/v1/approvals` | 🔲 Planned | Approval policy configuration |
-| `payment-requests` | `/api/v1/payment-requests` | 🔲 Planned | Payment request lifecycle UI |
-| `banking` | `/api/v1/bank` | 🔲 Planned | Bank accounts & reconciliation |
-| `reporting` | `/api/v1/reporting` | 🔲 Planned | Dashboards, cashflow charts |
-| `webhooks` | `/api/v1/webhooks` | 🔲 Planned | Webhook subscription management |
-| `system` | `/api/v1/system` | 🔲 Planned | System health, data import UI |
+| Module | Namespace | Category | Description |
+|--------|-----------|----------|-------------|
+| `core` | `platform/core` | Engine | Tenants, Identity, RBAC |
+| `workflows` | `platform/workflows` | Engine | Universal State Machine |
+| `ledger` | `business/finance/ledger` | App | G/L Account Management |
+| `bank` | `business/finance/bank` | App | Cash & Bank Integration |
+| `ap` | `business/finance/ap` | App | Accounts Payable (Payment Requests) |
+| `reporting` | `platform/reporting` | Engine | Cross-domain Dashboards |
+| `webhooks` | `platform/webhooks` | Engine | System Integration Layer |
 
 ---
 

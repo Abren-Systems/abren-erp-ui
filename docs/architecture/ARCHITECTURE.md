@@ -17,13 +17,12 @@ The frontend is **domain-aware and backend-aligned**, not an exact mirror. The b
 
 | Backend Concept | Frontend Analog | Relationship |
 |---|---|---|
-| Bounded Context (module) | Feature Module | **1:1 alignment** — same domain names |
-| Shared Kernel | `core/` library | **1:1 alignment** — contracts & primitives |
-| Domain Entity | TypeScript interface | **Simplified** — no aggregate behavior |
-| Application Service | Composable (Use Case) | **Aligned** — same action names |
-| Repository + UoW | API Client | **Collapsed** — one layer, not two |
-| Domain Events | Event Bus | **Lightweight** — for cross-module reactivity |
-| Anti-Corruption Layer | Mapper (DTO → ViewModel) | **Frontend-specific** — UI concerns |
+| Bounded Context (module) | Hierarchical Module | **Bifurcated** — Business vs Platform |
+| Shared Kernel | `src/core/` library | **1:1 alignment** — contracts & primitives |
+| Domain Entity | Plain Reactive Type | **Vue-native** — No classes to break reactivity |
+| Value Object | Immutable Class | **Encapsulated Logic** (e.g. `Money`) |
+| Use Case | Composable | **Lifecycle Aware** — e.g. `useLedgerAccounts` |
+| Anti-Corruption Layer | Mapper + Adapter | **The Shield** — Infrastructure isolation |
 
 ### 1.3 Evolution Path
 The project is designed for **zero-rewrite scaling**. Today's module boundaries are tomorrow's micro-frontend packages. The architecture supports:
@@ -42,11 +41,11 @@ Phase 3 (Scale):   Module Federation micro-frontends
 
 | Rule | Enforcement | Prevents |
 |---|---|---|
-| **Modules own their state** | No cross-store imports | State coupling |
-| **Communication via Event Bus or Props** | Module A never imports Module B's store | Module leakage |
-| **Side effects via Composables** | No raw API calls in components | Untestable UI |
-| **Core = Contracts only** | Only types, primitives, and utilities in `core/` | Business logic in core |
-| **API layer is replaceable** | Domain types ≠ API DTOs; Mappers enforce this | Backend coupling |
+| **Domain is Pure** | No UI/API/State in `domain/` | Business rule leakage |
+| **Infra is the Firewall** | Mandatory Mappers in `infrastructure/` | Backend DTO leakage |
+| **App is Orchestration** | Side effects ONLY in `application/` | Logic scattered in UI |
+| **UI is Presentation** | Pages use formatters, not domain logic | Presentation coupling |
+| **Bifurcated Mono-Repo** | Business vs Platform separation | Engineering/Business overlap |
 
 ### 2.2 Strict Dependency Flow
 Dependencies point **inward** only. Modules may only depend on `core/` and never on each other.
@@ -92,15 +91,12 @@ graph TD
 
 ### 2.3 Layer Responsibilities
 
-| Layer | Responsibility | Contains | May Import |
-|---|---|---|---|
-| **Pages** | Route-level views, layout composition | `*Page.vue` | Composables, Core UI Components |
-| **Components** | Reusable UI elements within a module | `*.vue` | Core UI Components, Types |
-| **Composables** | Use case orchestration, business logic | `use*.ts` | Stores, API Clients, Event Bus |
-| **Stores** | Module-scoped reactive state | `*.store.ts` | Types only |
-| **API Clients** | HTTP request/response, error handling | `*.api.ts` | Mappers, Core HTTP Client |
-| **Mappers** | DTO ↔ ViewModel transformation (ACL) | `*.mapper.ts` | Types only |
-| **Types** | TypeScript interfaces, enums, unions | `*.types.ts` | Nothing (leaf nodes) |
+| Layer | Responsibility | Contains | May Import | Authority |
+|---|---|---|---|---|
+| **Domain** | Pure business rules & types | `*.types.ts`, `Money.ts` | Nothing | Business Logic |
+| **Application** | Orchestration & Use Cases | `application/composables/` | Domain, Infra | **TanStack Query** |
+| **Infrastructure**| ACL, Mapping, Adapters | `infrastructure/adapter.ts`| Domain, Core API| **DTOs** (input) |
+| **UI** | Presentation & Formatting | `ui/pages/`, `ui/utils/` | Application, Core UI| Presentation |
 
 ---
 
@@ -117,7 +113,8 @@ graph TD
 | **DataGrid Engine** | **TanStack Table** + **TanStack Virtual** | Sorting, filtering, pagination, virtualized scrolling |
 | **Server State** | **TanStack Query** | Caching, background refetch, optimistic updates |
 | **Form State** | **TanStack Form** + **Zod** | Headless, type-safe validation |
-| **Client State** | Pinia | Bounded-context scoped (auth, UI ephemeral state) |
+| **Client State** | Pinia | Ephemeral/UI state ONLY (sidebar collapse, local filters) |
+| **Server State** | **TanStack Query** | Authority for all domain data (ledger accounts, etc.) |
 | **Styling** | **Tailwind CSS v4** | `@theme` design tokens, utility-first CSS. *(See [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md))* |
 | **Language** | TypeScript (strict) | Compile-time safety, `noUncheckedIndexedAccess` |
 | **HTTP** | Axios | Interceptors for auth, idempotency, error envelopes |
@@ -151,47 +148,48 @@ A **module** is a self-contained directory under `src/modules/` that represents 
 ### 4.2 Module Internal Structure (Mandatory)
 
 ```
-src/modules/{module-name}/
-├── components/      # Vue components scoped to this module
-├── composables/     # Use Case Hooks (business logic orchestration)
-├── mappers/         # DTO → ViewModel transformers (Anti-Corruption Layer)
-├── pages/           # Route-level page components
-├── api/             # HTTP client for this module's backend endpoints
-├── stores/          # Pinia store(s) for module client state
-├── types/           # TypeScript interfaces, enums, view models
-├── routes.ts        # Lazy-loaded route definitions
-└── index.ts         # ModuleDefinition export (auto-registration)
+src/modules/{category}/{module-name}/
+├── domain/          # PURE: Interfaces, Value Objects, Logic
+├── application/     # ORCHESTRATION: Use Case Composables
+├── infrastructure/  # FIREWALL: Mappers, Adapters (ACL)
+└── ui/              # PRESENTATION: Components, Pages, Formatters
+    ├── components/
+    ├── pages/
+    └── utils/       # UI-specific formatters
 ```
 
 ### 4.3 Module Registration Pattern
 Each module exports a `ModuleDefinition` in its `index.ts`. The router aggregates these dynamically:
 
 ```typescript
-// modules/accounting/index.ts
-export const accountingModule: ModuleDefinition = {
-  id: 'accounting',
-  name: 'Accounting',
+// modules/business/finance/ledger/index.ts
+export const ledgerModule: ModuleDefinition = {
+  id: 'ledger',
+  name: 'General Ledger',
+  category: 'business',
   routes: () => import('./routes').then(m => m.default),
-  permissions: ['accounting.view', 'accounting.edit'],
+  permissions: ['ledger.view', 'ledger.edit'],
   menuItems: [
-    { label: 'Chart of Accounts', route: 'AccountingCoa', icon: 'book-open' },
-    { label: 'Journal Entries', route: 'AccountingJournals', icon: 'file-text' },
+    { label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' },
+    { label: 'Journal Entries', route: 'LedgerJournals', icon: 'file-text' },
   ],
 }
 ```
 
 ### 4.4 Module Rules
-1. **No cross-module imports**: `modules/accounting/` must NEVER import from `modules/payment-requests/`.
+1. **No cross-module imports**: `business/finance/ledger/` must NEVER import from `business/finance/ap/`.
 2. **Public API**: If Module A needs data from Module B, it goes through the Event Bus or a Core type.
-3. **One store per module**: Each module gets exactly one Pinia store. No global stores outside `core/`.
-4. **Route ownership**: Each module exports a `ModuleDefinition`. The router aggregates them automatically.
+3. **Query-First State**: Domain data stays in TanStack Query. Pinia is for UI-specific toggles.
+4. **Route ownership**: Each module exports a `ModuleDefinition`.
 
 ---
 
 ## 5. Anti-Corruption Layer (The Mapper Pattern)
 
 ### 5.1 Why Mappers?
-The backend will evolve independently. DTO field names will change, new fields will appear, and deprecated fields will be removed. Without a Mapper layer, every backend change cascades through dozens of Vue components.
+The backend will evolve independently. **DTOs** (Data Transfer Objects) are the raw shapes from the server. Mappers ensure:
+1. Backend field renames only propagate to the mapper file, not to 50+ components.
+2. DTOs are "sanitized" into high-integrity domain types.
 
 ### 5.2 The Contract
 
@@ -253,10 +251,10 @@ type EventMap = {
 ### 6.3 Anti-Pattern: Direct Imports
 ```typescript
 // ❌ BANNED: Module A importing Module B's internals
-import { useAccountingStore } from '@/modules/accounting/stores/accounting.store'
+import { useLedgerStore } from '@/modules/business/finance/ledger/stores/ledger.store'
 
 // ✅ CORRECT: Listen via Event Bus
-eventBus.on('journal-entry:posted', ({ id }) => {
+eventBus.on('ledger:entry-posted', ({ id }) => {
   // React to the event within our own module
   refreshRelatedData(id)
 })

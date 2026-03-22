@@ -8,16 +8,14 @@
 
 Each backend module has a 1:1 frontend counterpart:
 
-| Backend Module | Backend Schema | Frontend Module | Route Prefix | Description |
-|---|---|---|---|---|
-| `core` | `core` | `modules/identity/` | `/identity` | Tenants, Users, Login |
-| `accounting` | `accounting` | `modules/accounting/` | `/accounting` | Chart of Accounts, Journal Entries |
-| `approvals` | `approvals` | `modules/workflows/` | `/workflows` | Approval policies & workflow config |
-| `payment_requests` | `payment_requests` | `modules/payment-requests/` | `/payments` | Payment request lifecycle |
-| `bank` | `bank` | `modules/banking/` | `/banking` | Bank accounts, reconciliation |
-| `reporting` | — | `modules/reporting/` | `/reporting` | Dashboards, cashflow charts |
-| `webhooks` | `webhooks` | `modules/webhooks/` | `/settings/webhooks` | Webhook subscription management |
-| `system` | — | `modules/system/` | `/system` | System health, data import |
+| Module | Category | Sub-Path | Description |
+|---|---|---|---|
+| `core` | Platform | `platform/core` | Identity, Tenants, RBAC |
+| `workflows` | Platform | `platform/workflows` | State Machine, Engine |
+| `ledger` | Business | `business/finance/ledger` | Chart of Accounts, G/L |
+| `bank` | Business | `business/finance/bank` | Cash Management, Reconciliation |
+| `ap` | Business | `business/finance/ap` | Accounts Payable, Payments |
+| `reporting` | Platform | `platform/reporting` | Cross-domain analytics |
 
 ---
 
@@ -26,35 +24,22 @@ Each backend module has a 1:1 frontend counterpart:
 Every module **MUST** follow this exact directory layout:
 
 ```
-src/modules/{module-name}/
-├── components/              # Vue SFCs scoped to this module
-│   ├── {Entity}List.vue     # List/table views
-│   ├── {Entity}Form.vue     # Create/edit forms
-│   └── {Entity}Card.vue     # Detail/summary cards
+src/modules/{category}/{module}/
+├── domain/                  # [Pure] Business rules & Types
+│   ├── {entity}.types.ts
+│   └── {vo}.ts              # Value Objects (e.g. Money)
 │
-├── composables/             # Use Case Hooks (business logic)
-│   ├── use{Action}.ts       # One composable per business action
-│   └── use{Entity}List.ts   # List data fetching + pagination
+├── application/             # [Orchestration] Composables
+│   └── use{Entity}List.ts   # Side-effect logic
 │
-├── mappers/                 # Anti-Corruption Layer
-│   └── {entity}.mapper.ts   # DTO → ViewModel pure functions
+├── infrastructure/          # [Firewall] ACL
+│   ├── {module}.mapper.ts   # DTO Conversion
+│   └── {module}.adapter.ts  # API Communication
 │
-├── pages/                   # Route-level page components
-│   ├── {Entity}ListPage.vue
-│   └── {Entity}DetailPage.vue
-│
-├── api/                     # HTTP client for this module's endpoints
-│   └── {module}.api.ts      # Typed API calls (uses core http-client)
-│
-├── stores/                  # Pinia store(s)
-│   └── {module}.store.ts    # Module-scoped client state
-│
-├── types/                   # TypeScript definitions
-│   ├── api.types.ts         # Raw API DTO interfaces (from OpenAPI)
-│   └── view.types.ts        # ViewModel interfaces (what components use)
-│
-├── routes.ts                # Lazy-loaded route definitions
-└── index.ts                 # ModuleDefinition export
+└── ui/                      # [Presentation] SFCs
+    ├── components/
+    ├── pages/
+    └── utils/               # Display formatters
 ```
 
 ---
@@ -64,15 +49,18 @@ src/modules/{module-name}/
 ### Files
 | Type | Pattern | Example |
 |---|---|---|
-| API client | `{module}.api.ts` | `accounting.api.ts` |
-| Store | `{module}.store.ts` | `accounting.store.ts` |
-| Composable | `use{Action}.ts` | `useVoidEntry.ts` |
-| Mapper | `{entity}.mapper.ts` | `journal-entry.mapper.ts` |
-| Page | `{Entity}{View}Page.vue` | `JournalEntryListPage.vue` |
-| Component | `{Entity}{Role}.vue` | `JournalEntryForm.vue` |
-| API types | `api.types.ts` | — |
-| View types | `view.types.ts` | — |
+| Adapter | `{module}_adapter.ts` | `ledger_adapter.ts` |
+| Mapper | `{entity}.mapper.ts` | `account.mapper.ts` |
+| Composable | `use{Action}.ts` | `useLedgerAccounts.ts` |
+| Types | `{entity}.types.ts` | `account.types.ts` |
+| Formatter | `{entity}-formatter.ts`| `account-formatter.ts` |
 | Routes | `routes.ts` | — |
+| Entry | `index.ts` | — |
+
+### Data Types
+- **DTOs**: Raw as-received-from-server types (from `generated.types.ts`).
+- **Domain Types**: Clean, reactive frontend-owned interfaces.
+- **View Models**: UI-specific derivations (colors, labels, permissions).
 
 ### Composable Naming (Action Alignment)
 Composable names mirror the backend's action-oriented API endpoints:
@@ -94,15 +82,13 @@ Backend: GET  /accounts                   →  useAccountList()
 // ✅ ALLOWED: Module imports from core
 import { Money } from '@/core/domain/money'
 import { httpClient } from '@/core/api/http-client'
-import { eventBus } from '@/core/event-bus/event-bus'
 
 // ✅ ALLOWED: Module imports from itself
-import { useAccountingStore } from '../stores/accounting.store'
-import { toViewModel } from '../mappers/journal-entry.mapper'
+import { useLedgerAccounts } from '../application/composables/useLedgerAccounts'
+import { mapAccount } from '../infrastructure/ledger.mapper'
 
 // ❌ BANNED: Module imports from another module
-import { usePaymentStore } from '@/modules/payment-requests/stores/...'
-import AccountCard from '@/modules/accounting/components/AccountCard.vue'
+import { usePaymentStore } from '@/modules/business/finance/ap/payment-requests/...'
 ```
 
 ### 4.2 ESLint Rule Configuration
@@ -143,17 +129,17 @@ Module A (Payment Requests)          Module B (Accounting)
 Each module exports a `ModuleDefinition` that includes its routes, permissions, and menu items:
 
 ```typescript
-// modules/accounting/index.ts
-import type { ModuleDefinition } from '@/core/types/module'
+// modules/business/finance/ledger/index.ts
+import type { ModuleDefinition } from '@/core/types/module.types'
 
-export const accountingModule: ModuleDefinition = {
-  id: 'accounting',
-  name: 'Accounting',
+export const ledgerModule: ModuleDefinition = {
+  id: 'ledger',
+  name: 'General Ledger',
+  category: 'business',
   routes: () => import('./routes').then(m => m.default),
-  permissions: ['accounting.view', 'accounting.edit'],
+  permissions: ['ledger.view', 'ledger.edit'],
   menuItems: [
-    { label: 'Chart of Accounts', route: 'AccountingCoa', icon: 'book-open' },
-    { label: 'Journal Entries', route: 'AccountingJournals', icon: 'file-text' },
+    { label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' },
   ],
 }
 ```
@@ -185,18 +171,13 @@ for (const mod of modules) {
 
 ---
 
-## 6. Adding a New Module Checklist
-
 When creating a new module (e.g., `procurement`):
 
-- [ ] Create `src/modules/procurement/` with the standard directory structure
-- [ ] Create `index.ts` — `ModuleDefinition` export with id, permissions, menuItems
-- [ ] Create `api/procurement.api.ts` — typed API client for backend endpoints
-- [ ] Create `types/api.types.ts` — interfaces matching backend DTOs
-- [ ] Create `types/view.types.ts` — ViewModel interfaces for components
-- [ ] Create `mappers/` — at least one mapper with unit tests
-- [ ] Create `stores/procurement.store.ts` — Pinia store (client state only)
-- [ ] Create `routes.ts` — lazy-loaded route definitions
-- [ ] Register module in `modules/index.ts` module array
-- [ ] Add feature gate check if the module is toggleable
-- [ ] Update `docs/OVERVIEW.md` module table
+- [ ] Create directory under `src/modules/business/` or `src/modules/platform/`
+- [ ] Implement `domain/{entity}.types.ts`
+- [ ] Implement `infrastructure/{module}_adapter.ts` (Fetches **DTOs**)
+- [ ] Implement `infrastructure/{module}.mapper.ts` (**DTO → Domain** mapping)
+- [ ] Implement `application/composables/use{Entity}.ts` (Orchestrated by **TanStack Query**)
+- [ ] Implement `ui/` (Pages, Components, Formatters)
+- [ ] Create `index.ts` — `ModuleDefinition` export
+- [ ] Register module in `src/modules/registry.ts`
