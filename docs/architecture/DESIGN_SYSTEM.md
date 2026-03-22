@@ -133,11 +133,18 @@ Abren ERP operates on a 3-tier density scale. The default is **Compact** to serv
 
 ---
 
-## 6. Elevation (Shadows & Z-Index)
+## 6. Elevation (Shadows & Layered Surfaces)
 
-Elevation is used to create visual hierarchy, particularly for floating elements (modals, dropdowns) over data grids. Shadows have a dual-layer softness to match the Radix Slate tone.
+Elevation is used to create visual hierarchy. In an ERP, excessive drop shadows appear cluttered. 
 
-### 6.1 Drop Shadows
+### 6.1 Layered Surfaces Strategy
+Instead of relying solely on heavy shadows, we use **layered surfaces**—especially critical in Dark Mode.
+*   **Base (Level 0)**: The application background (`--color-neutral-50` / `#0d1117` dark).
+*   **Elevated (Level 1)**: Cards, Sidebars, and Drawers (`#ffffff` / `#161d28` dark).
+*   **Floating (Level 2)**: Modals and Dropdowns (`#ffffff` / `#1e293b` dark + shadow).
+
+### 6.2 Drop Shadows
+Shadows have a dual-layer softness to match the Radix Slate tone and are applied only to elevated/floating layers.
 * `--shadow-sm`: Soft border definition for basic interactive elements (buttons).
 * `--shadow-md`: Hover states for cards.
 * `--shadow-lg`: Dropdown menus, tooltips, and popovers.
@@ -157,6 +164,19 @@ A global Command Palette is required. It provides power users instant keyboard a
 
 ### 7.2 Context Preservation (Drawers)
 For editing records in a dense grid context, prefer **slide-out Drawers** over new page navigations. This preserves the user's scroll position and applied filters in the background grid.
+
+### 7.3 Destructive Confirmations
+Any action that deletes a record or irrevocably alters a ledger state must trigger a blocking **AlertDialog** (using Radix Vue primitives). The dialog must force the user to explicitly click an Indigo or Red confirmation button. Passive "Are you sure?" tooltips are insufficient for destructive financial actions.
+
+---
+
+## 8. Responsive Strategy (Mobile Graceful Degradation)
+
+Abren ERP is a desktop-first operational console. Attempting full feature parity on mobile devices breaks high-density data requirements. We enforce strict graceful degradation:
+
+*   **Desktop (≥ 1024px)**: Full feature parity. Complex grids, drawer-based editing, multi-column reporting.
+*   **Tablet (768px – 1023px)**: Reduced parity. The left navigation rail collapses aggressively, and secondary grid columns are hidden by default. Let users rotate to landscape for wider grids.
+*   **Mobile (< 768px)**: We **do not** render data grids on phones. Mobile views are restricted strictly to read-only KPI dashboards, simple list feeds, and basic approval workflows (e.g., "Approve PO"). Always prioritize speed over complexity on mobile.
 
 ---
 
