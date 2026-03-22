@@ -4,12 +4,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: 'coa',
     name: 'LedgerCoa',
-    component: () => import('./pages/ChartOfAccountsPage.vue'),
+    component: () => import('./ui/pages/ChartOfAccountsPage.vue'),
   },
   {
     path: 'journals',
     name: 'LedgerJournals',
-    component: () => import('./pages/JournalEntriesPage.vue'),
+    component: () => import('./ui/pages/JournalEntriesPage.vue'),
   },
 ]
 

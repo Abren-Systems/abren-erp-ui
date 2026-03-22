@@ -1,13 +1,13 @@
-import type { BusinessDomain } from '@/core/types/module.types'
+import type { ModuleDefinition } from '@/core/types/module.types'
 
-export const ledgerModule: BusinessDomain = {
+export const ledgerModule: ModuleDefinition = {
   id: 'ledger',
-  name: 'Ledger',
+  name: 'General Ledger',
   category: 'business',
   routes: () => import('./routes').then(m => m.default),
   permissions: ['ledger.view', 'ledger.edit'],
   menuItems: [
     { label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' },
-    { label: 'Journal Entries', route: 'LedgerJournals', icon: 'file-text' },
+    { label: 'Journal Entries', route: 'LedgerEntries', icon: 'file-text' },
   ],
 }

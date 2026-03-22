@@ -11,7 +11,7 @@ import {
   type VisibilityState,
 } from '@tanstack/vue-table'
 import { computed } from 'vue'
-import DataGridToolbar from './DataGridToolbar.vue'
+import DataGridToolbar from '../plugins/DataGridToolbar.vue'
 import DataGridSkeleton from './DataGridSkeleton.vue'
 import DataGridEmpty from './DataGridEmpty.vue'
 
