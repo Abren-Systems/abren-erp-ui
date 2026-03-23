@@ -1,5 +1,7 @@
 import type { components } from '@/core/api/generated.types'
 import type { Account } from '../domain/account.types'
+import type { AccountId } from '@/core/types/brand.types'
+import { toId } from '@/core/types/brand.types'
 import { Currency } from '@/core/domain/currency'
 import { Money } from '@/core/domain/money'
 
@@ -14,7 +16,7 @@ export function mapAccount(dto: AccountRead): Account {
   const currency = Currency.ETB
 
   return {
-    id: dto.id,
+    id: toId<AccountId>(dto.id),
     code: String(dto.code), // Convert numeric code to string for UI
     name: dto.name,
     type: dto.account_type.toLowerCase(),

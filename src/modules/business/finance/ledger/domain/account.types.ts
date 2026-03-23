@@ -1,5 +1,6 @@
 import { Currency } from '@/core/domain/currency'
 import { Money } from '@/core/domain/money'
+import type { AccountId } from '@/core/types/brand.types'
 
 /**
  * Account Domain Type
@@ -8,7 +9,7 @@ import { Money } from '@/core/domain/money'
  * Vue-native and fully reactive.
  */
 export interface Account {
-  id: string
+  id: AccountId
   code: string // We'll keep it as string in domain for easier display/search
   name: string
   type: string
