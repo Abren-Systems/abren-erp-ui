@@ -69,15 +69,15 @@ The frontend mirrors the backend's bounded contexts as self-contained modules:
           └──────────────────┴────────────────┘
 ```
 
-| Module      | Namespace                 | Category | Description                         |
-| ----------- | ------------------------- | -------- | ----------------------------------- |
-| `core`      | `platform/core`           | Engine   | Tenants, Identity, RBAC             |
-| `workflows` | `platform/workflows`      | Engine   | Universal State Machine             |
-| `ledger`    | `business/finance/ledger` | App      | G/L Account Management              |
-| `bank`      | `business/finance/bank`   | App      | Cash & Bank Integration             |
-| `ap`        | `business/finance/ap`     | App      | Accounts Payable (Payment Requests) |
-| `reporting` | `platform/reporting`      | Engine   | Cross-domain Dashboards             |
-| `webhooks`  | `platform/webhooks`       | Engine   | System Integration Layer            |
+| Module      | Namespace                 | Category | Description                         | Status |
+| ----------- | ------------------------- | -------- | ----------------------------------- | ------ |
+| `core`      | `platform/core`           | Engine   | Tenants, Identity, RBAC             | ✅ Implemented |
+| `workflows` | `platform/workflows`      | Engine   | Universal State Machine             | ✅ Implemented |
+| `ledger`    | `business/finance/ledger` | App      | G/L Account Management              | ✅ Implemented |
+| `bank`      | `business/finance/bank`   | App      | Cash & Bank Integration             | 📋 Planned |
+| `ap`        | `business/finance/ap`     | App      | Accounts Payable (Payment Requests) | ✅ Implemented |
+| `reporting` | `platform/reporting`      | Engine   | Cross-domain Dashboards             | 📋 Planned |
+| `webhooks`  | `platform/webhooks`       | Engine   | System Integration Layer            | 📋 Planned |
 
 ---
 

@@ -25,18 +25,14 @@ Every module **MUST** follow this exact directory layout:
 
 ```
 src/modules/{category}/{module}/
-├── domain/                  # [Pure] Business rules & Types
-│   ├── {entity}.types.ts
-│   └── {vo}.ts              # Value Objects (e.g. Money)
-│
-├── application/             # [Orchestration] Composables
-│   └── use{Entity}List.ts   # Side-effect logic
-│
 ├── infrastructure/          # [Firewall] ACL
 │   ├── {module}.mapper.ts   # DTO Conversion
 │   └── {module}.adapter.ts  # API Communication
 │
-└── ui/                      # [Presentation] SFCs & Display Logic
+└── domain/                  # [Pure] Business rules & Types
+    ├── {entity}.types.ts
+    └── {vo}.ts              # Value Objects (e.g. Money)
+
     ├── components/          # Tier 3 (Stateless)
     ├── pages/               # Tier 4 (Orchestrators)
     ├── grids/               # Grid Configurations

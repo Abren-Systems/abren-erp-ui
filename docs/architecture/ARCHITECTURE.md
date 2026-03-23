@@ -155,9 +155,9 @@ A **module** is a self-contained directory under `src/modules/` that represents 
 
 ```
 src/modules/{category}/{module-name}/
+├── infrastructure/  # FIREWALL: Mappers, Adapters (ACL)
 ├── domain/          # PURE: Interfaces, Value Objects, Logic
 ├── application/     # ORCHESTRATION: Use Case Composables
-├── infrastructure/  # FIREWALL: Mappers, Adapters (ACL)
 └── ui/              # PRESENTATION: Components, Pages, Formatters
     ├── components/
     ├── pages/
@@ -206,10 +206,10 @@ The backend will evolve independently. **DTOs** (Data Transfer Objects) are the 
 ### 5.2 The Contract
 
 ```typescript
-// modules/payment-requests/mappers/payment-request.mapper.ts
+// modules/payment-requests/infrastructure/payment-request.mapper.ts
 
-import type { PaymentRequestDTO } from '../types/api.types'
-import type { PaymentRequestViewModel } from '../types/view.types'
+import type { PaymentRequestDTO } from '../infrastructure/api.types'
+import type { PaymentRequestViewModel } from '../ui/types/view.types'
 
 export function toViewModel(dto: PaymentRequestDTO): PaymentRequestViewModel {
   return {

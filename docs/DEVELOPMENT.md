@@ -108,7 +108,7 @@ vp dev
 | UI Utils       | kebab-case | `account-formatter.ts`   | `ui/utils/`       |
 | Composables    | camelCase  | `useLedgerAccounts.ts`   | `application/`    |
 | Adapters       | snake_case | `ledger_adapter.ts`      | `infrastructure/` |
-| Mappers        | dot-suffix | `ledger.mapper.ts`       | `domain/mappers/` |
+| Mappers        | dot-suffix | `ledger.mapper.ts`       | `infrastructure/` |
 | Types          | dot-suffix | `account.types.ts`       | `domain/models/`  |
 
 ### 4.4 Import Order
@@ -127,7 +127,7 @@ import { accountColumns } from '../grids/account.grid'
 import { formatAccountCode } from '../utils/account-formatter'
 
 // 4. Domain & Infrastructure (Implementation)
-import { toEntity } from '../../domain/mappers/ledger.mapper'
+import { toEntity } from '../../infrastructure/ledger.mapper'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 ```
 
@@ -223,14 +223,10 @@ Every module MUST adhere to the **4-Layer Architecture** to prevent logic leakag
 
 ```text
 src/modules/{category}/{module}/
-├── domain/                # PURE BUSINESS LOGIC
-│   ├── models/            # Plain Types & Value Objects
-│   └── mappers/           # DTO → Entity transformation
-├── application/           # ORCHESTRATION
-│   └── composables/       # TanStack Query logic, Workflows
-├── infrastructure/        # EXTERNAL WORLD
+├── infrastructure/        # EXTERNAL WORLD (ACL)
 │   ├── api.types.ts       # Generated DTO re-exports
-│   └── {name}_adapter.ts  # HTTP calls & path resolution
+│   ├── {name}_adapter.ts  # HTTP calls & path resolution
+│   └── {name}.mapper.ts   # DTO → Entity transformation
 └── ui/                    # PRESENTATION
     ├── components/        # Stateless molecules
     ├── pages/             # Stateful orchestrators
@@ -244,7 +240,7 @@ When starting a new module or refactoring an old one, use the **Finance / Ledger
 
 - **Grid Config**: [account.grid.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/ui/grids/account.grid.ts)
 - **Application Logic**: [useLedgerAccounts.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/application/composables/useLedgerAccounts.ts)
-- **Domain Mapping**: [ledger.mapper.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/domain/mappers/ledger.mapper.ts)
+- **Domain Mapping**: [ledger.mapper.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/infrastructure/ledger.mapper.ts)
 
 ---
 
