@@ -10,7 +10,11 @@ import type { BusinessDomain, PlatformEngine } from '@/core/types/module.types'
  *
  * Separates "Business Domains" (User Apps) from "Platform Engines" (Internals).
  */
-export const businessModules: BusinessDomain[] = [ledgerModule, bankModule, paymentRequestsModule]
+export const businessModules: BusinessDomain[] = [
+  ledgerModule,
+  bankModule,
+  paymentRequestsModule,
+] as BusinessDomain[]
 
 export const platformModules: PlatformEngine[] = [coreModule, workflowsModule]
 

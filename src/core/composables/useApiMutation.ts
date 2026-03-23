@@ -8,7 +8,7 @@ import { useMutation, type UseMutationOptions } from '@tanstack/vue-query'
  */
 export function useApiMutation<TData, TError = Error, TVariables = void, TContext = unknown>(
   mutationFn: (variables: TVariables) => Promise<TData>,
-  options?: UseMutationOptions<TData, TError, TVariables, TContext>,
+  options?: Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationFn'>,
 ) {
   return useMutation({
     mutationFn,

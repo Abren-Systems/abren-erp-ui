@@ -779,6 +779,7 @@ export default defineConfig({
       defineProps: 'readonly',
       defineEmits: 'readonly',
       defineExpose: 'readonly',
+      defineOptions: 'readonly',
       defineSlots: 'readonly',
       defineModel: 'readonly',
       withDefaults: 'readonly',

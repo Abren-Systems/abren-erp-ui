@@ -20,7 +20,7 @@ export function useFeatureGate(feature: string) {
 
   function guardRoute(): boolean {
     if (!isEnabled.value) {
-      router.push({ name: 'feature-disabled', params: { feature } })
+      void router.push({ name: 'feature-disabled', params: { feature } })
       return false
     }
     return true
