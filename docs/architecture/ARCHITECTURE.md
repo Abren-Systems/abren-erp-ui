@@ -28,13 +28,11 @@ The frontend is **domain-aware and backend-aligned**, not an exact mirror. The b
 
 ### 1.3 Evolution Path
 
-The project is designed for **zero-rewrite scaling**. Today's module boundaries are tomorrow's micro-frontend packages. The architecture supports:
+The project is designed for **zero-rewrite scaling**. We follow a 3-phased modernization journey:
 
-```
-Phase 1 (Now):     Vue 3 SPA with Module Directories
-Phase 2 (Growth):  Nx/Turborepo Mono-repo with per-module packages
-Phase 3 (Scale):   Module Federation micro-frontends
-```
+*   **Phase 1 (MVP Solidification)**: Establish strict statelessness, **Hybrid RBAC + ABAC** security, and domain-aligned modules.
+*   **Phase 2 (Strict Decomposition)**: Align with backend API providers and decoupled event communication.
+*   **Phase 3 (Enterprise Scale)**: Deploy advanced caching, load balancing, and production observability.
 
 ---
 
@@ -335,7 +333,16 @@ All mutating requests (`POST`, `PUT`, `PATCH`) automatically attach an `Idempote
 
 ---
 
-## 9. Anti-Pattern Catalog (Banned List)
+## 9. Hybrid Authorization Model (UI Perspective)
+
+The UI works in concert with the backend's **RBAC + ABAC** security model:
+
+1.  **RBAC (Feature Visibility)**: The UI uses the `useAuthStore().hasPermission('module:action')` helper to show/hide navigation items, buttons, and views.
+2.  **ABAC (Data Sovereignty)**: The UI is strictly stateless and tenant-scoped. It relies on the backend to filter resources based on attribute ownership. The UI's responsibility is to provide the **Tenant Context** via headers and ensure that "Edit" modes are only enabled when the user's attributes match the record's metadata.
+
+---
+
+## 10. Anti-Pattern Catalog (Banned List)
 
 | Anti-Pattern                         | Why It Fails                            | Alternative                         |
 | ------------------------------------ | --------------------------------------- | ----------------------------------- |
