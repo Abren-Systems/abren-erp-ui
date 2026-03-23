@@ -23,24 +23,16 @@ description: Comprehensive patterns, conventions, and code examples for developi
 ```
 src/
 ├── app/              # Application shell (router, layouts, main.ts)
-├── core/           # Shared Kernel (cross-cutting concerns)
-│   ├── api/          # HTTP client, error handling, generated types
-│   ├── auth/         # Auth store, route guards
-│   ├── components/   # Design system primitives (AppButton, AppModal, etc.)
-│   ├── composables/  # Cross-cutting hooks (useFeatureGate, usePagination)
-│   ├── domain/       # Value objects (Money, Currency) and branded types
-│   ├── event-bus/    # Typed cross-module event bus
-│   └── utils/        # Pure utility functions (formatDate, formatMoney)
-├── modules/          # Bounded contexts (one per backend module)
-│   ├── identity/
-│   ├── accounting/
-│   ├── workflows/
-│   ├── payment-requests/
-│   ├── banking/
-│   ├── reporting/
-│   ├── webhooks/
-│   └── system/
-└── styles/           # Design tokens (CSS custom properties)
+├── core/             # Shared Kernel (cross-cutting concerns)
+│   ├── api/          # HTTP client, interceptors
+│   ├── ui/           # Design System (Reka UI / shadcn-vue)
+│   ├── auth/         # Auth store
+│   ├── domain/       # Shared value objects (Money, Currency)
+│   └── composables/  # Generic hooks (useDataGrid, useAsync)
+├── modules/          # Bounded Contexts (Monolith)
+│   ├── business/     # Feature-Rich Modules (Ledger, Procurement)
+│   └── platform/     # Cross-Cutting Services (Identity, Workflows)
+└── assets/           # Global styles and Tailwind v4 theme
 ```
 
 Each module has this internal structure:
@@ -65,48 +57,46 @@ modules/{category}/{module}/
 
 ---
 
-## Pattern 1: Vue Component (SFC)
+## Pattern 1: High-Integrity SFC (Page Orchestrator)
+
+Pages are the stateful entry points of a module. They compose shared **Engines** (DataGrid) with module-specific **Application Logic** (Composables).
 
 ```vue
+<!-- modules/business/ledger/ui/pages/LedgerAccountsPage.vue -->
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { Button } from "@/core/ui/button";
+import { useRouter } from "vue-router";
 import { DataGrid, useDataGrid } from "@/core/ui/data-grid";
-import { usePaymentRequests } from "../application/composables/usePaymentRequests";
-import { accountColumns } from "../ui/grids/account.grid";
+import { Button } from "@/core/ui/button";
+import { useLedgerAccounts } from "../../application/composables/useLedgerAccounts";
+import { accountColumns } from "../grids/account.grid";
 
-// ── Props ────────────────────────────────────────────────
-interface Props {
-  mode?: 'compact' | 'full';
-}
-const props = withDefaults(defineProps<Props>(), {
-  mode: 'full',
-});
+const router = useRouter();
 
-// ── Emits ────────────────────────────────────────────────
-const emit = defineEmits<{
-  select: [id: string];
-}>();
+// 1. Application Layer (Domain state)
+const { accounts, isLoading, error } = useLedgerAccounts();
 
-// ── Application Layer (Orchestration) ────────────────────
-const { requests, isLoading } = usePaymentRequests();
+// 2. UI Layer (Local ephemeral grid state)
 const { gridState } = useDataGrid();
 
-// ── Methods ──────────────────────────────────────────────
-function handleRowClick(row: any) {
-  emit("select", row.id);
+function handleRowClick(account: any) {
+  router.push({ name: 'ledger.account-detail', params: { id: account.id } });
 }
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold tracking-tight">Ledger Accounts</h2>
-      <Button variant="primary" size="sm">Add Account</Button>
-    </div>
+  <div class="p-6 space-y-6">
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Chart of Accounts</h1>
+        <p class="text-sm text-muted-foreground">Manage your fiscal account structure.</p>
+      </div>
+      <Button @click="router.push({ name: 'ledger.account-create' })">
+        New Account
+      </Button>
+    </header>
 
     <DataGrid
-      :data="requests"
+      :data="accounts"
       :columns="accountColumns"
       :loading="isLoading"
       :state="gridState"
@@ -114,41 +104,36 @@ function handleRowClick(row: any) {
     />
   </div>
 </template>
-
-<style scoped>
-/* Only module-specific layout tweaks. Never override Design System tokens. */
-</style>
 ```
+
+> **Thin Pages, Logic-Rich Composables.** The SFC should focus on layout and event routing. All business orchestration belongs in the `application/` layer.
 
 ---
 
-### 2.1 UI State Store Template (The Ephemeral Local)
+## Pattern 2: Ephemeral UI State (Pinia)
 
-**ONLY use Pinia for UI-specific state (sidebar, filters, local search, view toggles). Domain data stays in TanStack Query.**
+Pinia is strictly for **ephemeral UI state**. **NEVER** duplicate domain data (Server State) in Pinia stores.
 
 ```typescript
-// modules/business/finance/ledger/ui/store/ledger-ui.store.ts
+// modules/business/ledger/ui/store/ledger-ui.store.ts
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useLedgerUIStore = defineStore("ledger-ui", () => {
-  // ── Ephemeral UI State ───────────────────────────────
-  const isFilterVisible = ref(false);
-  const activeView = ref<'grid' | 'cards'>('grid');
-  const selectedAccountId = ref<string | null>(null);
+  const isFilterPanelVisible = ref(false);
+  const density = ref<'comfortable' | 'compact'>('compact');
 
-  // ── Actions ──────────────────────────────────────────
   function toggleFilters() {
-    isFilterVisible.value = !isFilterVisible.value;
+    isFilterPanelVisible.value = !isFilterPanelVisible.value;
   }
 
   function $reset() {
-    isFilterVisible.value = false;
-    activeView.value = 'grid';
-    selectedAccountId.value = null;
+    isFilterPanelVisible.value = false;
+    const activeView = ref('grid');
+    const selectedAccountId = ref<string | null>(null);
   }
 
-  return { isFilterVisible, activeView, selectedAccountId, toggleFilters, $reset };
+  return { isFilterPanelVisible, density, toggleFilters, $reset };
 });
 ```
 
@@ -165,32 +150,37 @@ export const useStore = defineStore('name', {
 
 ---
 
-## Pattern 3: Application Composable (Application Layer)
+## Pattern 3: Application Composable (Use Case)
 
-Composables orchestrate: **Infrastructure Adapter** → **Domain Mapper** → **TanStack Query**.
+Composables orchestrate data flow between the **Infrastructure Layer** (Adapters) and the **UI Layer**.
 
 ```typescript
 // modules/business/finance/ledger/application/composables/useLedgerAccounts.ts
 import { useQuery } from "@tanstack/vue-query";
 import { ledgerAdapter } from "../../infrastructure/ledger_adapter";
-import { mapAccount } from "../../domain/mappers/ledger.mapper";
+import { mapToAccount } from "../../domain/mappers/ledger.mapper";
 
 export function useLedgerAccounts() {
   const {
     data: accounts,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["ledger-accounts"],
     queryFn: async () => {
-      const dtos = await ledgerAdapter.listAccounts();
-      return dtos.map(mapAccount);
+      const dtos = await ledgerAdapter.list();
+      return dtos.map(mapToAccount);
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  return { accounts, isLoading, error };
+  return { accounts, isLoading, error, refetch };
 }
 ```
+
+> [!TIP]
+> **Use raw `useQuery`** for local module orchestration. The core `useApiQuery` is reserved for infrastructure-level caching across bounded contexts.
 
 ### Action-Oriented Composable (Mirrors Backend Action Endpoint)
 
@@ -223,49 +213,40 @@ export function useSubmitRequest() {
 
 ## Pattern 4: Infrastructure Adapter
 
-Adapters handle HTTP calls, path resolution, and type-safety at the boundary.
+Adapters handle HTTP state and path resolution. They are the **only** layer that knows about the Core `httpClient`.
 
 ```typescript
 // modules/business/finance/ledger/infrastructure/ledger_adapter.ts
 import { httpClient } from "@/core/api/http-client";
-import type { AccountDTO, CreateAccountDTO } from "./api.types";
+import type { LedgerAccountDTO } from "./api.types";
 
 const BASE = "/finance/ledger/accounts";
 
 export const ledgerAdapter = {
-  listAccounts: (): Promise<AccountDTO[]> => 
-    httpClient.get(BASE),
-
-  getAccount: (id: string): Promise<AccountDTO> => 
-    httpClient.get(`${BASE}/${id}`),
-
-  createAccount: (dto: CreateAccountDTO): Promise<AccountDTO> => 
-    httpClient.post(BASE, dto),
-
-  postJournal: (id: string): Promise<AccountDTO> => 
-    httpClient.post(`${BASE}/${id}/post`),
+  list: (): Promise<LedgerAccountDTO[]> => httpClient.get(BASE),
+  get: (id: string): Promise<LedgerAccountDTO> => httpClient.get(`${BASE}/${id}`),
 };
 ```
 
 ---
 
-## Pattern 5: Domain Mapper (Anti-Corruption Layer)
+## Pattern 5: Domain Mapper
 
-Mappers are pure functions: **DTO** (Infrastructure) → **Entity** (Domain).
+Mappers transform outside DTOs into inside **Domain Entities**.
 
 ```typescript
 // modules/business/finance/ledger/domain/mappers/ledger.mapper.ts
 import { Money } from "@/core/domain/money";
-import type { AccountDTO } from "../../infrastructure/api.types";
+import type { LedgerAccountDTO } from "../../infrastructure/api.types";
 import type { LedgerAccount } from "../models/account.types";
 
-export function mapAccount(dto: AccountDTO): LedgerAccount {
+export function mapToAccount(dto: LedgerAccountDTO): LedgerAccount {
   return {
     id: dto.id,
-    code: dto.code,
+    code: dto.account_code,
     name: dto.name,
     type: dto.type,
-    balance: Money.from(dto.balance, dto.currency),
+    balance: Money.from(dto.current_balance, dto.currency),
     isSystem: dto.is_system_account,
     metadata: {
       lastPosted: dto.last_posted_at,
@@ -277,9 +258,6 @@ export function mapAccount(dto: AccountDTO): LedgerAccount {
 
 ---
 
-## Pattern 6: Types (API DTOs + View Models)
-
-```typescript
 ## Pattern 6: Types & Models (4-Layer Isolation)
 
 ### 6.1 Infrastructure Layer (DTOs)
@@ -515,39 +493,17 @@ export const eventBus = new TypedEventBus();
 ## Pattern 11: Unit Test (Mapper)
 
 ```typescript
-// modules/payment-requests/mappers/__tests__/payment-request.mapper.test.ts
-import { describe, it, expect } from "vitest";
-import { toViewModel } from "../payment-request.mapper";
-import type { PaymentRequestDTO } from "../../types/api.types";
-
-const baseDTO: PaymentRequestDTO = {
-  id: "550e8400-e29b-41d4-a716-446655440000",
-  beneficiary_name: "Acme Corp",
-  amount: 15000.5,
-  currency: "ETB",
-  status: "DRAFT",
-  description: "Office supplies",
-  bank_account_id: null,
-  submitted_at: null,
-  paid_at: null,
-  current_approval_step: 0,
-  assigned_approver_id: null,
-};
-
-## Pattern 11: Unit Test (Mapper)
-
-```typescript
 // modules/business/finance/ledger/domain/mappers/__tests__/ledger.mapper.test.ts
 import { describe, it, expect } from "vitest";
-import { mapAccount } from "../ledger.mapper";
-import type { AccountDTO } from "../../../infrastructure/api.types";
+import { mapToAccount } from "../ledger.mapper";
+import type { LedgerAccountDTO } from "../../../infrastructure/api.types";
 
-const baseDTO: AccountDTO = {
+const baseDTO: LedgerAccountDTO = {
   id: "550e8400-e29b-41d4-a716-446655440000",
-  code: "1000",
+  account_code: "1000",
   name: "Main Cash",
   type: "ASSET",
-  balance: 15000.5,
+  current_balance: 15000.5,
   currency: "ETB",
   is_system_account: false,
   version: 1,
@@ -556,19 +512,18 @@ const baseDTO: AccountDTO = {
 
 describe("Ledger Mapper", () => {
   it("maps DTO to LedgerAccount entity", () => {
-    const entity = mapAccount(baseDTO);
+    const entity = mapToAccount(baseDTO);
     expect(entity.name).toBe("Main Cash");
     expect(entity.balance.amount).toBe(15000.5);
     expect(entity.balance.currency).toBe("ETB");
   });
 
   it("handles metadata nesting", () => {
-    const entity = mapAccount(baseDTO);
+    const entity = mapToAccount(baseDTO);
     expect(entity.metadata.version).toBe(1);
     expect(entity.metadata.lastPosted).toBe("2026-03-20T15:30:00Z");
   });
 });
-```
 ```
 
 ---
@@ -637,6 +592,18 @@ This skill document is optimized for high-integrity autonomous development.
 ### 1. Toolchain Alignment
 - **Verification**: Always run `vp check` and `vp test` after generating code.
 - **Rules**: Refer to the [Vite+ Master Skill](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/node_modules/vite-plus/skills/vite-plus/SKILL.md) for CLI standards.
+## Pattern 12: Unified Toolchain (Vite+ / pnpm)
+
+We use **Vite+** (`vp`) as our single toolchain entry point, backed by **pnpm** for high-efficiency link-based dependency management.
+
+- **`vp install`**: Replaces `npm install`. Standardizes lockfile generation (`pnpm-lock.yaml`).
+- **`vp check`**: Unified command for linting (**Oxlint**), formatting (**Oxfmt**), and type-checking (**vue-tsc**).
+- **`vp dev / vp test / vp build`**: All standard Vite/Vitest tasks are performed through the `vp` CLI.
+
+> [!CAUTION]
+> **NEVER** use `npm` or `yarn`. These are legacy package managers and will cause lockfile fragmentation.
+
+---
 
 ### 2. High-Integrity Diagnostic (Devtools)
 - **Instrumentation**: Every major state transition MUST emit a domain event via `@tanstack/devtools-event-client`.

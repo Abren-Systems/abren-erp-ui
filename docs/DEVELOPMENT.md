@@ -8,9 +8,9 @@
 
 | **Environment** | **Vite+ (`vp`)** | Unified Build & Toolchain CLI |
 | **Node.js** | 20 LTS+ | JavaScript runtime |
-| **npm**     | 10+     | Package manager    |
-| **Git**     | 2.40+   | Version control    |
-| **VS Code** | Latest  | Recommended IDE    |
+| **pnpm**    | 10+     | Recommended package manager |
+| **Git**     | 2.40+   | Version control |
+| **VS Code** | Latest  | Recommended IDE |
 
 ### Recommended VS Code Extensions
 
