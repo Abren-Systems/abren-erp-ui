@@ -84,15 +84,15 @@ Backend: GET  /accounts                   →  useAccountList()
 
 ```typescript
 // ✅ ALLOWED: Module imports from core
-import { Money } from "@/core/domain/money";
-import { httpClient } from "@/core/api/http-client";
+import { Money } from '@/core/domain/money'
+import { httpClient } from '@/core/api/http-client'
 
 // ✅ ALLOWED: Module imports from itself
-import { useLedgerAccounts } from "../application/composables/useLedgerAccounts";
-import { mapAccount } from "../infrastructure/ledger.mapper";
+import { useLedgerAccounts } from '../application/composables/useLedgerAccounts'
+import { mapAccount } from '../infrastructure/ledger.mapper'
 
 // ❌ BANNED: Module imports from another module
-import { usePaymentStore } from "@/modules/business/finance/ap/payment-requests/...";
+import { usePaymentStore } from '@/modules/business/finance/ap/payment-requests/...'
 ```
 
 ### 4.2 ESLint Rule Configuration
@@ -135,40 +135,40 @@ Each module exports a `ModuleDefinition` that includes its routes, permissions, 
 
 ```typescript
 // modules/business/finance/ledger/index.ts
-import type { ModuleDefinition } from "@/core/types/module.types";
+import type { ModuleDefinition } from '@/core/types/module.types'
 
 export const ledgerModule: ModuleDefinition = {
-  id: "ledger",
-  name: "General Ledger",
-  category: "business",
-  routes: () => import("./routes").then((m) => m.default),
-  permissions: ["ledger.view", "ledger.edit"],
-  menuItems: [{ label: "Chart of Accounts", route: "LedgerCoa", icon: "book-open" }],
-};
+  id: 'ledger',
+  name: 'General Ledger',
+  category: 'business',
+  routes: () => import('./routes').then((m) => m.default),
+  permissions: ['ledger.view', 'ledger.edit'],
+  menuItems: [{ label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' }],
+}
 ```
 
 The central `app/router/index.ts` aggregates all module definitions dynamically:
 
 ```typescript
 // app/router/index.ts
-import { modules } from "@/modules";
+import { modules } from '@/modules'
 
 const router = createRouter({
   routes: [
     {
-      path: "/app",
+      path: '/app',
       component: AuthenticatedLayout,
       beforeEnter: [requiresAuth],
       children: [], // Populated dynamically from module definitions
     },
   ],
-});
+})
 
 // Register module routes dynamically
 for (const mod of modules) {
   mod.routes().then((routes) => {
-    routes.forEach((route) => router.addRoute("app", route));
-  });
+    routes.forEach((route) => router.addRoute('app', route))
+  })
 }
 ```
 

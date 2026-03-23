@@ -1,41 +1,41 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/core/auth/auth.store";
-import { Button } from "@/core/ui/button";
-import { Input } from "@/core/ui/input";
-import { Label } from "@/core/ui/label";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/core/auth/auth.store'
+import { Button } from '@/core/ui/button'
+import { Input } from '@/core/ui/input'
+import { Label } from '@/core/ui/label'
 
-const router = useRouter();
-const authStore = useAuthStore();
+const router = useRouter()
+const authStore = useAuthStore()
 
-const email = ref("");
-const password = ref("");
-const isLoading = ref(false);
+const email = ref('')
+const password = ref('')
+const isLoading = ref(false)
 
 async function handleLogin() {
-  isLoading.value = true;
+  isLoading.value = true
   try {
     // Mock authentication successful with dev bypass
     authStore.setAuth(
-      "dev-token",
+      'dev-token',
       {
-        id: "00000000-0000-0000-0000-000000000001",
-        email: email.value || "test@example.com",
-        full_name: "Test User",
-        role: "admin",
+        id: '00000000-0000-0000-0000-000000000001',
+        email: email.value || 'test@example.com',
+        full_name: 'Test User',
+        role: 'admin',
       },
       {
-        id: "754b3739-4526-4441-979f-fc0aab15b8d9",
-        name: "Default Tenant",
+        id: '754b3739-4526-4441-979f-fc0aab15b8d9',
+        name: 'Default Tenant',
         features: { ledger: true },
       },
-    );
+    )
 
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    router.push("/app");
+    await new Promise((resolve) => setTimeout(resolve, 800))
+    router.push('/app')
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 </script>

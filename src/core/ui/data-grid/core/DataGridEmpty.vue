@@ -1,8 +1,8 @@
 <script setup lang="ts">
 defineProps<{
-  message?: string;
-  colspan: number;
-}>();
+  message?: string
+  colspan: number
+}>()
 </script>
 
 <template>
@@ -28,7 +28,7 @@ defineProps<{
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <path d="M3 9h18M9 21V9" />
         </svg>
-        <span>{{ message ?? "No records found" }}</span>
+        <span>{{ message ?? 'No records found' }}</span>
         <!-- Optional create action slot -->
         <slot name="action" />
       </div>

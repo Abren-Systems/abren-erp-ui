@@ -1,2 +1,2 @@
 // Module directory placeholder — System Administration
-export {};
+export {}

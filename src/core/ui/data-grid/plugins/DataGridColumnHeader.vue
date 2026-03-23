@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { Column } from "@tanstack/vue-table";
-import { ArrowUp, ArrowDown, ChevronsUpDown } from "lucide-vue-next";
+import type { Column } from '@tanstack/vue-table'
+import { ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-vue-next'
 
 const props = defineProps<{
-  column: Column<any, unknown>;
-  title: string;
-}>();
+  column: Column<unknown, unknown>
+  title: string
+}>()
 
 function toggle() {
-  if (!props.column.getCanSort()) return;
-  props.column.toggleSorting(props.column.getIsSorted() === "asc");
+  if (!props.column.getCanSort()) return
+  props.column.toggleSorting(props.column.getIsSorted() === 'asc')
 }
 </script>
 

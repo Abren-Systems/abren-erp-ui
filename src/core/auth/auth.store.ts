@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
 /**
  * Auth Store — Shared Cross-Cutting Concern
@@ -14,53 +14,53 @@ import { ref, computed } from "vue";
 
 // ── Types ─────────────────────────────────────────────
 export interface CurrentUser {
-  id: string;
-  email: string;
-  full_name: string;
-  role: string;
+  id: string
+  email: string
+  full_name: string
+  role: string
 }
 
 export interface TenantInfo {
-  id: string;
-  name: string;
-  features: Record<string, boolean>;
+  id: string
+  name: string
+  features: Record<string, boolean>
 }
 
 // ── Store ─────────────────────────────────────────────
-export const useAuthStore = defineStore("auth", () => {
+export const useAuthStore = defineStore('auth', () => {
   // ── State ──────────────────────────────────────────
-  const token = ref<string | null>(localStorage.getItem("abren_token"));
-  const currentUser = ref<CurrentUser | null>(null);
-  const currentTenant = ref<TenantInfo | null>(null);
+  const token = ref<string | null>(localStorage.getItem('abren_token'))
+  const currentUser = ref<CurrentUser | null>(null)
+  const currentTenant = ref<TenantInfo | null>(null)
 
   // ── Computed ───────────────────────────────────────
-  const isAuthenticated = computed(() => !!token.value);
+  const isAuthenticated = computed(() => !!token.value)
 
-  const tenantFeatures = computed(() => currentTenant.value?.features ?? {});
+  const tenantFeatures = computed(() => currentTenant.value?.features ?? {})
 
   // ── Actions ────────────────────────────────────────
   function setAuth(newToken: string, user: CurrentUser, tenant: TenantInfo) {
-    token.value = newToken;
-    currentUser.value = user;
-    currentTenant.value = tenant;
-    localStorage.setItem("abren_token", newToken);
-    localStorage.setItem("abren_tenant_id", tenant.id);
+    token.value = newToken
+    currentUser.value = user
+    currentTenant.value = tenant
+    localStorage.setItem('abren_token', newToken)
+    localStorage.setItem('abren_tenant_id', tenant.id)
   }
 
   function hasFeature(feature: string): boolean {
-    return tenantFeatures.value[feature] === true;
+    return tenantFeatures.value[feature] === true
   }
 
   function logout() {
-    token.value = null;
-    currentUser.value = null;
-    currentTenant.value = null;
-    localStorage.removeItem("abren_token");
-    localStorage.removeItem("abren_tenant_id");
+    token.value = null
+    currentUser.value = null
+    currentTenant.value = null
+    localStorage.removeItem('abren_token')
+    localStorage.removeItem('abren_tenant_id')
   }
 
   function $reset() {
-    logout();
+    logout()
   }
 
   return {
@@ -76,5 +76,5 @@ export const useAuthStore = defineStore("auth", () => {
     hasFeature,
     logout,
     $reset,
-  };
-});
+  }
+})

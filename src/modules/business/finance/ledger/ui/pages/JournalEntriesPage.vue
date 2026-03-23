@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { DataGrid, useDataGrid } from "@/core/ui/data-grid";
+import { DataGrid, useDataGrid } from '@/core/ui/data-grid'
 
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
+const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
 const columns = [
-  { accessorKey: "id", header: "ID" },
-  { accessorKey: "date", header: "Date" },
-  { accessorKey: "description", header: "Description" },
-  { accessorKey: "status", header: "Status" },
-];
+  { accessorKey: 'id', header: 'ID' },
+  { accessorKey: 'date', header: 'Date' },
+  { accessorKey: 'description', header: 'Description' },
+  { accessorKey: 'status', header: 'Status' },
+]
 
-const data = [];
-const isPending = false;
+const data = []
+const isPending = false
 </script>
 
 <template>

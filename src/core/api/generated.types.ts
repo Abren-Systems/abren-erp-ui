@@ -4,15 +4,15 @@
  */
 
 export interface paths {
-  "/api/v1/core/tenants": {
+  '/api/v1/core/tenants': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Provision a new tenant organisation
      * @description Creates a new isolated tenant within the Abren ERP platform. A tenant represents a single organisation whose data is fully segregated from other tenants at the database level.
@@ -23,22 +23,22 @@ export interface paths {
      *
      *     **Note:** This endpoint does not require authentication in the initial bootstrap phase but should be restricted to super-admin roles in production.
      */
-    post: operations["create_tenant_api_v1_core_tenants_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/core/users": {
+    post: operations['create_tenant_api_v1_core_tenants_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/core/users': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Create a user within the current tenant
      * @description Registers a new user under the authenticated caller's tenant. The user receives a hashed password and is immediately active.
@@ -54,22 +54,22 @@ export interface paths {
      *     - `401 Unauthorized` — missing or invalid Bearer token.
      *     - `403 Forbidden` — caller lacks `core:manage_users` permission.
      */
-    post: operations["create_user_api_v1_core_users_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/core/setup": {
+    post: operations['create_user_api_v1_core_users_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/core/setup': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Bootstrap tenant and admin user in one step
      * @description Atomic one-time setup endpoint that provisions a new tenant and creates an initial administrator user in a single transaction. This is the recommended entry point for onboarding a new organisation.
@@ -87,20 +87,20 @@ export interface paths {
      *     - `400 Bad Request` — tenant name already taken or invalid input.
      *     - `422 Unprocessable Entity` — request body fails schema validation.
      */
-    post: operations["setup_erp_api_v1_core_setup_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/core/users/me": {
+    post: operations['setup_erp_api_v1_core_setup_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/core/users/me': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Retrieve the current user's profile
      * @description CQRS read-path endpoint that returns the profile of the authenticated user based on the JWT `sub` claim.
@@ -111,24 +111,24 @@ export interface paths {
      *     - `401 Unauthorized` — missing or invalid Bearer token.
      *     - `404 Not Found` — user record no longer exists.
      */
-    get: operations["read_users_me_api_v1_core_users_me_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/auth/login": {
+    get: operations['read_users_me_api_v1_core_users_me_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/login': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Authenticate and obtain JWT tokens
      * @description Standard **OAuth 2.0 Resource Owner Password Credentials** login. Accepts a username (email) and password via `application/x-www-form-urlencoded`, validates the credentials against the user store, and returns a JWT access token plus an optional refresh token.
@@ -143,22 +143,22 @@ export interface paths {
      *     - `401 Unauthorized` — email not found or password mismatch.
      *     - `422 Unprocessable Entity` — missing username or password field.
      */
-    post: operations["login_api_v1_auth_login_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/auth/refresh": {
+    post: operations['login_api_v1_auth_login_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/auth/refresh': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Refresh an expired access token
      * @description Exchanges a valid **refresh token** for a new access / refresh token pair.  Use this endpoint to maintain user sessions without re-prompting for credentials.
@@ -171,22 +171,22 @@ export interface paths {
      *     **Error scenarios:**
      *     - `401 Unauthorized` — token is expired, malformed, or is an access token instead of a refresh token.
      */
-    post: operations["refresh_token_api_v1_auth_refresh_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/accounting/journal-entries": {
+    post: operations['refresh_token_api_v1_auth_refresh_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/accounting/journal-entries': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Create a new journal entry with line items
      * @description Creates a double-entry journal entry in **DRAFT** status with one or more debit/credit line items.  Each line references a GL account from the Chart of Accounts and an amount in the specified currency.
@@ -206,22 +206,22 @@ export interface paths {
      *     - `403 Forbidden` — caller lacks `accounting:create_entry`.
      *     - `422 Unprocessable Entity` — schema validation failure.
      */
-    post: operations["create_journal_entry_api_v1_accounting_journal_entries_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/accounting/journal-entries/{entry_id}/post": {
+    post: operations['create_journal_entry_api_v1_accounting_journal_entries_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/accounting/journal-entries/{entry_id}/post': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Post a draft journal entry to the ledger
      * @description Transitions a journal entry from **DRAFT** to **POSTED** status, making it an immutable, auditable record in the General Ledger.
@@ -239,22 +239,22 @@ export interface paths {
      *     - `403 Forbidden` — caller lacks `accounting:post`.
      *     - `404 Not Found` — entry ID does not exist.
      */
-    post: operations["post_journal_entry_api_v1_accounting_journal_entries__entry_id__post_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/accounting/journal-entries/{entry_id}/void": {
+    post: operations['post_journal_entry_api_v1_accounting_journal_entries__entry_id__post_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/accounting/journal-entries/{entry_id}/void': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Void a posted journal entry
      * @description Voids an existing **POSTED** journal entry, effectively reversing its impact on the ledger while maintaining an audit trail.  Voiding is only possible for posted entries.
@@ -271,20 +271,20 @@ export interface paths {
      *     - `403 Forbidden` — caller lacks `accounting:void`.
      *     - `404 Not Found` — entry ID does not exist.
      */
-    post: operations["void_journal_entry_api_v1_accounting_journal_entries__entry_id__void_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/accounting/accounts": {
+    post: operations['void_journal_entry_api_v1_accounting_journal_entries__entry_id__void_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/accounting/accounts': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * List all GL accounts for the current tenant
      * @description Returns the complete Chart of Accounts for the authenticated user's tenant, including account codes, types, and hierarchy.
@@ -300,8 +300,8 @@ export interface paths {
      *     - `401 Unauthorized` — missing or invalid Bearer token.
      *     - `403 Forbidden` — caller lacks `accounting:view`.
      */
-    get: operations["list_accounts_api_v1_accounting_accounts_get"];
-    put?: never;
+    get: operations['list_accounts_api_v1_accounting_accounts_get']
+    put?: never
     /**
      * Create a new GL account in the Chart of Accounts
      * @description Adds a new General Ledger account to the tenant's Chart of Accounts. Accounts form a tree structure via optional `parent_id`.
@@ -321,22 +321,22 @@ export interface paths {
      *     - `403 Forbidden` — caller lacks `accounting:manage_accounts`.
      *     - `422 Unprocessable Entity` — schema validation failure.
      */
-    post: operations["create_account_api_v1_accounting_accounts_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/accounting/accounts/{account_id}/deactivate": {
+    post: operations['create_account_api_v1_accounting_accounts_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/accounting/accounts/{account_id}/deactivate': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Deactivate a GL account
      * @description Disables an account in the Chart of Accounts, preventing any future postings.  The account and its historical transactions remain in the ledger for reporting and audit purposes.
@@ -351,22 +351,22 @@ export interface paths {
      *     - `403 Forbidden` — caller lacks `accounting:manage_accounts`.
      *     - `404 Not Found` — account ID does not exist.
      */
-    post: operations["deactivate_account_api_v1_accounting_accounts__account_id__deactivate_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/accounting/accounts/{account_id}/rename": {
+    post: operations['deactivate_account_api_v1_accounting_accounts__account_id__deactivate_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/accounting/accounts/{account_id}/rename': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Rename a GL account
      * @description Updates the human-readable name of an account.  The unique code and historical data remain unchanged.
@@ -377,20 +377,20 @@ export interface paths {
      *     - `400 Bad Request` — name is empty or invalid.
      *     - `403 Forbidden` — caller lacks `accounting:manage_accounts`.
      */
-    post: operations["rename_account_api_v1_accounting_accounts__account_id__rename_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/approvals/health": {
+    post: operations['rename_account_api_v1_accounting_accounts__account_id__rename_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/approvals/health': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Approvals module health check
      * @description Returns a simple status indicator confirming the Approvals module is loaded and responsive.  This endpoint requires authentication and is intended for internal diagnostics.
@@ -399,22 +399,22 @@ export interface paths {
      *
      *     **Note:** This is a placeholder endpoint. Full approval workflow CRUD endpoints (define policies, list pending approvals, etc.) will be added in a future release.
      */
-    get: operations["health_check_api_v1_approvals_health_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/payment-requests": {
+    get: operations['health_check_api_v1_approvals_health_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/payment-requests': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * List payment requests for the current user
      * @description Returns all payment requests created by the authenticated user within their tenant, ordered by creation date descending.
@@ -428,8 +428,8 @@ export interface paths {
      *     **Error scenarios:**
      *     - `401 Unauthorized` — missing or invalid Bearer token.
      */
-    get: operations["list_my_requests_api_v1_payment_requests_get"];
-    put?: never;
+    get: operations['list_my_requests_api_v1_payment_requests_get']
+    put?: never
     /**
      * Create a new payment request
      * @description Initiates a new payment request in **DRAFT** status. The request captures the beneficiary, amount, currency, and business justification for the payment.
@@ -450,20 +450,20 @@ export interface paths {
      *     - `401 Unauthorized` — missing or invalid Bearer token.
      *     - `422 Unprocessable Entity` — schema validation failure.
      */
-    post: operations["create_payment_request_api_v1_payment_requests_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/payment-requests/{pr_id}": {
+    post: operations['create_payment_request_api_v1_payment_requests_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/payment-requests/{pr_id}': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Retrieve a specific payment request
      * @description Fetches the full details of a payment request by its UUID, including current status, approval step, and assigned approver.
@@ -474,233 +474,233 @@ export interface paths {
      *     - `401 Unauthorized` — missing or invalid Bearer token.
      *     - `404 Not Found` — payment request does not exist or belongs to a different tenant.
      */
-    get: operations["get_payment_request_api_v1_payment_requests__pr_id__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/payment-requests/{pr_id}/submit": {
+    get: operations['get_payment_request_api_v1_payment_requests__pr_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/payment-requests/{pr_id}/submit': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Submit a draft payment request for approval
      * @description Transition a payment request from **DRAFT** to **SUBMITTED** status and initiate the multi-step approval workflow.
      *
      *     **Required permission:** Requester (owner) of the request.
      */
-    post: operations["submit_payment_request_api_v1_payment_requests__pr_id__submit_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/payment-requests/{pr_id}/approve": {
+    post: operations['submit_payment_request_api_v1_payment_requests__pr_id__submit_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/payment-requests/{pr_id}/approve': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Approve a submitted payment request
      * @description Advances a payment request through its approval workflow.  If this is the final approval step, the status transitions to **APPROVED**.
      *
      *     **Required permission:** Assigned approver for the current step.
      */
-    post: operations["approve_payment_request_api_v1_payment_requests__pr_id__approve_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/payment-requests/{pr_id}/reject": {
+    post: operations['approve_payment_request_api_v1_payment_requests__pr_id__approve_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/payment-requests/{pr_id}/reject': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Reject a submitted payment request
      * @description Transitions a payment request from **SUBMITTED** to **REJECTED** status.  A reason must be provided for the requester.
      *
      *     **Required permission:** Assigned approver for the current step.
      */
-    post: operations["reject_payment_request_api_v1_payment_requests__pr_id__reject_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/payment-requests/{pr_id}/pay": {
+    post: operations['reject_payment_request_api_v1_payment_requests__pr_id__reject_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/payment-requests/{pr_id}/pay': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Mark an approved payment request as paid
      * @description Finalizes the lifecycle of an **APPROVED** payment request by marking it as **PAID**.  Finance users typically perform this action after executing the actual disbursement (e.g., bank transfer).
      *
      *     **Required permission:** Finance / Disbursement officer.
      */
-    post: operations["pay_payment_request_api_v1_payment_requests__pr_id__pay_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/reporting/cashflow/daily": {
+    post: operations['pay_payment_request_api_v1_payment_requests__pr_id__pay_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/reporting/cashflow/daily': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get daily cashflow summary
      * @description Returns denormalized daily cashflow aggregates (inflow/outflow) for a date range.
      */
-    get: operations["get_daily_cashflow_api_v1_reporting_cashflow_daily_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/webhooks/subscriptions": {
+    get: operations['get_daily_cashflow_api_v1_reporting_cashflow_daily_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/webhooks/subscriptions': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * List all webhook subscriptions
      * @description Retrieves all active and inactive webhook subscriptions configured for the current tenant.
      */
-    get: operations["list_subscriptions_api_v1_webhooks_subscriptions_get"];
-    put?: never;
+    get: operations['list_subscriptions_api_v1_webhooks_subscriptions_get']
+    put?: never
     /**
      * Create a new webhook subscription
      * @description Registers a URL to receive signed POST notifications when specific domain events occur within the tenant.
      *
      *     **Required permission:** Administrator / System Integration.
      */
-    post: operations["create_subscription_api_v1_webhooks_subscriptions_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/webhooks/subscriptions/{subscription_id}": {
+    post: operations['create_subscription_api_v1_webhooks_subscriptions_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/webhooks/subscriptions/{subscription_id}': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
     /**
      * Deactivate a webhook subscription
      * @description Permanently removes a webhook subscription. The external system will no longer receive domain events.
      */
-    delete: operations["delete_subscription_api_v1_webhooks_subscriptions__subscription_id__delete"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/system/ingest/accounts": {
+    delete: operations['delete_subscription_api_v1_webhooks_subscriptions__subscription_id__delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/system/ingest/accounts': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Bulk Ingest Chart of Accounts
      * @description Rapid-ingest historical GL Accounts from legacy systems.
      *     Bypasses standard DDD validation constraints, assuming external data sanitization.
      */
-    post: operations["bulk_ingest_accounts_api_v1_system_ingest_accounts_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/system/ingest/journal-entries": {
+    post: operations['bulk_ingest_accounts_api_v1_system_ingest_accounts_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/system/ingest/journal-entries': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Bulk Ingest Historical Ledger Balances
      * @description Rapid-ingest pre-balanced historical journal entries and ledger lines.
      *     Executes raw SQL block pushes to achieve orders of magnitude faster imports than single events.
      */
-    post: operations["bulk_ingest_journal_entries_api_v1_system_ingest_journal_entries_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/health": {
+    post: operations['bulk_ingest_journal_entries_api_v1_system_ingest_journal_entries_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/health': {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Application health check
      * @description Returns a simple JSON status indicating the API process is running and able to serve requests.  This endpoint requires **no authentication** and is intended for load-balancer and container-orchestrator liveness probes.
      */
-    get: operations["health_check_health_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    get: operations['health_check_health_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
-export type webhooks = Record<string, never>;
+export type webhooks = Record<string, never>
 export interface components {
   schemas: {
     /**
@@ -713,25 +713,25 @@ export interface components {
        * @description Numeric account code.  Must be unique within the tenant's Chart of Accounts.  Follow your organisation's numbering convention (e.g. 1xxx = Assets, 2xxx = Liabilities).
        * @example 1010
        */
-      code: number;
+      code: number
       /**
        * Name
        * @description Descriptive name for the account.
        * @example Petty Cash
        */
-      name: string;
+      name: string
       /**
        * Account Type
        * @description Account classification: `Asset`, `Liability`, `Equity`, `Revenue`, or `Expense`.
        * @example Asset
        */
-      account_type: string;
+      account_type: string
       /**
        * Parent Id
        * @description Optional parent account UUID for hierarchical nesting. The parent must be of the same account type.
        */
-      parent_id?: string | null;
-    };
+      parent_id?: string | null
+    }
     /**
      * AccountRead
      * @description Read model for a General Ledger account in the Chart of Accounts.
@@ -742,36 +742,36 @@ export interface components {
        * Format: uuid
        * @description Unique identifier of the GL account (UUID v7).
        */
-      id: string;
+      id: string
       /**
        * Code
        * @description Numeric account code following the organisation's chart structure. Typically 4-6 digits (e.g. 1000 = Cash, 4000 = Revenue).
        * @example 1000
        */
-      code: number;
+      code: number
       /**
        * Name
        * @description Human-readable account name.
        * @example Cash and Cash Equivalents
        */
-      name: string;
+      name: string
       /**
        * Account Type
        * @description Classification of the account. One of: `Asset`, `Liability`, `Equity`, `Revenue`, `Expense`.
        * @example Asset
        */
-      account_type: string;
+      account_type: string
       /**
        * Parent Id
        * @description UUID of the parent account for hierarchical grouping. `null` indicates a top-level account.
        */
-      parent_id?: string | null;
+      parent_id?: string | null
       /**
        * Is Active
        * @description Whether the account can receive new postings.
        */
-      is_active: boolean;
-    };
+      is_active: boolean
+    }
     /**
      * AccountRename
      * @description Request body for renaming a GL account.
@@ -782,8 +782,8 @@ export interface components {
        * @description New descriptive name for the account.
        * @example Petty Cash - Main Office
        */
-      name: string;
-    };
+      name: string
+    }
     /** AccountsImportRequest */
     AccountsImportRequest: {
       /**
@@ -791,43 +791,43 @@ export interface components {
        * @description List of raw Account rows.
        */
       items: {
-        [key: string]: unknown;
-      }[];
-    };
+        [key: string]: unknown
+      }[]
+    }
     /** Body_login_api_v1_auth_login_post */
     Body_login_api_v1_auth_login_post: {
       /** Grant Type */
-      grant_type?: string | null;
+      grant_type?: string | null
       /** Username */
-      username: string;
+      username: string
       /**
        * Password
        * Format: password
        */
-      password: string;
+      password: string
       /**
        * Scope
        * @default
        */
-      scope: string;
+      scope: string
       /** Client Id */
-      client_id?: string | null;
+      client_id?: string | null
       /**
        * Client Secret
        * Format: password
        */
-      client_secret?: string | null;
-    };
+      client_secret?: string | null
+    }
     /** BulkImportResponse */
     BulkImportResponse: {
       /**
        * Success
        * @default true
        */
-      success: boolean;
+      success: boolean
       /** Imported Rows */
-      imported_rows: number;
-    };
+      imported_rows: number
+    }
     /**
      * CreateTenantRequest
      * @description Request body for provisioning a new tenant organisation.
@@ -838,7 +838,7 @@ export interface components {
        * @description Display name for the new tenant organisation. Must be unique across the entire platform.
        * @example Addis Manufacturing PLC
        */
-      name: string;
+      name: string
       /**
        * Features
        * @description Optional set of feature flags to enable/disable on creation.
@@ -848,9 +848,9 @@ export interface components {
        *     }
        */
       features?: {
-        [key: string]: boolean;
-      } | null;
-    };
+        [key: string]: boolean
+      } | null
+    }
     /**
      * CreateTenantResponse
      * @description Response returned after a tenant is successfully provisioned.
@@ -862,8 +862,8 @@ export interface components {
        * @description UUID v7 identifier assigned to the newly created tenant.
        * @example 019524f5-9a3c-7d2e-b145-68c3a7e1f9d0
        */
-      tenant_id: string;
-    };
+      tenant_id: string
+    }
     /**
      * CreateUserRequest
      * @description Request body for creating a new user within a tenant.
@@ -875,14 +875,14 @@ export interface components {
        * @description Email address used as the user's login identifier. Must be unique within the tenant.
        * @example admin@addis-manufacturing.com
        */
-      email: string;
+      email: string
       /**
        * Password
        * @description Plaintext password that will be hashed with bcrypt before storage. Must be at least 8 characters.
        * @example S3cureP@ssw0rd!
        */
-      password: string;
-    };
+      password: string
+    }
     /**
      * CreateUserResponse
      * @description Response returned after a user is successfully created.
@@ -894,8 +894,8 @@ export interface components {
        * @description UUID v7 identifier assigned to the newly created user.
        * @example 019524f5-b1a2-7e3f-c256-79d4b8f2a0e1
        */
-      user_id: string;
-    };
+      user_id: string
+    }
     /**
      * DailyCashflowDTO
      * @description Data Transfer Object for daily cashflow summary.
@@ -905,16 +905,16 @@ export interface components {
        * Date
        * Format: date
        */
-      date: string;
+      date: string
       /** Total Inflow */
-      total_inflow: number;
+      total_inflow: number
       /** Total Outflow */
-      total_outflow: number;
+      total_outflow: number
       /** Net Cashflow */
-      net_cashflow: number;
+      net_cashflow: number
       /** Currency Code */
-      currency_code: string;
-    };
+      currency_code: string
+    }
     /**
      * ErrorResponse
      * @description Standard error envelope returned by domain exception handlers.
@@ -925,25 +925,25 @@ export interface components {
        * @description Always false for error responses.
        * @default false
        */
-      success: boolean;
+      success: boolean
       /**
        * Detail
        * @description Human-readable error message describing what went wrong.
        * @example Journal entry with identifier 'abc-123' not found
        */
-      detail: string;
+      detail: string
       /**
        * Code
        * @description Machine-readable error code for programmatic handling. One of: DOMAIN_ERROR, NOT_FOUND, CONFLICT, FORBIDDEN, VALIDATION_ERROR, INVARIANT_VIOLATION.
        * @example NOT_FOUND
        */
-      code: string;
-    };
+      code: string
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
-    };
+      detail?: components['schemas']['ValidationError'][]
+    }
     /** JournalEntriesImportRequest */
     JournalEntriesImportRequest: {
       /**
@@ -951,16 +951,16 @@ export interface components {
        * @description List of raw JournalEntry rows.
        */
       entries: {
-        [key: string]: unknown;
-      }[];
+        [key: string]: unknown
+      }[]
       /**
        * Lines
        * @description List of raw JournalLine rows mapping entry_ids.
        */
       lines: {
-        [key: string]: unknown;
-      }[];
-    };
+        [key: string]: unknown
+      }[]
+    }
     /**
      * JournalEntryCreate
      * @description Request body for creating a new journal entry.
@@ -972,26 +972,26 @@ export interface components {
        * @description Transaction date in ISO 8601 format (YYYY-MM-DD).
        * @example 2026-03-18
        */
-      date: string;
+      date: string
       /**
        * Description
        * @description Narrative description of the business transaction (3–500 characters).
        * @example Purchase of office supplies from Mega Stationery
        */
-      description: string;
+      description: string
       /**
        * Base Currency
        * @description ISO 4217 code of the entry's functional (base) currency.
        * @default ETB
        * @example ETB
        */
-      base_currency: string;
+      base_currency: string
       /**
        * Lines
        * @description Ordered list of debit and credit lines.  A valid journal entry requires at least two lines (one debit and one credit).
        */
-      lines: components["schemas"]["JournalLineCreate"][];
-    };
+      lines: components['schemas']['JournalLineCreate'][]
+    }
     /**
      * JournalEntryRead
      * @description Read model for a complete journal entry with its line items.
@@ -1002,43 +1002,43 @@ export interface components {
        * Format: uuid
        * @description Unique identifier of the journal entry (UUID v7).
        */
-      id: string;
+      id: string
       /**
        * Entry Number
        * @description Auto-generated human-readable entry number (format: `JV-XXXXXXXX`).
        * @example JV-A1B2C3D4
        */
-      entry_number: string;
+      entry_number: string
       /**
        * Date
        * Format: date
        * @description Transaction date (ISO 8601).
        * @example 2026-03-18
        */
-      date: string;
+      date: string
       /**
        * Description
        * @description Narrative description of the transaction.
        */
-      description: string;
+      description: string
       /**
        * Base Currency
        * @description Functional currency for the entry.
        * @example ETB
        */
-      base_currency: string;
+      base_currency: string
       /**
        * Status
        * @description Current status of the entry: `DRAFT` or `POSTED`.
        * @example DRAFT
        */
-      status: string;
+      status: string
       /**
        * Lines
        * @description Ordered list of debit/credit lines comprising this entry.
        */
-      lines: components["schemas"]["JournalLineRead"][];
-    };
+      lines: components['schemas']['JournalLineRead'][]
+    }
     /**
      * JournalEntryVoid
      * @description Request body for voiding a posted journal entry.
@@ -1050,8 +1050,8 @@ export interface components {
        * @example Mistake in amount
        * @example Duplicate entry
        */
-      reason: string;
-    };
+      reason: string
+    }
     /**
      * JournalLineCreate
      * @description A single debit or credit line within a journal entry creation request.
@@ -1062,33 +1062,33 @@ export interface components {
        * Format: uuid
        * @description UUID of the GL account to debit or credit.
        */
-      account_id: string;
+      account_id: string
       /**
        * Description
        * @description Optional memo for this individual line item (max 500 characters).
        * @example Office supplies purchase
        */
-      description?: string | null;
+      description?: string | null
       /**
        * Amount
        * @description Monetary amount for this line in the specified currency.  Must be positive — direction is determined by `is_debit`.
        * @example 1500.00
        */
-      amount: number | string;
+      amount: number | string
       /**
        * Currency
        * @description ISO 4217 currency code for this line.  Multi-currency lines are converted to the entry's base currency at the prevailing rate.
        * @default ETB
        * @example ETB
        */
-      currency: string;
+      currency: string
       /**
        * Is Debit
        * @description `true` for a debit entry, `false` for a credit entry.  The sum of all debits must equal the sum of all credits for the parent journal entry to be postable.
        * @default true
        */
-      is_debit: boolean;
-    };
+      is_debit: boolean
+    }
     /**
      * JournalLineRead
      * @description Read model for a single line within a posted or draft journal entry.
@@ -1099,48 +1099,48 @@ export interface components {
        * Format: uuid
        * @description Unique identifier of the journal line.
        */
-      id: string;
+      id: string
       /**
        * Account Id
        * Format: uuid
        * @description GL account UUID this line posts to.
        */
-      account_id: string;
+      account_id: string
       /**
        * Description
        * @description Optional line-level memo.
        */
-      description?: string | null;
+      description?: string | null
       /**
        * Amount
        * @description Amount in the line's original currency.
        * @example 1500.00
        */
-      amount: string;
+      amount: string
       /**
        * Currency
        * @description ISO 4217 currency code of the line amount.
        * @example ETB
        */
-      currency: string;
+      currency: string
       /**
        * Amount In Base
        * @description Amount converted to the entry's base currency.
        * @example 1500.00
        */
-      amount_in_base: string;
+      amount_in_base: string
       /**
        * Exchange Rate
        * @description Exchange rate applied for the conversion (1.0 if same currency).
        * @example 1.000000
        */
-      exchange_rate: string;
+      exchange_rate: string
       /**
        * Is Debit
        * @description `true` if this is a debit line, `false` if credit.
        */
-      is_debit: boolean;
-    };
+      is_debit: boolean
+    }
     /**
      * PaymentRequestCreateDTO
      * @description Request body for creating a new payment request.
@@ -1151,32 +1151,32 @@ export interface components {
        * Format: uuid
        * @description UUID of the beneficiary (payee) who will receive the payment.
        */
-      beneficiary_id: string;
+      beneficiary_id: string
       /**
        * Amount
        * @description Monetary amount to be paid.  Must be a positive number.  Precision is determined by the currency's decimal places.
        * @example 25000
        */
-      amount: number;
+      amount: number
       /**
        * Currency
        * @description ISO 4217 currency code for the payment amount.
        * @default ETB
        * @example ETB
        */
-      currency: string;
+      currency: string
       /**
        * Justification
        * @description Business justification explaining why this payment is required.  Reviewed by approvers during the approval workflow.
        * @example Monthly office rent — March 2026
        */
-      justification: string;
+      justification: string
       /**
        * Bank Account Id
        * @description Optional UUID of the bank account from which the payment should be disbursed.  If omitted, finance selects at payment time.
        */
-      bank_account_id?: string | null;
-    };
+      bank_account_id?: string | null
+    }
     /**
      * PaymentRequestDTO
      * @description Read model representing a payment request with its current lifecycle state.
@@ -1187,68 +1187,68 @@ export interface components {
        * Format: uuid
        * @description Unique identifier of the payment request (UUID v7).
        */
-      id: string;
+      id: string
       /**
        * Requester Id
        * Format: uuid
        * @description UUID of the user who created this request.
        */
-      requester_id: string;
+      requester_id: string
       /**
        * Beneficiary Id
        * Format: uuid
        * @description UUID of the beneficiary (payee).
        */
-      beneficiary_id: string;
+      beneficiary_id: string
       /**
        * Amount
        * @description Payment amount in the specified currency.
        * @example 25000
        */
-      amount: number;
+      amount: number
       /**
        * Currency
        * @description ISO 4217 currency code.
        * @example ETB
        */
-      currency: string;
+      currency: string
       /**
        * Justification
        * @description Business justification provided by the requester.
        */
-      justification: string;
+      justification: string
       /**
        * @description Current lifecycle status: `DRAFT`, `SUBMITTED`, `APPROVED`, `REJECTED`, or `PAID`.
        * @example DRAFT
        */
-      status: components["schemas"]["PaymentRequestStatus"];
+      status: components['schemas']['PaymentRequestStatus']
       /**
        * Bank Account Id
        * @description UUID of the selected disbursement bank account, if any.
        */
-      bank_account_id?: string | null;
+      bank_account_id?: string | null
       /**
        * Submitted At
        * @description Timestamp when the request was submitted for approval (ISO 8601).
        */
-      submitted_at?: string | null;
+      submitted_at?: string | null
       /**
        * Paid At
        * @description Timestamp when the payment was disbursed (ISO 8601).
        */
-      paid_at?: string | null;
+      paid_at?: string | null
       /**
        * Current Approval Step
        * @description Zero-based index of the current approval step in the workflow.  Increments as each approver advances the request.
        * @example 0
        */
-      current_approval_step: number;
+      current_approval_step: number
       /**
        * Assigned Approver Id
        * @description UUID of the user currently assigned to approve this step.
        */
-      assigned_approver_id?: string | null;
-    };
+      assigned_approver_id?: string | null
+    }
     /**
      * PaymentRequestPayDTO
      * @description Request body for marking an approved request as paid.
@@ -1259,14 +1259,14 @@ export interface components {
        * @description Method used for disbursement (e.g. BANK_TRANSFER, CHECK, CASH).
        * @example BANK_TRANSFER
        */
-      payment_method: string;
+      payment_method: string
       /**
        * Disbursement Reference
        * @description External transaction reference or confirmation number.
        * @example TRX-2026-0318-99
        */
-      disbursement_reference: string;
-    };
+      disbursement_reference: string
+    }
     /**
      * PaymentRequestRejectDTO
      * @description Request body for rejecting a payment request (requires reason).
@@ -1277,13 +1277,13 @@ export interface components {
        * @description Reason for rejecting the request (reviewed by requester).
        * @example Budget allocation exceeded for Q1
        */
-      reason: string;
-    };
+      reason: string
+    }
     /**
      * PaymentRequestStatus
      * @enum {string}
      */
-    PaymentRequestStatus: "DRAFT" | "SUBMITTED" | "APPROVED" | "REJECTED" | "PAID";
+    PaymentRequestStatus: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PAID'
     /**
      * SetupRequest
      * @description Request body for the one-time ERP bootstrap operation.
@@ -1294,21 +1294,21 @@ export interface components {
        * @description Display name for the organisation to provision.
        * @example Addis Manufacturing PLC
        */
-      tenant_name: string;
+      tenant_name: string
       /**
        * Admin Email
        * Format: email
        * @description Email address for the initial administrator account.
        * @example admin@addis-manufacturing.com
        */
-      admin_email: string;
+      admin_email: string
       /**
        * Admin Password
        * @description Password for the initial administrator (hashed on creation).
        * @example S3cureP@ssw0rd!
        */
-      admin_password: string;
-    };
+      admin_password: string
+    }
     /**
      * SetupResponse
      * @description Response confirming both tenant and admin user were created.
@@ -1320,15 +1320,15 @@ export interface components {
        * @description UUID v7 of the provisioned tenant.
        * @example 019524f5-9a3c-7d2e-b145-68c3a7e1f9d0
        */
-      tenant_id: string;
+      tenant_id: string
       /**
        * User Id
        * Format: uuid
        * @description UUID v7 of the admin user created within the tenant.
        * @example 019524f5-b1a2-7e3f-c256-79d4b8f2a0e1
        */
-      user_id: string;
-    };
+      user_id: string
+    }
     /**
      * TokenDTO
      * @description Auth token response containing JWT access and refresh tokens.
@@ -1338,19 +1338,19 @@ export interface components {
        * Access Token
        * @description Short-lived JWT access token.  Include as `Authorization: Bearer <token>` on subsequent requests.  Contains claims: `sub`, `tenant_id`, `email`, `roles`, `permissions`.
        */
-      access_token: string;
+      access_token: string
       /**
        * Refresh Token
        * @description Long-lived refresh token (7-day expiry) used to obtain a new access token via the `/auth/refresh` endpoint.
        */
-      refresh_token?: string | null;
+      refresh_token?: string | null
       /**
        * Token Type
        * @description Token type — always `"bearer"` per OAuth 2.0 specification.
        * @default bearer
        */
-      token_type: string;
-    };
+      token_type: string
+    }
     /**
      * UserProfileDTO
      * @description CQRS read model for a user's profile.
@@ -1361,38 +1361,38 @@ export interface components {
        * Format: uuid
        * @description Unique identifier of the user (UUID v7).
        */
-      id: string;
+      id: string
       /**
        * Tenant Id
        * Format: uuid
        * @description Identifier of the tenant this user belongs to.
        */
-      tenant_id: string;
+      tenant_id: string
       /**
        * Email
        * @description User's email address (login identifier).
        * @example admin@addis-manufacturing.com
        */
-      email: string;
+      email: string
       /**
        * Is Active
        * @description Whether the user account is currently active and can authenticate.
        */
-      is_active: boolean;
-    };
+      is_active: boolean
+    }
     /** ValidationError */
     ValidationError: {
       /** Location */
-      loc: (string | number)[];
+      loc: (string | number)[]
       /** Message */
-      msg: string;
+      msg: string
       /** Error Type */
-      type: string;
+      type: string
       /** Input */
-      input?: unknown;
+      input?: unknown
       /** Context */
-      ctx?: Record<string, never>;
-    };
+      ctx?: Record<string, never>
+    }
     /**
      * ValidationErrorDetail
      * @description Individual field-level validation error (FastAPI / Pydantic 422).
@@ -1406,20 +1406,20 @@ export interface components {
        *       "amount"
        *     ]
        */
-      loc: (string | number)[];
+      loc: (string | number)[]
       /**
        * Msg
        * @description Validation error message.
        * @example value is not a valid float
        */
-      msg: string;
+      msg: string
       /**
        * Type
        * @description Error type identifier from the validation backend.
        * @example value_error
        */
-      type: string;
-    };
+      type: string
+    }
     /**
      * ValidationErrorResponse
      * @description HTTP 422 response body produced by FastAPI request validation.
@@ -1430,13 +1430,13 @@ export interface components {
        * @description Always false for error responses.
        * @default false
        */
-      success: boolean;
+      success: boolean
       /**
        * Detail
        * @description List of per-field validation errors.
        */
-      detail: components["schemas"]["ValidationErrorDetail"][];
-    };
+      detail: components['schemas']['ValidationErrorDetail'][]
+    }
     /**
      * WebhookSubscriptionCreateDTO
      * @description Request body for creating a new webhook subscription.
@@ -1447,20 +1447,20 @@ export interface components {
        * @description Type of event to subscribe to (e.g., 'JOURNAL_ENTRY_POSTED', 'PAYMENT_APPROVED', or '*' for all).
        * @example JOURNAL_ENTRY_POSTED
        */
-      event_type: string;
+      event_type: string
       /**
        * Target Url
        * @description External HTTP URL where the signed JSON payload will be POSTed.
        * @example https://api.external-partner.com/webhooks/abren
        */
-      target_url: string;
+      target_url: string
       /**
        * Description
        * @description Optional internal description for this subscription.
        * @example Integration with Partner X Accounting Service
        */
-      description?: string | null;
-    };
+      description?: string | null
+    }
     /**
      * WebhookSubscriptionDTO
      * @description Read model for a webhook subscription.
@@ -1470,1359 +1470,1359 @@ export interface components {
        * Id
        * Format: uuid
        */
-      id: string;
+      id: string
       /** Event Type */
-      event_type: string;
+      event_type: string
       /** Target Url */
-      target_url: string;
+      target_url: string
       /** Secret */
-      secret: string;
+      secret: string
       /** Is Active */
-      is_active: boolean;
+      is_active: boolean
       /** Description */
-      description: string | null;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+      description: string | null
+    }
+  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
-export type $defs = Record<string, never>;
+export type $defs = Record<string, never>
 export interface operations {
   create_tenant_api_v1_core_tenants_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateTenantRequest"];
-      };
-    };
+        'application/json': components['schemas']['CreateTenantRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["CreateTenantResponse"];
-        };
-      };
+          'application/json': components['schemas']['CreateTenantResponse']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   create_user_api_v1_core_users_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateUserRequest"];
-      };
-    };
+        'application/json': components['schemas']['CreateUserRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["CreateUserResponse"];
-        };
-      };
+          'application/json': components['schemas']['CreateUserResponse']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   setup_erp_api_v1_core_setup_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SetupRequest"];
-      };
-    };
+        'application/json': components['schemas']['SetupRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["SetupResponse"];
-        };
-      };
+          'application/json': components['schemas']['SetupResponse']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   read_users_me_api_v1_core_users_me_get: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["UserProfileDTO"];
-        };
-      };
+          'application/json': components['schemas']['UserProfileDTO']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Resource not found.** The requested entity does not exist or does not belong to the current tenant. */
       404: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   login_api_v1_auth_login_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/x-www-form-urlencoded": components["schemas"]["Body_login_api_v1_auth_login_post"];
-      };
-    };
+        'application/x-www-form-urlencoded': components['schemas']['Body_login_api_v1_auth_login_post']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["TokenDTO"];
-        };
-      };
+          'application/json': components['schemas']['TokenDTO']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   refresh_token_api_v1_auth_refresh_post: {
     parameters: {
       query: {
-        refresh_token: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+        refresh_token: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["TokenDTO"];
-        };
-      };
+          'application/json': components['schemas']['TokenDTO']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description Validation Error */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   create_journal_entry_api_v1_accounting_journal_entries_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["JournalEntryCreate"];
-      };
-    };
+        'application/json': components['schemas']['JournalEntryCreate']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["JournalEntryRead"];
-        };
-      };
+          'application/json': components['schemas']['JournalEntryRead']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   post_journal_entry_api_v1_accounting_journal_entries__entry_id__post_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        entry_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
+        entry_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["JournalEntryRead"];
-        };
-      };
+          'application/json': components['schemas']['JournalEntryRead']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Resource not found.** The requested entity does not exist or does not belong to the current tenant. */
       404: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description Validation Error */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   void_journal_entry_api_v1_accounting_journal_entries__entry_id__void_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        entry_id: string;
-      };
-      cookie?: never;
-    };
+        entry_id: string
+      }
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["JournalEntryVoid"];
-      };
-    };
+        'application/json': components['schemas']['JournalEntryVoid']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["JournalEntryRead"];
-        };
-      };
+          'application/json': components['schemas']['JournalEntryRead']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   list_accounts_api_v1_accounting_accounts_get: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["AccountRead"][];
-        };
-      };
+          'application/json': components['schemas']['AccountRead'][]
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   create_account_api_v1_accounting_accounts_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["AccountCreate"];
-      };
-    };
+        'application/json': components['schemas']['AccountCreate']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["AccountRead"];
-        };
-      };
+          'application/json': components['schemas']['AccountRead']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   deactivate_account_api_v1_accounting_accounts__account_id__deactivate_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        account_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
+        account_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["AccountRead"];
-        };
-      };
+          'application/json': components['schemas']['AccountRead']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   rename_account_api_v1_accounting_accounts__account_id__rename_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        account_id: string;
-      };
-      cookie?: never;
-    };
+        account_id: string
+      }
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["AccountRename"];
-      };
-    };
+        'application/json': components['schemas']['AccountRename']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["AccountRead"];
-        };
-      };
+          'application/json': components['schemas']['AccountRead']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   health_check_api_v1_approvals_health_get: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
+          'application/json': unknown
+        }
+      }
+    }
+  }
   list_my_requests_api_v1_payment_requests_get: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["PaymentRequestDTO"][];
-        };
-      };
+          'application/json': components['schemas']['PaymentRequestDTO'][]
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   create_payment_request_api_v1_payment_requests_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["PaymentRequestCreateDTO"];
-      };
-    };
+        'application/json': components['schemas']['PaymentRequestCreateDTO']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["PaymentRequestDTO"];
-        };
-      };
+          'application/json': components['schemas']['PaymentRequestDTO']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   get_payment_request_api_v1_payment_requests__pr_id__get: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        pr_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
+        pr_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["PaymentRequestDTO"];
-        };
-      };
+          'application/json': components['schemas']['PaymentRequestDTO']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Resource not found.** The requested entity does not exist or does not belong to the current tenant. */
       404: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description Validation Error */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   submit_payment_request_api_v1_payment_requests__pr_id__submit_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        pr_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
+        pr_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": unknown;
-        };
-      };
+          'application/json': unknown
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   approve_payment_request_api_v1_payment_requests__pr_id__approve_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        pr_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
+        pr_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": unknown;
-        };
-      };
+          'application/json': unknown
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   reject_payment_request_api_v1_payment_requests__pr_id__reject_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        pr_id: string;
-      };
-      cookie?: never;
-    };
+        pr_id: string
+      }
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["PaymentRequestRejectDTO"];
-      };
-    };
+        'application/json': components['schemas']['PaymentRequestRejectDTO']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": unknown;
-        };
-      };
+          'application/json': unknown
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   pay_payment_request_api_v1_payment_requests__pr_id__pay_post: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        pr_id: string;
-      };
-      cookie?: never;
-    };
+        pr_id: string
+      }
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["PaymentRequestPayDTO"];
-      };
-    };
+        'application/json': components['schemas']['PaymentRequestPayDTO']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": unknown;
-        };
-      };
+          'application/json': unknown
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   get_daily_cashflow_api_v1_reporting_cashflow_daily_get: {
     parameters: {
       query: {
-        start_date: string;
-        end_date: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+        start_date: string
+        end_date: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["DailyCashflowDTO"][];
-        };
-      };
+          'application/json': components['schemas']['DailyCashflowDTO'][]
+        }
+      }
       /** @description Validation Error */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   list_subscriptions_api_v1_webhooks_subscriptions_get: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["WebhookSubscriptionDTO"][];
-        };
-      };
+          'application/json': components['schemas']['WebhookSubscriptionDTO'][]
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   create_subscription_api_v1_webhooks_subscriptions_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["WebhookSubscriptionCreateDTO"];
-      };
-    };
+        'application/json': components['schemas']['WebhookSubscriptionCreateDTO']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["WebhookSubscriptionDTO"];
-        };
-      };
+          'application/json': components['schemas']['WebhookSubscriptionDTO']
+        }
+      }
       /** @description **Bad request.** The request could not be processed due to a domain-level business rule violation. */
       400: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Insufficient permissions.** The authenticated user does not hold the required RBAC permission for this operation. */
       403: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Validation error.** One or more request fields failed schema or business-rule validation. */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ValidationErrorResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ValidationErrorResponse']
+        }
+      }
+    }
+  }
   delete_subscription_api_v1_webhooks_subscriptions__subscription_id__delete: {
     parameters: {
-      query?: never;
-      header?: never;
+      query?: never
+      header?: never
       path: {
-        subscription_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
+        subscription_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       204: {
         headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description **Authentication required.** The request lacks a valid Bearer token or the token has expired. */
       401: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description **Resource not found.** The requested entity does not exist or does not belong to the current tenant. */
       404: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description Validation Error */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   bulk_ingest_accounts_api_v1_system_ingest_accounts_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["AccountsImportRequest"];
-      };
-    };
+        'application/json': components['schemas']['AccountsImportRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["BulkImportResponse"];
-        };
-      };
+          'application/json': components['schemas']['BulkImportResponse']
+        }
+      }
       /** @description Validation Error */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   bulk_ingest_journal_entries_api_v1_system_ingest_journal_entries_post: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["JournalEntriesImportRequest"];
-      };
-    };
+        'application/json': components['schemas']['JournalEntriesImportRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       201: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
-        };
-      };
+          'application/json': {
+            [key: string]: unknown
+          }
+        }
+      }
       /** @description Validation Error */
       422: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   health_check_health_get: {
     parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Response */
       200: {
         headers: {
-          [name: string]: unknown;
-        };
+          [name: string]: unknown
+        }
         content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
+          'application/json': unknown
+        }
+      }
+    }
+  }
 }

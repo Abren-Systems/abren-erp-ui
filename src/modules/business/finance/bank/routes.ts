@@ -1,9 +1,9 @@
-import { h } from "vue";
+import { h } from 'vue'
 
 export default [
   {
-    path: "accounts",
-    name: "BankAccountsList",
-    component: () => Promise.resolve({ render: () => h("div", "Banking Accounts (Stub)") }),
+    path: 'accounts',
+    name: 'BankAccountsList',
+    component: () => Promise.resolve({ render: () => h('div', 'Banking Accounts (Stub)') }),
   },
-];
+]

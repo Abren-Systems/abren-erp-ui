@@ -1,4 +1,4 @@
-import { useQuery, type UseQueryOptions } from "@tanstack/vue-query";
+import { useQuery, type UseQueryOptions } from '@tanstack/vue-query'
 
 /**
  * useApiQuery
@@ -16,5 +16,5 @@ export function useApiQuery<TData, TError = Error>(
     queryFn,
     staleTime: 1000 * 60 * 5, // 5 minutes default
     ...options,
-  });
+  })
 }

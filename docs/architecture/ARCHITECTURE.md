@@ -113,7 +113,7 @@ graph TD
 | **Framework**             | Vue 3 (Composition API)                   | SFC colocation, perfect mapping for backend Use Cases                                                                |
 | **Build**                 | Vite                                      | Sub-second HMR, native ESM, Tailwind v4 native support                                                               |
 | **UI System**             | **Custom Design System** (`core/ui/`)     | Full ownership, zero vendor lock-in, ERP-optimized. _(See [UI_FOUNDATION_DECISION.md](./UI_FOUNDATION_DECISION.md))_ |
-| **Accessible Primitives** | **Reka UI** / **shadcn-vue**            | Headless Dialog, Tooltip, Popover, DropdownMenu                                                                      |
+| **Accessible Primitives** | **Reka UI** / **shadcn-vue**              | Headless Dialog, Tooltip, Popover, DropdownMenu                                                                      |
 | **DataGrid Engine**       | **TanStack Table** + **TanStack Virtual** | Sorting, filtering, pagination, virtualized scrolling                                                                |
 | **Server State**          | **TanStack Query**                        | Caching, background refetch, optimistic updates                                                                      |
 | **Form State**            | **TanStack Form** + **Zod**               | Headless, type-safe validation                                                                                       |
@@ -171,16 +171,16 @@ Each module exports a `ModuleDefinition` in its `index.ts`. The router aggregate
 ```typescript
 // modules/business/finance/ledger/index.ts
 export const ledgerModule: ModuleDefinition = {
-  id: "ledger",
-  name: "General Ledger",
-  category: "business",
-  routes: () => import("./routes").then((m) => m.default),
-  permissions: ["ledger.view", "ledger.edit"],
+  id: 'ledger',
+  name: 'General Ledger',
+  category: 'business',
+  routes: () => import('./routes').then((m) => m.default),
+  permissions: ['ledger.view', 'ledger.edit'],
   menuItems: [
-    { label: "Chart of Accounts", route: "LedgerCoa", icon: "book-open" },
-    { label: "Journal Entries", route: "LedgerJournals", icon: "file-text" },
+    { label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' },
+    { label: 'Journal Entries', route: 'LedgerJournals', icon: 'file-text' },
   ],
-};
+}
 ```
 
 ### 4.4 Module Rules
@@ -208,8 +208,8 @@ The backend will evolve independently. **DTOs** (Data Transfer Objects) are the 
 ```typescript
 // modules/payment-requests/mappers/payment-request.mapper.ts
 
-import type { PaymentRequestDTO } from "../types/api.types";
-import type { PaymentRequestViewModel } from "../types/view.types";
+import type { PaymentRequestDTO } from '../types/api.types'
+import type { PaymentRequestViewModel } from '../types/view.types'
 
 export function toViewModel(dto: PaymentRequestDTO): PaymentRequestViewModel {
   return {
@@ -219,10 +219,10 @@ export function toViewModel(dto: PaymentRequestDTO): PaymentRequestViewModel {
     status: dto.status,
     statusLabel: STATUS_LABELS[dto.status], // UI-specific
     statusColor: STATUS_COLORS[dto.status], // UI-specific
-    canSubmit: dto.status === "DRAFT", // UI invariant
-    canApprove: dto.status === "SUBMITTED", // UI invariant
+    canSubmit: dto.status === 'DRAFT', // UI invariant
+    canApprove: dto.status === 'SUBMITTED', // UI invariant
     submittedAt: dto.submitted_at ? formatDate(dto.submitted_at) : null,
-  };
+  }
 }
 ```
 
@@ -244,11 +244,11 @@ Modules communicate via a typed Event Bus in `core/`. This mirrors the backend's
 ```typescript
 // core/event-bus/event-bus.ts
 type EventMap = {
-  "payment-request:submitted": { id: string };
-  "payment-request:paid": { id: string; amount: Money };
-  "journal-entry:posted": { id: string; entryNumber: string };
-  "tenant:feature-toggled": { feature: string; enabled: boolean };
-};
+  'payment-request:submitted': { id: string }
+  'payment-request:paid': { id: string; amount: Money }
+  'journal-entry:posted': { id: string; entryNumber: string }
+  'tenant:feature-toggled': { feature: string; enabled: boolean }
+}
 ```
 
 ### 6.2 When to Use What
@@ -264,13 +264,13 @@ type EventMap = {
 
 ```typescript
 // ❌ BANNED: Module A importing Module B's internals
-import { useLedgerStore } from "@/modules/business/finance/ledger/stores/ledger.store";
+import { useLedgerStore } from '@/modules/business/finance/ledger/stores/ledger.store'
 
 // ✅ CORRECT: Listen via Event Bus
-eventBus.on("ledger:entry-posted", ({ id }) => {
+eventBus.on('ledger:entry-posted', ({ id }) => {
   // React to the event within our own module
-  refreshRelatedData(id);
-});
+  refreshRelatedData(id)
+})
 ```
 
 ---
@@ -321,11 +321,11 @@ All backend responses follow the envelope `{ success, data, meta }` or `{ succes
 ```typescript
 // core/api/http-client.ts
 async function request<T>(config: AxiosRequestConfig): Promise<T> {
-  const response = await axios(config);
+  const response = await axios(config)
   if (response.data.success) {
-    return response.data.data as T;
+    return response.data.data as T
   }
-  throw new ApiError(response.data.detail, response.data.code);
+  throw new ApiError(response.data.detail, response.data.code)
 }
 ```
 

@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { RouterView, useRoute } from "vue-router";
-import { businessModules, platformModules } from "@/modules";
-import type { BusinessDomain, PlatformEngine, MenuItem } from "@/core/types/module.types";
-import { Button } from "@/core/ui/button";
-import { LayoutDashboard, LogOut, ChevronRight, Library, Cpu, Settings } from "lucide-vue-next";
+import { RouterView, useRoute } from 'vue-router'
+import { businessModules, platformModules } from '@/modules'
+import type { BusinessDomain, PlatformEngine, MenuItem } from '@/core/types/module.types'
+import { Button } from '@/core/ui/button'
+import { LayoutDashboard, LogOut, ChevronRight, Library, Cpu, Settings } from 'lucide-vue-next'
 
-const route = useRoute();
+const route = useRoute()
 
 // Primary Navigation (Dashboard + Business Domains)
-const coreItems = [{ label: "Dashboard", icon: LayoutDashboard, href: "/app" }];
+const coreItems = [{ label: 'Dashboard', icon: LayoutDashboard, href: '/app' }]
 
 const businessItems = businessModules.flatMap((m: BusinessDomain) =>
   m.menuItems.map((item: MenuItem) => ({
     ...item,
-    href: item.href || `/app/${m.id}/${item.label.toLowerCase().replace(/ /g, "-")}`,
+    href: item.href || `/app/${m.id}/${item.label.toLowerCase().replace(/ /g, '-')}`,
   })),
-);
+)
 
 // Platform/Infrastructure Navigation
 const platformItems = platformModules.flatMap((m: PlatformEngine) =>
   m.menuItems.map((item: MenuItem) => ({
     ...item,
-    href: item.href || `/app/${m.id}/${item.label.toLowerCase().replace(/ /g, "-")}`,
+    href: item.href || `/app/${m.id}/${item.label.toLowerCase().replace(/ /g, '-')}`,
   })),
-);
+)
 </script>
 
 <template>
@@ -129,7 +129,7 @@ const platformItems = platformModules.flatMap((m: PlatformEngine) =>
         class="h-16 border-b border-neutral-100 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10 shrink-0"
       >
         <h2 class="text-lg font-bold text-neutral-900 tracking-tight">
-          {{ route.name || "Dashboard" }}
+          {{ route.name || 'Dashboard' }}
         </h2>
         <div class="flex items-center space-x-3">
           <Button variant="ghost" size="icon" class="rounded-full hover:bg-neutral-100 h-9 w-9">

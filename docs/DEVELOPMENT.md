@@ -8,9 +8,9 @@
 
 | **Environment** | **Vite+ (`vp`)** | Unified Build & Toolchain CLI |
 | **Node.js** | 20 LTS+ | JavaScript runtime |
-| **pnpm**    | 10+     | Recommended package manager |
-| **Git**     | 2.40+   | Version control |
-| **VS Code** | Latest  | Recommended IDE |
+| **pnpm** | 10+ | Recommended package manager |
+| **Git** | 2.40+ | Version control |
+| **VS Code** | Latest | Recommended IDE |
 
 ### Recommended VS Code Extensions
 
@@ -43,17 +43,17 @@ vp dev
 
 ## 3. Available Scripts
 
-| Command           | Description                                      |
-| ----------------- | ------------------------------------------------ |
-| `vp dev`          | Start Vite dev server with HMR                   |
-| `vp build`        | Production build                                 |
-| `vp preview`      | Preview production build locally                 |
+| Command                 | Description                                      |
+| ----------------------- | ------------------------------------------------ |
+| `vp dev`                | Start Vite dev server with HMR                   |
+| `vp build`              | Production build                                 |
+| `vp preview`            | Preview production build locally                 |
 | `vp run generate-types` | Regenerate TypeScript types from backend OpenAPI |
-| `vp lint`         | Run Oxlint                                 |
-| `vp fmt`          | Run Oxfmt                                  |
-| `vp check`        | Run unified type-check, lint, and format         |
-| `vp test`         | Run Vitest unit tests                            |
-| `vp run test:e2e` | Run Playwright E2E tests                         |
+| `vp lint`               | Run Oxlint                                       |
+| `vp fmt`                | Run Oxfmt                                        |
+| `vp check`              | Run unified type-check, lint, and format         |
+| `vp test`               | Run Vitest unit tests                            |
+| `vp run test:e2e`       | Run Playwright E2E tests                         |
 
 ---
 
@@ -65,26 +65,26 @@ vp dev
 - **No `any`**: Use `unknown` + type guards instead.
 - **Branded types** for domain IDs:
   ```typescript
-  type TenantId = string & { readonly __brand: "TenantId" };
-  type UserId = string & { readonly __brand: "UserId" };
+  type TenantId = string & { readonly __brand: 'TenantId' }
+  type UserId = string & { readonly __brand: 'UserId' }
   ```
 - **Exhaustive switch**: Always handle all enum variants:
   ```typescript
   function getStatusColor(status: PaymentRequestStatus): string {
     switch (status) {
-      case "DRAFT":
-        return "gray";
-      case "SUBMITTED":
-        return "blue";
-      case "APPROVED":
-        return "green";
-      case "REJECTED":
-        return "red";
-      case "PAID":
-        return "emerald";
+      case 'DRAFT':
+        return 'gray'
+      case 'SUBMITTED':
+        return 'blue'
+      case 'APPROVED':
+        return 'green'
+      case 'REJECTED':
+        return 'red'
+      case 'PAID':
+        return 'emerald'
       default: {
-        const _exhaustive: never = status;
-        throw new Error(`Unhandled status: ${_exhaustive}`);
+        const _exhaustive: never = status
+        throw new Error(`Unhandled status: ${_exhaustive}`)
       }
     }
   }
@@ -100,35 +100,35 @@ vp dev
 
 ### 4.3 Naming Conventions
 
-| Type           | Convention | Example                  | Location             |
-| -------------- | ---------- | ------------------------ | -------------------- |
-| Vue components | PascalCase | `AccountBadge.vue`       | `ui/components/`     |
-| Pages          | PascalCase | `JournalEntriesPage.vue` | `ui/pages/`          |
-| Grid Configs   | dot-suffix | `account.grid.ts`        | `ui/grids/`          |
-| UI Utils       | kebab-case | `account-formatter.ts`   | `ui/utils/`          |
-| Composables    | camelCase  | `useLedgerAccounts.ts`   | `application/`       |
-| Adapters       | snake_case | `ledger_adapter.ts`      | `infrastructure/`    |
-| Mappers        | dot-suffix | `ledger.mapper.ts`       | `domain/mappers/`    |
-| Types          | dot-suffix | `account.types.ts`       | `domain/models/`     |
+| Type           | Convention | Example                  | Location          |
+| -------------- | ---------- | ------------------------ | ----------------- |
+| Vue components | PascalCase | `AccountBadge.vue`       | `ui/components/`  |
+| Pages          | PascalCase | `JournalEntriesPage.vue` | `ui/pages/`       |
+| Grid Configs   | dot-suffix | `account.grid.ts`        | `ui/grids/`       |
+| UI Utils       | kebab-case | `account-formatter.ts`   | `ui/utils/`       |
+| Composables    | camelCase  | `useLedgerAccounts.ts`   | `application/`    |
+| Adapters       | snake_case | `ledger_adapter.ts`      | `infrastructure/` |
+| Mappers        | dot-suffix | `ledger.mapper.ts`       | `domain/mappers/` |
+| Types          | dot-suffix | `account.types.ts`       | `domain/models/`  |
 
 ### 4.4 Import Order
 
 ```typescript
 // 1. Framework & Core Primitives
-import { ref, computed } from "vue";
-import { Button } from "@/core/ui/button";
-import { DataGrid, useDataGrid } from "@/core/ui/data-grid";
+import { ref, computed } from 'vue'
+import { Button } from '@/core/ui/button'
+import { DataGrid, useDataGrid } from '@/core/ui/data-grid'
 
 // 2. Application Layer (Orchestration)
-import { useLedgerAccounts } from "../../application/composables/useLedgerAccounts";
+import { useLedgerAccounts } from '../../application/composables/useLedgerAccounts'
 
 // 3. UI Layer (Configuration & Logic)
-import { accountColumns } from "../grids/account.grid";
-import { formatAccountCode } from "../utils/account-formatter";
+import { accountColumns } from '../grids/account.grid'
+import { formatAccountCode } from '../utils/account-formatter'
 
 // 4. Domain & Infrastructure (Implementation)
-import { toEntity } from "../../domain/mappers/ledger.mapper";
-import { ledgerAdapter } from "../../infrastructure/ledger_adapter";
+import { toEntity } from '../../domain/mappers/ledger.mapper'
+import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 ```
 
 ---
@@ -189,7 +189,7 @@ VITE_API_BASE_URL=https://api.abren.app
 All visual tokens are defined in `src/assets/main.css` using Tailwind v4's `@theme` directive:
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Colors */
@@ -201,8 +201,8 @@ All visual tokens are defined in `src/assets/main.css` using Tailwind v4's `@the
   --color-danger: #ef4444;
 
   /* Typography */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
   /* Radius */
   --radius-sm: 0.25rem;

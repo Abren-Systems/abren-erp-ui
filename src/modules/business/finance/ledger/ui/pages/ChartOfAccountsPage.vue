@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { DataGrid, useDataGrid } from "@/core/ui/data-grid";
-import { Button } from "@/core/ui/button";
-import { Plus } from "lucide-vue-next";
-import { useLedgerAccounts } from "../../application/composables/useLedgerAccounts";
-import { accountColumns } from "../grids/account.grid";
+import { DataGrid, useDataGrid } from '@/core/ui/data-grid'
+import { Button } from '@/core/ui/button'
+import { Plus } from 'lucide-vue-next'
+import { useLedgerAccounts } from '../../application/composables/useLedgerAccounts'
+import { accountColumns } from '../grids/account.grid'
 
 // ── Grid state (sorting, selection, global filter) ─────────────
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
+const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
 // ── Application Layer Orchestration ────────────────────────────
-const { accounts: data, isPending } = useLedgerAccounts();
+const { accounts: data, isPending } = useLedgerAccounts()
 </script>
 
 <template>

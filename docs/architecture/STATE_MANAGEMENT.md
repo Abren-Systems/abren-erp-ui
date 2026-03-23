@@ -27,26 +27,26 @@ Domain data (entities fetched from the API) must **never** be manually duplicate
 
 ```typescript
 // modules/business/finance/ledger/ui/stores/ledger-ui.store.ts
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export const useLedgerUIStore = defineStore("ledger-ui", () => {
-  const isFilterVisible = ref(false);
-  const activeView = ref<'grid' | 'cards'>('grid');
-  const selectedAccountId = ref<string | null>(null);
+export const useLedgerUIStore = defineStore('ledger-ui', () => {
+  const isFilterVisible = ref(false)
+  const activeView = ref<'grid' | 'cards'>('grid')
+  const selectedAccountId = ref<string | null>(null)
 
   function toggleFilters() {
-    isFilterVisible.value = !isFilterVisible.value;
+    isFilterVisible.value = !isFilterVisible.value
   }
 
   function $reset() {
-    isFilterVisible.value = false;
-    activeView.value = 'grid';
-    selectedAccountId.value = null;
+    isFilterVisible.value = false
+    activeView.value = 'grid'
+    selectedAccountId.value = null
   }
 
-  return { isFilterVisible, activeView, selectedAccountId, toggleFilters, $reset };
-});
+  return { isFilterVisible, activeView, selectedAccountId, toggleFilters, $reset }
+})
 ```
 
 ### 2.2 Key Rules
@@ -81,9 +81,9 @@ sequenceDiagram
 
 ```typescript
 // modules/business/finance/ap/payment-requests/application/composables/usePaymentRequests.ts
-import { useQuery } from "@tanstack/vue-query";
-import { paymentRequestAdapter } from "../infrastructure/payment_request_adapter";
-import { mapPaymentRequest } from "../infrastructure/payment_request.mapper";
+import { useQuery } from '@tanstack/vue-query'
+import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
+import { mapPaymentRequest } from '../infrastructure/payment_request.mapper'
 
 export function usePaymentRequests() {
   const {
@@ -91,14 +91,14 @@ export function usePaymentRequests() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["payment-requests"],
+    queryKey: ['payment-requests'],
     queryFn: async () => {
-      const dtos = await paymentRequestAdapter.list();
-      return dtos.map(mapPaymentRequest);
+      const dtos = await paymentRequestAdapter.list()
+      return dtos.map(mapPaymentRequest)
     },
-  });
+  })
 
-  return { requests, isLoading, error };
+  return { requests, isLoading, error }
 }
 ```
 
@@ -110,28 +110,28 @@ Stores **never** import other stores. When Module A's action should refresh Modu
 
 ```typescript
 // modules/payment-requests/composables/usePayRequest.ts
-import { eventBus } from "@/core/event-bus/event-bus";
+import { eventBus } from '@/core/event-bus/event-bus'
 
 export function usePayRequest() {
   async function payRequest(id: string, dto: PayRequestDTO) {
-    const result = await paymentRequestApi.pay(id, dto);
-    store.updateRequest(toViewModel(result));
+    const result = await paymentRequestApi.pay(id, dto)
+    store.updateRequest(toViewModel(result))
 
     // Notify other modules without importing them
-    eventBus.emit("payment-request:paid", {
+    eventBus.emit('payment-request:paid', {
       id: result.id,
       amount: Money.from(result.amount, result.currency),
-    });
+    })
   }
 
-  return { payRequest };
+  return { payRequest }
 }
 
 // modules/business/finance/ledger/application/composables/useLedgerAccounts.ts
 // Subscribes to the event — refreshes its own caches
-eventBus.on("payment-request:paid", () => {
-  queryClient.invalidateQueries(["ledger-accounts"]);
-});
+eventBus.on('payment-request:paid', () => {
+  queryClient.invalidateQueries(['ledger-accounts'])
+})
 ```
 
 ---
@@ -142,30 +142,30 @@ For actions that should feel instant (like submitting a request), apply state ch
 
 ```typescript
 export function useSubmitRequest() {
-  const store = usePaymentRequestStore();
+  const store = usePaymentRequestStore()
 
   async function submit(id: string) {
-    const previousState = { ...store.requests };
+    const previousState = { ...store.requests }
 
     // 1. Optimistic update
     store.updateRequest({
       ...store.selectedRequest!,
-      status: "SUBMITTED",
+      status: 'SUBMITTED',
       canSubmit: false,
-    });
+    })
 
     try {
       // 2. Confirm with server
-      const confirmed = await paymentRequestApi.submit(id);
-      store.updateRequest(toViewModel(confirmed));
+      const confirmed = await paymentRequestApi.submit(id)
+      store.updateRequest(toViewModel(confirmed))
     } catch (error) {
       // 3. Rollback on failure
-      store.setRequests(previousState);
-      throw error;
+      store.setRequests(previousState)
+      throw error
     }
   }
 
-  return { submit };
+  return { submit }
 }
 ```
 
@@ -177,16 +177,16 @@ The auth store is the **only** store in `core/`. It holds identity state consume
 
 ```typescript
 // core/auth/auth.store.ts
-export const useAuthStore = defineStore("auth", () => {
-  const token = ref<string | null>(null);
-  const currentUser = ref<CurrentUser | null>(null);
-  const currentTenant = ref<TenantInfo | null>(null);
+export const useAuthStore = defineStore('auth', () => {
+  const token = ref<string | null>(null)
+  const currentUser = ref<CurrentUser | null>(null)
+  const currentTenant = ref<TenantInfo | null>(null)
 
-  const isAuthenticated = computed(() => !!token.value);
-  const tenantFeatures = computed(() => currentTenant.value?.features ?? {});
+  const isAuthenticated = computed(() => !!token.value)
+  const tenantFeatures = computed(() => currentTenant.value?.features ?? {})
 
   function hasFeature(feature: string): boolean {
-    return tenantFeatures.value[feature] === true;
+    return tenantFeatures.value[feature] === true
   }
 
   return {
@@ -196,8 +196,8 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     tenantFeatures,
     hasFeature,
-  };
-});
+  }
+})
 ```
 
 This store is not a bounded context — it's infrastructure that enables module isolation by providing identity context to route guards and API interceptors.

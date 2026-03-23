@@ -1,9 +1,9 @@
-import type { components } from "@/core/api/generated.types";
-import type { Account } from "../domain/account.types";
-import { Currency } from "@/core/domain/currency";
-import { Money } from "@/core/domain/money";
+import type { components } from '@/core/api/generated.types'
+import type { Account } from '../domain/account.types'
+import { Currency } from '@/core/domain/currency'
+import { Money } from '@/core/domain/money'
 
-type AccountRead = components["schemas"]["AccountRead"];
+type AccountRead = components['schemas']['AccountRead']
 
 /**
  * Transforms a raw API Account DTO into a Domain Type
@@ -11,7 +11,7 @@ type AccountRead = components["schemas"]["AccountRead"];
 export function mapAccount(dto: AccountRead): Account {
   // Backend currently doesn't provide currency_code in AccountRead,
   // defaulting to functional currency (ETB) for now.
-  const currency = Currency.ETB;
+  const currency = Currency.ETB
 
   return {
     id: dto.id,
@@ -21,5 +21,5 @@ export function mapAccount(dto: AccountRead): Account {
     currency: currency,
     isActive: dto.is_active,
     balance: Money.zero(currency),
-  };
+  }
 }

@@ -1,4 +1,4 @@
-import { useMutation, type UseMutationOptions } from "@tanstack/vue-query";
+import { useMutation, type UseMutationOptions } from '@tanstack/vue-query'
 
 /**
  * useApiMutation
@@ -13,5 +13,5 @@ export function useApiMutation<TData, TError = Error, TVariables = void, TContex
   return useMutation({
     mutationFn,
     ...options,
-  });
+  })
 }

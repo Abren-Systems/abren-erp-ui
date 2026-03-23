@@ -1,4 +1,4 @@
-import type { RouteLocationNormalized, NavigationGuardNext } from "vue-router";
+import type { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 
 /**
  * authGuard
@@ -12,13 +12,13 @@ export async function authGuard(
   next: NavigationGuardNext,
 ) {
   // TODO: Connect to useAuthStore()
-  const isAuthenticated = true; // Mocked for now
+  const isAuthenticated = true // Mocked for now
 
-  if (to.path.startsWith("/app") && !isAuthenticated) {
-    next("/login");
-  } else if (to.path === "/login" && isAuthenticated) {
-    next("/app");
+  if (to.path.startsWith('/app') && !isAuthenticated) {
+    next('/login')
+  } else if (to.path === '/login' && isAuthenticated) {
+    next('/app')
   } else {
-    next();
+    next()
   }
 }

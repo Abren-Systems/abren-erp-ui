@@ -1,5 +1,5 @@
-import { Currency } from "@/core/domain/currency";
-import { Money } from "@/core/domain/money";
+import { Currency } from '@/core/domain/currency'
+import { Money } from '@/core/domain/money'
 
 /**
  * Account Domain Type
@@ -8,13 +8,13 @@ import { Money } from "@/core/domain/money";
  * Vue-native and fully reactive.
  */
 export interface Account {
-  id: string;
-  code: string; // We'll keep it as string in domain for easier display/search
-  name: string;
-  type: string;
-  currency?: Currency; // Optional if not provided by backend
-  isActive: boolean;
-  balance: Money;
+  id: string
+  code: string // We'll keep it as string in domain for easier display/search
+  name: string
+  type: string
+  currency?: Currency // Optional if not provided by backend
+  isActive: boolean
+  balance: Money
 }
 
 /**
@@ -22,5 +22,5 @@ export interface Account {
  */
 export interface AccountSummary extends Account {
   // Add derived properties if needed for summary
-  hasJournalEntries: boolean;
+  hasJournalEntries: boolean
 }
