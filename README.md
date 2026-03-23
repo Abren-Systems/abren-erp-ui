@@ -22,16 +22,16 @@
 
 ```bash
 # Install dependencies
-npm install
+vp install
 
 # Start dev server (proxies /api to localhost:8000)
-npm run dev
+vp dev
 
 # Run unit tests
-npm run test:unit
+vp test
 
 # Generate API types from backend
-npm run generate-types
+vp run generate-types
 ```
 
 ## Project Structure

@@ -31,31 +31,30 @@ git clone <repo-url> abren-erp-ui
 cd abren-erp-ui
 
 # Install dependencies
-npm install
+vp install
 
 # Generate API types (requires backend running on port 8000)
-npm run generate-types
+vp run generate-types
 
 # Start dev server
-npm run dev
+vp dev
 ```
 
 ---
 
 ## 3. Available Scripts
 
-| Command                  | Description                                      |
-| ------------------------ | ------------------------------------------------ |
-| `npm run dev`            | Start Vite dev server with HMR                   |
-| `npm run build`          | Production build                                 |
-| `npm run preview`        | Preview production build locally                 |
-| `npm run generate-types` | Regenerate TypeScript types from backend OpenAPI |
-| `npm run lint`           | Run ESLint                                       |
-| `npm run lint:fix`       | Run ESLint with auto-fix                         |
-| `npm run type-check`     | Run TypeScript compiler (no emit)                |
-| `npm run test`           | Run Vitest unit tests                            |
-| `npm run test:coverage`  | Run tests with coverage report                   |
-| `npm run test:e2e`       | Run Playwright E2E tests                         |
+| Command           | Description                                      |
+| ----------------- | ------------------------------------------------ |
+| `vp dev`          | Start Vite dev server with HMR                   |
+| `vp build`        | Production build                                 |
+| `vp preview`      | Preview production build locally                 |
+| `vp run generate-types` | Regenerate TypeScript types from backend OpenAPI |
+| `vp lint`         | Run Oxlint                                 |
+| `vp fmt`          | Run Oxfmt                                  |
+| `vp check`        | Run unified type-check, lint, and format         |
+| `vp test`         | Run Vitest unit tests                            |
+| `vp run test:e2e` | Run Playwright E2E tests                         |
 
 ---
 
@@ -158,9 +157,8 @@ test(payment-requests): add mapper unit tests
 
 Before every commit:
 
-1. `npm run lint:fix` — Auto-fix linting issues
-2. `npm run type-check` — Ensure no TypeScript errors
-3. `npm run test` — Run unit tests
+1. `vp check --fix` — Auto-fix linting and formatting issues
+2. `vp test` — Run unit tests
 
 ---
 
