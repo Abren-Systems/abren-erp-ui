@@ -101,33 +101,35 @@ vp dev
 
 ### 4.3 Naming Conventions
 
-| Type           | Convention | Example                  |
-| -------------- | ---------- | ------------------------ |
-| Directories    | kebab-case | `payment-requests/`      |
-| Vue components | PascalCase | `PaymentRequestForm.vue` |
-| Composables    | camelCase  | `usePaymentRequests.ts`  |
-| Adapters       | snake_case | `ledger_adapter.ts`      |
-| Mappers        | dot-suffix | `ledger.mapper.ts`       |
-| Types          | dot-suffix | `account.types.ts`       |
-| Formatters     | kebab-case | `account-formatter.ts`   |
+| Type           | Convention | Example                  | Location             |
+| -------------- | ---------- | ------------------------ | -------------------- |
+| Vue components | PascalCase | `AccountBadge.vue`       | `ui/components/`     |
+| Pages          | PascalCase | `JournalEntriesPage.vue` | `ui/pages/`          |
+| Grid Configs   | dot-suffix | `account.grid.ts`        | `ui/grids/`          |
+| UI Utils       | kebab-case | `account-formatter.ts`   | `ui/utils/`          |
+| Composables    | camelCase  | `useLedgerAccounts.ts`   | `application/`       |
+| Adapters       | snake_case | `ledger_adapter.ts`      | `infrastructure/`    |
+| Mappers        | dot-suffix | `ledger.mapper.ts`       | `domain/mappers/`    |
+| Types          | dot-suffix | `account.types.ts`       | `domain/models/`     |
 
 ### 4.4 Import Order
 
 ```typescript
-// 1. Vue/framework imports
+// 1. Framework & Core Primitives
 import { ref, computed } from "vue";
-import { useQuery } from "@tanstack/vue-query";
-
-// 2. Core infrastructure imports
-import { Money } from "@/core/domain/money";
 import { Button } from "@/core/ui/button";
+import { DataGrid, useDataGrid } from "@/core/ui/data-grid";
 
-// 3. Module orchestration (Application)
-import { useLedgerAccounts } from "../application/composables/useLedgerAccounts";
+// 2. Application Layer (Orchestration)
+import { useLedgerAccounts } from "../../application/composables/useLedgerAccounts";
 
-// 4. Domain & Infrastructure
-import type { Account } from "../domain/account.types";
-import { ledgerAdapter } from "../infrastructure/ledger_adapter";
+// 3. UI Layer (Configuration & Logic)
+import { accountColumns } from "../grids/account.grid";
+import { formatAccountCode } from "../utils/account-formatter";
+
+// 4. Domain & Infrastructure (Implementation)
+import { toEntity } from "../../domain/mappers/ledger.mapper";
+import { ledgerAdapter } from "../../infrastructure/ledger_adapter";
 ```
 
 ---
@@ -212,7 +214,35 @@ All visual tokens are defined in `src/assets/main.css` using Tailwind v4's `@the
 
 ### 7.2 Rules
 
-- **No hardcoded colors** in component styles — use Tailwind utilities with design tokens.
-- **Scoped styles** in every component.
-- **Dark mode**: Support via `[data-theme="dark"]` attribute on `<html>`.
 - **Always use `core/ui/` components** — never raw HTML elements for buttons, inputs, or tables.
+
+---
+
+## 8. High-Integrity Module Structure
+
+Every module MUST adhere to the **4-Layer Architecture** to prevent logic leakage and ensure scalability.
+
+```text
+src/modules/{category}/{module}/
+├── domain/                # PURE BUSINESS LOGIC
+│   ├── models/            # Plain Types & Value Objects
+│   └── mappers/           # DTO → Entity transformation
+├── application/           # ORCHESTRATION
+│   └── composables/       # TanStack Query logic, Workflows
+├── infrastructure/        # EXTERNAL WORLD
+│   ├── api.types.ts       # Generated DTO re-exports
+│   └── {name}_adapter.ts  # HTTP calls & path resolution
+└── ui/                    # PRESENTATION
+    ├── components/        # Stateless molecules
+    ├── pages/             # Stateful orchestrators
+    ├── grids/             # Column definitions (DataGrid)
+    └── utils/             # Formatters & display logic
+```
+
+### 8.1 The "Gold Standard" Blueprint
+
+When starting a new module or refactoring an old one, use the **Finance / Ledger** module as the reference implementation. It is the first module to achieve full High-Integrity alignment.
+
+- **Grid Config**: [account.grid.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/ui/grids/account.grid.ts)
+- **Application Logic**: [useLedgerAccounts.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/application/composables/useLedgerAccounts.ts)
+- **Domain Mapping**: [ledger.mapper.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/domain/mappers/ledger.mapper.ts)

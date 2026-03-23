@@ -30,7 +30,7 @@ This provides the **speed of a UI library** with the **absolute code ownership o
 
 Reka UI is the official, independent port of the legendary Radix Primitives for Vue. It provides unstyled, highly accessible UI components (Select, Dialog, Dropdown, Accordion) built entirely from scratch using the Vue 3 Composition API.
 
-- **How it works:** You install `radix-vue` (soon to be `reka-ui`), import `<SelectRoot>`, `<SelectTrigger>`, and `<SelectPortal>`, and wrap them around your own HTML.
+- **How it works:** You install `reka-ui`, import `<SelectRoot>`, `<SelectTrigger>`, and `<SelectPortal>`, and wrap them around your own HTML.
 - **Pros:**
   - 100% control over the DOM.
   - You aren't fighting a framework's generic CSS.
@@ -50,7 +50,7 @@ shadcn-vue is a tremendously popular pattern (originally popular in React as `sh
 - **Pros:**
   - **Zero Vendor Lock-in:** You physically own the `.vue` file. There is no `node_modules/shadcn-vue` to update and break your app. If you need a custom ERP feature in a dropdown, you just edit your local `core/ui/Dropdown.vue`.
   - **Massive Time-Saver:** You get an enterprise-grade, beautifully styled component immediately, saving weeks of writing focus-states in Tailwind.
-  - **Ecosystem Synergy:** Integrates natively with `@tanstack/zod-form-adapter`, Radix Vue, and Tailwind CSS.
+  - **Ecosystem Synergy:** Integrates natively with `@tanstack/zod-form-adapter`, Reka UI, and Tailwind CSS.
 - **Cons:**
   - You inherit their initial design opinions (which are excellent, but you will need to map them slightly to our new `@theme` tokens in `main.css`).
   - Creates slightly more boilerplate in your `core/ui` folder, but this is intentional (ownership over abstraction).

@@ -188,7 +188,7 @@ Abren ERP enforces a strict functional split for floating surfaces to preserve b
 
 ### 7.3 Destructive Confirmations
 
-Any action that deletes a record or irrevocably alters a ledger state must trigger a blocking **AlertDialog** (using Radix Vue primitives). The dialog must force the user to explicitly click an Indigo or Red confirmation button. Passive "Are you sure?" tooltips are insufficient for destructive financial actions.
+Any action that deletes a record or irrevocably alters a ledger state must trigger a blocking **AlertDialog** (using Reka UI primitives). The dialog must force the user to explicitly click an Indigo or Red confirmation button. Passive "Are you sure?" tooltips are insufficient for destructive financial actions.
 
 ---
 
@@ -249,9 +249,9 @@ The UI layer must remain isolated from hardcoded currency symbols or date format
 
 ## 11. Primitive Components (`core/ui/`)
 
-All base UI components (`AppButton`, `AppInput`, `AppSelect`, etc.) are physically owned in `src/core/ui/` and strictly utilize the tokens above.
+All base UI components (`Button`, `Input`, `Select`, etc.) are physically owned in `src/core/ui/` and strictly utilize the tokens above.
 
-- **Base Tech:** Radix Vue (accessible DOM primitives via `radix-vue`)
+- **Base Tech:** Reka UI (accessible DOM primitives via `reka-ui`)
 - **Scaffolding:** shadcn-vue CLI
 - **Styling Framework:** Tailwind CSS v4 `@theme`
 

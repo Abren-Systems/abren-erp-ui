@@ -440,7 +440,7 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
 
 ```vue
 <DataGrid
-  :columns="columns"
+  :columns="accountColumns"
   :data="data"
   :loading="isPending"
   v-model:sorting="sorting"
@@ -450,7 +450,7 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
 />
 ```
 
-> **Rule**: Never pass `Ref` objects as props. Always bind primitives via `v-model`.
+> **Rule**: Column definitions (`accountColumns`) must be defined in the **Grid Configuration Layer** (`ui/grids/account.grid.ts`), NOT inline in the page or component.
 
 ---
 
@@ -458,11 +458,13 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
 
 ```text
 src/core/ui/data-grid/
-├── DataGrid.vue              ← Main orchestrator (BUILT)
-├── DataGridToolbar.vue       ← Search + actions (BUILT)
-├── DataGridColumnHeader.vue  ← Sortable header cell (BUILT)
-├── DataGridSkeleton.vue      ← Shimmer loading rows (BUILT)
-├── DataGridEmpty.vue         ← No-results state (BUILT)
+├── core/
+│   ├── DataGrid.vue          ← Main entry point (BUILT)
+│   ├── DataGridSkeleton.vue  ← Shimmer loading rows (BUILT)
+│   └── DataGridEmpty.vue     ← No-results state (BUILT)
+├── plugins/
+│   ├── DataGridToolbar.vue       ← Search + actions (BUILT)
+│   └── DataGridColumnHeader.vue  ← Sortable header cell (BUILT)
 ├── index.ts                  ← Public API barrel (BUILT)
 │
 ├── Filters/ [PHASE 2]
@@ -486,6 +488,9 @@ src/core/ui/data-grid/
 
 src/core/composables/
 └── useDataGrid.ts            ← State factory (BUILT)
+
+src/modules/{module}/ui/grids/
+└── {entity}.grid.ts          ← Column Definitions & Formatters
 ```
 
 ---
@@ -553,7 +558,7 @@ Triggered by right-click on a data row.
 | Edit            | If row is editable            |
 | Delete          | If user has delete permission |
 
-Implementation: Radix Vue `ContextMenu` primitive.
+Implementation: Reka UI `ContextMenu` primitive.
 
 ---
 

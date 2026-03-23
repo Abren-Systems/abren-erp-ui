@@ -1,7 +1,7 @@
 # UI Component Architecture
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)
-> **Stack:** Vue 3 + Tailwind CSS v4 + Radix Vue (Headless)
+> **Stack:** Vue 3 + Tailwind CSS v4 + Reka UI (Headless) + shadcn-vue + Custom Design System
 
 ---
 

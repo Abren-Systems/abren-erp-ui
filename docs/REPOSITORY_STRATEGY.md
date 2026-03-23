@@ -28,15 +28,18 @@ abren-erp/                           # Parent directory (NOT a git repo)
 └── abren-erp-ui/                    # Frontend (new git repo)
     ├── src/
     │   ├── modules/
-    │   │   ├── identity/            ← mirrors core
-    │   │   ├── accounting/          ← mirrors accounting
-    │   │   ├── workflows/           ← mirrors approvals
-    │   │   ├── payment-requests/    ← mirrors payment_requests
-    │   │   ├── banking/             ← mirrors bank
-    │   │   ├── reporting/           ← mirrors reporting
-    │   │   ├── webhooks/            ← mirrors webhooks
-    │   │   └── system/              ← mirrors system
-    │   └── core/
+    │   │   ├── platform/            # Infrastructure & Platform Engines
+    │   │   │   ├── core/            ← identity, tenants, generic types
+    │   │   │   ├── workflows/       ← approvals, state machines
+    │   │   │   └── system/          ← logging, audit, global config
+    │   │   │
+    │   │   └── business/            # Vertical Business Applications
+    │   │       └── finance/
+    │   │           ├── ledger/      ← accounting, COA, journals
+    │   │           └── ap/
+    │   │               └── payment-requests/
+    │   │
+    │   └── core/                    # Shared UI Components & Global Utils
     ├── docs/
     ├── package.json
     ├── vite.config.ts
@@ -102,7 +105,7 @@ export interface components {
   }
 }
 
-// modules/payment-requests/types/api.types.ts — Module-scoped re-export
+// modules/business/finance/ap/payment-requests/infrastructure/api.types.ts — Module-scoped re-export
 import type { components } from '@/core/api/generated.types'
 
 export type PaymentRequestDTO = components['schemas']['PaymentRequestDTO']

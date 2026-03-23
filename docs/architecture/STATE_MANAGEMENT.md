@@ -9,83 +9,43 @@
 
 We distinguish between two types of state to ensure high performance and reliability:
 
-1.  **Server State (TanStack Query)**: Data that lives on the server and is fetched via API (e.g., Accounts, Payment Requests). TanStack Query handles caching, refetching, and optimistic updates.
-2.  **Client State (Pinia)**: Ephemeral UI state (e.g., "is sidebar open") or cross-cutting configuration (e.g., "current tenant").
+1.  **Server State (TanStack Query)**: **The Source of Truth** for all domain data (e.g., Accounts, Payment Requests). It manages the cache lifecycle, background refetching, and API synchronization.
+2.  **Client State (Pinia)**: **Ephemeral UI State** (e.g., "is sidebar open", "active tab") or **Global Context** (e.g., "current session", "permissions").
 
-### 1.1 Store Boundaries
+### 1.1 The "Query-First" Rule
 
-Each module uses **TanStack Query** for all domain data fetching and caching. Pinia is reserved ONLY for ephemeral UI state (e.g. "is the filter panel expanded").
+Domain data (entities fetched from the API) must **never** be manually duplicated into a Pinia store unless there is a specific requirement for complex cross-component optimistic mutations that TanStack Query cannot handle (extremely rare in an ERP).
+
+- **Use TanStack Query** for: List data, Single records, Paginated results.
+- **Use Pinia** for: Sidebar toggles, Command palette visibility, Local form drafts, App density settings.
 
 ---
 
 ## 2. Store Anatomy
 
-### 2.1 Standard Store Template
+### 2.1 UI State Store Template (The Ephemeral Local)
 
 ```typescript
-// modules/payment-requests/stores/payment-requests.store.ts
+// modules/business/finance/ledger/ui/stores/ledger-ui.store.ts
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import type { PaymentRequestViewModel } from "../types/view.types";
+import { ref } from "vue";
 
-export const usePaymentRequestStore = defineStore("payment-requests", () => {
-  // ── State ──────────────────────────────────────────────
-  const requests = ref<PaymentRequestViewModel[]>([]);
-  const isLoading = ref(false);
-  const error = ref<string | null>(null);
-  const selectedId = ref<string | null>(null);
+export const useLedgerUIStore = defineStore("ledger-ui", () => {
+  const isFilterVisible = ref(false);
+  const activeView = ref<'grid' | 'cards'>('grid');
+  const selectedAccountId = ref<string | null>(null);
 
-  // ── Computed (Derived State) ───────────────────────────
-  const selectedRequest = computed(
-    () => requests.value.find((r) => r.id === selectedId.value) ?? null,
-  );
-  const draftRequests = computed(() => requests.value.filter((r) => r.status === "DRAFT"));
-  const pendingApproval = computed(() => requests.value.filter((r) => r.status === "SUBMITTED"));
-
-  // ── Actions ────────────────────────────────────────────
-  function setRequests(data: PaymentRequestViewModel[]) {
-    requests.value = data;
-  }
-
-  function updateRequest(updated: PaymentRequestViewModel) {
-    const idx = requests.value.findIndex((r) => r.id === updated.id);
-    if (idx >= 0) {
-      requests.value[idx] = updated;
-    }
-  }
-
-  function setLoading(state: boolean) {
-    isLoading.value = state;
-  }
-
-  function setError(msg: string | null) {
-    error.value = msg;
+  function toggleFilters() {
+    isFilterVisible.value = !isFilterVisible.value;
   }
 
   function $reset() {
-    requests.value = [];
-    isLoading.value = false;
-    error.value = null;
-    selectedId.value = null;
+    isFilterVisible.value = false;
+    activeView.value = 'grid';
+    selectedAccountId.value = null;
   }
 
-  return {
-    // State
-    requests,
-    isLoading,
-    error,
-    selectedId,
-    // Computed
-    selectedRequest,
-    draftRequests,
-    pendingApproval,
-    // Actions
-    setRequests,
-    updateRequest,
-    setLoading,
-    setError,
-    $reset,
-  };
+  return { isFilterVisible, activeView, selectedAccountId, toggleFilters, $reset };
 });
 ```
 

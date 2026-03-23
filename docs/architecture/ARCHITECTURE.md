@@ -113,7 +113,7 @@ graph TD
 | **Framework**             | Vue 3 (Composition API)                   | SFC colocation, perfect mapping for backend Use Cases                                                                |
 | **Build**                 | Vite                                      | Sub-second HMR, native ESM, Tailwind v4 native support                                                               |
 | **UI System**             | **Custom Design System** (`core/ui/`)     | Full ownership, zero vendor lock-in, ERP-optimized. _(See [UI_FOUNDATION_DECISION.md](./UI_FOUNDATION_DECISION.md))_ |
-| **Accessible Primitives** | **Radix Vue** / **shadcn-vue**            | Headless Dialog, Tooltip, Popover, DropdownMenu                                                                      |
+| **Accessible Primitives** | **Reka UI** / **shadcn-vue**            | Headless Dialog, Tooltip, Popover, DropdownMenu                                                                      |
 | **DataGrid Engine**       | **TanStack Table** + **TanStack Virtual** | Sorting, filtering, pagination, virtualized scrolling                                                                |
 | **Server State**          | **TanStack Query**                        | Caching, background refetch, optimistic updates                                                                      |
 | **Form State**            | **TanStack Form** + **Zod**               | Headless, type-safe validation                                                                                       |
@@ -193,6 +193,8 @@ export const ledgerModule: ModuleDefinition = {
 ---
 
 ## 5. Anti-Corruption Layer (The Mapper Pattern)
+
+- **Component Foundation**: [Reka UI](https://reka-ui.com/) (formerly Radix Vue) + [shadcn-vue](https://www.shadcn-vue.com/). We use headless primitives to ensure 100% accessibility and full styling control via our custom design system.
 
 ### 5.1 Why Mappers?
 

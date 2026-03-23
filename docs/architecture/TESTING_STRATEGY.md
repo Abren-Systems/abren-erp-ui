@@ -29,12 +29,11 @@
 
 | Layer             | Type        | What to Test                                    | Tool                    | Coverage Target |
 | ----------------- | ----------- | ----------------------------------------------- | ----------------------- | --------------- |
-| **Mappers**       | Unit        | DTO → ViewModel transformation correctness      | Vitest                  | **100%**        |
-| **Value Objects** | Unit        | `Money` arithmetic, `Currency` parsing          | Vitest                  | **100%**        |
-| **Composables**   | Unit        | Business logic orchestration, error handling    | Vitest                  | **90%+**        |
-| **Stores**        | Unit        | State mutations, computed derivations           | Vitest + Pinia Testing  | **90%+**        |
-| **Components**    | Component   | Render output, user interactions, prop handling | Vitest + Vue Test Utils | **80%+**        |
-| **Module Flow**   | Integration | Full flow: API → Mapper → Store → Component     | Vitest + MSW            | Key workflows   |
+| **Mappers**       | Unit        | DTO → Entity transformation correctness         | Vitest                  | **100%**        |
+| **Grid Configs**  | Unit        | Column definitions, formatting logic            | Vitest                  | **100%**        |
+| **Composables**   | Unit        | Application orchestration, Query state          | Vitest + Vue Test Utils | **90%+**        |
+| **Components**    | Component   | Render output, user interactions (Tier 1-3)     | Vitest + Vue Test Utils | **80%+**        |
+| **Feature Pages** | Integration | Full flow: API (MSW) → Composable → Grid        | Vitest + MSW            | Key workflows   |
 | **User Journeys** | E2E         | Login → Navigate → Create → Submit → Approve    | Playwright              | Critical paths  |
 
 ---
@@ -46,10 +45,10 @@
 Mappers are pure functions — they're the cheapest, fastest, and most impactful tests.
 
 ```typescript
-// modules/payment-requests/mappers/__tests__/payment-request.mapper.test.ts
+// modules/business/finance/ap/payment-requests/domain/mappers/__tests__/payment-request.mapper.test.ts
 import { describe, it, expect } from "vitest";
-import { toViewModel } from "../payment-request.mapper";
-import type { PaymentRequestDTO } from "../../types/api.types";
+import { toEntity } from "../payment-request.mapper";
+import type { PaymentRequestDTO } from "../../infrastructure/api.types";
 
 describe("PaymentRequest Mapper", () => {
   const baseDTO: PaymentRequestDTO = {
@@ -129,21 +128,39 @@ describe("Money", () => {
 });
 ```
 
-### 3.3 Composable Tests
+### 3.3 Composable Tests (Application Orchestration)
+
+Composables should be tested by mocking the Infrastructure layer (API calls) and asserting on the returned reactive states from TanStack Query.
 
 ```typescript
-// modules/payment-requests/composables/__tests__/useSubmitRequest.test.ts
+// modules/business/finance/ap/payment-requests/application/composables/__tests__/useSubmitRequest.test.ts
 import { describe, it, expect, vi } from "vitest";
-import { setActivePinia, createPinia } from "pinia";
 import { useSubmitRequest } from "../useSubmitRequest";
 
 describe("useSubmitRequest", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
+  it("transitions to success state after API call", async () => {
+    // ... test Query status (isPending -> isSuccess)
+  });
+});
+```
+
+### 3.4 Grid Configuration Tests (UI Layer)
+
+Tests that the column definitions have correct formatters and alignment.
+
+```typescript
+// modules/business/finance/ledger/ui/grids/__tests__/account.grid.test.ts
+import { describe, it, expect } from "vitest";
+import { accountColumns } from "../account.grid";
+
+describe("Account Grid Configuration", () => {
+  it("defines the Code column with correct alignment", () => {
+    const col = accountColumns.find(c => c.id === 'code');
+    expect(col.meta?.align).toBe('left');
   });
 
-  it("updates store status optimistically", async () => {
-    // ... test optimistic update + rollback on failure
+  it("assigns the Currency formatter to the balance column", () => {
+    // ... verify formatter logic
   });
 });
 ```
