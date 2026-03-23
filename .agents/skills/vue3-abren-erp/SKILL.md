@@ -9,11 +9,12 @@ description: Comprehensive patterns, conventions, and code examples for developi
 
 1. **ALWAYS** use Vue 3 **Composition API** with `<script setup lang="ts">`. **NEVER** use Options API.
 2. **ALWAYS** use TypeScript strict mode. **NEVER** use `any`.
-3. **ALWAYS** use `ref()` for primitive values, `reactive()` for objects. **NEVER** mix them inconsistently.
-4. **ALWAYS** use Pinia `defineStore()` with **setup function syntax** (not options syntax).
-5. **ALWAYS** use scoped styles: `<style scoped>`.
-6. **ALWAYS** use CSS custom properties from `src/styles/variables.css` for colors, spacing, and typography.
-7. **NEVER** import from another module's internals. Only import from `@/core/` or the current module.
+3. **ALWAYS** use **TanStack Query** for all domain/server state. **NEVER** put domain data in Pinia.
+4. **ALWAYS** adhere to the **4-Layer Architecture** (Domain, Application, Infrastructure, UI).
+5. **ALWAYS** use **props-in, events-out** for component communication.
+6. **ALWAYS** use **Reka UI / shadcn-vue** primitives from `@/core/ui/`.
+7. **ALWAYS** use Tailwind v4 design tokens via `@theme` variables in `src/assets/main.css`.
+8. **NEVER** import from another module's internals (Infrastructure/Application/UI). Only use shared `platform/` modules or the module's own layers.
 
 ---
 
@@ -45,15 +46,21 @@ src/
 Each module has this internal structure:
 
 ```
-modules/{name}/
-├── api/              → {name}.api.ts        (HTTP client)
-├── components/       → {Entity}{Role}.vue   (UI components)
-├── composables/      → use{Action}.ts       (business logic hooks)
-├── mappers/          → {entity}.mapper.ts   (DTO → ViewModel)
-├── pages/            → {Entity}Page.vue     (route-level views)
-├── stores/           → {name}.store.ts      (Pinia state)
-├── types/            → api.types.ts, view.types.ts
-└── routes.ts         → lazy-loaded route definitions
+modules/{category}/{module}/
+├── domain/                # 1. PURE BUSINESS LOGIC
+│   ├── models/            # Entity Types & Value Objects
+│   └── mappers/           # DTO → Entity transformation
+├── application/           # 2. ORCHESTRATION
+│   └── composables/       # TanStack Query logic, Use Cases
+├── infrastructure/        # 3. EXTERNAL WORLD
+│   ├── api.types.ts       # Generated DTO re-exports
+│   └── {name}_adapter.ts  # HTTP calls & path resolution
+└── ui/                    # 4. PRESENTATION
+    ├── components/        # Molecules & Atoms
+    ├── pages/             # Stateful route orchestrators
+    ├── grids/             # Column definitions (DataGrid)
+    ├── store/             # Ephemeral UI State (Pinia)
+    └── utils/             # Formatters & display logic
 ```
 
 ---
@@ -62,252 +69,86 @@ modules/{name}/
 
 ```vue
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { storeToRefs } from "pinia";
-import { usePaymentRequests } from "../composables/usePaymentRequests";
-import type { PaymentRequestViewModel } from "../types/view.types";
+import { ref, computed } from "vue";
+import { Button } from "@/core/ui/button";
+import { DataGrid, useDataGrid } from "@/core/ui/data-grid";
+import { usePaymentRequests } from "../application/composables/usePaymentRequests";
+import { accountColumns } from "../ui/grids/account.grid";
 
 // ── Props ────────────────────────────────────────────────
 interface Props {
-  tenantId: string;
-  showDraftsOnly?: boolean;
+  mode?: 'compact' | 'full';
 }
 const props = withDefaults(defineProps<Props>(), {
-  showDraftsOnly: false,
+  mode: 'full',
 });
 
 // ── Emits ────────────────────────────────────────────────
-interface Emits {
-  (e: "select", request: PaymentRequestViewModel): void;
-  (e: "create"): void;
-}
-const emit = defineEmits<Emits>();
+const emit = defineEmits<{
+  select: [id: string];
+}>();
 
-// ── Composable (Use Case) ────────────────────────────────
-const { requests, isLoading, error, refresh } = usePaymentRequests();
-
-// ── Local State ──────────────────────────────────────────
-const searchQuery = ref("");
-
-// ── Computed ─────────────────────────────────────────────
-const filteredRequests = computed(() => {
-  let result = requests.value;
-  if (props.showDraftsOnly) {
-    result = result.filter((r) => r.status === "DRAFT");
-  }
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
-    result = result.filter((r) => r.beneficiary.toLowerCase().includes(q));
-  }
-  return result;
-});
+// ── Application Layer (Orchestration) ────────────────────
+const { requests, isLoading } = usePaymentRequests();
+const { gridState } = useDataGrid();
 
 // ── Methods ──────────────────────────────────────────────
-function handleSelect(request: PaymentRequestViewModel) {
-  emit("select", request);
+function handleRowClick(row: any) {
+  emit("select", row.id);
 }
 </script>
 
 <template>
-  <div class="payment-request-list">
-    <header class="list-header">
-      <h2>Payment Requests</h2>
-      <div class="list-actions">
-        <input
-          v-model="searchQuery"
-          type="search"
-          placeholder="Search beneficiary..."
-          class="search-input"
-          data-testid="search-requests"
-        />
-        <button class="btn btn-primary" data-testid="create-request" @click="emit('create')">
-          New Request
-        </button>
-      </div>
-    </header>
-
-    <div v-if="isLoading" class="loading-state" data-testid="loading">Loading...</div>
-
-    <div v-else-if="error" class="error-state" data-testid="error">
-      {{ error }}
-      <button @click="refresh">Retry</button>
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-semibold tracking-tight">Ledger Accounts</h2>
+      <Button variant="primary" size="sm">Add Account</Button>
     </div>
 
-    <table v-else class="data-table" data-testid="request-table">
-      <thead>
-        <tr>
-          <th>Beneficiary</th>
-          <th>Amount</th>
-          <th>Status</th>
-          <th>Submitted</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="request in filteredRequests"
-          :key="request.id"
-          class="clickable-row"
-          :data-testid="`request-row-${request.id}`"
-          @click="handleSelect(request)"
-        >
-          <td>{{ request.beneficiary }}</td>
-          <td>{{ request.amount.format() }}</td>
-          <td>
-            <span :class="['status-badge', `status-${request.statusColor}`]">
-              {{ request.statusLabel }}
-            </span>
-          </td>
-          <td>{{ request.submittedAt ?? "—" }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <DataGrid
+      :data="requests"
+      :columns="accountColumns"
+      :loading="isLoading"
+      :state="gridState"
+      @row-click="handleRowClick"
+    />
   </div>
 </template>
 
 <style scoped>
-.payment-request-list {
-  padding: var(--space-lg);
-}
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-lg);
-}
-
-.list-actions {
-  display: flex;
-  gap: var(--space-md);
-}
-
-.search-input {
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-md);
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th,
-.data-table td {
-  padding: var(--space-sm) var(--space-md);
-  text-align: left;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.clickable-row {
-  cursor: pointer;
-}
-
-.clickable-row:hover {
-  background-color: var(--color-hover);
-}
-
-.status-badge {
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-}
-
-.status-gray {
-  background: var(--color-gray-100);
-  color: var(--color-gray-700);
-}
-.status-blue {
-  background: var(--color-blue-100);
-  color: var(--color-blue-700);
-}
-.status-green {
-  background: var(--color-green-100);
-  color: var(--color-green-700);
-}
-.status-red {
-  background: var(--color-red-100);
-  color: var(--color-red-700);
-}
+/* Only module-specific layout tweaks. Never override Design System tokens. */
 </style>
 ```
 
 ---
 
-## Pattern 2: Pinia Store (Setup Syntax)
+### 2.1 UI State Store Template (The Ephemeral Local)
 
-**ALWAYS use the setup function syntax (function-based), NOT the options syntax.**
+**ONLY use Pinia for UI-specific state (sidebar, filters, local search, view toggles). Domain data stays in TanStack Query.**
 
 ```typescript
-// modules/payment-requests/stores/payment-requests.store.ts
+// modules/business/finance/ledger/ui/store/ledger-ui.store.ts
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import type { PaymentRequestViewModel } from "../types/view.types";
+import { ref } from "vue";
 
-export const usePaymentRequestStore = defineStore("payment-requests", () => {
-  // ── State (use ref for each) ───────────────────────────
-  const requests = ref<PaymentRequestViewModel[]>([]);
-  const isLoading = ref(false);
-  const error = ref<string | null>(null);
-  const selectedId = ref<string | null>(null);
+export const useLedgerUIStore = defineStore("ledger-ui", () => {
+  // ── Ephemeral UI State ───────────────────────────────
+  const isFilterVisible = ref(false);
+  const activeView = ref<'grid' | 'cards'>('grid');
+  const selectedAccountId = ref<string | null>(null);
 
-  // ── Computed (derived state) ───────────────────────────
-  const selectedRequest = computed(
-    () => requests.value.find((r) => r.id === selectedId.value) ?? null,
-  );
-
-  const draftCount = computed(() => requests.value.filter((r) => r.status === "DRAFT").length);
-
-  // ── Actions (plain functions) ──────────────────────────
-  function setRequests(data: PaymentRequestViewModel[]) {
-    requests.value = data;
-  }
-
-  function updateRequest(updated: PaymentRequestViewModel) {
-    const idx = requests.value.findIndex((r) => r.id === updated.id);
-    if (idx >= 0) {
-      requests.value[idx] = updated;
-    }
-  }
-
-  function setLoading(state: boolean) {
-    isLoading.value = state;
-  }
-
-  function setError(msg: string | null) {
-    error.value = msg;
-  }
-
-  function clearSelection() {
-    selectedId.value = null;
+  // ── Actions ──────────────────────────────────────────
+  function toggleFilters() {
+    isFilterVisible.value = !isFilterVisible.value;
   }
 
   function $reset() {
-    requests.value = [];
-    isLoading.value = false;
-    error.value = null;
-    selectedId.value = null;
+    isFilterVisible.value = false;
+    activeView.value = 'grid';
+    selectedAccountId.value = null;
   }
 
-  return {
-    // State
-    requests,
-    isLoading,
-    error,
-    selectedId,
-    // Computed
-    selectedRequest,
-    draftCount,
-    // Actions
-    setRequests,
-    updateRequest,
-    setLoading,
-    setError,
-    clearSelection,
-    $reset,
-  };
+  return { isFilterVisible, activeView, selectedAccountId, toggleFilters, $reset };
 });
 ```
 
@@ -324,27 +165,30 @@ export const useStore = defineStore('name', {
 
 ---
 
-## Pattern 3: Composable (Use Case Hook)
+## Pattern 3: Application Composable (Application Layer)
 
-Composables orchestrate: API call → Mapper → Returned reactive state (via TanStack Query).
+Composables orchestrate: **Infrastructure Adapter** → **Domain Mapper** → **TanStack Query**.
 
 ```typescript
-// modules/payment-requests/composables/usePaymentRequests.ts
-import { useApiQuery } from "@/core/composables/useApiQuery";
-import { paymentRequestApi } from "../api/payment-requests.api";
-import { toViewModel } from "../mappers/payment-request.mapper";
+// modules/business/finance/ledger/application/composables/useLedgerAccounts.ts
+import { useQuery } from "@tanstack/vue-query";
+import { ledgerAdapter } from "../../infrastructure/ledger_adapter";
+import { mapAccount } from "../../domain/mappers/ledger.mapper";
 
-export function usePaymentRequests() {
+export function useLedgerAccounts() {
   const {
-    data: requests,
+    data: accounts,
     isLoading,
     error,
-  } = useApiQuery(["payment-requests"], async () => {
-    const dtos = await paymentRequestApi.list();
-    return dtos.map(toViewModel);
+  } = useQuery({
+    queryKey: ["ledger-accounts"],
+    queryFn: async () => {
+      const dtos = await ledgerAdapter.listAccounts();
+      return dtos.map(mapAccount);
+    },
   });
 
-  return { requests, isLoading, error };
+  return { accounts, isLoading, error };
 }
 ```
 
@@ -377,90 +221,56 @@ export function useSubmitRequest() {
 
 ---
 
-## Pattern 4: API Client
+## Pattern 4: Infrastructure Adapter
+
+Adapters handle HTTP calls, path resolution, and type-safety at the boundary.
 
 ```typescript
-// modules/payment-requests/api/payment-requests.api.ts
+// modules/business/finance/ledger/infrastructure/ledger_adapter.ts
 import { httpClient } from "@/core/api/http-client";
-import type {
-  PaymentRequestDTO,
-  PaymentRequestCreateDTO,
-  PaymentRequestPayDTO,
-} from "../types/api.types";
+import type { AccountDTO, CreateAccountDTO } from "./api.types";
 
-const BASE = "/payment-requests";
+const BASE = "/finance/ledger/accounts";
 
-export const paymentRequestApi = {
-  list: (): Promise<PaymentRequestDTO[]> => httpClient.get(BASE),
+export const ledgerAdapter = {
+  listAccounts: (): Promise<AccountDTO[]> => 
+    httpClient.get(BASE),
 
-  get: (id: string): Promise<PaymentRequestDTO> => httpClient.get(`${BASE}/${id}`),
+  getAccount: (id: string): Promise<AccountDTO> => 
+    httpClient.get(`${BASE}/${id}`),
 
-  create: (dto: PaymentRequestCreateDTO): Promise<PaymentRequestDTO> => httpClient.post(BASE, dto),
+  createAccount: (dto: CreateAccountDTO): Promise<AccountDTO> => 
+    httpClient.post(BASE, dto),
 
-  submit: (id: string): Promise<PaymentRequestDTO> => httpClient.post(`${BASE}/${id}/submit`),
-
-  approve: (id: string): Promise<PaymentRequestDTO> => httpClient.post(`${BASE}/${id}/approve`),
-
-  reject: (id: string, reason: string): Promise<PaymentRequestDTO> =>
-    httpClient.post(`${BASE}/${id}/reject`, { reason }),
-
-  pay: (id: string, dto: PaymentRequestPayDTO): Promise<PaymentRequestDTO> =>
-    httpClient.post(`${BASE}/${id}/pay`, dto),
+  postJournal: (id: string): Promise<AccountDTO> => 
+    httpClient.post(`${BASE}/${id}/post`),
 };
 ```
 
 ---
 
-## Pattern 5: Mapper (Anti-Corruption Layer)
+## Pattern 5: Domain Mapper (Anti-Corruption Layer)
 
-Mappers are pure functions: DTO in → ViewModel out. No side effects.
+Mappers are pure functions: **DTO** (Infrastructure) → **Entity** (Domain).
 
 ```typescript
-// modules/payment-requests/mappers/payment-request.mapper.ts
+// modules/business/finance/ledger/domain/mappers/ledger.mapper.ts
 import { Money } from "@/core/domain/money";
-import { formatDate } from "@/core/utils/date";
-import type { PaymentRequestDTO } from "../types/api.types";
-import type { PaymentRequestViewModel } from "../types/view.types";
+import type { AccountDTO } from "../../infrastructure/api.types";
+import type { LedgerAccount } from "../models/account.types";
 
-const STATUS_LABELS: Record<string, string> = {
-  DRAFT: "Draft",
-  SUBMITTED: "Pending Approval",
-  APPROVED: "Approved",
-  REJECTED: "Rejected",
-  PAID: "Paid",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "gray",
-  SUBMITTED: "blue",
-  APPROVED: "green",
-  REJECTED: "red",
-  PAID: "emerald",
-};
-
-export function toViewModel(dto: PaymentRequestDTO): PaymentRequestViewModel {
+export function mapAccount(dto: AccountDTO): LedgerAccount {
   return {
     id: dto.id,
-    beneficiary: dto.beneficiary_name,
-    amount: Money.from(dto.amount, dto.currency),
-    status: dto.status,
-    statusLabel: STATUS_LABELS[dto.status] ?? dto.status,
-    statusColor: STATUS_COLORS[dto.status] ?? "gray",
-    canSubmit: dto.status === "DRAFT",
-    canApprove: dto.status === "SUBMITTED",
-    canReject: dto.status === "SUBMITTED",
-    canPay: dto.status === "APPROVED",
-    submittedAt: dto.submitted_at ? formatDate(dto.submitted_at) : null,
-    paidAt: dto.paid_at ? formatDate(dto.paid_at) : null,
-  };
-}
-
-export function toCreateDTO(form: PaymentRequestFormData): PaymentRequestCreateDTO {
-  return {
-    beneficiary_name: form.beneficiary,
-    amount: form.amount,
-    currency: form.currency,
-    description: form.description,
+    code: dto.code,
+    name: dto.name,
+    type: dto.type,
+    balance: Money.from(dto.balance, dto.currency),
+    isSystem: dto.is_system_account,
+    metadata: {
+      lastPosted: dto.last_posted_at,
+      version: dto.version
+    }
   };
 }
 ```
@@ -470,60 +280,40 @@ export function toCreateDTO(form: PaymentRequestFormData): PaymentRequestCreateD
 ## Pattern 6: Types (API DTOs + View Models)
 
 ```typescript
-// modules/payment-requests/types/api.types.ts
-// These mirror backend Pydantic DTOs (ideally auto-generated from OpenAPI)
-export interface PaymentRequestDTO {
+## Pattern 6: Types & Models (4-Layer Isolation)
+
+### 6.1 Infrastructure Layer (DTOs)
+```typescript
+// modules/business/finance/ledger/infrastructure/api.types.ts
+export interface AccountDTO {
   id: string;
-  beneficiary_name: string;
-  amount: number;
+  code: string;
+  name: string;
+  type: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE';
+  balance: number;
   currency: string;
-  status: "DRAFT" | "SUBMITTED" | "APPROVED" | "REJECTED" | "PAID";
-  description: string | null;
-  bank_account_id: string | null;
-  submitted_at: string | null;
-  paid_at: string | null;
-  current_approval_step: number;
-  assigned_approver_id: string | null;
-}
-
-export interface PaymentRequestCreateDTO {
-  beneficiary_name: string;
-  amount: number;
-  currency: string;
-  description: string | null;
-}
-
-export interface PaymentRequestPayDTO {
-  payment_method: string;
-  disbursement_reference: string;
+  is_system_account: boolean;
+  version: number;
+  last_posted_at: string | null;
 }
 ```
 
+### 6.2 Domain Layer (Entities)
 ```typescript
-// modules/payment-requests/types/view.types.ts
-// These are what Vue components consume — UI-optimized
+// modules/business/finance/ledger/domain/models/account.types.ts
 import type { Money } from "@/core/domain/money";
 
-export interface PaymentRequestViewModel {
+export interface LedgerAccount {
   id: string;
-  beneficiary: string; // Renamed for UI clarity
-  amount: Money; // Value Object, not raw number
-  status: string;
-  statusLabel: string; // "Draft", "Pending Approval"
-  statusColor: string; // CSS class name
-  canSubmit: boolean; // Derived UI permission
-  canApprove: boolean;
-  canReject: boolean;
-  canPay: boolean;
-  submittedAt: string | null; // Formatted date string
-  paidAt: string | null;
-}
-
-export interface PaymentRequestFormData {
-  beneficiary: string;
-  amount: number;
-  currency: string;
-  description: string;
+  code: string;
+  name: string;
+  type: string;
+  balance: Money; // Value Object
+  isSystem: boolean;
+  metadata: {
+    lastPosted: string | null;
+    version: number;
+  };
 }
 ```
 
@@ -744,52 +534,41 @@ const baseDTO: PaymentRequestDTO = {
   assigned_approver_id: null,
 };
 
-describe("PaymentRequest Mapper", () => {
-  it("maps beneficiary_name to beneficiary", () => {
-    const vm = toViewModel(baseDTO);
-    expect(vm.beneficiary).toBe("Acme Corp");
+## Pattern 11: Unit Test (Mapper)
+
+```typescript
+// modules/business/finance/ledger/domain/mappers/__tests__/ledger.mapper.test.ts
+import { describe, it, expect } from "vitest";
+import { mapAccount } from "../ledger.mapper";
+import type { AccountDTO } from "../../../infrastructure/api.types";
+
+const baseDTO: AccountDTO = {
+  id: "550e8400-e29b-41d4-a716-446655440000",
+  code: "1000",
+  name: "Main Cash",
+  type: "ASSET",
+  balance: 15000.5,
+  currency: "ETB",
+  is_system_account: false,
+  version: 1,
+  last_posted_at: "2026-03-20T15:30:00Z",
+};
+
+describe("Ledger Mapper", () => {
+  it("maps DTO to LedgerAccount entity", () => {
+    const entity = mapAccount(baseDTO);
+    expect(entity.name).toBe("Main Cash");
+    expect(entity.balance.amount).toBe(15000.5);
+    expect(entity.balance.currency).toBe("ETB");
   });
 
-  it("wraps amount in Money value object", () => {
-    const vm = toViewModel(baseDTO);
-    expect(vm.amount.amount).toBe(15000.5);
-    expect(vm.amount.format()).toContain("15,000.50");
-  });
-
-  it("derives canSubmit=true for DRAFT", () => {
-    const vm = toViewModel(baseDTO);
-    expect(vm.canSubmit).toBe(true);
-    expect(vm.canApprove).toBe(false);
-    expect(vm.canPay).toBe(false);
-  });
-
-  it("derives canApprove=true for SUBMITTED", () => {
-    const vm = toViewModel({ ...baseDTO, status: "SUBMITTED" });
-    expect(vm.canApprove).toBe(true);
-    expect(vm.canSubmit).toBe(false);
-  });
-
-  it("derives canPay=true for APPROVED", () => {
-    const vm = toViewModel({ ...baseDTO, status: "APPROVED" });
-    expect(vm.canPay).toBe(true);
-    expect(vm.canApprove).toBe(false);
-  });
-
-  it("formats submittedAt when present", () => {
-    const vm = toViewModel({
-      ...baseDTO,
-      status: "SUBMITTED",
-      submitted_at: "2026-03-20T15:30:00Z",
-    });
-    expect(vm.submittedAt).toBeTruthy();
-    expect(vm.submittedAt).not.toBe("2026-03-20T15:30:00Z"); // Should be formatted
-  });
-
-  it("leaves submittedAt null when not set", () => {
-    const vm = toViewModel(baseDTO);
-    expect(vm.submittedAt).toBeNull();
+  it("handles metadata nesting", () => {
+    const entity = mapAccount(baseDTO);
+    expect(entity.metadata.version).toBe(1);
+    expect(entity.metadata.lastPosted).toBe("2026-03-20T15:30:00Z");
   });
 });
+```
 ```
 
 ---
@@ -803,14 +582,13 @@ Always use these path aliases:
 import { Money } from "@/core/domain/money";
 import { httpClient } from "@/core/api/http-client";
 import { eventBus } from "@/core/event-bus/event-bus";
-import { useAuthStore } from "@/core/auth/auth.store";
 
-// ✅ Module-internal (relative)
-import { usePaymentRequestStore } from "../stores/payment-requests.store";
-import { toViewModel } from "../mappers/payment-request.mapper";
+// ✅ Module-internal (relative preferred)
+import { useLedgerUIStore } from "../ui/store/ledger-ui.store";
+import { mapAccount } from "../../domain/mappers/ledger.mapper";
 
-// ❌ BANNED: Cross-module imports
-import { useAccountingStore } from "@/modules/accounting/stores/accounting.store";
+// ❌ BANNED: Cross-module internal imports
+import { useLedgerStore } from "@/modules/business/finance/ledger/ui/store/ledger-ui.store";
 ```
 
 ---
@@ -849,3 +627,23 @@ The backend uses these patterns that the UI must align with:
 - **Idempotency**: All mutating requests must send an `Idempotency-Key` header
 - **Tenant context**: Always include tenant ID in auth headers
 - **Date format**: All dates are UTC ISO 8601 strings
+
+---
+
+## Specialized Agent Skills & MASTERY
+
+This skill document is optimized for high-integrity autonomous development.
+
+### 1. Toolchain Alignment
+- **Verification**: Always run `vp check` and `vp test` after generating code.
+- **Rules**: Refer to the [Vite+ Master Skill](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/node_modules/vite-plus/skills/vite-plus/SKILL.md) for CLI standards.
+
+### 2. High-Integrity Diagnostic (Devtools)
+- **Instrumentation**: Every major state transition MUST emit a domain event via `@tanstack/devtools-event-client`.
+- **Bidirectional**: Use the `EventClient` for enabling devtools-to-app commands (e.g., "Revert to Previous Fiscal State").
+- **Reference**: [Devtools Instrumentation Skill](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/node_modules/@tanstack/devtools-event-client/skills/devtools-instrumentation/SKILL.md).
+
+### 3. Agent Performance Grade: MASTER
+- **Honesty**: Refuse to generate code that mixes layers or duplicates domain state in Pinia.
+- **Accuracy**: Ensure all imports use the bifurcated `business/` vs `platform/` category system.
+- **Elegance**: Use Reka UI primitives to ensure maximum accessibility and performance.

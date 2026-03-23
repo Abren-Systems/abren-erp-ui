@@ -6,8 +6,7 @@
 
 ## 1. Prerequisites
 
-| Tool        | Version | Purpose            |
-| ----------- | ------- | ------------------ |
+| **Environment** | **Vite+ (`vp`)** | Unified Build & Toolchain CLI |
 | **Node.js** | 20 LTS+ | JavaScript runtime |
 | **npm**     | 10+     | Package manager    |
 | **Git**     | 2.40+   | Version control    |
@@ -246,3 +245,27 @@ When starting a new module or refactoring an old one, use the **Finance / Ledger
 - **Grid Config**: [account.grid.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/ui/grids/account.grid.ts)
 - **Application Logic**: [useLedgerAccounts.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/application/composables/useLedgerAccounts.ts)
 - **Domain Mapping**: [ledger.mapper.ts](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/src/modules/business/finance/ledger/domain/mappers/ledger.mapper.ts)
+
+---
+
+## 9. Specialized Agent Skills & Toolchain Mastery
+
+The Abren ERP project is optimized for both human and AI-agent developers. We leverage a unified toolchain and specialized Agent Skills to maintain high-integrity code.
+
+### 9.1 The Vite+ Unified Toolchain (`vp`)
+
+We use **Vite+** (`vp`) as our single entry point for all development tasks. It wraps Vite, Vitest, Oxlint, Oxfmt, and Rolldown.
+
+- **Human Workflow**: Use `vp dev`, `vp test`, and `vp check` instead of fragmented tool commands.
+- **Agent Workflow**: Always use the `vp` CLI for build, test, and linting verification. Reference the [Vite+ Skill Docs](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/node_modules/vite-plus/skills/vite-plus/SKILL.md) for advanced usage rules.
+
+### 9.2 TanStack Devtools & Observability
+
+For advanced debugging and state inspection, we use the **TanStack Devtools Event System**.
+
+- **Instrumentation**: Place strategic `emit()` calls at architecture boundaries (Middleware entry/exit, State Transitions).
+- **Bidirectional Communication**: The Devtools panel can send commands (e.g., `reset`, `set-state`) back to the application.
+- **Reference**: See the [Devtools Event Client Skill](file:///Users/yuma/python-projects/abren-erp/abren-erp-ui/node_modules/@tanstack/devtools-event-client/skills/devtools-event-client/SKILL.md) for implementation patterns.
+
+> [!TIP]
+> **Always run `vp check --fix` before committing.** This ensures that our Oxlint and Oxfmt rules are strictly enforced and the codebase remains in a high-integrity state.
