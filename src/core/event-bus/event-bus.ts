@@ -22,6 +22,7 @@ export type EventMap = {
   'journal-entry:voided': { id: string }
   'tenant:feature-toggled': { feature: string; enabled: boolean }
   'auth:logged-out': Record<string, never>
+  'workflow:action-completed': Record<string, never>
 }
 
 // ── Implementation ────────────────────────────────────

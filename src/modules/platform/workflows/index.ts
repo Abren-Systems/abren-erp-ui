@@ -6,5 +6,8 @@ export const workflowsModule: PlatformEngine = {
   category: 'platform',
   routes: () => import('./routes').then((m) => m.default),
   permissions: ['workflows.view'],
-  menuItems: [{ label: 'States', route: 'WorkflowsStates', icon: 'git-branch' }],
+  menuItems: [
+    { label: 'Inbox', route: 'WorkflowInbox', icon: 'inbox' },
+    { label: 'States', route: 'WorkflowsStates', icon: 'git-branch' },
+  ],
 }
