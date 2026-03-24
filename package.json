@@ -11,6 +11,7 @@
     "check:fix": "vp check --fix",
     "lint": "vp lint . --fix",
     "format": "vp fmt src/",
+    "generate": "node scripts/scaffold-module.js",
     "test:unit": "vp test",
     "test:unit:watch": "vp test --watch",
     "test:e2e": "playwright test",

@@ -49,6 +49,7 @@ vp dev
 | `vp build`              | Production build                                 |
 | `vp preview`            | Preview production build locally                 |
 | `vp run generate-types` | Regenerate TypeScript types from backend OpenAPI |
+| `vp run generate`       | Scaffold a strict 4-layer architectural module   |
 | `vp lint`               | Run Oxlint                                       |
 | `vp fmt`                | Run Oxfmt                                        |
 | `vp check`              | Run unified type-check, lint, and format         |
@@ -233,6 +234,18 @@ src/modules/{category}/{module}/
     ├── grids/             # Column definitions (DataGrid)
     └── utils/             # Formatters & display logic
 ```
+
+### 8.1 Module Generation (The Paved Road)
+
+**Never manually create a module directory tree.** We enforce strict boundary rules via ESLint, so it is critical that the boilerplate is generated perfectly to prevent tooling errors.
+
+To create a new module, use the built-in generator script:
+
+```bash
+vp run generate business/crm/customers
+```
+
+This instantly creates the strict 4-layer structure and wires up the `index.ts`, routing, and domain entry points. All you need to do is register the generated export in `src/modules/index.ts`.
 
 ### 8.1 The "Gold Standard" Blueprint
 
