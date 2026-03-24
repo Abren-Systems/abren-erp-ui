@@ -1,6 +1,5 @@
 import axios from 'axios'
 import type { AxiosRequestConfig } from 'axios'
-import { AUTH_KEYS } from '../auth/constants'
 
 /**
  * Abren ERP — Shared HTTP Client
@@ -38,8 +37,6 @@ const USER_KEY = 'abren_current_user'
 const TENANT_KEY = 'abren_current_tenant'
 
 function clearStoredAuth() {
-  sessionStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN)
-  sessionStorage.removeItem(AUTH_KEYS.REFRESH_TOKEN)
   sessionStorage.removeItem(USER_KEY)
   sessionStorage.removeItem(TENANT_KEY)
 }
@@ -48,6 +45,7 @@ function clearStoredAuth() {
 const httpClient = axios.create({
   baseURL: '/api/v1',
   timeout: 30_000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -55,10 +53,7 @@ const httpClient = axios.create({
 
 // ── Request Interceptor: Auth + Tenant + Idempotency ──
 httpClient.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN)
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
+  // Authentication is now managed transparently by the browser via HttpOnly cookies
 
   // Idempotency key for mutating requests
   const method = config.method?.toUpperCase()
