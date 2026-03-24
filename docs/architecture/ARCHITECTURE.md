@@ -159,7 +159,7 @@ src/modules/{category}/{module-name}/
 ├── application/     # ORCHESTRATION: Use Case Composables
 └── ui/              # PRESENTATION: Components, Pages, Formatters
     ├── components/
-    ├── pages/
+    ├── pages/       # List, Detail, Create, Edit, Wizard variants
     └── utils/       # UI-specific formatters
 ```
 
