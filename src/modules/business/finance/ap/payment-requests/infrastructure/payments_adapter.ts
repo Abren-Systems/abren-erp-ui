@@ -4,18 +4,14 @@ import type { PaymentRequestDTO, PaymentRequestCreateDTO, PaymentRequestPayDTO }
 const BASE = '/finance/ap/requests'
 
 export const paymentsAdapter = {
-  list: (): Promise<PaymentRequestDTO[]> => 
-    apiGet(BASE),
+  list: (): Promise<PaymentRequestDTO[]> => apiGet(BASE),
 
-  get: (id: string): Promise<PaymentRequestDTO> => 
-    apiGet(`${BASE}/${id}`),
+  get: (id: string): Promise<PaymentRequestDTO> => apiGet(`${BASE}/${id}`),
 
-  create: (dto: PaymentRequestCreateDTO): Promise<PaymentRequestDTO> => 
-    apiPost(BASE, dto),
+  create: (dto: PaymentRequestCreateDTO): Promise<PaymentRequestDTO> => apiPost(BASE, dto),
 
-  submit: (id: string): Promise<PaymentRequestDTO> => 
-    apiPost(`${BASE}/${id}/submit`),
+  submit: (id: string): Promise<PaymentRequestDTO> => apiPost(`${BASE}/${id}/submit`),
 
-  pay: (id: string, dto: PaymentRequestPayDTO): Promise<PaymentRequestDTO> => 
+  pay: (id: string, dto: PaymentRequestPayDTO): Promise<PaymentRequestDTO> =>
     apiPost(`${BASE}/${id}/pay`, dto),
 }

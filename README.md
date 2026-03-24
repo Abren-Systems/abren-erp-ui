@@ -58,15 +58,15 @@ src/
 
 ## Documentation
 
-| Document             | Path                                                                           |
-| -------------------- | ------------------------------------------------------------------------------ |
-| Architecture         | [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)         |
-| Module Structure     | [docs/architecture/MODULE_STRUCTURE.md](docs/architecture/MODULE_STRUCTURE.md) |
-| State Management     | [docs/architecture/STATE_MANAGEMENT.md](docs/architecture/STATE_MANAGEMENT.md) |
-| API Integration      | [docs/architecture/API_INTEGRATION.md](docs/architecture/API_INTEGRATION.md)   |
-| Form Architecture    | [docs/architecture/FORM_ARCHITECTURE.md](docs/architecture/FORM_ARCHITECTURE.md) |
-| Error Handling       | [docs/architecture/ERROR_HANDLING.md](docs/architecture/ERROR_HANDLING.md)     |
-| Testing Strategy     | [docs/architecture/TESTING_STRATEGY.md](docs/architecture/TESTING_STRATEGY.md) |
-| Repository Strategy  | [docs/REPOSITORY_STRATEGY.md](docs/REPOSITORY_STRATEGY.md)                    |
-| Development Guide    | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)                                    |
-| Implementation Status | [docs/IMPLEMENTATION_ROADMAP.md](docs/IMPLEMENTATION_ROADMAP.md)              |
+| Document              | Path                                                                             |
+| --------------------- | -------------------------------------------------------------------------------- |
+| Architecture          | [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)           |
+| Module Structure      | [docs/architecture/MODULE_STRUCTURE.md](docs/architecture/MODULE_STRUCTURE.md)   |
+| State Management      | [docs/architecture/STATE_MANAGEMENT.md](docs/architecture/STATE_MANAGEMENT.md)   |
+| API Integration       | [docs/architecture/API_INTEGRATION.md](docs/architecture/API_INTEGRATION.md)     |
+| Form Architecture     | [docs/architecture/FORM_ARCHITECTURE.md](docs/architecture/FORM_ARCHITECTURE.md) |
+| Error Handling        | [docs/architecture/ERROR_HANDLING.md](docs/architecture/ERROR_HANDLING.md)       |
+| Testing Strategy      | [docs/architecture/TESTING_STRATEGY.md](docs/architecture/TESTING_STRATEGY.md)   |
+| Repository Strategy   | [docs/REPOSITORY_STRATEGY.md](docs/REPOSITORY_STRATEGY.md)                       |
+| Development Guide     | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)                                       |
+| Implementation Status | [docs/IMPLEMENTATION_ROADMAP.md](docs/IMPLEMENTATION_ROADMAP.md)                 |

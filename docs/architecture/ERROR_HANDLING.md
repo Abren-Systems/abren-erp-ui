@@ -17,15 +17,15 @@ In an ERP, errors are **expected operational events** — network failures, vali
 
 ## 2. Error Categories & Handling Matrix
 
-| HTTP Status | Category | Auto-Handled By | User-Facing Behavior |
-|---|---|---|---|
-| `401` | Session Expired | HTTP Interceptor | Redirect to `/login` with `?redirect=` |
-| `403` | Forbidden | Composable layer | Toast: "You don't have permission to perform this action" |
-| `409` | Conflict | Composable layer | Toast with retry option: "Record was modified by another user" |
-| `422` | Validation Error | TanStack Form | Field-level inline errors |
-| `429` | Rate Limited | HTTP Interceptor | Toast: "Too many requests. Please wait." |
-| `500` | Server Error | HTTP Interceptor | Toast: "Something went wrong. Please try again." |
-| Network Error | Connectivity | HTTP Interceptor | Toast with retry: "Unable to reach the server." |
+| HTTP Status   | Category         | Auto-Handled By  | User-Facing Behavior                                           |
+| ------------- | ---------------- | ---------------- | -------------------------------------------------------------- |
+| `401`         | Session Expired  | HTTP Interceptor | Redirect to `/login` with `?redirect=`                         |
+| `403`         | Forbidden        | Composable layer | Toast: "You don't have permission to perform this action"      |
+| `409`         | Conflict         | Composable layer | Toast with retry option: "Record was modified by another user" |
+| `422`         | Validation Error | TanStack Form    | Field-level inline errors                                      |
+| `429`         | Rate Limited     | HTTP Interceptor | Toast: "Too many requests. Please wait."                       |
+| `500`         | Server Error     | HTTP Interceptor | Toast: "Something went wrong. Please try again."               |
+| Network Error | Connectivity     | HTTP Interceptor | Toast with retry: "Unable to reach the server."                |
 
 ---
 
@@ -109,10 +109,18 @@ A global toast composable provides consistent user feedback for mutations:
 ```typescript
 // core/composables/useToast.ts (prescribed interface)
 export function useToast() {
-  function success(message: string): void { /* ... */ }
-  function error(message: string): void { /* ... */ }
-  function warning(message: string): void { /* ... */ }
-  function info(message: string): void { /* ... */ }
+  function success(message: string): void {
+    /* ... */
+  }
+  function error(message: string): void {
+    /* ... */
+  }
+  function warning(message: string): void {
+    /* ... */
+  }
+  function info(message: string): void {
+    /* ... */
+  }
 
   return { success, error, warning, info }
 }
@@ -120,12 +128,12 @@ export function useToast() {
 
 ### 4.2 Rules
 
-| Scenario | Toast Type | Duration |
-|---|---|---|
-| Mutation succeeded | `success` | 3 seconds, auto-dismiss |
-| Mutation failed (recoverable) | `error` | 5 seconds, manual dismiss |
-| Mutation failed (permission) | `warning` | 5 seconds, manual dismiss |
-| Background sync info | `info` | 3 seconds, auto-dismiss |
+| Scenario                      | Toast Type | Duration                  |
+| ----------------------------- | ---------- | ------------------------- |
+| Mutation succeeded            | `success`  | 3 seconds, auto-dismiss   |
+| Mutation failed (recoverable) | `error`    | 5 seconds, manual dismiss |
+| Mutation failed (permission)  | `warning`  | 5 seconds, manual dismiss |
+| Background sync info          | `info`     | 3 seconds, auto-dismiss   |
 
 ### 4.3 Anti-Patterns
 
@@ -139,11 +147,11 @@ export function useToast() {
 
 ### 5.1 The Three Loading States
 
-| State | Mechanism | Visual |
-|---|---|---|
-| **Initial Load** | `isPending === true && data === undefined` | Full skeleton (shimmer rows in DataGrid) |
+| State                  | Mechanism                                   | Visual                                        |
+| ---------------------- | ------------------------------------------- | --------------------------------------------- |
+| **Initial Load**       | `isPending === true && data === undefined`  | Full skeleton (shimmer rows in DataGrid)      |
 | **Background Refetch** | `isFetching === true && data !== undefined` | Subtle top progress bar, data remains visible |
-| **Mutation In-Flight** | `mutation.isPending` | Button disabled + spinner, form stays visible |
+| **Mutation In-Flight** | `mutation.isPending`                        | Button disabled + spinner, form stays visible |
 
 ### 5.2 Skeleton Convention
 

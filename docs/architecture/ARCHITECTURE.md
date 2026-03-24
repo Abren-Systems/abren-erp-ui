@@ -325,7 +325,11 @@ export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promi
   return response.data.data // Extracts { success, data, meta } → T
 }
 
-export async function apiPost<T>(url: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+export async function apiPost<T>(
+  url: string,
+  body?: unknown,
+  config?: AxiosRequestConfig,
+): Promise<T> {
   const response = await httpClient.post<ApiResponse<T>>(url, body, config)
   return response.data.data
 }
@@ -426,7 +430,7 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 | [State Management](STATE_MANAGEMENT.md)          | Pinia store patterns and reactive state flows         |
 | [API Integration](API_INTEGRATION.md)            | HTTP client, mapper patterns, OpenAPI type generation |
 | [Form Architecture](FORM_ARCHITECTURE.md)        | TanStack Form + Zod integration and form patterns     |
-| [Error Handling](ERROR_HANDLING.md)               | Error categories, toast system, loading states        |
+| [Error Handling](ERROR_HANDLING.md)              | Error categories, toast system, loading states        |
 | [Testing Strategy](TESTING_STRATEGY.md)          | Frontend testing pyramid and coverage targets         |
 | [Development Guide](../DEVELOPMENT.md)           | Local setup, coding standards, and conventions        |
 | [Repository Strategy](../REPOSITORY_STRATEGY.md) | How the UI repo coexists with the API repo            |

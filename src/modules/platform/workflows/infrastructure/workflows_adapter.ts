@@ -4,15 +4,13 @@ import type { PendingApprovalDTO, ApprovalActionDTO, WorkflowPolicyDTO } from '.
 const BASE = '/workflows'
 
 export const workflowsAdapter = {
-  getPendingTasks: (): Promise<PendingApprovalDTO[]> => 
-    apiGet(`${BASE}/approvals/pending`),
+  getPendingTasks: (): Promise<PendingApprovalDTO[]> => apiGet(`${BASE}/approvals/pending`),
 
-  submitDecision: (instanceId: string, action: ApprovalActionDTO): Promise<void> => 
+  submitDecision: (instanceId: string, action: ApprovalActionDTO): Promise<void> =>
     apiPost(`${BASE}/approvals/${instanceId}/actions`, action),
 
-  listPolicies: (): Promise<WorkflowPolicyDTO[]> => 
-    apiGet(`${BASE}/state/policies`),
+  listPolicies: (): Promise<WorkflowPolicyDTO[]> => apiGet(`${BASE}/state/policies`),
 
-  createPolicy: (policy: Partial<WorkflowPolicyDTO>): Promise<WorkflowPolicyDTO> => 
+  createPolicy: (policy: Partial<WorkflowPolicyDTO>): Promise<WorkflowPolicyDTO> =>
     apiPost(`${BASE}/state/policies`, policy),
 }

@@ -11,16 +11,18 @@ export const workflowColumns: ColumnDef<PendingApproval>[] = [
   {
     accessorKey: 'entityId',
     header: 'Reference',
-    cell: ({ row }) => h('code', { class: 'text-xs text-neutral-500' }, row.original.entityId.slice(0, 8)),
+    cell: ({ row }) =>
+      h('code', { class: 'text-xs text-neutral-500' }, row.original.entityId.slice(0, 8)),
   },
   {
     accessorKey: 'currentState',
     header: 'From',
-    cell: ({ row }) => h('div', { class: 'flex items-center gap-2' }, [
-      h('span', { class: 'text-neutral-500' }, row.original.currentState),
-      h('span', { class: 'text-neutral-300' }, '→'),
-      h('span', { class: 'font-bold text-primary-600' }, row.original.targetState || '???'),
-    ]),
+    cell: ({ row }) =>
+      h('div', { class: 'flex items-center gap-2' }, [
+        h('span', { class: 'text-neutral-500' }, row.original.currentState),
+        h('span', { class: 'text-neutral-300' }, '→'),
+        h('span', { class: 'font-bold text-primary-600' }, row.original.targetState || '???'),
+      ]),
   },
   {
     accessorKey: 'submittedAt',

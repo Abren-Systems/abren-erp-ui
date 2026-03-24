@@ -62,8 +62,8 @@ type PaymentRequestFormValues = z.infer<typeof paymentRequestSchema>
 
 // ── Composable ────────────────────────────────────────
 export function usePaymentRequestForm() {
-  const { mutateAsync, isPending, error } = useApiMutation(
-    (values: PaymentRequestFormValues) => paymentRequestAdapter.create(values),
+  const { mutateAsync, isPending, error } = useApiMutation((values: PaymentRequestFormValues) =>
+    paymentRequestAdapter.create(values),
   )
 
   const form = useForm({
@@ -133,11 +133,11 @@ const { form, isPending } = usePaymentRequestForm()
 
 ### 5.1 When to Validate
 
-| Trigger | Use Case | Configuration |
-|---|---|---|
+| Trigger       | Use Case                                             | Configuration                      |
+| ------------- | ---------------------------------------------------- | ---------------------------------- |
 | **On Change** | Real-time feedback for simple fields (text, numbers) | `validators: { onChange: schema }` |
-| **On Blur** | Deferred validation for expensive checks or IDs | `validators: { onBlur: schema }` |
-| **On Submit** | Final gate before mutation (always active) | `validators: { onSubmit: schema }` |
+| **On Blur**   | Deferred validation for expensive checks or IDs      | `validators: { onBlur: schema }`   |
+| **On Submit** | Final gate before mutation (always active)           | `validators: { onSubmit: schema }` |
 
 ### 5.2 Error Display Rules
 

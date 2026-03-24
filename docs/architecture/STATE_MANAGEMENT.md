@@ -162,9 +162,7 @@ export function useSubmitRequest() {
 
       // Optimistically update the cached list
       queryClient.setQueryData<PaymentRequest[]>(['payment-requests'], (old) =>
-        (old ?? []).map((pr) =>
-          pr.id === id ? { ...pr, status: 'SUBMITTED' as const } : pr,
-        ),
+        (old ?? []).map((pr) => (pr.id === id ? { ...pr, status: 'SUBMITTED' as const } : pr)),
       )
 
       return { previous }

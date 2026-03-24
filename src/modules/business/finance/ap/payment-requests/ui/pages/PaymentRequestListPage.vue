@@ -41,10 +41,10 @@ async function handleAction(request: PaymentRequest) {
       :loading="isLoading"
     >
       <template #actions="{ row }">
-        <Button 
+        <Button
           v-if="row.original.status === 'DRAFT'"
-          size="sm" 
-          variant="outline" 
+          size="sm"
+          variant="outline"
           @click.stop="handleAction(row.original)"
           :disabled="isSubmitting"
         >

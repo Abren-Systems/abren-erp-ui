@@ -17,9 +17,7 @@ const { accounts: data, isPending } = useLedgerAccounts()
     <!-- Page Header -->
     <div class="flex shrink-0 items-start justify-between">
       <div>
-        <h1 class="m-0 text-heading text-[var(--color-grid-text)]">
-          Chart of Accounts
-        </h1>
+        <h1 class="m-0 text-heading text-[var(--color-grid-text)]">Chart of Accounts</h1>
         <p class="mt-1 text-body-sm text-[var(--color-grid-text-muted)]">
           Manage your ledger accounts and financial structure.
         </p>

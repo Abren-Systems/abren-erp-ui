@@ -15,10 +15,10 @@ export function useSubmitPaymentRequest() {
         // Invalidate both PR list and Workflow task list
         void queryClient.invalidateQueries({ queryKey: ['payment-requests'] })
         void queryClient.invalidateQueries({ queryKey: ['workflow-pending-tasks'] })
-        
+
         // Emit global event
         eventBus.emit('payment-request:submitted', { id: '' }) // ID in payload if needed
       },
-    }
+    },
   )
 }
