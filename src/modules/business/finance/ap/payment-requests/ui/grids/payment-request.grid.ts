@@ -1,6 +1,15 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
+import { Badge } from '@/core/ui/badge'
 import type { PaymentRequest } from '../../domain/models/payment-request.types'
+
+const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  DRAFT: 'outline',
+  SUBMITTED: 'secondary',
+  APPROVED: 'default',
+  REJECTED: 'destructive',
+  PAID: 'default',
+}
 
 export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   {
@@ -16,36 +25,34 @@ export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   {
     accessorKey: 'beneficiaryId',
     header: 'Beneficiary',
-    cell: ({ row }) => h('span', { class: 'font-medium' }, row.original.beneficiaryId.slice(0, 8)), // In real app, name lookup
+    cell: ({ row }) =>
+      h('span', { class: 'font-medium text-sm' }, row.original.beneficiaryId.slice(0, 8) + '…'),
   },
   {
-    accessorKey: 'amount',
+    accessorKey: 'totalAmount',
     header: 'Amount',
-    cell: ({ row }) => h('span', { class: 'font-bold' }, row.original.amount.format()),
+    cell: ({ row }) =>
+      h('span', { class: 'font-bold tabular-nums' }, row.original.totalAmount.format()),
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => {
-      const statusMap: Record<string, string> = {
-        DRAFT: 'bg-neutral-100 text-neutral-700',
-        AWAITING_APPROVAL: 'bg-warning-50 text-warning-700 border border-warning-100',
-        APPROVED: 'bg-success-50 text-success-700 border border-success-100',
-        REJECTED: 'bg-danger-50 text-danger-700 border border-danger-100',
-        PAID: 'bg-primary-50 text-primary-700 border border-primary-100',
-      }
-      return h(
-        'span',
-        {
-          class: `px-2 py-0.5 rounded-full text-xs font-semibold ${statusMap[row.original.status] || 'bg-neutral-100'}`,
-        },
-        row.original.status,
-      )
-    },
+    cell: ({ row }) =>
+      h(
+        Badge,
+        { variant: STATUS_VARIANT[row.original.status] ?? 'outline' },
+        () => row.original.status,
+      ),
   },
   {
     accessorKey: 'submittedAt',
-    header: 'Date',
-    cell: ({ row }) => row.original.submittedAt?.toLocaleDateString() || '-',
+    header: 'Submitted',
+    cell: ({ row }) => row.original.submittedAt?.toLocaleDateString('en-ET') ?? '—',
+  },
+  {
+    accessorKey: 'currentApprovalStep',
+    header: 'Approval Step',
+    cell: ({ row }) =>
+      h('span', { class: 'text-neutral-500 text-sm' }, `Step ${row.original.currentApprovalStep}`),
   },
 ]
