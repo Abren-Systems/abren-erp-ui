@@ -27,6 +27,8 @@ export interface PaymentRequestDTO {
   paid_at: string | null
   current_approval_step: number
   assigned_approver_id: string | null
+  source_module: string | null
+  source_id: string | null
 }
 
 export interface PaymentRequestLineCreateDTO {
@@ -44,6 +46,8 @@ export interface PaymentRequestCreateDTO {
   lines: PaymentRequestLineCreateDTO[]
   bank_account_id?: string | null
   target_liability_account_id?: string | null
+  source_module?: string | null
+  source_id?: string | null
 }
 
 export interface PaymentRequestPayDTO {

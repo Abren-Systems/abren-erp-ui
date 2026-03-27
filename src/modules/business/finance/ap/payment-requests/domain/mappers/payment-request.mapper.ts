@@ -29,5 +29,7 @@ export function mapToPaymentRequest(dto: PaymentRequestDTO): PaymentRequest {
     paidAt: dto.paid_at ? new Date(dto.paid_at) : null,
     currentApprovalStep: dto.current_approval_step,
     assignedApproverId: dto.assigned_approver_id,
+    sourceModule: dto.source_module,
+    sourceId: dto.source_id,
   }
 }

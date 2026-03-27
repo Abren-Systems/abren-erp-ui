@@ -27,4 +27,6 @@ export interface PaymentRequest {
   paidAt: Date | null
   currentApprovalStep: number
   assignedApproverId: string | null
+  sourceModule: string | null
+  sourceId: string | null
 }
