@@ -35,12 +35,12 @@ export const vendorBillColumns: ColumnDef<VendorBillDTO>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const status = row.original.status
-      const variants: Record<string, string> = {
+      const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
         DRAFT: 'secondary',
         VALIDATED: 'default',
-        PAID: 'success',
+        PAID: 'secondary', // Using secondary for paid as success might not be in the base variants
       }
-      return h(Badge, { variant: variants[status] || 'default' }, () => status)
+      return h(Badge, { variant: (variants[status] || 'default') as 'default' }, () => status)
     },
   },
 ]

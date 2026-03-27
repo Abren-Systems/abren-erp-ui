@@ -13,6 +13,7 @@ export interface LineFormState {
   amount: string
   accountId: string
   categoryId: string
+  taxRuleId: string
   taxAmount: string
 }
 
@@ -28,11 +29,25 @@ export function useCreatePaymentRequest() {
   })
 
   const lines = ref<LineFormState[]>([
-    { description: '', amount: '', accountId: '', categoryId: '', taxAmount: '' },
+    {
+      description: '',
+      amount: '',
+      accountId: '',
+      categoryId: '',
+      taxRuleId: '',
+      taxAmount: '',
+    },
   ])
 
   function addLine() {
-    lines.value.push({ description: '', amount: '', accountId: '', categoryId: '', taxAmount: '' })
+    lines.value.push({
+      description: '',
+      amount: '',
+      accountId: '',
+      categoryId: '',
+      taxRuleId: '',
+      taxAmount: '',
+    })
   }
 
   function removeLine(index: number) {
@@ -50,6 +65,7 @@ export function useCreatePaymentRequest() {
         amount: parseFloat(l.amount),
         account_id: l.accountId || null,
         category_id: l.categoryId || null,
+        tax_rule_id: l.taxRuleId || null,
         tax_amount: l.taxAmount ? parseFloat(l.taxAmount) : null,
       }))
 

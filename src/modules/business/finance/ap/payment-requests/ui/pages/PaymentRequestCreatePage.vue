@@ -119,35 +119,60 @@ async function handleSubmit() {
               placeholder="0.00"
             />
           </div>
-          <!-- GL Account -->
-          <div class="col-span-2">
-            <label class="block text-xs text-neutral-500 mb-1">GL Account</label>
-            <input
-              v-model="line.accountId"
-              type="text"
-              class="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
-              placeholder="UUID"
-            />
-          </div>
-          <!-- Category -->
-          <div class="col-span-2">
-            <label class="block text-xs text-neutral-500 mb-1">Category</label>
-            <input
-              v-model="line.categoryId"
-              type="text"
-              class="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
-              placeholder="UUID"
-            />
-          </div>
-          <!-- Remove button -->
-          <div class="col-span-2 flex items-end justify-end pb-0.5">
-            <button
-              class="text-xs text-danger-500 hover:text-danger-700 disabled:opacity-30"
-              :disabled="lines.length === 1"
-              @click="removeLine(idx)"
-            >
-              Remove
-            </button>
+          <!-- Row 2 -->
+          <div class="grid grid-cols-12 gap-2 items-start mt-1">
+            <!-- GL Account -->
+            <div class="col-span-3">
+              <label class="block text-xs text-neutral-500 mb-1">GL Account</label>
+              <input
+                v-model="line.accountId"
+                type="text"
+                class="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
+                placeholder="UUID"
+              />
+            </div>
+            <!-- Category -->
+            <div class="col-span-3">
+              <label class="block text-xs text-neutral-500 mb-1">Category</label>
+              <input
+                v-model="line.categoryId"
+                type="text"
+                class="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
+                placeholder="UUID"
+              />
+            </div>
+            <!-- Tax Rule -->
+            <div class="col-span-3">
+              <label class="block text-xs text-neutral-500 mb-1">WHT Rule (Opt)</label>
+              <input
+                v-model="line.taxRuleId"
+                type="text"
+                class="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
+                placeholder="WHT Rule UUID"
+              />
+            </div>
+            <!-- Tax Amount -->
+            <div class="col-span-2">
+              <label class="block text-xs text-neutral-500 mb-1">WHT Amt</label>
+              <input
+                v-model="line.taxAmount"
+                type="number"
+                step="0.01"
+                min="0"
+                class="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
+                placeholder="0.00"
+              />
+            </div>
+            <!-- Remove button -->
+            <div class="col-span-1 flex items-end justify-end pb-0.5">
+              <button
+                class="text-xs text-danger-500 hover:text-danger-700 disabled:opacity-30"
+                :disabled="lines.length === 1"
+                @click="removeLine(idx)"
+              >
+                Del
+              </button>
+            </div>
           </div>
         </div>
 
