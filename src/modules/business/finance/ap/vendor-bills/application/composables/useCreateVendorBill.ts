@@ -16,10 +16,19 @@ export function useCreateVendorBill() {
     justification: '',
   })
 
-  const lines = ref([{ description: '', amount: '', accountId: '', categoryId: '' }])
+  const lines = ref([
+    { description: '', amount: '', accountId: '', categoryId: '', taxRuleId: '', taxAmount: '' },
+  ])
 
   function addLine() {
-    lines.value.push({ description: '', amount: '', accountId: '', categoryId: '' })
+    lines.value.push({
+      description: '',
+      amount: '',
+      accountId: '',
+      categoryId: '',
+      taxRuleId: '',
+      taxAmount: '',
+    })
   }
 
   function removeLine(idx: number) {
@@ -45,6 +54,8 @@ export function useCreateVendorBill() {
             amount: parseFloat(l.amount),
             account_id: l.accountId || null,
             category_id: l.categoryId || null,
+            tax_rule_id: l.taxRuleId || null,
+            tax_amount: l.taxAmount ? parseFloat(l.taxAmount) : null,
           })),
       }
       const created = await vendorBillsAdapter.create(dto)
