@@ -1,3 +1,15 @@
+/**
+ * Module type contracts for the Abren ERP module registry.
+ *
+ * Every feature module (business or platform) must export an object that satisfies
+ * `ModuleDefinition`. The registry (`src/modules/index.ts`) splits these into
+ * `BusinessDomain` and `PlatformEngine` arrays, which drive both the router and
+ * the sidebar navigation in `AuthenticatedLayout`.
+ *
+ * Adding a new module requires only:
+ *   1. Implementing `ModuleDefinition` (or its narrowed subtype)
+ *   2. Registering it in `src/modules/index.ts`
+ */
 import type { RouteRecordRaw } from 'vue-router'
 import type { Component } from 'vue'
 

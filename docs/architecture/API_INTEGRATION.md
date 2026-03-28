@@ -65,26 +65,15 @@ httpClient.interceptors.request.use((config) => {
   return config
 })
 
-// ── Response Interceptors ────────────────────────────────
+// ── Response Headers & Unwrapping ────────────────────────
 
-// Unwrap the backend's response envelope
-httpClient.interceptors.response.use(
-  (response) => {
-    // Backend wraps all responses: { success: true, data: ... }
-    if (response.data?.success !== undefined) {
-      return response.data.data
-    }
-    return response.data
-  },
-  (error) => {
-    // Backend wraps errors: { success: false, detail: "...", code: "..." }
-    if (error.response?.data) {
-      const { detail, code } = error.response.data
-      throw new ApiError(detail, code, error.response.status)
-    }
-    throw error
-  },
-)
+/**
+ * Note: Our ResponseEnveloperMiddleware (Backend) wraps all JSON in:
+ * { "success": true, "data": T }
+ *
+ * The apiGet/apiPost helpers are responsible for unwrapping this
+ * and returning only the 'data' property to the caller.
+ */
 
 export { httpClient }
 ```
@@ -249,15 +238,13 @@ export function usePaymentRequests() {
 
 ---
 
-## 4. Anti-Corruption Layer (Mappers)
+### 4.1 Purpose [MANDATORY]
 
-### 4.1 Purpose
+Mappers are the **firewall** and **primary domain factory** between backend DTOs and frontend ViewModels. In the Abren ERP, we follow the **Mapper-as-Factory** pattern:
 
-Mappers are the **firewall** between backend DTOs and frontend ViewModels. They ensure:
-
-1. Backend field renames only propagate to the mapper file, not to 50+ components.
-2. UI-specific computed values (colors, labels, permissions) are derived here.
-3. Data shape is optimized for rendering, not for database normalization.
+1. **Isolation**: Backend field renames only propagate to the mapper file, not to components.
+2. **Domain Logic**: UI-specific computed values (colors, labels, permissions) are derived during mapping.
+3. **Data Integrity**: Mapping provides a final chance to enforce null-safety (e.g., providing defaults) before data enters the reactive state.
 
 ### 4.2 Anatomy of a Mapper
 

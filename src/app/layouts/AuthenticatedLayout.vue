@@ -1,4 +1,20 @@
 <script setup lang="ts">
+/**
+ * AuthenticatedLayout
+ *
+ * Root shell for all authenticated `/app/*` routes.
+ * Renders a fixed sidebar with two navigation sections:
+ *   - Applications: Dashboard + registered BusinessDomain modules
+ *   - Platform Engine: registered PlatformEngine modules
+ *
+ * Navigation items are derived dynamically from the module registry
+ * (`src/modules/index.ts`), so adding a new module automatically
+ * surfaces it in the sidebar without touching this component.
+ *
+ * The active route is highlighted via exact `route.path` matching.
+ * The header displays the current route name and a static user avatar
+ * placeholder (to be replaced with a real profile dropdown).
+ */
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { businessModules, platformModules } from '@/modules'
 import type { BusinessDomain, PlatformEngine, MenuItem } from '@/core/types/module.types'
@@ -13,6 +29,11 @@ const authStore = useAuthStore()
 // Primary Navigation (Dashboard + Business Domains)
 const coreItems = [{ label: 'Dashboard', icon: LayoutDashboard, href: '/app' }]
 
+/**
+ * Flatten all business module menu items into a single nav list.
+ * Falls back to a generated href (`/app/{moduleId}/{label-slug}`) when
+ * the module definition does not provide an explicit `href`.
+ */
 const businessItems = businessModules.flatMap((m: BusinessDomain) =>
   m.menuItems.map((item: MenuItem) => ({
     ...item,
@@ -20,7 +41,7 @@ const businessItems = businessModules.flatMap((m: BusinessDomain) =>
   })),
 )
 
-// Platform/Infrastructure Navigation
+// Platform/Infrastructure Navigation — same flattening logic as businessItems
 const platformItems = platformModules.flatMap((m: PlatformEngine) =>
   m.menuItems.map((item: MenuItem) => ({
     ...item,

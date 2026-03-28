@@ -29,10 +29,10 @@ src/modules/{category}/{module}/
 │   ├── {entity}.types.ts    # Domain interfaces & value objects
 │   └── {vo}.ts              # Value Objects (e.g. Money)
 │
-├── infrastructure/          # [Firewall] ACL
-│   ├── {module}.mapper.ts   # DTO → Domain conversion
-│   ├── {module}_adapter.ts  # API Communication
-│   └── api.types.ts         # DTO interfaces (if not using generated types)
+├── infrastructure/          # [Firewall] Anti-Corruption Layer (ACL)
+│   ├── {module}.mapper.ts   # [MANDATORY] DTO → Domain factory
+│   ├── {module}_adapter.ts  # [I/O] API Communication
+│   └── api.types.ts         # DTO interfaces
 │
 ├── application/             # [Orchestration] Use Case Composables
 │   └── composables/
@@ -191,7 +191,7 @@ When creating a new module (e.g., `procurement`):
 - [ ] Create directory under `src/modules/business/` or `src/modules/platform/`
 - [ ] Implement `domain/{entity}.types.ts`
 - [ ] Implement `infrastructure/{module}_adapter.ts` (Fetches **DTOs**)
-- [ ] Implement `infrastructure/{module}.mapper.ts` (**DTO → Domain** mapping)
+- [ ] Implement `infrastructure/{module}.mapper.ts` (**DTO → Domain** factory logic)
 - [ ] Implement `application/composables/use{Entity}.ts` (Orchestrated by **TanStack Query**)
 - [ ] Implement `ui/` (Pages, Components, Formatters)
 - [ ] Create `index.ts` — `ModuleDefinition` export

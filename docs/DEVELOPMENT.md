@@ -283,5 +283,101 @@ For advanced debugging and state inspection, we use the **TanStack Devtools Even
 - **Bidirectional Communication**: The Devtools panel can send commands (e.g., `reset`, `set-state`) back to the application.
 - **Reference**: See the [Devtools Event Client Skill](file:///Users/yuma/python-projects/abren-erp/abren-ui/node_modules/@tanstack/devtools-event-client/skills/devtools-event-client/SKILL.md) for implementation patterns.
 
+---
+
+## 10. In-Code Documentation Standard
+
+### Philosophy
+
+Comments should answer questions the code cannot. The _what_ is already in the code — comments explain the _why_, the _tradeoff_, or the _constraint_ that led to a decision.
+
+**Write a comment when:**
+
+- The logic is non-obvious or involves a known edge case
+- A security invariant is being enforced
+- A business rule drives a technical choice
+- A workaround exists for a known library bug or limitation
+- A complex algorithm or reactive dependency chain is implemented
+
+**Do not write a comment when:**
+
+- It merely restates the code
+- The function name already communicates intent clearly
+
+Comments are code. They must be updated when the logic changes, and deleted when they go stale.
+
+---
+
+### Module-Level JSDoc
+
+Required for all files in `core/` and for non-trivial module entry points. State the file's responsibility and any architectural constraints.
+
+```typescript
+/**
+ * Abren ERP — Shared HTTP Client
+ *
+ * Responsibilities:
+ * - Unwrap the backend's { success, data, meta } envelope
+ * - Attach Idempotency-Key for mutating requests
+ * - Centralized error handling
+ */
+```
+
+---
+
+### Composable JSDoc
+
+Required for all exported composables. Include a `@example` block when the usage pattern is not immediately obvious.
+
+```typescript
+/**
+ * useFeatureGate
+ *
+ * Mirrors the backend's FeatureGate dependency.
+ * Checks if a feature is enabled for the current tenant.
+ *
+ * @example
+ *   const { isEnabled } = useFeatureGate('webhooks')
+ *   if (!isEnabled.value) { // hide UI }
+ */
+```
+
+---
+
+### Vue Component JSDoc
+
+Required in `<script setup>` for all components outside `core/ui/` (primitive UI components are exempt). Describe:
+
+- The component's purpose
+- How it sources its data (props, store, composable)
+- Any non-obvious template behavior
+
+```typescript
+/**
+ * AccountListPage
+ *
+ * Displays the paginated ledger account list for the current tenant.
+ * Data is fetched via `useLedgerAccounts` composable (TanStack Query).
+ * Row actions (edit, archive) emit events via the typed event bus.
+ */
+```
+
+---
+
+### Inline Comments
+
+Follow the "why not what" rule. Use section markers to break up long files:
+
+```typescript
+// ── Types ─────────────────────────────────────────────
+// ── Request Interceptor ────────────────────────────────
+```
+
+---
+
+### Type Annotations
+
+Mandatory everywhere. `any` is banned — use `unknown` with type guards. See Section 4.1 for the full TypeScript rules.
+
 > [!TIP]
 > **Always run `vp check --fix` before committing.** This ensures that our Oxlint and Oxfmt rules are strictly enforced and the codebase remains in a high-integrity state.

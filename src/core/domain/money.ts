@@ -22,6 +22,10 @@ export class Money {
     return new Money(0, currency)
   }
 
+  /**
+   * Format the amount as a locale-aware currency string.
+   * Defaults to Ethiopian locale (`en-ET`) since ETB is the primary currency.
+   */
   format(locale: string = 'en-ET'): string {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
@@ -58,6 +62,7 @@ export class Money {
   }
 
   private assertSameCurrency(other: Money): void {
+    // Arithmetic across currencies is a domain invariant violation — always throw
     if (this.currency !== other.currency) {
       throw new Error(
         `Cannot perform arithmetic on different currencies: ${this.currency} vs ${other.currency}`,

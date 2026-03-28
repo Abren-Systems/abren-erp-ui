@@ -88,12 +88,28 @@ httpClient.interceptors.response.use(
   },
 )
 
-// ── Typed Request Helpers ─────────────────────────────
+/**
+ * Performs an authenticated GET request and unwraps the { success, data } envelope.
+ *
+ * @template T - The expected type of the 'data' property in the response.
+ * @param {string} url - The endpoint URL (relative to /api/v1).
+ * @param {AxiosRequestConfig} [config] - Optional Axios configuration.
+ * @returns {Promise<T>} - The unwrapped 'data' payload.
+ */
 export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   const response = await httpClient.get<ApiResponse<T>>(url, config)
   return response.data.data
 }
 
+/**
+ * Performs an authenticated POST request and unwraps the { success, data } envelope.
+ *
+ * @template T - The expected type of the 'data' property in the response.
+ * @param {string} url - The endpoint URL (relative to /api/v1).
+ * @param {unknown} [body] - The data to send in the request body.
+ * @param {AxiosRequestConfig} [config] - Optional Axios configuration.
+ * @returns {Promise<T>} - The unwrapped 'data' payload.
+ */
 export async function apiPost<T>(
   url: string,
   body?: unknown,
@@ -103,6 +119,15 @@ export async function apiPost<T>(
   return response.data.data
 }
 
+/**
+ * Performs an authenticated PUT request and unwraps the { success, data } envelope.
+ *
+ * @template T - The expected type of the 'data' property in the response.
+ * @param {string} url - The endpoint URL (relative to /api/v1).
+ * @param {unknown} [body] - The data to send in the request body.
+ * @param {AxiosRequestConfig} [config] - Optional Axios configuration.
+ * @returns {Promise<T>} - The unwrapped 'data' payload.
+ */
 export async function apiPut<T>(
   url: string,
   body?: unknown,
@@ -112,6 +137,15 @@ export async function apiPut<T>(
   return response.data.data
 }
 
+/**
+ * Performs an authenticated PATCH request and unwraps the { success, data } envelope.
+ *
+ * @template T - The expected type of the 'data' property in the response.
+ * @param {string} url - The endpoint URL (relative to /api/v1).
+ * @param {unknown} [body] - The data to send in the request body.
+ * @param {AxiosRequestConfig} [config] - Optional Axios configuration.
+ * @returns {Promise<T>} - The unwrapped 'data' payload.
+ */
 export async function apiPatch<T>(
   url: string,
   body?: unknown,
@@ -121,6 +155,14 @@ export async function apiPatch<T>(
   return response.data.data
 }
 
+/**
+ * Performs an authenticated DELETE request and unwraps the { success, data } envelope.
+ *
+ * @template T - The expected type of the 'data' property in the response.
+ * @param {string} url - The endpoint URL (relative to /api/v1).
+ * @param {AxiosRequestConfig} [config] - Optional Axios configuration.
+ * @returns {Promise<T>} - The unwrapped 'data' payload.
+ */
 export async function apiDelete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   const response = await httpClient.delete<ApiResponse<T>>(url, config)
   return response.data.data

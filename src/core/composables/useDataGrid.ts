@@ -3,6 +3,14 @@
  *
  * Returns reactive state objects compatible with TanStack Table v8.
  * Pass the returned `state` object directly into <DataGrid :state="state" />.
+ *
+ * All grid state (sorting, selection, filters, visibility) is co-located here
+ * so that parent components stay thin and grid resets are trivially composable.
+ *
+ * @example
+ *   const grid = useDataGrid()
+ *   // Reset selection after a bulk action
+ *   grid.resetSelection()
  */
 import { ref } from 'vue'
 import type {
@@ -32,11 +40,13 @@ export function useDataGrid() {
   }
 
   function resetFilters() {
+    /** Clears column-level filters and the global search string. */
     columnFilters.value = []
     globalFilter.value = ''
   }
 
   function resetAll() {
+    /** Full reset — restores the grid to its initial unfiltered, unselected state. */
     sorting.value = []
     rowSelection.value = {}
     columnVisibility.value = {}
@@ -44,6 +54,7 @@ export function useDataGrid() {
     globalFilter.value = ''
   }
 
+  /** Returns the number of currently selected rows. */
   const selectedCount = () => Object.keys(rowSelection.value).length
 
   return {
