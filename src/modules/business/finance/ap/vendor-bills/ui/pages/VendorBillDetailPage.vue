@@ -4,17 +4,18 @@ import { Button } from '@/core/ui/button'
 import { Badge } from '@/core/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/core/ui/card'
 import { useVendorBill } from '../../application/composables/useVendorBill'
-import { Money } from '@/core/domain/money'
+import { useValidateVendorBill } from '../../application/composables/useValidateVendorBill'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
 
-const { bill, isLoading, validate, isActionPending } = useVendorBill(props.id)
+const { bill, isLoading } = useVendorBill(props.id)
+const { validate, isPending: isActionPending } = useValidateVendorBill()
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary'> = {
   DRAFT: 'secondary',
   VALIDATED: 'default',
-  PAID: 'default', // 'success' not in variant type
+  PAID: 'default',
 }
 
 async function handleValidate() {
@@ -23,12 +24,11 @@ async function handleValidate() {
       'Validate this vendor bill? This will automatically post an accrual entry to the general ledger.',
     )
   ) {
-    await validate()
+    await validate(props.id)
   }
 }
 
 function handleCreatePR() {
-  // Pass DTO to Create PR page (In a real app, query params or store orchestration)
   void router.push({ name: 'PaymentRequestCreate' })
 }
 </script>
@@ -65,17 +65,17 @@ function handleCreatePR() {
           <dl class="grid grid-cols-2 gap-4 text-sm">
             <div>
               <dt class="text-neutral-500">Vendor ID</dt>
-              <dd class="font-medium font-mono text-xs mt-1">{{ bill.vendor_id }}</dd>
+              <dd class="font-medium font-mono text-xs mt-1">{{ bill.vendorId }}</dd>
             </div>
             <div>
               <dt class="text-neutral-500">Total Amount</dt>
               <dd class="font-bold text-lg mt-1 whitespace-nowrap">
-                {{ Money.from(bill.total_amount, bill.currency).format() }}
+                {{ bill.totalAmount.format() }}
               </dd>
             </div>
             <div>
               <dt class="text-neutral-500">Bill Number</dt>
-              <dd class="mt-1 font-mono text-neutral-900">{{ bill.bill_number }}</dd>
+              <dd class="mt-1 font-mono text-neutral-900">{{ bill.billNumber }}</dd>
             </div>
             <div>
               <dt class="text-neutral-500">Currency</dt>
@@ -83,11 +83,11 @@ function handleCreatePR() {
             </div>
             <div>
               <dt class="text-neutral-500">Issue Date</dt>
-              <dd class="mt-1">{{ new Date(bill.issue_date).toLocaleDateString() }}</dd>
+              <dd class="mt-1">{{ bill.issueDate.toLocaleDateString() }}</dd>
             </div>
             <div>
               <dt class="text-neutral-500">Due Date</dt>
-              <dd class="mt-1">{{ new Date(bill.due_date).toLocaleDateString() }}</dd>
+              <dd class="mt-1">{{ bill.dueDate.toLocaleDateString() }}</dd>
             </div>
             <div class="col-span-2 mt-2">
               <dt class="text-neutral-500">Justification / Description</dt>
@@ -121,17 +121,17 @@ function handleCreatePR() {
               >
                 <td class="py-2">{{ line.description }}</td>
                 <td class="py-2 text-right font-mono font-semibold">
-                  {{ Money.from(line.amount, bill.currency).format() }}
+                  {{ line.amount.format() }}
                 </td>
                 <td class="py-2 pl-4">
-                  <code v-if="line.account_id" class="text-xs text-neutral-400">{{
-                    line.account_id.slice(0, 8)
+                  <code v-if="line.accountId" class="text-xs text-neutral-400">{{
+                    line.accountId.slice(0, 8)
                   }}</code>
                   <span v-else class="text-neutral-300 text-xs">—</span>
                 </td>
                 <td class="py-2 pl-4">
-                  <code v-if="line.category_id" class="text-xs text-neutral-400">{{
-                    line.category_id.slice(0, 8)
+                  <code v-if="line.categoryId" class="text-xs text-neutral-400">{{
+                    line.categoryId.slice(0, 8)
                   }}</code>
                   <span v-else class="text-neutral-300 text-xs">—</span>
                 </td>
@@ -141,7 +141,7 @@ function handleCreatePR() {
               <tr class="border-t border-neutral-200">
                 <td class="py-2 font-semibold">Total</td>
                 <td class="py-2 text-right font-bold font-mono">
-                  {{ Money.from(bill.total_amount, bill.currency).format() }}
+                  {{ bill.totalAmount.format() }}
                 </td>
                 <td colspan="2" />
               </tr>

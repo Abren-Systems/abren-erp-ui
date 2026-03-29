@@ -1,37 +1,39 @@
+import type { Money } from '@/core/domain/money'
+
 export enum VendorBillStatus {
   DRAFT = 'DRAFT',
   VALIDATED = 'VALIDATED',
   PAID = 'PAID',
 }
 
-export interface VendorBillLineDTO {
+export interface VendorBillLine {
   id?: string
   description: string
-  amount: number
-  account_id?: string | null
-  category_id?: string | null
-  journal_line_id?: string | null
+  amount: Money
+  accountId: string | null
+  categoryId: string | null
+  journalLineId: string | null
 }
 
-export interface VendorBillDTO {
+export interface VendorBill {
   id: string
-  vendor_id: string
-  bill_number: string
-  issue_date: string
-  due_date: string
+  vendorId: string
+  billNumber: string
+  issueDate: Date
+  dueDate: Date
   currency: string
   justification: string
   status: VendorBillStatus
-  total_amount: number
-  lines: VendorBillLineDTO[]
+  totalAmount: Money
+  lines: VendorBillLine[]
 }
 
-export interface VendorBillCreateDTO {
-  vendor_id: string
-  bill_number: string
-  issue_date: string
-  due_date: string
+export interface VendorBillCreate {
+  vendorId: string
+  billNumber: string
+  issueDate: string
+  dueDate: string
   currency: string
   justification: string
-  lines: VendorBillLineDTO[]
+  lines: Omit<VendorBillLine, 'amount' | 'journalLineId'> & { amount: number }[]
 }

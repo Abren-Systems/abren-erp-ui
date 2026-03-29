@@ -30,6 +30,15 @@ export default tseslint.config(
         },
       ],
 
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'alert',
+          message:
+            'Architectural Violation: Use the toast notification system instead of window.alert().',
+        },
+      ],
+
       // 2. Enforce Design System
       'vue/no-restricted-static-attribute': [
         'error',

@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/core/ui/data-grid'
 import { Button } from '@/core/ui/button'
 import { vendorBillColumns } from '../grids/vendor-bill.grid'
-import { useVendorBillsStore } from '../../application/store/useVendorBillsStore'
-import type { VendorBillDTO } from '../../infrastructure/api.types'
+import { useVendorBills } from '../../application/composables/useVendorBills'
+import type { VendorBill } from '../../domain/models/vendor-bill.types'
 
 const router = useRouter()
-const store = useVendorBillsStore()
+const { bills, isLoading } = useVendorBills()
 const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
-onMounted(() => {
-  store.fetchBills()
-})
-
-function handleRowClick(bill: VendorBillDTO) {
+function handleRowClick(bill: VendorBill) {
   void router.push({ name: 'VendorBillDetail', params: { id: bill.id } })
 }
 
@@ -39,9 +34,9 @@ function handleCreate() {
       v-model:row-selection="rowSelection"
       v-model:column-visibility="columnVisibility"
       v-model:global-filter="globalFilter"
-      :data="store.bills || []"
+      :data="bills || []"
       :columns="vendorBillColumns"
-      :loading="store.isLoading"
+      :loading="isLoading"
       placeholder="Search vendor bills..."
       @row-click="handleRowClick"
     />

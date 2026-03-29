@@ -1,34 +1,29 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { Badge } from '@/core/ui/badge'
-import type { VendorBillDTO } from '../../infrastructure/api.types'
-import { Money } from '@/core/domain/money'
+import type { VendorBill } from '../../domain/models/vendor-bill.types'
 
-export const vendorBillColumns: ColumnDef<VendorBillDTO>[] = [
+export const vendorBillColumns: ColumnDef<VendorBill>[] = [
   {
-    accessorKey: 'bill_number',
+    accessorKey: 'billNumber',
     header: 'Bill #',
-    cell: ({ row }) => h('span', { class: 'font-mono' }, row.original.bill_number),
+    cell: ({ row }) => h('span', { class: 'font-mono' }, row.original.billNumber),
   },
   {
-    accessorKey: 'issue_date',
+    accessorKey: 'issueDate',
     header: 'Issue Date',
-    cell: ({ row }) => new Date(row.original.issue_date).toLocaleDateString(),
+    cell: ({ row }) => row.original.issueDate.toLocaleDateString(),
   },
   {
-    accessorKey: 'due_date',
+    accessorKey: 'dueDate',
     header: 'Due Date',
-    cell: ({ row }) => new Date(row.original.due_date).toLocaleDateString(),
+    cell: ({ row }) => row.original.dueDate.toLocaleDateString(),
   },
   {
-    accessorKey: 'total_amount',
+    accessorKey: 'totalAmount',
     header: 'Amount',
     cell: ({ row }) =>
-      h(
-        'div',
-        { class: 'text-right font-mono' },
-        Money.from(row.original.total_amount, row.original.currency).format(),
-      ),
+      h('div', { class: 'text-right font-mono' }, row.original.totalAmount.format()),
   },
   {
     accessorKey: 'status',
@@ -38,7 +33,7 @@ export const vendorBillColumns: ColumnDef<VendorBillDTO>[] = [
       const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
         DRAFT: 'secondary',
         VALIDATED: 'default',
-        PAID: 'secondary', // Using secondary for paid as success might not be in the base variants
+        PAID: 'secondary',
       }
       return h(Badge, { variant: (variants[status] || 'default') as 'default' }, () => status)
     },

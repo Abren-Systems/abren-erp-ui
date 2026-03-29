@@ -2,14 +2,23 @@ import { Money } from '@/core/domain/money'
 import type { PaymentRequestDTO } from '../../infrastructure/api.types'
 import type { PaymentRequest, PaymentRequestLine } from '../models/payment-request.types'
 
-function mapLine(lineDto: PaymentRequestDTO['lines'][number]): PaymentRequestLine {
+import { Currency } from '@/core/domain/currency'
+
+function mapLine(
+  lineDto: PaymentRequestDTO['lines'][number],
+  parentCurrencyStr: string,
+): PaymentRequestLine {
+  const parentCurrency = Object.values(Currency).includes(parentCurrencyStr as Currency)
+    ? (parentCurrencyStr as Currency)
+    : Currency.USD
+
   return {
     id: lineDto.id,
     description: lineDto.description,
-    amount: Money.from(lineDto.amount, 'ETB'), // currency resolved from header
+    amount: Money.from(lineDto.amount, parentCurrency),
     accountId: lineDto.account_id,
     categoryId: lineDto.category_id,
-    taxAmount: lineDto.tax_amount != null ? Money.from(lineDto.tax_amount, 'ETB') : null,
+    taxAmount: lineDto.tax_amount != null ? Money.from(lineDto.tax_amount, parentCurrency) : null,
   }
 }
 
@@ -22,7 +31,7 @@ export function mapToPaymentRequest(dto: PaymentRequestDTO): PaymentRequest {
     currency: dto.currency,
     justification: dto.justification,
     status: dto.status,
-    lines: dto.lines.map(mapLine),
+    lines: dto.lines.map((ln) => mapLine(ln, dto.currency)),
     bankAccountId: dto.bank_account_id,
     targetLiabilityAccountId: dto.target_liability_account_id,
     submittedAt: dto.submitted_at ? new Date(dto.submitted_at) : null,
