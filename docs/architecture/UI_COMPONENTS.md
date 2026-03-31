@@ -9,6 +9,14 @@
 
 To ensure scalability and prevent "component soup," we categorize all UI elements into four distinct tiers based on their knowledge of the business domain.
 
+### Tier 1: Primitives (Atomic)
+
+- **Location**: `src/core/ui/primitives/`
+- **Nature**: Pure atoms (Button, Input, Checkbox, Skeleton).
+- **Knowledge**: Zero business knowledge.
+- **Enforcement**: Built on **Reka UI** (Headless) to ensure 100% WAI-ARIA compliance.
+- **Rule**: Standardized styles via Tailwind v4. No module-specific overrides allowed.
+
 ### Tier 2: Shared Patterns (Core UI)
 
 - **Location**: `src/core/ui/shared/`
@@ -102,3 +110,27 @@ To keep the UI testable and high-performance, follow the **Props In, Events Out*
 | **NO Business Logic in Components** | Components are for display and composition only. |
 | **NO API calls in Tier 1-3**        | Data fetching is an Application/Page concern.    |
 | **NO Grid Columns in .vue Files**   | Use the `ui/grids/` layer.                       |
+
+---
+
+## 9. Enterprise UI Standards [MANDATORY]
+
+To achieve the "High-Integrity" UX required for high-volume financial operations, all components must adhere to these three pillars:
+
+### 9.1 Accessibility & Tab-to-Flow
+
+ERP power users rely exclusively on the keyboard.
+
+- **Rule**: Every form must sustain a logical `Tab` flow.
+- **Rule**: All custom components must implement `aria-*` attributes and keyboard event handlers (`Enter`, `Space`, `Escape`).
+- **Rule**: Focus states must be high-contrast and never suppressed.
+
+### 9.2 Tabular Numbers
+
+Financial data must be perfectly aligned for scannability.
+
+- **Rule**: All monetary values, balance sheets, and counts must use the `font-variant-numeric: tabular-nums` CSS property.
+
+### 9.3 Data Density Control
+
+The UI must allow users to toggle between **Compact** (high density) and **Comfortable** (low density) modes via the `useAppDensity` core composable.

@@ -33,7 +33,24 @@ The project is designed for **zero-rewrite scaling**, following the exact same p
 1. **Vertical (Architecture): Constant.** Every module is built with strict statelessness, domain-aligned boundaries, mapper isolation, and the full security model from the moment of implementation. No exceptions.
 2. **Horizontal (Product Depth): Additive.** New features plug into the existing routing, state, and API client capabilities without requiring structural rewrites of the core platform.
 
-> **The architecture guarantees that progressive depth is always additive, never corrective.** The path forward is exclusively about expanding functional scope.
+### 1.4 The "Gold Standard" Principle
+
+The architecture guarantees that progressive depth is always additive, never corrective. The path forward is exclusively about expanding functional scope.
+
+### 1.5 Symmetry, Not Parity (Architectural Philosophy) [STRATEGIC]
+
+We follow the principle of **"Mirroring the Bounded Context, Adapting the Medium."** The frontend is structurally symmetric with the backend to ensure predictability, but it is not a blind, code-level replica.
+
+- **Mirroring (Parity)**: Top-level sub-directories in `src/modules/` must exactly match the backend's module names (e.g., `finance/ledger`).
+- **Symmetry (Patterns)**: We mirror the backend's _intent_ using Vue-idiomatic patterns. The backend's `facade.py` finds its symmetric counterpart in the frontend's **Action-Oriented Composables** (e.g., `usePayRequest`).
+- **Integrity (Absolute)**: The **Mapper-as-Factory** and **Layer Isolation** rules are absolute on both sides. The domain logic must be shielded from raw DTO shapes regardless of the language.
+
+### 1.6 Full-Stack Symmetry: The DTO Contract
+
+The backend's **OpenAPI Specification** is the authoritative contract for the full stack.
+
+- The frontend generates its TypeScript types directly from this spec.
+- The **Mapper-as-Factory** (§5) is the specific architectural component responsible for transforming these external DTO shapes into high-integrity Frontend Domain Models.
 
 ---
 
@@ -193,16 +210,22 @@ export const ledgerModule: ModuleDefinition = {
 
 ---
 
-## 5. Anti-Corruption Layer (The Mapper Pattern)
+## 5. The Mapper-as-Factory Pattern (Anti-Corruption Layer)
 
-### 5.1 Why Mappers?
+### 5.1 Why Mapper-as-Factory?
 
-The backend will evolve independently. **DTOs** (Data Transfer Objects) are the raw shapes from the server. Mappers ensure:
+The backend evolves independently. **DTOs** (Data Transfer Objects) are the raw, volatile shapes from the server. The Mapper-as-Factory ensures:
 
-1. Backend field renames only propagate to the mapper file, not to 50+ components.
-2. DTOs are "sanitized" into high-integrity domain types.
+1.  **Isolation**: Backend field renames only propagate to the mapper file, not to components or stores.
+2.  **Integrity**: DTOs (raw data) are "sanitized" and transformed into high-integrity **Domain Models** or **ViewModels** (encapsulated logic).
+3.  **Predictability**: Every component receives the same predictable data shape regardless of API versioning.
 
 ### 5.2 The Contract
+
+Every module infrastructure layer must implement mappers with two standardized factory functions:
+
+- `toViewModel()` / `toDomain()`: Transforms a raw backend DTO into a frontend-owned model.
+- `toDTO()`: Transforms a frontend model back into the raw backend shape for mutations.
 
 ```typescript
 // modules/payment-requests/infrastructure/payment-request.mapper.ts
@@ -210,16 +233,19 @@ The backend will evolve independently. **DTOs** (Data Transfer Objects) are the 
 import type { PaymentRequestDTO } from '../infrastructure/api.types'
 import type { PaymentRequestViewModel } from '../ui/types/view.types'
 
+/**
+ * Mapper-as-Factory for Payment Requests.
+ * Ensures the UI is never coupled to the backend's raw response shape.
+ */
 export function toViewModel(dto: PaymentRequestDTO): PaymentRequestViewModel {
   return {
     id: dto.id,
     beneficiary: dto.beneficiary_name,
     amount: Money.from(dto.amount, dto.currency),
     status: dto.status,
-    statusLabel: STATUS_LABELS[dto.status], // UI-specific
-    statusColor: STATUS_COLORS[dto.status], // UI-specific
-    canSubmit: dto.status === 'DRAFT', // UI invariant
-    canApprove: dto.status === 'SUBMITTED', // UI invariant
+    // derivation/logic capture
+    statusLabel: STATUS_LABELS[dto.status],
+    canSubmit: dto.status === 'DRAFT',
     submittedAt: dto.submitted_at ? formatDate(dto.submitted_at) : null,
   }
 }
@@ -227,10 +253,9 @@ export function toViewModel(dto: PaymentRequestDTO): PaymentRequestViewModel {
 
 ### 5.3 Rules
 
-- Components **NEVER** consume raw API DTOs. They receive `ViewModels` from the mapper.
-- Mappers are **pure functions** — no side effects, no API calls, no store access.
-- Mappers have **100% unit test coverage**. They are the cheapest and most critical tests.
-- When the backend changes a DTO field, **only the mapper file changes** — components remain untouched.
+- **Absolute Shielding**: Components **NEVER** consume raw API DTOs. They receive `ViewModels` or `Domain Models` from the Mapper Factory.
+- **Pure Logic**: Mappers are **pure functions** — no side effects, no API calls, no store access.
+- **Test Mandatory**: Mappers have **100% unit test coverage**.
 
 ---
 
@@ -436,6 +461,29 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 | [Testing Strategy](TESTING_STRATEGY.md)          | Frontend testing pyramid and coverage targets         |
 | [Development Guide](../DEVELOPMENT.md)           | Local setup, coding standards, and conventions        |
 | [Repository Strategy](../REPOSITORY_STRATEGY.md) | How the UI repo coexists with the API repo            |
+
+## 12. Quality & Documentation Standards
+
+### 12.1 In-Code Documentation Philosophy
+
+Comments must answer questions the code cannot. The _what_ is in the code — comments explain the _why_, the _tradeoff_, or the _constraint_ that led to a decision.
+
+**Write a comment when:**
+
+- The logic is non-obvious or involves an edge case.
+- A business rule drives a technical choice.
+- A workaround exists for a library bug or limitation.
+- A complex algorithm or reactive dependency chain is implemented.
+
+### 12.2 JSDoc Standards
+
+- **Module-Level**: Required for `core/` and non-trivial entries. State responsibility and constraints.
+- **Composable**: Required for all exported composables. Include an `@example` block.
+- **Vue Component**: Required in `<script setup>` for all components outside `core/ui/`. Describe purpose and data sourcing.
+
+### 12.3 Type Annotations
+
+Mandatory everywhere. `any` is strictly banned — use `unknown` with type guards.
 
 ---
 

@@ -58,32 +58,33 @@ export const useLedgerUIStore = defineStore('ledger-ui', () => {
 
 ---
 
-## 3. Data Flow: API → Store → Component
+## 3. Data Flow: API → Component
 
 ```mermaid
 sequenceDiagram
     participant C as Component
-    participant H as Composable (Use Case)
-    participant A as Service Client
-    participant M as Mapper
-    participant TQ as TanStack Query
+    participant H as Composable (Facade)
+    participant A as Adapter (Infrastructure)
+    participant M as Mapper (Firewall)
+    participant TQ as TanStack Query (Cache)
 
     C->>H: onMounted → usePaymentRequests()
     H->>TQ: useApiQuery(['payment-requests'], ...)
-    TQ->>A: paymentRequestApi.list()
-    A-->>TQ: PaymentRequestDTO[]
+    TQ->>A: adapter.list()
+    A-->>TQ: PaymentRequestDTO[] (raw)
+    Note over TQ,M: Integrity Firewall
     TQ->>M: dtos.map(toViewModel)
-    M-->>TQ: PaymentRequestViewModel[]
+    M-->>TQ: PaymentRequestViewModel[] (clean)
     TQ-->>C: Reactive data via computed refs
 ```
 
-### 3.1 Composable with TanStack Query
+### 3.1 Composable with TanStack Query (Facade)
 
 ```typescript
 // modules/business/finance/ap/payment-requests/application/composables/usePaymentRequests.ts
 import { useQuery } from '@tanstack/vue-query'
 import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
-import { mapPaymentRequest } from '../infrastructure/payment_request.mapper'
+import { toViewModel } from '../infrastructure/payment_request.mapper'
 
 export function usePaymentRequests() {
   const {
@@ -94,7 +95,8 @@ export function usePaymentRequests() {
     queryKey: ['payment-requests'],
     queryFn: async () => {
       const dtos = await paymentRequestAdapter.list()
-      return dtos.map(mapPaymentRequest)
+      // Always map BEFORE data enters the Query Cache
+      return dtos.map(toViewModel)
     },
   })
 
@@ -106,21 +108,27 @@ export function usePaymentRequests() {
 
 ## 4. Cross-Module Reactivity via Event Bus
 
-Stores **never** import other stores. When Module A's action should refresh Module B's data, use the Event Bus:
+Stores **never** import other stores for domain data. When Module A's action should refresh Module B's data, use the Event Bus and Cache Invalidation:
 
 ```typescript
-// modules/payment-requests/composables/usePayRequest.ts
+// modules/business/finance/ap/payment-requests/application/composables/usePayRequest.ts
 import { eventBus } from '@/core/event-bus/event-bus'
+import { useQueryClient } from '@tanstack/vue-query'
 
 export function usePayRequest() {
-  async function payRequest(id: string, dto: PayRequestDTO) {
-    const result = await paymentRequestApi.pay(id, dto)
-    store.updateRequest(toViewModel(result))
+  const queryClient = useQueryClient()
 
-    // Notify other modules without importing them
-    eventBus.emit('payment-request:paid', {
+  async function payRequest(id: string, dto: PayRequestDTO) {
+    // 1. Perform mutation via Adapter
+    const result = await paymentRequestAdapter.pay(id, dto)
+
+    // 2. Refresh LOCAL cache immediately
+    void queryClient.invalidateQueries({ queryKey: ['payment-requests'] })
+
+    // 3. Notify OTHER modules (Ledger, Messaging) without importing them
+    eventBus.emit('ap:pr:paid', {
       id: result.id,
-      amount: Money.from(result.amount, result.currency),
+      amount: result.amount, // Raw DTO value, receiver will map
     })
   }
 
@@ -129,8 +137,8 @@ export function usePayRequest() {
 
 // modules/business/finance/ledger/application/composables/useLedgerAccounts.ts
 // Subscribes to the event — refreshes its own caches
-eventBus.on('payment-request:paid', () => {
-  queryClient.invalidateQueries(['ledger-accounts'])
+eventBus.on('ap:pr:paid', () => {
+  queryClient.invalidateQueries({ queryKey: ['ledger-accounts'] })
 })
 ```
 

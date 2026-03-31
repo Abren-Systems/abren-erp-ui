@@ -19,35 +19,64 @@ Each backend module has a 1:1 frontend counterpart:
 
 ---
 
+### 1.1 Architectural Categorization
+
+To maintain a scalable and clean workspace, modules are partitioned into two architectural categories:
+
+| Category     | Role                                                  | Key Constraint                                              |
+| :----------- | :---------------------------------------------------- | :---------------------------------------------------------- |
+| **Platform** | The **"Engine"**. Provides cross-domain capabilities. | **Capability-First**. No business-specific logic allowed.   |
+| **Business** | The **"Domain"**. Implements specific ERP features.   | **Domain-First**. Consumes platform features via Protocols. |
+
+### 1.2 The Single-Module Boundary Rule (Consolidation)
+
+**Rule:** Every backend module (Bounded Context) maps to exactly **one** frontend module.
+
+To prevent "Sub-Module Fatigue," do **NOT** create deep layer nesting for related features. For example, `Payment Requests` and `Vendor Bills` are both features of the `AP` (Accounts Payable) module and MUST live within the same 4-layer taxonomy:
+
+- ❌ `business/finance/ap/payment-requests/infrastructure/`
+- ✅ `business/finance/ap/infrastructure/` (Shared adapter for all AP context)
+
+**UI Organization:** Within the `ui/` layer, use feature-organized folders to keep components manageable (e.g., `ui/payment-requests/` and `ui/vendor-bills/`).
+
+---
+
 ## 2. Module Internal Structure
 
-Every module **MUST** follow this exact directory layout:
+Every module **MUST** adhere to the **4-Layer Taxonomy** to ensure horizontal scalability and prevent business logic leakage into the presentation layer.
 
-```
+```text
 src/modules/{category}/{module}/
 ├── domain/                  # [Pure] Business rules & Types
-│   ├── {entity}.types.ts    # Domain interfaces & value objects
-│   └── {vo}.ts              # Value Objects (e.g. Money)
+│   ├── {entity}.types.ts    # Frontend domain models
+│   └── {vo}.ts              # Value Objects (logic-rich types like Money)
 │
 ├── infrastructure/          # [Firewall] Anti-Corruption Layer (ACL)
-│   ├── {module}.mapper.ts   # [MANDATORY] DTO → Domain factory
-│   ├── {module}_adapter.ts  # [I/O] API Communication
-│   └── api.types.ts         # DTO interfaces
+│   ├── {module}.mapper.ts   # [MANDATORY] Mapper-as-Factory (DTO ↔ UI Model)
+│   ├── {module}_adapter.ts  # [I/O] Typed API Communication
+│   └── api.types.ts         # Backend DTO interfaces (Source: Backend OpenAPI)
 │
-├── application/             # [Orchestration] Use Case Composables
+├── application/             # [Orchestration] Use Case Composables (UI Facades)
 │   └── composables/
-│       ├── use{Entity}s.ts  # Query composable (read)
-│       └── use{Action}.ts   # Mutation composable (write)
+│       ├── use{Entity}s.ts  # Query Facade (TanStack Query)
+│       └── use{Action}.ts   # Command Facade (Mutations & Side-effects)
 │
-├── ui/                      # [Presentation] Components, Pages, Formatters
-│   ├── components/          # Module-scoped components & FormDrawers
-│   ├── pages/               # Route-level views (List, Detail, Create, Edit, Wizard)
-│   ├── grids/               # DataGrid column configurations
-│   └── utils/               # UI-specific formatters & helpers
+├── ui/                      # [Presentation] View-only layer
+│   ├── components/          # Stateless molecules & module-specific atoms
+│   ├── pages/               # Route-level stateful orchestrators
+│   ├── grids/               # TanStack Table column configurations
+│   └── utils/               # Display formatters
 │
 ├── routes.ts                # Lazy-loaded route definitions
 └── index.ts                 # ModuleDefinition export
 ```
+
+### 2.1 The UI Facade (Composables)
+
+In our **Symmetry-over-Parity** model, the frontend's **Application Composables** are the symmetric counterpart to the backend's `facade.py`.
+
+- **Rule**: Component files (`.vue`) are strictly prohibited from calling Mappers or Adapters directly.
+- **Rule**: All API orchestration, caching configuration, and side-effect dispatching (toasts, event bus) must happen within a Composable.
 
 ---
 
@@ -125,21 +154,24 @@ import { usePaymentStore } from '@/modules/business/finance/ap/payment-requests/
 
 ### 4.3 Data Flow Between Modules
 
-```
-Module A (Payment Requests)          Module B (Accounting)
-┌──────────────────────────┐        ┌──────────────────────────┐
-│ usePayRequest()          │        │ useJournalEntries()      │
-│  └── paymentApi.pay()    │        │  └── accountingApi.list()│
-│      └── eventBus.emit() ├──┐     │                          │
-│         'pr:paid'        │  │     │ eventBus.on('pr:paid')   │
-└──────────────────────────┘  │     │  └── refreshEntries()    │
-                               │     └──────────────────────────┘
+To maintain full-stack integrity, all cross-module side effects travel via the **Event Bus**, while internal data flow is shielded by the **Mapper-as-Factory**.
+
+```text
+Module A (Finance/AP)               Module B (Finance/Ledger)
+┌───────────────────────────┐         ┌───────────────────────────┐
+│ [Application Composable]  │         │ [Application Composable]  │
+│ usePayRequest()           │         │ useJournalEntries()       │
+│  ├── adapter.pay()        │         │  ├── adapter.list()       │
+│  └── mapper.toDTO()       │         │  └── mapper.toViewModel() │
+│      └── [Side Effect]    │         │      └── [Domain Model]   │
+│          eventBus.emit()  ├──┐      │                           │
+│          'ap:pr:paid'     │  │      │ eventBus.on('ap:pr:paid') │
+└───────────────────────────┘  │      │  └── query.invalidate()   │
+                               │      └───────────────────────────┘
                                │                  ▲
                                └──────────────────┘
                             Event Bus (Shared Kernel)
 ```
-
----
 
 ## 5. Route Registration Pattern
 
@@ -186,13 +218,26 @@ for (const mod of modules) {
 
 ---
 
+## 10. Frontend Architectural Symmetry (Vue 3 Mapper)
+
+To maintain full-stack integrity, the frontend must mirror the backend's domain boundaries while adapting to the UI's reactive medium.
+
+| Pattern            | Frontend Implementation                   | Backend Symmetric Counterpart                           |
+| ------------------ | ----------------------------------------- | ------------------------------------------------------- |
+| **Entry Point**    | **Action Composables** (`application/`)   | **Module Facade** (`application/facade.py`)             |
+| **ACL (Firewall)** | **Mapper-as-Factory** (`infrastructure/`) | **Infrastructure Mapper** (`infrastructure/mappers.py`) |
+| **Data Shape**     | **ViewModels / Models** (`domain/`)       | **DTOs** (`application/dtos.py` / `generated.types.ts`) |
+| **State Caching**  | **TanStack Query** (Server State)         | **Read-Side Cache / Redis**                             |
+
+---
+
+## 5-Component Scaffolding Checklist
+
 When creating a new module (e.g., `procurement`):
 
-- [ ] Create directory under `src/modules/business/` or `src/modules/platform/`
-- [ ] Implement `domain/{entity}.types.ts`
-- [ ] Implement `infrastructure/{module}_adapter.ts` (Fetches **DTOs**)
-- [ ] Implement `infrastructure/{module}.mapper.ts` (**DTO → Domain** factory logic)
-- [ ] Implement `application/composables/use{Entity}.ts` (Orchestrated by **TanStack Query**)
-- [ ] Implement `ui/` (Pages, Components, Formatters)
-- [ ] Create `index.ts` — `ModuleDefinition` export
-- [ ] Register module in `src/modules/registry.ts`
+- [ ] 1. **Domain Types**: Define `domain/{entity}.types.ts` (The UI-owned source of truth).
+- [ ] 2. **Infrastructure Adapter**: Define `infrastructure/{module}_adapter.ts` (Fetches **DTOs** using `apiGet/apiPost`).
+- [ ] 3. **Mapper-as-Factory**: Implement `toViewModel()` and `toDTO()` factory logic (The Integrity Firewall).
+- [ ] 4. **Application Facade**: Create `application/composables/use{Entity}` using TanStack Query.
+- [ ] 5. **UI Orchestration**: Build `ui/pages/` and `ui/components/` as view-only compositions.
+- [ ] 6. **Registration**: Export `ModuleDefinition` in `index.ts` and register in `src/modules/registry.ts`.

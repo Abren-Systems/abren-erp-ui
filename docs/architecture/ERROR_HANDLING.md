@@ -17,47 +17,51 @@ In an ERP, errors are **expected operational events** — network failures, vali
 
 ## 2. Error Categories & Handling Matrix
 
-| HTTP Status   | Category         | Auto-Handled By  | User-Facing Behavior                                           |
-| ------------- | ---------------- | ---------------- | -------------------------------------------------------------- |
-| `401`         | Session Expired  | HTTP Interceptor | Redirect to `/login` with `?redirect=`                         |
-| `403`         | Forbidden        | Composable layer | Toast: "You don't have permission to perform this action"      |
-| `409`         | Conflict         | Composable layer | Toast with retry option: "Record was modified by another user" |
-| `422`         | Validation Error | TanStack Form    | Field-level inline errors                                      |
-| `429`         | Rate Limited     | HTTP Interceptor | Toast: "Too many requests. Please wait."                       |
-| `500`         | Server Error     | HTTP Interceptor | Toast: "Something went wrong. Please try again."               |
-| Network Error | Connectivity     | HTTP Interceptor | Toast with retry: "Unable to reach the server."                |
+Our error handling logic uses a combination of **HTTP Status Codes** (transport) and **Error Codes** (domain) to resolve user-facing feedback. This ensures symmetry with the backend's `DomainError` system.
+
+| HTTP Status | Domain Code         | Category        | User-Facing Behavior                                |
+| ----------- | ------------------- | --------------- | --------------------------------------------------- |
+| `401`       | —                   | Session Expired | Redirect to `/login`                                |
+| `403`       | `PERMISSION_DENIED` | Forbidden       | Toast: "Access denied. Required: [permission]"      |
+| `404`       | `RECORD_NOT_FOUND`  | Not Found       | Local state reset + "Record does not exist"         |
+| `409`       | `CONFLICT`          | Concurrent Edit | Toast: "Record was modified. Please refresh."       |
+| `422`       | `VALIDATION_ERROR`  | Input Integrity | Field-level inline errors (Zod + TanStack Form)     |
+| `429`       | `RATE_LIMIT`        | Rate Limited    | Toast: "Too many requests. Please wait."            |
+| `500`       | `INTERNAL_ERROR`    | Server Error    | Toast: "Something went wrong. Please try again."    |
+| —           | `NETWORK_FAILURE`   | Connectivity    | Toast with retry: "Unable to reach the server."     |
+| —           | `PROVIDER_DOWN`     | Integration     | Toast: "External service is currently unavailable." |
 
 ---
 
 ## 3. Error Handling Layers
 
-### 3.1 Layer 1: HTTP Interceptor (Automatic)
+### 3.1 Layer 1: HTTP Interceptor (Automatic Integration)
 
-The core HTTP client handles infrastructure errors that are universal across all modules:
+The core HTTP client handles infrastructure errors and unwraps the success/error envelopes. It populates an `ApiError` class with the specific backend error code.
 
 ```typescript
 // core/api/http-client.ts — Response interceptor
+
 httpClient.interceptors.response.use(
-  (response) => response,
+  (response) => response.data, // Unwrap Success Envelope: { data: T } -> T
   async (error) => {
     if (error.response) {
-      const { status, data } = error.response
+      const { status, data } = error.response as AxiosResponse<ApiErrorResponse>
 
       // Session expired — clear auth and redirect
       if (status === 401) {
-        clearStoredAuth()
-        if (window.location.pathname !== '/login') {
-          window.location.assign('/login')
-        }
+        handleAuthExpiry()
+        return Promise.reject(new ApiError('UNAUTHORIZED', 'Session expired.'))
       }
 
-      // Extract structured error message from backend envelope
-      if (data?.detail) {
-        return Promise.reject(new Error(data.detail))
+      // Handle Structured Error Envelopes: { detail: S, code: C }
+      if (data && data.success === false) {
+        return Promise.reject(new ApiError(data.code, data.detail, status))
       }
     }
 
-    return Promise.reject(error)
+    // Fallback for timeout/network failures
+    return Promise.reject(new ApiError('NETWORK_FAILURE', error.message))
   },
 )
 ```

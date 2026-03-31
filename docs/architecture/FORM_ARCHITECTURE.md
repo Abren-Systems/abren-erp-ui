@@ -38,9 +38,9 @@ sequenceDiagram
 
 ---
 
-## 3. Form Composable Pattern
+## 3. Form Composable Pattern (The Integrity Pipeline)
 
-Each module's form logic lives in `application/composables/`. Forms follow the same Use Case Composable pattern as queries.
+Each module's form logic lives in `application/composables/`. Forms follow the same **UI Facade** pattern as queries, but with a critical **Integrity Firewall** on submission.
 
 ```typescript
 // modules/business/finance/ap/payment-requests/application/composables/usePaymentRequestForm.ts
@@ -49,8 +49,9 @@ import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
 import { useApiMutation } from '@/core/composables/useApiMutation'
 import { paymentRequestAdapter } from '../../infrastructure/payment_request_adapter'
+import { toDTO } from '../../infrastructure/payment_request.mapper'
 
-// ── Schema ────────────────────────────────────────────
+// ── Schema (Symmetric with Domain Logic) ──────────────────
 const paymentRequestSchema = z.object({
   beneficiaryName: z.string().min(1, 'Beneficiary is required'),
   amount: z.number().positive('Amount must be positive'),
@@ -62,8 +63,15 @@ type PaymentRequestFormValues = z.infer<typeof paymentRequestSchema>
 
 // ── Composable ────────────────────────────────────────
 export function usePaymentRequestForm() {
-  const { mutateAsync, isPending, error } = useApiMutation((values: PaymentRequestFormValues) =>
-    paymentRequestAdapter.create(values),
+  const { mutateAsync, isPending, error } = useApiMutation(
+    async (values: PaymentRequestFormValues) => {
+      // 1. TRANSFORM: UI values → Backend DTO via Mapper Factory
+      const dto = toDTO(values)
+
+      // 2. IO: Send hardened DTO to the Adapter
+      // (Idempotency-Key is handled by useApiMutation/httpClient)
+      return paymentRequestAdapter.create(dto)
+    },
   )
 
   const form = useForm({

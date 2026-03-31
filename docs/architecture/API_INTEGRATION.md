@@ -29,7 +29,7 @@ All modules share a single Axios instance configured with interceptors for authe
 
 ### 2.1 Base Configuration
 
-```typescript
+````typescript
 // core/api/http-client.ts
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/core/auth/auth.store'
@@ -65,54 +65,86 @@ httpClient.interceptors.request.use((config) => {
   return config
 })
 
-// ── Response Headers & Unwrapping ────────────────────────
+### 2.2 Response Envelope Handling [MANDATORY]
 
-/**
- * Note: Our ResponseEnveloperMiddleware (Backend) wraps all JSON in:
- * { "success": true, "data": T }
- *
- * The apiGet/apiPost helpers are responsible for unwrapping this
- * and returning only the 'data' property to the caller.
- */
+The backend provides a unified response envelope. The Core HTTP Client is responsible for unwrapping these envelopes before they reach the module Adapters.
 
-export { httpClient }
+**Success Envelope:**
+```json
+{
+  "success": true,
+  "data": { ... }, // The actual payload (DTO)
+  "meta": { "total": 100, "page": 1 } // Pagination or secondary context
+}
+````
+
+**Error Envelope:**
+
+```json
+{
+  "success": false,
+  "detail": "Descriptive error message",
+  "code": "ERROR_CODE_STRING" // Symmetric with backend DomainError
+}
 ```
 
-### 2.2 Error Types
+### 2.3 Response Types & Unwrapping Logic
 
 ```typescript
 // core/api/types.ts
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public readonly code: string,
-    public readonly status: number,
-  ) {
-    super(message)
-    this.name = 'ApiError'
-  }
-}
 
-// Backend response envelope types
+/**
+ * Standard Success Envelope
+ * T is the DTO shape (e.g., PaymentRequestDTO)
+ */
 export interface ApiResponse<T> {
   success: true
   data: T
   meta: Record<string, unknown> | null
 }
 
+/**
+ * Standard Error Envelope
+ * Symmetric with the backend's ErrorDetail schema.
+ */
 export interface ApiErrorResponse {
   success: false
   detail: string
   code: string
 }
 
-export interface PaginatedResponse<T> {
-  items: T[]
-  total: number
-  page: number
-  page_size: number
+/**
+ * The apiGet/apiPost helpers unwrap the data field automatically.
+ */
+export async function apiGet<T>(url: string): Promise<T> {
+  const response = await httpClient.get<ApiResponse<T>>(url)
+  return response.data.data
 }
 ```
+
+---
+
+## 3. Module API Adapters
+
+Each module has a typed **Adapter** that wraps the shared HTTP client. Adapters are responsible for path resolution and fetching raw DTOs.
+
+### 3.1 Rules
+
+- **Return raw DTOs**: Adapters must never call Mappers or return ViewModels.
+- **One Adapter per module**: No shared "mega API" files.
+- **Action-Oriented Names**: Method names must match backend endpoints (`submit`, `void`, `post`).
+
+---
+
+## 4. The Mapper-as-Factory Pattern
+
+### 4.1 Purpose [MANDATORY]
+
+Mappers are the **Integrity Firewall** and **Primary Domain Factory** between backend DTOs and frontend Models. In the Abren ERP, we follow the **Mapper-as-Factory** pattern to achieve full-stack symmetry:
+
+1. **Isolation**: Backend field renames only propagate to the mapper file, not to components.
+2. **Domain Logic Capture**: UI-specific computed values (labels, permissions, formatting) are captured _at the boundary_, not in the component.
+3. **Validation**: Mapping ensures raw API data (DTOs) conforms to strict frontend Typescript models.
 
 ---
 

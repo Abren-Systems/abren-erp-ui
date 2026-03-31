@@ -27,30 +27,30 @@
 
 ## 2. Layer Breakdown
 
-| Layer             | Type        | What to Test                                 | Tool                    | Coverage Target |
-| ----------------- | ----------- | -------------------------------------------- | ----------------------- | --------------- |
-| **Mappers**       | Unit        | DTO → Entity transformation correctness      | Vitest                  | **100%**        |
-| **Grid Configs**  | Unit        | Column definitions, formatting logic         | Vitest                  | **100%**        |
-| **Composables**   | Unit        | Application orchestration, Query state       | Vitest + Vue Test Utils | **90%+**        |
-| **Components**    | Component   | Render output, user interactions (Tier 1-3)  | Vitest + Vue Test Utils | **80%+**        |
-| **Feature Pages** | Integration | Full flow: API (MSW) → Composable → Grid     | Vitest + MSW            | Key workflows   |
-| **User Journeys** | E2E         | Login → Navigate → Create → Submit → Approve | Playwright              | Critical paths  |
+| Layer             | Type        | What to Test                                 | Tool                    | Coverage Target      |
+| ----------------- | ----------- | -------------------------------------------- | ----------------------- | -------------------- |
+| **Mappers**       | Unit        | DTO ↔ Model transformation (The Firewall)    | Vitest                  | **100% (MANDATORY)** |
+| **Grid Configs**  | Unit        | Column definitions, formatting logic         | Vitest                  | **100%**             |
+| **Composables**   | Unit        | Application orchestration (Side-effects)     | Vitest + Vue Test Utils | **90%+**             |
+| **Components**    | Component   | Render output, user interactions (Tier 1-3)  | Vitest + Vue Test Utils | **80%+**             |
+| **Feature Pages** | Integration | Full flow: API (MSW) → Composable → Grid     | Vitest + MSW            | Key workflows        |
+| **User Journeys** | E2E         | Login → Navigate → Create → Submit → Approve | Playwright              | Critical paths       |
 
 ---
 
 ## 3. Unit Tests
 
-### 3.1 Mapper Tests (Highest Priority)
+### 3.1 Mapper Tests (The Integrity Firewall)
 
-Mappers are pure functions — they're the cheapest, fastest, and most impactful tests.
+Mappers are the most critical unit tests. They ensure that backend changes to DTOs are caught immediately before they reach the UI. **100% branch and statement coverage is mandatory.**
 
 ```typescript
-// modules/business/finance/ap/payment-requests/domain/mappers/__tests__/payment-request.mapper.test.ts
+// modules/business/finance/ap/payment-requests/infrastructure/__tests__/payment-request.mapper.test.ts
 import { describe, it, expect } from 'vitest'
-import { toEntity } from '../payment-request.mapper'
-import type { PaymentRequestDTO } from '../../infrastructure/api.types'
+import { toViewModel, toDTO } from '../payment_request.mapper'
+import type { PaymentRequestDTO } from '../api.types'
 
-describe('PaymentRequest Mapper', () => {
+describe('PaymentRequest Mapper (Factory)', () => {
   const baseDTO: PaymentRequestDTO = {
     id: '550e8400-e29b-41d4-a716-446655440000',
     beneficiary_name: 'Acme Corp',
@@ -64,37 +64,21 @@ describe('PaymentRequest Mapper', () => {
     assigned_approver_id: null,
   }
 
-  it('maps beneficiary_name to beneficiary', () => {
+  it('maps DTO to ViewModel (toViewModel)', () => {
     const vm = toViewModel(baseDTO)
     expect(vm.beneficiary).toBe('Acme Corp')
-  })
-
-  it('converts amount to Money value object', () => {
-    const vm = toViewModel(baseDTO)
-    expect(vm.amount.format()).toContain('15,000.50')
-  })
-
-  it('derives canSubmit from DRAFT status', () => {
-    const vm = toViewModel(baseDTO)
+    expect(vm.amount.amount).toBe(15000.5)
     expect(vm.canSubmit).toBe(true)
-    expect(vm.canApprove).toBe(false)
   })
 
-  it('derives canApprove from SUBMITTED status', () => {
-    const vm = toViewModel({ ...baseDTO, status: 'SUBMITTED' })
-    expect(vm.canSubmit).toBe(false)
-    expect(vm.canApprove).toBe(true)
+  it('maps Form Values to DTO (toDTO)', () => {
+    const formValues = { beneficiaryName: 'New Corp', amount: 500 }
+    const dto = toDTO(formValues)
+    expect(dto.beneficiary_name).toBe('New Corp')
+    expect(dto.amount).toBe(500)
   })
 
-  it('formats submitted_at date when present', () => {
-    const vm = toViewModel({
-      ...baseDTO,
-      submitted_at: '2026-03-20T15:30:00Z',
-    })
-    expect(vm.submittedAt).toBeTruthy()
-  })
-
-  it('leaves submittedAt null when not submitted', () => {
+  it('handles edge cases (e.g. null dates)', () => {
     const vm = toViewModel(baseDTO)
     expect(vm.submittedAt).toBeNull()
   })
@@ -108,38 +92,43 @@ describe('PaymentRequest Mapper', () => {
 import { describe, it, expect } from 'vitest'
 import { Money, Currency } from '../money'
 
-describe('Money', () => {
+describe('Money (Value Object)', () => {
   it('adds same-currency amounts', () => {
     const a = Money.from(100, Currency.ETB)
     const b = Money.from(50.25, Currency.ETB)
     expect(a.add(b).amount).toBe(150.25)
   })
 
-  it('throws when adding different currencies', () => {
+  it('throws on cross-currency addition', () => {
     const etb = Money.from(100, Currency.ETB)
     const usd = Money.from(50, Currency.USD)
-    expect(() => etb.add(usd)).toThrow('different currencies')
-  })
-
-  it('formats in locale', () => {
-    const m = Money.from(1234.56, Currency.ETB)
-    expect(m.format('en-US')).toContain('1,234.56')
+    expect(() => etb.add(usd)).toThrow()
   })
 })
 ```
 
-### 3.3 Composable Tests (Application Orchestration)
+### 3.3 Composable Tests (Application Side-Effects)
 
-Composables should be tested by mocking the Infrastructure layer (API calls) and asserting on the returned reactive states from TanStack Query.
+Testing a Composable (UI Facade) requires asserting that the correct **Side Effects** were triggered.
 
 ```typescript
-// modules/business/finance/ap/payment-requests/application/composables/__tests__/useSubmitRequest.test.ts
+// modules/business/finance/ap/payment-requests/application/composables/__tests__/usePayRequest.test.ts
 import { describe, it, expect, vi } from 'vitest'
-import { useSubmitRequest } from '../useSubmitRequest'
+import { usePayRequest } from '../usePayRequest'
 
-describe('useSubmitRequest', () => {
-  it('transitions to success state after API call', async () => {
-    // ... test Query status (isPending -> isSuccess)
+describe('usePayRequest (Application Facade)', () => {
+  it('triggers toast and cache invalidation on success', async () => {
+    const { payRequest } = usePayRequest()
+    const toast = useToast() // mocked
+    const queryClient = useQueryClient() // mocked
+
+    await payRequest('123', { amount: 500 })
+
+    // Verify Side Effects
+    expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('Success'))
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['payment-requests'],
+    })
   })
 })
 ```
