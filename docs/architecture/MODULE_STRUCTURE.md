@@ -8,14 +8,14 @@
 
 Each backend module has a 1:1 frontend counterpart:
 
-| Module      | Category | Sub-Path                  | Description                     |
-| ----------- | -------- | ------------------------- | ------------------------------- |
-| `core`      | Platform | `platform/core`           | Identity, Tenants, RBAC         |
-| `workflows` | Platform | `platform/workflows`      | State Machine, Engine           |
-| `ledger`    | Business | `business/finance/ledger` | Chart of Accounts, G/L          |
-| `bank`      | Business | `business/finance/bank`   | Cash Management, Reconciliation |
-| `ap`        | Business | `business/finance/ap`     | Accounts Payable, Payments      |
-| `reporting` | Platform | `platform/reporting`      | Cross-domain analytics          |
+| Module      | Category | Sub-Path             | Description                     |
+| ----------- | -------- | -------------------- | ------------------------------- |
+| `core`      | Platform | `core`               | Identity, Tenants, RBAC         |
+| `workflows` | Platform | `workflows`          | State Machine, Engine           |
+| `ledger`    | Business | `finance/ledger`     | Chart of Accounts, G/L          |
+| `bank`      | Business | `finance/bank`       | Cash Management, Reconciliation |
+| `ap`        | Business | `finance/ap`         | Accounts Payable, Payments      |
+| `reporting` | Platform | `platform/reporting` | Cross-domain analytics          |
 
 ---
 
@@ -34,8 +34,8 @@ To maintain a scalable and clean workspace, modules are partitioned into two arc
 
 To prevent "Sub-Module Fatigue," do **NOT** create deep layer nesting for related features. For example, `Payment Requests` and `Vendor Bills` are both features of the `AP` (Accounts Payable) module and MUST live within the same 4-layer taxonomy:
 
-- ❌ `business/finance/ap/payment-requests/infrastructure/`
-- ✅ `business/finance/ap/infrastructure/` (Shared adapter for all AP context)
+- ❌ `finance/ap/infrastructure/`
+- ✅ `finance/ap/infrastructure/` (Shared adapter for all AP context)
 
 **UI Organization:** Within the `ui/` layer, use feature-organized folders to keep components manageable (e.g., `ui/payment-requests/` and `ui/vendor-bills/`).
 
@@ -86,7 +86,7 @@ In our **Symmetry-over-Parity** model, the frontend's **Application Composables*
 
 | Type        | Pattern                 | Example                 |
 | ----------- | ----------------------- | ----------------------- |
-| List Page   | `*ListPage.vue`         | `AccountListPage.vue`   |
+| List Page   | `*ListPage.vue`         | `AccountsListPage.vue`  |
 | Detail Page | `*DetailPage.vue`       | `AccountDetailPage.vue` |
 | Editor Page | `*EditPage.vue`         | `AccountEditPage.vue`   |
 | Create Page | `*CreatePage.vue`       | `AccountCreatePage.vue` |
@@ -125,15 +125,15 @@ Backend: GET  /accounts                   →  useAccountList()
 
 ```typescript
 // ✅ ALLOWED: Module imports from core
-import { Money } from '@/core/domain/money'
-import { httpClient } from '@/core/api/http-client'
+import { Money } from '@/shared/domain/money'
+import { httpClient } from '@/shared/api/http-client'
 
 // ✅ ALLOWED: Module imports from itself
 import { useLedgerAccounts } from '../application/composables/useLedgerAccounts'
 import { mapAccount } from '../infrastructure/ledger.mapper'
 
 // ❌ BANNED: Module imports from another module
-import { usePaymentStore } from '@/modules/business/finance/ap/payment-requests/...'
+import { usePaymentStore } from '@/modules/finance/ap/...'
 ```
 
 ### 4.2 ESLint Rule Configuration
@@ -178,8 +178,8 @@ Module A (Finance/AP)               Module B (Finance/Ledger)
 Each module exports a `ModuleDefinition` that includes its routes, permissions, and menu items:
 
 ```typescript
-// modules/business/finance/ledger/index.ts
-import type { ModuleDefinition } from '@/core/types/module.types'
+// modules/finance/ledger/index.ts
+import type { ModuleDefinition } from '@/shared/types/module.types'
 
 export const ledgerModule: ModuleDefinition = {
   id: 'ledger',

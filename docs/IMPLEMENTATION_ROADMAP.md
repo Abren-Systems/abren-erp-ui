@@ -19,7 +19,7 @@
 
 ---
 
-## 1. Core Infrastructure (`src/core/`)
+## 1. Core Infrastructure (`src/shared/`)
 
 _Blueprint: [ARCHITECTURE.md §7](architecture/ARCHITECTURE.md)_
 
@@ -41,7 +41,7 @@ _Blueprint: [ARCHITECTURE.md §7](architecture/ARCHITECTURE.md)_
 
 ---
 
-## 2. Design System (`src/core/ui/`)
+## 2. Design System (`src/shared/components/`)
 
 _Blueprint: [DESIGN_SYSTEM.md](architecture/DESIGN_SYSTEM.md), [UI_FOUNDATION_DECISION.md](architecture/UI_FOUNDATION_DECISION.md)_
 
@@ -99,22 +99,22 @@ _Blueprint: [DESIGN_SYSTEM.md](architecture/DESIGN_SYSTEM.md), [UI_FOUNDATION_DE
 
 _Blueprint: [ARCHITECTURE.md §4](architecture/ARCHITECTURE.md)_
 
-| Component                               | Status | Notes                                           |
-| --------------------------------------- | ------ | ----------------------------------------------- |
-| Router (dynamic module aggregation)     | ✅     | TLA-based, auto-registers from `allModules`     |
-| Auth Guard (global `beforeEach`)        | ✅     | Hydration + redirect logic                      |
-| Public Layout (login page)              | ✅     | Minimal, clean                                  |
-| Authenticated Layout (sidebar + header) | ✅     | Module-driven nav, business/platform separation |
-| Breadcrumb navigation                   | 📋     | Not built                                       |
-| Header user menu / profile              | 🔨     | Avatar placeholder, no dropdown                 |
+| Component                               | Status | Notes                                       |
+| --------------------------------------- | ------ | ------------------------------------------- |
+| Router (dynamic module aggregation)     | ✅     | TLA-based, auto-registers from `allModules` |
+| Auth Guard (global `beforeEach`)        | ✅     | Hydration + redirect logic                  |
+| Public Layout (login page)              | ✅     | Minimal, clean                              |
+| Authenticated Layout (sidebar + header) | ✅     | Module-driven nav, flat category separation |
+| Breadcrumb navigation                   | 📋     | Not built                                   |
+| Header user menu / profile              | 🔨     | Avatar placeholder, no dropdown             |
 
 ---
 
-## 4. Business Modules (`src/modules/business/`)
+## 4. Business Modules (`src/modules/`)
 
 _Blueprint: [MODULE_STRUCTURE.md](architecture/MODULE_STRUCTURE.md)_
 
-### 4.1 General Ledger (`business/finance/ledger`)
+### 4.1 General Ledger (`finance/ledger`)
 
 | Layer                                          | Status | Notes                                                  |
 | ---------------------------------------------- | ------ | ------------------------------------------------------ |
@@ -128,7 +128,7 @@ _Blueprint: [MODULE_STRUCTURE.md](architecture/MODULE_STRUCTURE.md)_
 | `ui/utils/account-formatter.ts`                | ✅     | UI-specific formatting                                 |
 | `index.ts` + `routes.ts`                       | ✅     | Module registered                                      |
 
-### 4.2 Banking (`business/finance/bank`)
+### 4.2 Banking (`finance/bank`)
 
 | Layer                          | Status | Notes                              |
 | ------------------------------ | ------ | ---------------------------------- |
@@ -136,7 +136,7 @@ _Blueprint: [MODULE_STRUCTURE.md](architecture/MODULE_STRUCTURE.md)_
 | `routes.ts`                    | 🔨     | Exists, routes to stub             |
 | 4-layer structure              | 📋     | No domain/infra/app/ui directories |
 
-### 4.3 Accounts Payable — Payment Requests (`business/finance/ap/payment-requests`)
+### 4.3 Accounts Payable — Payment Requests (`finance/ap`)
 
 | Layer                                                | Status | Notes                                   |
 | ---------------------------------------------------- | ------ | --------------------------------------- |
@@ -149,7 +149,7 @@ _Blueprint: [MODULE_STRUCTURE.md](architecture/MODULE_STRUCTURE.md)_
 | `ui/grids/payment-request.grid.ts`                   | ✅     | Column definitions                      |
 | `index.ts` + `routes.ts`                             | ✅     | Module registered                       |
 
-### 4.4 Reporting (`business/reporting`)
+### 4.4 Reporting (`reporting`)
 
 | Component        | Status | Notes                            |
 | ---------------- | ------ | -------------------------------- |
@@ -157,9 +157,9 @@ _Blueprint: [MODULE_STRUCTURE.md](architecture/MODULE_STRUCTURE.md)_
 
 ---
 
-## 5. Platform Modules (`src/modules/platform/`)
+## 5. Platform Modules (`src/modules/`)
 
-### 5.1 Core (`platform/core`)
+### 5.1 Core (`core`)
 
 | Component               | Status | Notes                                                    |
 | ----------------------- | ------ | -------------------------------------------------------- |
@@ -168,13 +168,13 @@ _Blueprint: [MODULE_STRUCTURE.md](architecture/MODULE_STRUCTURE.md)_
 | User Management Pages   | 📋     | Backend supports it, frontend not built                  |
 | Tenant Management Pages | 📋     | Backend supports it, frontend not built                  |
 
-### 5.2 Workflows (`platform/workflows`)
+### 5.2 Workflows (`workflows`)
 
 | Component                                        | Status | Notes                                     |
 | ------------------------------------------------ | ------ | ----------------------------------------- |
 | `domain/workflow.types.ts`                       | ✅     | `PendingApproval` entity                  |
 | `infrastructure/workflows_adapter.ts`            | ✅     | Fetch tasks, submit decision              |
-| `domain/mappers/workflow.mapper.ts`              | ✅     | DTO → domain                              |
+| `infrastructure/mappers/workflow.mapper.ts`      | ✅     | DTO → domain                              |
 | `application/composables/usePendingApprovals.ts` | ✅     | TanStack Query                            |
 | `application/composables/useApprovalAction.ts`   | ✅     | Mutation + event bus                      |
 | `ui/pages/WorkflowInboxPage.vue`                 | ✅     | DataGrid + action dialog                  |
@@ -220,7 +220,7 @@ _Blueprint: [STATE_MANAGEMENT.md](architecture/STATE_MANAGEMENT.md), [FORM_ARCHI
 | Task                                                    | Priority | Notes                                              |
 | ------------------------------------------------------- | -------- | -------------------------------------------------- |
 | Consolidate brand types (delete `core/domain/types.ts`) | ✅       | Completed                                          |
-| Delete `core/ui/data-table/`                            | ✅       | Completed                                          |
+| Delete `shared/components/data-table/`                  | ✅       | Completed                                          |
 | Delete `modules/shared/`                                | **P0**   | Empty placeholder directories                      |
 | Extract auth storage keys to shared constants           | **P1**   | Duplicated in `auth.store.ts` and `http-client.ts` |
 | Replace inline styles in `ChartOfAccountsPage.vue`      | **P1**   | Violates anti-pattern catalog                      |

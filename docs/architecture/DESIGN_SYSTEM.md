@@ -2,7 +2,7 @@
 
 _The definitive source of truth for visual tokens, typography, and spacing used across the Abren ERP UI._
 
-This document strictly reflects the design tokens implemented via **Tailwind CSS v4 `@theme`** in `src/assets/main.css`. All custom components built in `src/core/ui/` must adhere exclusively to these tokens.
+This document strictly reflects the design tokens implemented via **Tailwind CSS v4 `@theme`** in `src/assets/main.css`. All custom components built in `src/shared/components/` must adhere exclusively to these tokens.
 
 ---
 
@@ -247,9 +247,9 @@ The UI layer must remain isolated from hardcoded currency symbols or date format
 
 ---
 
-## 11. Primitive Components (`core/ui/`)
+## 11. Primitive Components (`shared/components/`)
 
-All base UI components (`Button`, `Input`, `Select`, etc.) are physically owned in `src/core/ui/` and strictly utilize the tokens above.
+All base UI components (`Button`, `Input`, `Select`, etc.) are physically owned in `src/shared/components/` and strictly utilize the tokens above.
 
 - **Base Tech:** Reka UI (accessible DOM primitives via `reka-ui`)
 - **Scaffolding:** shadcn-vue CLI

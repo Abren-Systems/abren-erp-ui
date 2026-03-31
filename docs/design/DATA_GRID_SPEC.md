@@ -457,7 +457,7 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 # 18. 🗂️ FULL COMPONENT TREE (PHASE 1 + 2)
 
 ```text
-src/core/ui/data-grid/
+src/shared/components/data-grid/
 ├── core/
 │   ├── DataGrid.vue          ← Main entry point (BUILT)
 │   ├── DataGridSkeleton.vue  ← Shimmer loading rows (BUILT)
@@ -486,7 +486,7 @@ src/core/ui/data-grid/
     └── StatusEditor.vue
 
 
-src/core/composables/
+src/shared/composables/
 └── useDataGrid.ts            ← State factory (BUILT)
 
 src/modules/{module}/ui/grids/

@@ -16,7 +16,7 @@ The three primary contenders for a modern Vue 3 application are:
 
 **Recommendation:** Abren ERP utilizes the **shadcn-vue** workflow.
 
-This is not a choice _against_ Reka UI, because shadcn-vue **is** Reka UI. By using shadcn-vue, we get the unstyled, accessible primitives of Reka UI, but we drastically accelerate development by having completely pre-styled, copy-pasteable Tailwind CSS components injected directly into `src/core/ui/`.
+This is not a choice _against_ Reka UI, because shadcn-vue **is** Reka UI. By using shadcn-vue, we get the unstyled, accessible primitives of Reka UI, but we drastically accelerate development by having completely pre-styled, copy-pasteable Tailwind CSS components injected directly into `src/shared/components/`.
 
 This provides the **speed of a UI library** with the **absolute code ownership of a custom design system**.
 
@@ -46,14 +46,14 @@ Reka UI is the official, independent port of the legendary Radix Primitives for 
 
 shadcn-vue is a tremendously popular pattern (originally popular in React as `shadcn/ui`) ported to Vue. It is **not** a component library that you install via `npm install`. It is a CLI tool.
 
-- **How it works:** You run a command like `npx shadcn-vue@latest add button`. The CLI downloads `Button.vue`, fully styled with Tailwind CSS, and physically saves it into your `src/core/ui/` folder. This component internally imports `Reka UI` for accessibility.
+- **How it works:** You run a command like `npx shadcn-vue@latest add button`. The CLI downloads `Button.vue`, fully styled with Tailwind CSS, and physically saves it into your `src/shared/components/` folder. This component internally imports `Reka UI` for accessibility.
 - **Pros:**
-  - **Zero Vendor Lock-in:** You physically own the `.vue` file. There is no `node_modules/shadcn-vue` to update and break your app. If you need a custom ERP feature in a dropdown, you just edit your local `core/ui/Dropdown.vue`.
+  - **Zero Vendor Lock-in:** You physically own the `.vue` file. There is no `node_modules/shadcn-vue` to update and break your app. If you need a custom ERP feature in a dropdown, you just edit your local `shared/components/Dropdown.vue`.
   - **Massive Time-Saver:** You get an enterprise-grade, beautifully styled component immediately, saving weeks of writing focus-states in Tailwind.
   - **Ecosystem Synergy:** Integrates natively with `@tanstack/zod-form-adapter`, Reka UI, and Tailwind CSS.
 - **Cons:**
   - You inherit their initial design opinions (which are excellent, but you will need to map them slightly to our new `@theme` tokens in `main.css`).
-  - Creates slightly more boilerplate in your `core/ui` folder, but this is intentional (ownership over abstraction).
+  - Creates slightly more boilerplate in your `shared/components` folder, but this is intentional (ownership over abstraction).
 
 ### 2.3 Ark UI
 
@@ -98,9 +98,9 @@ Conversely, using a heavy framework like PrimeVue locks you into their DOM struc
 
 **shadcn-vue sits precisely in the middle: The Golden Path.**
 
-1. **The Core UI Layer (`src/core/ui/`):** We use the shadcn-vue CLI to scaffold our primitives (`Button`, `Input`, `Select`, `Dialog`).
+1. **The Core UI Layer (`src/shared/components/`):** We use the shadcn-vue CLI to scaffold our primitives (`Button`, `Input`, `Select`, `Dialog`).
 2. **The Styling Layer (`main.css`):** The generated components are already wired to use CSS Variables. We simply map these variables to our newly created Tailwind v4 `@theme` design tokens.
-3. **The Business Components (`modules/.../components/`):** We import our owned `core/ui/Button.vue` to compose complex interfaces like `PaymentRequestForm.vue`.
+3. **The Business Components (`modules/.../components/`):** We import our owned `shared/components/Button.vue` to compose complex interfaces like `PaymentRequestForm.vue`.
 
 ### 4.1 Tailwind v4 Compatibility Note
 

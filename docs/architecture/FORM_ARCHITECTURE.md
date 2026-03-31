@@ -1,7 +1,7 @@
 # Form Architecture
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)
-> **Technology:** TanStack Form + Zod + Custom Design System (`core/ui/`)
+> **Technology:** TanStack Form + Zod + Custom Design System (`shared/components/`)
 
 ---
 
@@ -43,11 +43,11 @@ sequenceDiagram
 Each module's form logic lives in `application/composables/`. Forms follow the same **UI Facade** pattern as queries, but with a critical **Integrity Firewall** on submission.
 
 ```typescript
-// modules/business/finance/ap/payment-requests/application/composables/usePaymentRequestForm.ts
+// modules/finance/ap/application/composables/usePaymentRequestForm.ts
 import { useForm } from '@tanstack/vue-form'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
-import { useApiMutation } from '@/core/composables/useApiMutation'
+import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { paymentRequestAdapter } from '../../infrastructure/payment_request_adapter'
 import { toDTO } from '../../infrastructure/payment_request.mapper'
 
@@ -103,9 +103,9 @@ Pages import the form composable and bind fields declaratively using the design 
 ```vue
 <script setup lang="ts">
 import { usePaymentRequestForm } from '../../application/composables/usePaymentRequestForm'
-import { Input } from '@/core/ui/input'
-import { Label } from '@/core/ui/label'
-import { Button } from '@/core/ui/button'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
+import { Button } from '@/shared/components/button'
 
 const { form, isPending } = usePaymentRequestForm()
 </script>

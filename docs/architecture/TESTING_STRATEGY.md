@@ -45,7 +45,7 @@
 Mappers are the most critical unit tests. They ensure that backend changes to DTOs are caught immediately before they reach the UI. **100% branch and statement coverage is mandatory.**
 
 ```typescript
-// modules/business/finance/ap/payment-requests/infrastructure/__tests__/payment-request.mapper.test.ts
+// modules/finance/ap/infrastructure/__tests__/payment-request.mapper.test.ts
 import { describe, it, expect } from 'vitest'
 import { toViewModel, toDTO } from '../payment_request.mapper'
 import type { PaymentRequestDTO } from '../api.types'
@@ -112,7 +112,7 @@ describe('Money (Value Object)', () => {
 Testing a Composable (UI Facade) requires asserting that the correct **Side Effects** were triggered.
 
 ```typescript
-// modules/business/finance/ap/payment-requests/application/composables/__tests__/usePayRequest.test.ts
+// modules/finance/ap/application/composables/__tests__/usePayRequest.test.ts
 import { describe, it, expect, vi } from 'vitest'
 import { usePayRequest } from '../usePayRequest'
 
@@ -138,7 +138,7 @@ describe('usePayRequest (Application Facade)', () => {
 Tests that the column definitions have correct formatters and alignment.
 
 ```typescript
-// modules/business/finance/ledger/ui/grids/__tests__/account.grid.test.ts
+// modules/finance/ledger/ui/grids/__tests__/account.grid.test.ts
 import { describe, it, expect } from 'vitest'
 import { accountColumns } from '../account.grid'
 

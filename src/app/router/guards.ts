@@ -1,5 +1,5 @@
 import type { NavigationGuardWithThis } from 'vue-router'
-import { useAuthStore } from '@/core/auth/auth.store'
+import { useAuthStore } from '@/shared/auth/auth.store'
 
 /**
  * authGuard

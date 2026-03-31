@@ -9,7 +9,7 @@
     "cssVars": true
   },
   "aliases": {
-    "components": "@/core/ui",
-    "utils": "@/core/utils"
+    "components": "@/shared/components",
+    "utils": "@/shared/utils"
   }
 }

@@ -17,14 +17,14 @@ A **domain-aware frontend** for a Financial Operating System — not a collectio
 
 The frontend is **domain-aware and backend-aligned**, not an exact mirror. The backend's DDD layers (Entity → Service → Repository → UoW) are too granular for a UI. We collapse them into a simpler, pragmatic structure while preserving the same module names, action names, and domain vocabulary.
 
-| Backend Concept          | Frontend Analog     | Relationship                                    |
-| ------------------------ | ------------------- | ----------------------------------------------- |
-| Bounded Context (module) | Hierarchical Module | **Bifurcated** — Business vs Platform           |
-| Shared Kernel            | `src/core/` library | **1:1 alignment** — contracts & primitives      |
-| Domain Entity            | Plain Reactive Type | **Vue-native** — No classes to break reactivity |
-| Value Object             | Immutable Class     | **Encapsulated Logic** (e.g. `Money`)           |
-| Use Case                 | Composable          | **Lifecycle Aware** — e.g. `useLedgerAccounts`  |
-| Anti-Corruption Layer    | Mapper + Adapter    | **The Shield** — Infrastructure isolation       |
+| Backend Concept          | Frontend Analog       | Relationship                                    |
+| ------------------------ | --------------------- | ----------------------------------------------- |
+| Bounded Context (module) | Hierarchical Module   | **Bifurcated** — Business vs Platform           |
+| Shared Kernel            | `src/shared/` library | **1:1 alignment** — contracts & primitives      |
+| Domain Entity            | Plain Reactive Type   | **Vue-native** — No classes to break reactivity |
+| Value Object             | Immutable Class       | **Encapsulated Logic** (e.g. `Money`)           |
+| Use Case                 | Composable            | **Lifecycle Aware** — e.g. `useLedgerAccounts`  |
+| Anti-Corruption Layer    | Mapper + Adapter      | **The Shield** — Infrastructure isolation       |
 
 ### 1.3 Two Axes of Growth
 
@@ -91,7 +91,7 @@ graph TD
 
     subgraph "Core Infrastructure"
         SK_T[Types & Interfaces]
-        SK_C[Design System - core/ui]
+        SK_C[Design System - shared/components]
         SK_U[Utilities]
         SK_EB[Event Bus]
     end
@@ -124,20 +124,20 @@ graph TD
 
 ### 3.1 Core Stack
 
-| Layer                     | Technology                                | Rationale                                                                                                            |
-| ------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Framework**             | Vue 3 (Composition API)                   | SFC colocation, perfect mapping for backend Use Cases                                                                |
-| **Build**                 | Vite                                      | Sub-second HMR, native ESM, Tailwind v4 native support                                                               |
-| **UI System**             | **Custom Design System** (`core/ui/`)     | Full ownership, zero vendor lock-in, ERP-optimized. _(See [UI_FOUNDATION_DECISION.md](./UI_FOUNDATION_DECISION.md))_ |
-| **Accessible Primitives** | **Reka UI** / **shadcn-vue**              | Headless Dialog, Tooltip, Popover, DropdownMenu                                                                      |
-| **DataGrid Engine**       | **TanStack Table** + **TanStack Virtual** | Sorting, filtering, pagination, virtualized scrolling                                                                |
-| **Server State**          | **TanStack Query**                        | Caching, background refetch, optimistic updates                                                                      |
-| **Form State**            | **TanStack Form** + **Zod**               | Headless, type-safe validation                                                                                       |
-| **Client State**          | Pinia                                     | Ephemeral/UI state ONLY (sidebar collapse, local filters)                                                            |
-| **Server State**          | **TanStack Query**                        | Authority for all domain data (ledger accounts, etc.)                                                                |
-| **Styling**               | **Tailwind CSS v4**                       | `@theme` design tokens, utility-first CSS. _(See [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md))_                            |
-| **Language**              | TypeScript (strict)                       | Compile-time safety, `noUncheckedIndexedAccess`                                                                      |
-| **HTTP**                  | Axios                                     | Interceptors for auth, idempotency, error envelopes                                                                  |
+| Layer                     | Technology                                      | Rationale                                                                                                            |
+| ------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Framework**             | Vue 3 (Composition API)                         | SFC colocation, perfect mapping for backend Use Cases                                                                |
+| **Build**                 | Vite                                            | Sub-second HMR, native ESM, Tailwind v4 native support                                                               |
+| **UI System**             | **Custom Design System** (`shared/components/`) | Full ownership, zero vendor lock-in, ERP-optimized. _(See [UI_FOUNDATION_DECISION.md](./UI_FOUNDATION_DECISION.md))_ |
+| **Accessible Primitives** | **Reka UI** / **shadcn-vue**                    | Headless Dialog, Tooltip, Popover, DropdownMenu                                                                      |
+| **DataGrid Engine**       | **TanStack Table** + **TanStack Virtual**       | Sorting, filtering, pagination, virtualized scrolling                                                                |
+| **Server State**          | **TanStack Query**                              | Caching, background refetch, optimistic updates                                                                      |
+| **Form State**            | **TanStack Form** + **Zod**                     | Headless, type-safe validation                                                                                       |
+| **Client State**          | Pinia                                           | Ephemeral/UI state ONLY (sidebar collapse, local filters)                                                            |
+| **Server State**          | **TanStack Query**                              | Authority for all domain data (ledger accounts, etc.)                                                                |
+| **Styling**               | **Tailwind CSS v4**                             | `@theme` design tokens, utility-first CSS. _(See [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md))_                            |
+| **Language**              | TypeScript (strict)                             | Compile-time safety, `noUncheckedIndexedAccess`                                                                      |
+| **HTTP**                  | Axios                                           | Interceptors for auth, idempotency, error envelopes                                                                  |
 
 ### 3.2 Development & Quality
 
@@ -185,7 +185,7 @@ src/modules/{category}/{module-name}/
 Each module exports a `ModuleDefinition` in its `index.ts`. The router aggregates these dynamically:
 
 ```typescript
-// modules/business/finance/ledger/index.ts
+// modules/finance/ledger/index.ts
 export const ledgerModule: ModuleDefinition = {
   id: 'ledger',
   name: 'General Ledger',
@@ -201,7 +201,7 @@ export const ledgerModule: ModuleDefinition = {
 
 ### 4.4 Module Rules
 
-1. **No cross-module imports**: `business/finance/ledger/` must NEVER import from `business/finance/ap/`.
+1. **No cross-module imports**: `finance/ledger/` must NEVER import from `finance/ap/`.
 2. **Public API**: If Module A needs data from Module B, it goes through the Event Bus or a Core type.
 3. **Query-First State**: Domain data stays in TanStack Query. Pinia is for UI-specific toggles.
 4. **Route ownership**: Each module exports a `ModuleDefinition`.
@@ -288,7 +288,7 @@ type EventMap = {
 
 ```typescript
 // ❌ BANNED: Module A importing Module B's internals
-import { useLedgerStore } from '@/modules/business/finance/ledger/stores/ledger.store'
+import { useLedgerStore } from '@/modules/finance/ledger/stores/ledger.store'
 
 // ✅ CORRECT: Listen via Event Bus
 eventBus.on('ledger:entry-posted', ({ id }) => {
@@ -299,7 +299,7 @@ eventBus.on('ledger:entry-posted', ({ id }) => {
 
 ---
 
-## 7. Core Infrastructure (`src/core/`)
+## 7. Core Infrastructure (`src/shared/`)
 
 ### 7.1 What Goes in Core
 
@@ -366,8 +366,8 @@ export async function apiPost<T>(
 Module adapters import these helpers exclusively — never raw `httpClient`:
 
 ```typescript
-// modules/business/finance/ledger/infrastructure/ledger_adapter.ts
-import { apiGet } from '@/core/api/http-client'
+// modules/finance/ledger/infrastructure/ledger_adapter.ts
+import { apiGet } from '@/shared/api/http-client'
 
 export const ledgerAdapter = {
   async getAccounts(): Promise<Account[]> {
@@ -434,18 +434,18 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 ## 10. Anti-Pattern Catalog (Banned List)
 
-| Anti-Pattern                         | Why It Fails                            | Alternative                         |
-| ------------------------------------ | --------------------------------------- | ----------------------------------- |
-| **Raw API types in components**      | Backend DTO change breaks 50 components | Mapper → ViewModel pattern          |
-| **Cross-module store imports**       | Creates invisible dependency graphs     | Event Bus or Core types             |
-| **Business logic in templates**      | Untestable, duplicated across views     | Composables (Use Case Hooks)        |
-| **Global CSS classes**               | Styling conflicts across modules        | Scoped styles + design tokens       |
-| **`any` types**                      | Defeats TypeScript's entire purpose     | Strict mode, branded types          |
-| **Direct Axios calls in components** | Untestable, no error interception       | Module-scoped API client            |
-| **Storing tokens in localStorage**   | XSS vulnerability                       | httpOnly cookies or in-memory       |
-| **Inline styles for theming**        | Unmaintainable at scale                 | Tailwind v4 `@theme` design tokens  |
-| **Raw HTML tables**                  | No sorting, pagination, virtual scroll  | `core/ui` DataGrid (TanStack Table) |
-| **Bypassing design system**          | UI inconsistency                        | Always use `core/ui` components     |
+| Anti-Pattern                         | Why It Fails                            | Alternative                                   |
+| ------------------------------------ | --------------------------------------- | --------------------------------------------- |
+| **Raw API types in components**      | Backend DTO change breaks 50 components | Mapper → ViewModel pattern                    |
+| **Cross-module store imports**       | Creates invisible dependency graphs     | Event Bus or Core types                       |
+| **Business logic in templates**      | Untestable, duplicated across views     | Composables (Use Case Hooks)                  |
+| **Global CSS classes**               | Styling conflicts across modules        | Scoped styles + design tokens                 |
+| **`any` types**                      | Defeats TypeScript's entire purpose     | Strict mode, branded types                    |
+| **Direct Axios calls in components** | Untestable, no error interception       | Module-scoped API client                      |
+| **Storing tokens in localStorage**   | XSS vulnerability                       | httpOnly cookies or in-memory                 |
+| **Inline styles for theming**        | Unmaintainable at scale                 | Tailwind v4 `@theme` design tokens            |
+| **Raw HTML tables**                  | No sorting, pagination, virtual scroll  | `shared/components` DataGrid (TanStack Table) |
+| **Bypassing design system**          | UI inconsistency                        | Always use `shared/components` components     |
 
 ---
 
@@ -479,7 +479,7 @@ Comments must answer questions the code cannot. The _what_ is in the code — co
 
 - **Module-Level**: Required for `core/` and non-trivial entries. State responsibility and constraints.
 - **Composable**: Required for all exported composables. Include an `@example` block.
-- **Vue Component**: Required in `<script setup>` for all components outside `core/ui/`. Describe purpose and data sourcing.
+- **Vue Component**: Required in `<script setup>` for all components outside `shared/components/`. Describe purpose and data sourcing.
 
 ### 12.3 Type Annotations
 

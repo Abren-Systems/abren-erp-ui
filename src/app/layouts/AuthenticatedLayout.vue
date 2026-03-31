@@ -17,9 +17,9 @@
  */
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { businessModules, platformModules } from '@/modules'
-import type { BusinessDomain, PlatformEngine, MenuItem } from '@/core/types/module.types'
-import { useAuthStore } from '@/core/auth/auth.store'
-import { Button } from '@/core/ui/button'
+import type { BusinessDomain, PlatformEngine, MenuItem } from '@/shared/types/module.types'
+import { useAuthStore } from '@/shared/auth/auth.store'
+import { Button } from '@/shared/components/button'
 import { LayoutDashboard, LogOut, ChevronRight, Library, Cpu, Settings } from 'lucide-vue-next'
 
 const route = useRoute()

@@ -33,7 +33,7 @@ abren-erp/                           # Parent directory (NOT a git repo)
     │   │   │   ├── workflows/       ← approvals, state machines
     │   │   │   └── system/          ← logging, audit, global config
     │   │   │
-    │   │   └── business/            # Vertical Business Applications
+    │   │   └── ledger/              # Flattened Module Domain
     │   │       └── finance/
     │   │           ├── ledger/      ← accounting, COA, journals
     │   │           └── ap/
@@ -74,7 +74,7 @@ npm install -D openapi-typescript
 # package.json script
 {
   "scripts": {
-    "generate-types": "openapi-typescript http://localhost:8000/api/v1/openapi.json -o src/core/api/generated.types.ts"
+    "generate-types": "openapi-typescript http://localhost:8000/api/v1/openapi.json -o src/shared/api/generated.types.ts"
   }
 }
 ```
@@ -105,8 +105,8 @@ export interface components {
   }
 }
 
-// modules/business/finance/ap/payment-requests/infrastructure/api.types.ts — Module-scoped re-export
-import type { components } from '@/core/api/generated.types'
+// modules/finance/ap/infrastructure/api.types.ts — Module-scoped re-export
+import type { components } from '@/shared/api/generated.types'
 
 export type PaymentRequestDTO = components['schemas']['PaymentRequestDTO']
 export type PaymentRequestCreateDTO = components['schemas']['PaymentRequestCreateDTO']

@@ -11,7 +11,7 @@ To ensure scalability and prevent "component soup," we categorize all UI element
 
 ### Tier 1: Primitives (Atomic)
 
-- **Location**: `src/core/ui/primitives/`
+- **Location**: `src/shared/components/`
 - **Nature**: Pure atoms (Button, Input, Checkbox, Skeleton).
 - **Knowledge**: Zero business knowledge.
 - **Enforcement**: Built on **Reka UI** (Headless) to ensure 100% WAI-ARIA compliance.
@@ -19,14 +19,14 @@ To ensure scalability and prevent "component soup," we categorize all UI element
 
 ### Tier 2: Shared Patterns (Core UI)
 
-- **Location**: `src/core/ui/shared/`
+- **Location**: `src/shared/components/` (e.g., `src/shared/components/data-grid/`)
 - **Nature**: Reusable organisms (FormLayout, AppModal).
 - **Knowledge**: Layout knowledge, zero business domain knowledge.
 - **Rule**: Accessible to all modules. **Must remain domain-agnostic.**
 
 ### Tier 3: Domain Components (Module UI)
 
-- **Location**: `src/modules/{category}/{module}/ui/components/`
+- **Location**: `src/modules/{module}/ui/components/`
 - **Nature**: Reusable molecules (AccountBadge, PaymentStatusBadge).
 - **Knowledge**: Full knowledge of Module Domain Types.
 - **Guardrail**: **Strictly stateless** (or locally UI-stateful). **Never** fetch data or orchestrate workflows.
@@ -34,7 +34,7 @@ To ensure scalability and prevent "component soup," we categorize all UI element
 
 ### Tier 4: Feature Pages (Module UI)
 
-- **Location**: `src/modules/{category}/{module}/ui/pages/`
+- **Location**: `src/modules/{module}/ui/pages/`
 - **Nature**: The "Orchestrators."
 - **Knowledge**: Full knowledge of the Use Case (Application layer).
 - **Constraint**: **NEVER** call TanStack Query or API directly. **MUST** use application composables.
@@ -45,15 +45,23 @@ To ensure scalability and prevent "component soup," we categorize all UI element
 
 ```
 src/
-├── core/ui/
-│   ├── primitives/          # Tier 1
+├── shared/components/
+│   ├── button/              # Tier 1 (Primitive)
 │   ├── data-grid/           # Foundational UI Engine (Special)
-│   └── shared/              # Tier 2
+│   └── layout/              # Tier 2 (Pattern - Example)
 │
-└── modules/business/ledger/ui/
+└── modules/finance/ap/ui/payment-requests/
     ├── components/          # Tier 3 (Domain-Owned)
     ├── pages/               # Tier 4 (Feature Pages)
     ├── grids/               # Grid Configuration Layer (NEW)
+    ├── store/               # Pinia Stores (NEW)
+    └── utils/               # UI Logic Layer (Formatting)
+│
+└── modules/finance/ledger/ui/
+    ├── components/          # Tier 3 (Domain-Owned)
+    ├── pages/               # Tier 4 (Feature Pages)
+    ├── grids/               # Grid Configuration Layer (NEW)
+    ├── store/               # Pinia Stores (NEW)
     └── utils/               # UI Logic Layer (Formatting)
 ```
 
@@ -63,7 +71,7 @@ src/
 
 The DataGrid is not a standard "shared component"—it is a foundational UI engine.
 
-- **Location**: `src/core/ui/data-grid/`
+- **Location**: `src/shared/components/data-grid/`
 - **Structure**:
   - `core/`: Headless engine (virtualization, keyboard nav, TanStack Table setup).
   - `plugins/`: Generic behaviors (sorting, filtering, selection).

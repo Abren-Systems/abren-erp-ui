@@ -31,16 +31,13 @@ const router = createRouter({
           component: () => import('@/modules/platform/core/pages/DashboardPage.vue'),
         },
         // Dynamically register module routes
-        ...(await Promise.all(
-          allModules.map(async (m) => {
-            const routes = await m.routes()
-            // Optional: prefix routes with module ID for isolation
-            return routes.map((r) => ({
-              ...r,
-              path: `${m.id}/${r.path}`.replace(/\/+/g, '/'),
-            }))
-          }),
-        ).then((r) => r.flat())),
+        // Dynamically register module routes (synchronous mapping, components remain lazy loaded)
+        ...allModules.flatMap((m) => {
+          return m.routes.map((r) => ({
+            ...r,
+            path: `${m.id}/${r.path}`.replace(/\/+/g, '/'),
+          }))
+        }),
       ],
     },
     {

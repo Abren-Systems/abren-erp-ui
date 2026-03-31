@@ -58,26 +58,26 @@ The frontend mirrors the backend's bounded contexts as self-contained modules:
 │               PLATFORM ENGINES (Infra)              │
 ├──────────────────┬──────────────────┬───────────────┤
 │  Core / ID       │  Workflows       │  Reporting    │
-│  (platform/core) │ (platform/wf)    │ (platform/rep)│
+│  (core) │ (platform/wf)    │ (platform/rep)│
 └──────────────────┴──────────────────┴───────────────┘
                         │
           ┌─────────────┴─────────────┐
           │     BUSINESS APPS (Value) │
           ├──────────────────┬────────┴───────┐
           │      Finance     │      Sales     │
-          │ (business/fin)   │ (business/sale)│
+          │ (finance)        │ (sales)        │
           └──────────────────┴────────────────┘
 ```
 
-| Module      | Namespace                 | Category | Description                         | Status         |
-| ----------- | ------------------------- | -------- | ----------------------------------- | -------------- |
-| `core`      | `platform/core`           | Engine   | Tenants, Identity, RBAC             | ✅ Implemented |
-| `workflows` | `platform/workflows`      | Engine   | Universal State Machine             | ✅ Implemented |
-| `ledger`    | `business/finance/ledger` | App      | G/L Account Management              | ✅ Implemented |
-| `bank`      | `business/finance/bank`   | App      | Cash & Bank Integration             | 📋 Planned     |
-| `ap`        | `business/finance/ap`     | App      | Accounts Payable (Payment Requests) | ✅ Implemented |
-| `reporting` | `platform/reporting`      | Engine   | Cross-domain Dashboards             | 📋 Planned     |
-| `webhooks`  | `platform/webhooks`       | Engine   | System Integration Layer            | 📋 Planned     |
+| Module      | Namespace            | Category | Description                         | Status         |
+| ----------- | -------------------- | -------- | ----------------------------------- | -------------- |
+| `core`      | `core`               | Engine   | Tenants, Identity, RBAC             | ✅ Implemented |
+| `workflows` | `workflows`          | Engine   | Universal State Machine             | ✅ Implemented |
+| `ledger`    | `finance/ledger`     | App      | G/L Account Management              | ✅ Implemented |
+| `bank`      | `finance/bank`       | App      | Cash & Bank Integration             | 📋 Planned     |
+| `ap`        | `finance/ap`         | App      | Accounts Payable (Payment Requests) | ✅ Implemented |
+| `reporting` | `platform/reporting` | Engine   | Cross-domain Dashboards             | 📋 Planned     |
+| `webhooks`  | `platform/webhooks`  | Engine   | System Integration Layer            | 📋 Planned     |
 
 ---
 

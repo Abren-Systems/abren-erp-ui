@@ -1,10 +1,10 @@
-import { coreModule } from './platform/core'
-import { ledgerModule } from './business/finance/ledger'
-import { bankModule } from './business/finance/bank'
-import { apModule } from './business/finance/ap'
-import { reportingModule } from './business/reporting'
-import { workflowsModule } from './platform/workflows'
-import type { BusinessDomain, PlatformEngine } from '@/core/types/module.types'
+import { coreModule } from './core'
+import { ledgerModule } from './finance/ledger'
+import { bankModule } from './finance/bank'
+import { apModule } from './finance/ap'
+import { reportingModule } from './reporting'
+import { workflowsModule } from './workflows'
+import type { BusinessDomain, PlatformEngine } from '@/shared/types/module.types'
 
 /**
  * Categorized Module Registry

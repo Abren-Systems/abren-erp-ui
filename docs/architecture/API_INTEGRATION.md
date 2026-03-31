@@ -32,8 +32,8 @@ All modules share a single Axios instance configured with interceptors for authe
 ````typescript
 // core/api/http-client.ts
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
-import { useAuthStore } from '@/core/auth/auth.store'
-import { generateIdempotencyKey } from '@/core/composables/useIdempotencyKey'
+import { useAuthStore } from '@/shared/auth/auth.store'
+import { generateIdempotencyKey } from '@/shared/composables/useIdempotencyKey'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
@@ -152,13 +152,13 @@ Mappers are the **Integrity Firewall** and **Primary Domain Factory** between ba
 
 Each module has a typed API client that wraps the shared HTTP client with module-specific endpoint methods.
 
-// modules/business/finance/ap/payment-requests/infrastructure/payment_request_adapter.ts
-import { httpClient } from '@/core/api/http-client'
+// modules/finance/ap/infrastructure/payment_request_adapter.ts
+import { httpClient } from '@/shared/api/http-client'
 import type {
 PaymentRequestRead,
 PaymentRequestCreate,
 PaymentRequestUpdate
-} from '@/core/api/generated.types'
+} from '@/shared/api/generated.types'
 
 const BASE = '/payment-requests'
 
@@ -250,7 +250,7 @@ export function useApiMutation<TData, TVariables>(
 **Usage in a module composable:**
 
 ```typescript
-// modules/business/finance/ap/payment-requests/application/composables/usePaymentRequests.ts
+// modules/finance/ap/application/composables/usePaymentRequests.ts
 import { useQuery } from '@tanstack/vue-query'
 import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
 import { mapPaymentRequest } from '../infrastructure/payment_request.mapper'
@@ -338,7 +338,7 @@ npm install -D openapi-typescript
 
 # Add script to package.json
 "scripts": {
-  "generate-types": "openapi-typescript http://localhost:8000/api/v1/openapi.json -o src/core/api/generated.types.ts"
+  "generate-types": "openapi-typescript http://localhost:8000/api/v1/openapi.json -o src/shared/api/generated.types.ts"
 }
 ```
 
@@ -356,7 +356,7 @@ npm install -D openapi-typescript
 
 ```typescript
 // The generated file provides all backend schemas
-import type { components } from '@/core/api/generated.types'
+import type { components } from '@/shared/api/generated.types'
 
 // Reference specific DTOs
 type PaymentRequestDTO = components['schemas']['PaymentRequestDTO']
