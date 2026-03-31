@@ -122,8 +122,8 @@ _Blueprint: [MODULE_STRUCTURE.md](architecture/MODULE_STRUCTURE.md)_
 | `infrastructure/ledger_adapter.ts`             | ✅     | Uses OpenAPI DTOs + `apiGet`/`apiPost`                 |
 | `infrastructure/ledger.mapper.ts`              | ✅     | `AccountRead` → `Account` with branded IDs             |
 | `application/composables/useLedgerAccounts.ts` | ✅     | TanStack Query                                         |
-| `ui/pages/ChartOfAccountsPage.vue`             | 🔁     | Functional but uses inline styles (violates blueprint) |
-| `ui/pages/JournalEntriesPage.vue`              | 🔨     | Exists, needs verification                             |
+| `ui/pages/ChartOfAccountsListPage.vue`         | 🔁     | Functional but uses inline styles (violates blueprint) |
+| `ui/pages/JournalEntriesListPage.vue`          | 🔨     | Exists, needs verification                             |
 | `ui/grids/account.grid.ts`                     | ✅     | Column definitions                                     |
 | `ui/utils/account-formatter.ts`                | ✅     | UI-specific formatting                                 |
 | `index.ts` + `routes.ts`                       | ✅     | Module registered                                      |
@@ -223,7 +223,7 @@ _Blueprint: [STATE_MANAGEMENT.md](architecture/STATE_MANAGEMENT.md), [FORM_ARCHI
 | Delete `shared/components/data-table/`                  | ✅       | Completed                                          |
 | Delete `modules/shared/`                                | **P0**   | Empty placeholder directories                      |
 | Extract auth storage keys to shared constants           | **P1**   | Duplicated in `auth.store.ts` and `http-client.ts` |
-| Replace inline styles in `ChartOfAccountsPage.vue`      | **P1**   | Violates anti-pattern catalog                      |
+| Replace inline styles in `ChartOfAccountsListPage.vue`  | **P1**   | Violates anti-pattern catalog                      |
 
 ---
 
