@@ -4,17 +4,17 @@ const routes: RouteRecordRaw[] = [
   {
     path: 'coa',
     name: 'LedgerCoa',
-    component: () => import('./ui/accounts/pages/ChartOfAccountsPage.vue'),
+    component: () => import('./ui/accounts/pages/ChartOfAccountsListPage.vue'),
   },
   {
     path: 'journals',
     name: 'LedgerJournals',
-    component: () => import('./ui/journal-entries/pages/JournalEntriesPage.vue'),
+    component: () => import('./ui/journal-entries/pages/JournalEntriesListPage.vue'),
   },
   {
     path: 'fiscal-periods',
     name: 'LedgerFiscalPeriods',
-    component: () => import('./ui/fiscal-periods/pages/FiscalPeriodsPage.vue'),
+    component: () => import('./ui/fiscal-periods/pages/FiscalPeriodsListPage.vue'),
   },
   {
     path: 'settings',
