@@ -1,7 +1,9 @@
 <script setup lang="ts">
-const users = [
-  { id: 1, email: 'admin@abren.com', role: 'Super Admin', status: 'Active' },
-  { id: 2, email: 'finance@abren.com', role: 'Finance Manager', status: 'Active' },
+import { UserStatus, type User } from '../../domain/user.types'
+
+const users: Partial<User>[] = [
+  { id: '1', email: 'admin@abren.com', role: 'Super Admin', status: UserStatus.Active },
+  { id: '2', email: 'finance@abren.com', role: 'Finance Manager', status: UserStatus.Active },
 ]
 </script>
 

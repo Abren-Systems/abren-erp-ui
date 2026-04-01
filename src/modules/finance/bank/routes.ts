@@ -1,6 +1,5 @@
-import { h } from 'vue'
 import { useAuthStore } from '@/shared/auth/auth.store'
-import type { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
+import type { RouteLocationNormalized, NavigationGuardNext, RouteRecordRaw } from 'vue-router'
 
 export default [
   {
@@ -14,14 +13,6 @@ export default [
       if (!useAuthStore().hasFeature('bank_accounts')) return next('/app')
       next()
     },
-    component: () =>
-      Promise.resolve({
-        render: () =>
-          h(
-            'div',
-            { class: 'p-8 text-center text-neutral-500 font-medium' },
-            'Banking Accounts (Stub)',
-          ),
-      }),
+    component: () => import('./ui/pages/BankAccountsListPage.vue'),
   },
-]
+] satisfies RouteRecordRaw[]
