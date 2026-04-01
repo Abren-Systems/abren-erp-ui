@@ -1,4 +1,6 @@
-import { ref, onMounted } from 'vue'
+import { useApiQuery } from '@/shared/composables/useApiQuery'
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 import type { components } from '@/shared/api/generated.types'
 
@@ -6,48 +8,39 @@ type LedgerSettingsRead = components['schemas']['LedgerSettingsRead']
 type LedgerSettingsUpdate = components['schemas']['LedgerSettingsUpdate']
 
 /**
- * Composable for managing global Ledger Settings.
+ * Use Case: Manage Global Ledger Settings.
+ *
+ * Provides reactive access to the ledger configuration (bridge accounts,
+ * default payable accounts) and mutations to update them.
  */
 export function useLedgerSettings() {
-  const settings = ref<LedgerSettingsRead | null>(null)
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const fetchSettings = async () => {
-    isLoading.value = true
-    error.value = null
-    try {
-      settings.value = await ledgerAdapter.getLedgerSettings()
-    } catch (err) {
-      error.value = 'Failed to load ledger settings'
-      console.error(err)
-    } finally {
-      isLoading.value = false
-    }
-  }
+  const {
+    data: settings,
+    isLoading: isFetching,
+    error: fetchError,
+  } = useApiQuery<LedgerSettingsRead>(['ledger-settings'], () => ledgerAdapter.getLedgerSettings())
 
-  const updateSettings = async (data: LedgerSettingsUpdate) => {
-    isLoading.value = true
-    try {
-      settings.value = await ledgerAdapter.updateLedgerSettings(data)
-    } catch (err) {
-      error.value = 'Failed to update settings'
-      console.error(err)
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  onMounted(() => {
-    void fetchSettings()
-  })
+  const {
+    mutateAsync: updateSettings,
+    isPending: isUpdating,
+    error: updateError,
+  } = useApiMutation<void, Error, LedgerSettingsUpdate>(
+    async (data: LedgerSettingsUpdate) => {
+      await ledgerAdapter.updateLedgerSettings(data)
+    },
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: ['ledger-settings'] })
+      },
+    },
+  )
 
   return {
     settings,
-    isLoading,
-    error,
-    fetchSettings,
+    isLoading: isFetching || isUpdating,
+    error: fetchError || updateError,
     updateSettings,
   }
 }

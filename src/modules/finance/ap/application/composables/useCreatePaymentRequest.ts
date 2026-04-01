@@ -1,4 +1,3 @@
-import { ref } from 'vue'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
@@ -7,73 +6,63 @@ import type {
   PaymentRequestCreateDTO,
   PaymentRequestLineCreateDTO,
 } from '../../infrastructure/api.types'
+import { useForm } from '@tanstack/vue-form'
+import { zodValidator } from '@tanstack/zod-form-adapter'
+import { z } from 'zod'
 
-export interface LineFormState {
-  description: string
-  amount: string
-  accountId: string
-  categoryId: string
-  taxRuleId: string
-  taxAmount: string
-}
+/**
+ * Validation Schema for Payment Request Creation.
+ */
+const paymentRequestSchema = z.object({
+  beneficiaryId: z.string().min(1, 'Beneficiary ID is required'),
+  currency: z.string().length(3, 'Invalid currency code'),
+  justification: z.string().min(10, 'Justification must be at least 10 characters'),
+  bankAccountId: z.string(),
+  lines: z
+    .array(
+      z.object({
+        description: z.string().min(1, 'Description is required'),
+        amount: z.coerce.number().positive('Amount must be positive'),
+        accountId: z.string(),
+        categoryId: z.string(),
+        taxAmount: z.coerce.number(),
+      }),
+    )
+    .min(1, 'At least one line item is required'),
+})
 
+type PaymentRequestFormValues = z.infer<typeof paymentRequestSchema>
+
+/**
+ * Use Case: Create a new Payment Request.
+ *
+ * Manages the multi-line form state and submission logic for standalone
+ * payment requests.
+ */
 export function useCreatePaymentRequest() {
   const queryClient = useQueryClient()
   const router = useRouter()
 
-  const form = ref({
-    beneficiaryId: '',
-    currency: 'ETB',
-    justification: '',
-    bankAccountId: '',
-  })
-
-  const lines = ref<LineFormState[]>([
-    {
-      description: '',
-      amount: '',
-      accountId: '',
-      categoryId: '',
-      taxRuleId: '',
-      taxAmount: '',
-    },
-  ])
-
-  function addLine() {
-    lines.value.push({
-      description: '',
-      amount: '',
-      accountId: '',
-      categoryId: '',
-      taxRuleId: '',
-      taxAmount: '',
-    })
-  }
-
-  function removeLine(index: number) {
-    if (lines.value.length > 1) lines.value.splice(index, 1)
-  }
-
   const {
-    mutateAsync: create,
+    mutateAsync: createRequest,
     isPending: isSubmitting,
     error,
   } = useApiMutation(
-    async () => {
-      const mappedLines: PaymentRequestLineCreateDTO[] = lines.value.map((l) => ({
+    async (values: PaymentRequestFormValues) => {
+      const mappedLines: PaymentRequestLineCreateDTO[] = values.lines.map((l) => ({
         description: l.description,
-        amount: parseFloat(l.amount),
+        amount: l.amount,
         account_id: l.accountId || null,
         category_id: l.categoryId || null,
-        tax_amount: l.taxAmount ? parseFloat(l.taxAmount) : null,
+        tax_amount: l.taxAmount ?? null,
       }))
 
       const dto: PaymentRequestCreateDTO = {
-        beneficiary_id: form.value.beneficiaryId,
-        currency: form.value.currency,
-        justification: form.value.justification,
+        beneficiary_id: values.beneficiaryId,
+        currency: values.currency,
+        justification: values.justification,
         lines: mappedLines,
-        bank_account_id: form.value.bankAccountId || null,
+        bank_account_id: values.bankAccountId || null,
       }
 
       return await apAdapter.createRequest(dto)
@@ -86,5 +75,22 @@ export function useCreatePaymentRequest() {
     },
   )
 
-  return { form, lines, addLine, removeLine, create, isSubmitting, error }
+  const form = useForm({
+    defaultValues: {
+      beneficiaryId: '',
+      currency: 'ETB',
+      justification: '',
+      bankAccountId: '',
+      lines: [{ description: '', amount: 0, accountId: '', categoryId: '', taxAmount: 0 }],
+    },
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChange: paymentRequestSchema,
+    },
+    onSubmit: async ({ value }: { value: PaymentRequestFormValues }) => {
+      await createRequest(value)
+    },
+  } as unknown as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+
+  return { form, isSubmitting, error }
 }

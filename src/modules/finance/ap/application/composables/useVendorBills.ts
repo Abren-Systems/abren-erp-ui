@@ -2,6 +2,14 @@ import { useQuery } from '@tanstack/vue-query'
 import { apAdapter } from '../../infrastructure/adapter'
 import { APMapper } from '../../infrastructure/mappers'
 
+/**
+ * Use Case: View Vendor Bills List.
+ *
+ * Fetches and maps all supplier invoices (Vendor Bills).
+ *
+ * @example
+ * const { bills, isLoading } = useVendorBills()
+ */
 export function useVendorBills() {
   const {
     data: bills,

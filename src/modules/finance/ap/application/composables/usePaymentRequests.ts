@@ -2,6 +2,14 @@ import { useQuery } from '@tanstack/vue-query'
 import { apAdapter } from '../../infrastructure/adapter'
 import { APMapper } from '../../infrastructure/mappers'
 
+/**
+ * Use Case: View Payment Requests List.
+ *
+ * Fetches and maps all standalone payment requests.
+ *
+ * @example
+ * const { requests, isLoading } = usePaymentRequests()
+ */
 export function usePaymentRequests() {
   const {
     data: requests,

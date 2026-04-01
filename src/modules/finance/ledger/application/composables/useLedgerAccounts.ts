@@ -1,10 +1,15 @@
 import { useQuery } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
-import { mapAccount } from '../../infrastructure/mappers'
+import { LedgerMapper } from '../../infrastructure/mappers'
 import type { Account } from '../../domain/account.types'
 
 /**
- * Composable for managing ledger accounts state and fetching
+ * Use Case: View Chart of Accounts.
+ *
+ * Fetches and maps all General Ledger accounts.
+ *
+ * @example
+ * const { accounts, isLoading } = useLedgerAccounts()
  */
 export function useLedgerAccounts() {
   const {
@@ -16,7 +21,7 @@ export function useLedgerAccounts() {
     queryKey: ['ledger-accounts'],
     queryFn: async () => {
       const dtos = await ledgerAdapter.getAccounts()
-      return dtos.map(mapAccount)
+      return dtos.map((dto) => LedgerMapper.toAccount(dto))
     },
     staleTime: 1000 * 60 * 5,
   })

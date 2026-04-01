@@ -5,6 +5,9 @@ import { useQuery, type UseQueryOptions } from '@tanstack/vue-query'
  *
  * A wrapper around TanStack useQuery that ensures consistent
  * error handling and type-safety across the ERP.
+ *
+ * @example
+ * const { data, isLoading } = useApiQuery(['user', id], () => api.getUser(id))
  */
 export function useApiQuery<TData, TError = Error>(
   queryKey: unknown[],
