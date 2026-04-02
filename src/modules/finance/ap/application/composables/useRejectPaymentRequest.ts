@@ -1,6 +1,6 @@
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
-import { apAdapter } from '../../infrastructure/adapter'
+import { apAdapter } from '../../infrastructure/ap_adapter'
 import type { PaymentRequestRejectDTO } from '../../infrastructure/api.types'
 
 /**

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { WorkflowMapper } from '../workflow.mapper'
+import { WorkflowMapper } from '../mappers'
 import type { PendingApprovalDTO } from '../api.types'
 
 describe('WorkflowMapper', () => {

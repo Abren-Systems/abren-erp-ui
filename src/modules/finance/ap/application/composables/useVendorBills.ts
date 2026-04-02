@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/vue-query'
-import { apAdapter } from '../../infrastructure/adapter'
+import { apAdapter } from '../../infrastructure/ap_adapter'
 import { APMapper } from '../../infrastructure/mappers'
 
 /**

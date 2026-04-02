@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { apAdapter } from '../../infrastructure/adapter'
+import { apAdapter } from '../../infrastructure/ap_adapter'
 
 /**
  * Use Case: Validate a Vendor Bill.

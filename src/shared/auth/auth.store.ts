@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiGet, httpClient, type ApiResponse } from '@/shared/api/http-client'
+import { authAdapter } from './infrastructure/auth_adapter'
+import { AuthMapper } from './infrastructure/mappers'
 
 /**
  * Auth Store — Shared Cross-Cutting Concern
@@ -41,18 +41,7 @@ export interface TenantInfo {
   features: Record<string, boolean>
 }
 
-// The backend sets HttpOnly cookies containing the access/refresh tokens.
-// No physical token string is returned to the javascript client.
-interface LoginResponse {
-  message?: string
-}
-
-interface UserProfileResponse {
-  id: string
-  tenant_id: string
-  email: string
-  is_active: boolean
-}
+import { defineStore } from 'pinia'
 
 // ── Store ─────────────────────────────────────────────
 export const useAuthStore = defineStore('auth', () => {
@@ -93,18 +82,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function hydrateSession(): Promise<boolean> {
     try {
-      const [userProfile, tenant] = await Promise.all([
-        apiGet<UserProfileResponse>('/core/users/me'),
-        apiGet<TenantInfo>('/core/tenants/current'),
+      const [userProfileDTO, tenantDTO] = await Promise.all([
+        authAdapter.getCurrentUser(),
+        authAdapter.getCurrentTenant(),
       ])
 
-      currentUser.value = {
-        id: userProfile.id,
-        tenantId: userProfile.tenant_id,
-        email: userProfile.email,
-        isActive: userProfile.is_active,
-      }
-      currentTenant.value = tenant
+      currentUser.value = AuthMapper.toCurrentUser(userProfileDTO)
+      currentTenant.value = AuthMapper.toTenantInfo(tenantDTO)
       persistState()
       return true
     } catch {
@@ -114,15 +98,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function login(email: string, password: string): Promise<void> {
-    const formData = new URLSearchParams()
-    formData.set('username', email)
-    formData.set('password', password)
-
-    await httpClient.post<ApiResponse<LoginResponse>>('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    })
+    await authAdapter.login(email, password)
 
     const hydrated = await hydrateSession()
     if (!hydrated) {
