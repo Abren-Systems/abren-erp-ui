@@ -18,7 +18,7 @@ export function useBankAccounts() {
     queryKey: ['bank-accounts'],
     queryFn: async () => {
       const dtos = await bankAdapter.getBankAccounts()
-      return dtos.map(BankMapper.toBankAccount)
+      return dtos.map((dto) => BankMapper.toBankAccount(dto))
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
