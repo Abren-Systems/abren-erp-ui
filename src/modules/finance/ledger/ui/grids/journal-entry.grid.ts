@@ -1,6 +1,7 @@
 import type { JournalEntry } from '../../domain/journal-entry.types'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
+import { BusinessDate } from '@/shared/domain/business-date'
 import { Badge } from '@/shared/components/badge'
 
 /**
@@ -18,7 +19,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
   {
     accessorKey: 'entryDate',
     header: 'Date',
-    cell: ({ row }) => row.original.entryDate,
+    cell: ({ row }) => BusinessDate.format(row.original.entryDate),
   },
   {
     accessorKey: 'description',
@@ -32,13 +33,13 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     cell: ({ row }) => {
       const status = row.original.status
       const variant =
-        status === 'POSTED' ? 'success' : status === 'VOIDED' ? 'destructive' : 'secondary'
+        status === 'POSTED' ? 'default' : status === 'VOIDED' ? 'destructive' : 'secondary'
       return h(Badge, { variant }, () => status)
     },
   },
   {
     accessorKey: 'createdAt',
     header: 'Created',
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+    cell: ({ row }) => BusinessDate.format(row.original.createdAt),
   },
 ]

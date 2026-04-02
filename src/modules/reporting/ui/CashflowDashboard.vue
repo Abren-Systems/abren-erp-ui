@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCashflow } from '../application/composables/useCashflow'
+import { BusinessDate } from '@/shared/domain/business-date'
 import ReportingChart from './ReportingChart.vue'
 import { TrendingUp, TrendingDown, Clock, Wallet, LayoutDashboard } from 'lucide-vue-next'
 
 // Date Range (Last 30 days)
-const endDate = new Date().toISOString().split('T')[0]!
-const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]!
+const endDate = BusinessDate.today()
+const startDate = BusinessDate.fromIso(
+  new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]!,
+)
 
-const { entries, stats: cashflowStats, isLoading } = useCashflow({ startDate, endDate })
+const { entries, stats: cashflowStats } = useCashflow({ startDate, endDate })
 
 const displayStats = computed(() => [
   {
@@ -117,7 +120,7 @@ const displayStats = computed(() => [
         title="Cash Inflow: Actual vs Committed"
         :data="
           (entries ?? []).map((d) => ({
-            date: d.date.toISOString().split('T')[0] || '',
+            date: d.date,
             actual: d.actualInflow.amount,
             projected: d.projectedInflow.amount,
           }))
@@ -127,7 +130,7 @@ const displayStats = computed(() => [
         title="Cash Outflow: Actual vs Committed"
         :data="
           (entries ?? []).map((d) => ({
-            date: d.date.toISOString().split('T')[0] || '',
+            date: d.date,
             actual: d.actualOutflow.amount,
             projected: d.projectedOutflow.amount,
           }))
@@ -163,11 +166,11 @@ const displayStats = computed(() => [
           <tbody class="divide-y divide-slate-100">
             <tr
               v-for="row in entries ?? []"
-              :key="row.date.toISOString()"
+              :key="row.date"
               class="hover:bg-blue-50/30 transition-colors"
             >
               <td class="px-8 py-5 text-sm font-medium text-slate-700">
-                {{ row.date.toISOString().split('T')[0] }}
+                {{ BusinessDate.format(row.date) }}
               </td>
               <td class="px-8 py-5 text-sm font-semibold text-emerald-600">
                 + {{ row.actualInflow.format() }}

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { Money } from '../money'
-import { Currency } from '../currency'
+import { Money, Currency } from '../money'
 
 describe('Money Value Object', () => {
   it('should create a Money instance', () => {

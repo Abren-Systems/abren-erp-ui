@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { APMapper } from '../mappers'
 import type { PaymentRequestDTO, VendorBillDTO } from '../api.types'
-import { Currency } from '../../../../../shared/domain/currency'
+import { Currency } from '../../../../../shared/domain/money'
 import { VendorBillStatus } from '../../domain/ap.types'
 
 describe('APMapper', () => {
@@ -42,7 +42,7 @@ describe('APMapper', () => {
       expect(model.totalAmount.currency).toBe(Currency.ETB)
       expect(model.lines).toHaveLength(1)
       expect(model.lines[0].taxAmount?.amount).toBe(150)
-      expect(model.submittedAt).toEqual(new Date('2026-04-01T10:00:00Z'))
+      expect(model.submittedAt).toEqual('2026-04-01T10:00:00Z')
     })
   })
 
@@ -76,7 +76,7 @@ describe('APMapper', () => {
       expect(model.billNumber).toBe('INV-001')
       expect(model.totalAmount.amount).toBe(200)
       expect(model.totalAmount.currency).toBe(Currency.USD)
-      expect(model.issueDate).toEqual(new Date('2026-04-01'))
+      expect(model.issueDate).toEqual('2026-04-01')
     })
   })
 })

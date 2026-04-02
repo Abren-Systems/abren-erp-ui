@@ -36,6 +36,7 @@ export default tseslint.config(
     },
     files: ['**/*.ts', '**/*.vue', '**/*.js', '**/*.mjs'],
     rules: {
+      'no-console': 'error',
       /**
        * 1. Modular Monolith Architectural Bounds
        */
@@ -148,13 +149,14 @@ export default tseslint.config(
     },
   },
   /**
-   * 4. STRICT APPLICATION LAYER GUARDRAILS
+   * 4. STRICT DOMAIN & APPLICATION LAYER GUARDRAILS
    *
-   * Enforces "Branded ID" purity. Generic strings are banned for IDs
-   * to prevent logic errors and ensure nominal type safety.
+   * Enforces "Branded ID" purity and "Date Purity".
+   * Generic strings are banned for IDs and native Date objects are banned
+   * to ensure nominal type safety and prevent timezone leakage.
    */
   {
-    files: ['src/modules/**/application/**/*.ts'],
+    files: ['src/modules/**/application/**/*.ts', 'src/modules/**/domain/**/*.ts'],
     rules: {
       'no-restricted-syntax': [
         'error',
@@ -180,7 +182,17 @@ export default tseslint.config(
           selector:
             "Identifier[name=/^id$|Id$/][typeAnnotation.typeAnnotation.type='TSStringKeyword']",
           message:
-            'Architectural Violation: Generic "string" IDs are forbidden in the Application Layer. You MUST use a Branded ID (e.g., Brand<string, "EntityId">) for nominal type safety.',
+            'Architectural Violation: Generic "string" IDs are forbidden in Domain/Application layers. You MUST use a Branded ID (e.g., Brand<string, "EntityId">) for nominal type safety.',
+        },
+        {
+          selector: "NewExpression[callee.name='Date']",
+          message:
+            'Architectural Violation: Native "new Date()" is forbidden in Domain/Application layers. Use "BusinessDate.today()" or "BusinessDate.fromIso()" to ensure ISO-8601 consistency.',
+        },
+        {
+          selector: "TSTypeReference[typeName.name='Date']",
+          message:
+            'Architectural Violation: Native "Date" type is forbidden in Domain/Application layers. Use the "IsoDate" branded type from @/shared/domain/business-date.',
         },
       ],
     },

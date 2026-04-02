@@ -1,4 +1,5 @@
 import { h } from 'vue'
+import { BusinessDate } from '@/shared/domain/business-date'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { Badge } from '@/shared/components/badge'
 import type { PaymentRequest } from '../../../domain/ap.types'
@@ -47,7 +48,8 @@ export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   {
     accessorKey: 'submittedAt',
     header: 'Submitted',
-    cell: ({ row }) => row.original.submittedAt?.toLocaleDateString('en-ET') ?? '—',
+    cell: ({ row }) =>
+      row.original.submittedAt ? BusinessDate.format(row.original.submittedAt, 'en-ET') : '—',
   },
   {
     accessorKey: 'currentApprovalStep',

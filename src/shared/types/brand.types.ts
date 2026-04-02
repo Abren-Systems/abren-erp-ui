@@ -19,10 +19,16 @@ export type ModuleId = Brand<string, 'ModuleId'>
 
 export type AccountId = Brand<string, 'AccountId'>
 export type JournalEntryId = Brand<string, 'JournalEntryId'>
+export type JournalLineId = Brand<string, 'JournalLineId'>
 export type FiscalPeriodId = Brand<string, 'FiscalPeriodId'>
 export type PaymentRequestId = Brand<string, 'PaymentRequestId'>
+export type PaymentRequestLineId = Brand<string, 'PaymentRequestLineId'>
 export type VendorBillId = Brand<string, 'VendorBillId'>
+export type VendorBillLineId = Brand<string, 'VendorBillLineId'>
+export type VendorId = Brand<string, 'VendorId'>
+export type CategoryId = Brand<string, 'CategoryId'>
 export type BankAccountId = Brand<string, 'BankAccountId'>
+export type BankTransactionId = Brand<string, 'BankTransactionId'>
 export type WorkflowInstanceId = Brand<string, 'WorkflowInstanceId'>
 
 /**

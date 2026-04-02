@@ -1,3 +1,6 @@
+import type { TenantId, UserId } from '@/shared/types/brand.types'
+import type { IsoDate } from '@/shared/domain/business-date'
+
 /**
  * User Status
  */
@@ -11,10 +14,10 @@ export enum UserStatus {
  * Core User Entity (Domain Model).
  */
 export interface User {
-  id: string
+  id: UserId
   email: string
   role: string
   status: UserStatus
-  tenantId: string
-  lastLoginAt: Date | null
+  tenantId: TenantId
+  lastLoginAt: IsoDate | null
 }

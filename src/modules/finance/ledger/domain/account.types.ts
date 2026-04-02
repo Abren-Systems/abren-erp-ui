@@ -1,4 +1,4 @@
-import { Currency } from '@/shared/domain/currency'
+import { Currency } from '@/shared/domain/money'
 import { Money } from '@/shared/domain/money'
 import type { AccountId } from '@/shared/types/brand.types'
 

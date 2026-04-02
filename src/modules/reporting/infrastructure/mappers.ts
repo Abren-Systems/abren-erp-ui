@@ -1,5 +1,6 @@
 import { Money } from '@/shared/domain/money'
-import { Currency } from '@/shared/domain/currency'
+import { Currency } from '@/shared/domain/money'
+import { BusinessDate } from '@/shared/domain/business-date'
 import type { DailyCashflowDTO } from './api.types'
 import type { DailyCashflowEntry } from '../domain/reporting.types'
 
@@ -15,7 +16,7 @@ export class ReportingMapper {
       : Currency.USD
 
     return {
-      date: new Date(dto.date),
+      date: BusinessDate.fromIso(dto.date),
       actualInflow: Money.from(dto.total_inflow, currency),
       actualOutflow: Money.from(dto.total_outflow, currency),
       projectedInflow: Money.from(dto.projected_inflow, currency),

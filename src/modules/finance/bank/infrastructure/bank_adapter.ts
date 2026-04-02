@@ -1,5 +1,6 @@
 import { apiGet } from '@/shared/api/http-client'
 import type { BankAccountDTO, BankTransactionDTO } from './api.types'
+import type { BankAccountId } from '@/shared/types/brand.types'
 
 /**
  * Bank API Adapter
@@ -23,7 +24,7 @@ export const bankAdapter = {
    * @param accountId - The unique identifier of the bank account.
    * @returns List of raw BankTransactionDTOs.
    */
-  async getTransactions(accountId: string): Promise<BankTransactionDTO[]> {
+  async getTransactions(accountId: BankAccountId): Promise<BankTransactionDTO[]> {
     // Current route in spec is list only, assuming standard REST pattern for nested resources.
     // This allows UI development to proceed with mocked data if the endpoint returns 404.
     return apiGet<BankTransactionDTO[]>(`/finance/bank/accounts/${accountId}/transactions`)

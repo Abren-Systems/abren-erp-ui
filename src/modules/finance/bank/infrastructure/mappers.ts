@@ -1,7 +1,8 @@
 import { Money } from '@/shared/domain/money'
-import { Currency } from '@/shared/domain/currency'
-import type { BankAccountId } from '@/shared/types/brand.types'
+import { Currency } from '@/shared/domain/money'
+import type { BankAccountId, BankTransactionId } from '@/shared/types/brand.types'
 import { toId } from '@/shared/types/brand.types'
+import { BusinessDate } from '@/shared/domain/business-date'
 import type { BankAccount, BankTransaction } from '../domain/bank.types'
 import type { BankAccountDTO, BankTransactionDTO } from './api.types'
 
@@ -40,10 +41,10 @@ export class BankMapper {
    */
   static toTransaction(dto: BankTransactionDTO, accountId: BankAccountId): BankTransaction {
     return {
-      id: dto.id,
+      id: toId<BankTransactionId>(dto.id),
       accountId,
       amount: Money.from(dto.amount, dto.currency),
-      date: dto.date,
+      date: BusinessDate.fromIso(dto.date),
       reference: dto.reference,
       description: dto.description,
       type: dto.type as 'DEBIT' | 'CREDIT',

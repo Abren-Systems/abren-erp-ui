@@ -1,4 +1,5 @@
 import { h } from 'vue'
+import { BusinessDate } from '@/shared/domain/business-date'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { Badge } from '@/shared/components/badge'
 import type { VendorBill } from '../../../domain/ap.types'
@@ -12,12 +13,12 @@ export const vendorBillColumns: ColumnDef<VendorBill>[] = [
   {
     accessorKey: 'issueDate',
     header: 'Issue Date',
-    cell: ({ row }) => row.original.issueDate.toLocaleDateString(),
+    cell: ({ row }) => BusinessDate.format(row.original.issueDate),
   },
   {
     accessorKey: 'dueDate',
     header: 'Due Date',
-    cell: ({ row }) => row.original.dueDate.toLocaleDateString(),
+    cell: ({ row }) => BusinessDate.format(row.original.dueDate),
   },
   {
     accessorKey: 'totalAmount',

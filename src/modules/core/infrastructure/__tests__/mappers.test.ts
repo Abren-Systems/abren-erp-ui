@@ -18,6 +18,6 @@ describe('CoreMapper', () => {
     expect(model.id).toBe('user-1')
     expect(model.email).toBe('test@abren.com')
     expect(model.status).toBe(UserStatus.Active)
-    expect(model.lastLoginAt).toEqual(new Date('2026-04-01T12:00:00Z'))
+    expect(model.lastLoginAt).toEqual('2026-04-01T12:00:00Z')
   })
 })

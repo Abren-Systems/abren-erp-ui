@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { ReportingMapper } from '../mappers'
 import type { DailyCashflowDTO } from '../api.types'
-import { Currency } from '../../../../shared/domain/currency'
+import { Currency } from '../../../../shared/domain/money'
 
 describe('ReportingMapper', () => {
   it('should map DailyCashflowDTO to DailyCashflowEntry', () => {
@@ -17,7 +17,7 @@ describe('ReportingMapper', () => {
 
     const entry = ReportingMapper.toDailyCashflowEntry(dto)
 
-    expect(entry.date).toEqual(new Date('2026-04-01'))
+    expect(entry.date).toEqual('2026-04-01')
     expect(entry.actualInflow.amount).toBe(1000)
     expect(entry.actualInflow.currency).toBe(Currency.ETB)
     expect(entry.actualOutflow.amount).toBe(500)

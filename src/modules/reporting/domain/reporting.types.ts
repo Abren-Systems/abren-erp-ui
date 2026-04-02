@@ -1,4 +1,5 @@
 import { Money } from '@/shared/domain/money'
+import type { IsoDate } from '@/shared/domain/business-date'
 
 /**
  * Daily Cashflow Entry (Domain Model).
@@ -7,7 +8,7 @@ import { Money } from '@/shared/domain/money'
  * including actual and projected figures.
  */
 export interface DailyCashflowEntry {
-  date: Date
+  date: IsoDate
   actualInflow: Money
   actualOutflow: Money
   projectedInflow: Money

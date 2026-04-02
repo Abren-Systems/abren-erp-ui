@@ -22,7 +22,7 @@ describe('WorkflowMapper', () => {
     expect(model.currentState).toBe('pending_approval')
     expect(model.targetState).toBe('approved')
     expect(model.requiredRole).toBe('finance_manager')
-    expect(model.submittedAt).toEqual(new Date('2026-04-01T10:00:00Z'))
+    expect(model.submittedAt).toEqual('2026-04-01T10:00:00Z')
   })
 
   it('should handle null submitted_at', () => {

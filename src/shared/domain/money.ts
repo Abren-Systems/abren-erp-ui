@@ -5,7 +5,15 @@
  * Prevents mixing currencies in arithmetic operations.
  */
 
-import { Currency } from './currency'
+/**
+ * Currency Enum — Mirrors backend Currency value object
+ */
+export enum Currency {
+  ETB = 'ETB',
+  USD = 'USD',
+  EUR = 'EUR',
+  GBP = 'GBP',
+}
 
 export class Money {
   private constructor(
@@ -13,9 +21,20 @@ export class Money {
     public readonly currency: Currency,
   ) {}
 
+  /**
+   * Create Money from a major unit amount (e.g., 10.50).
+   */
   static from(amount: number, currency: Currency | string): Money {
     const curr = typeof currency === 'string' ? (currency as Currency) : currency
     return new Money(amount, curr)
+  }
+
+  /**
+   * Create Money from cents (e.g., 1050 cents = 10.50).
+   * Prevents floating point issues by forcing integer cents.
+   */
+  static fromCents(cents: number, currency: Currency): Money {
+    return new Money(cents / 100, currency)
   }
 
   static fromDTO(dto: { amount: number; currency: string }): Money {

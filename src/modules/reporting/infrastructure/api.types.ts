@@ -1,3 +1,5 @@
+import type { IsoDate } from '@/shared/domain/business-date'
+
 export interface DailyCashflowDTO {
   date: string
   total_inflow: number
@@ -9,6 +11,6 @@ export interface DailyCashflowDTO {
 }
 
 export interface CashflowQuery {
-  startDate: string
-  endDate: string
+  startDate: IsoDate
+  endDate: IsoDate
 }

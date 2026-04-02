@@ -1,34 +1,46 @@
-import type { Money } from '@/shared/domain/money'
-import type { PaymentRequestId, VendorBillId } from '@/shared/types/brand.types'
+import type { Money, Currency } from '@/shared/domain/money'
+import type { IsoDate } from '@/shared/domain/business-date'
+import type {
+  PaymentRequestId,
+  PaymentRequestLineId,
+  VendorBillId,
+  VendorBillLineId,
+  UserId,
+  AccountId,
+  CategoryId,
+  VendorId,
+  BankAccountId,
+  JournalLineId,
+} from '@/shared/types/brand.types'
 
 // --- Payment Request Types ---
 
 export type PaymentRequestStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PAID'
 
 export interface PaymentRequestLine {
-  id: string
+  id: PaymentRequestLineId // Line IDs are now branded for full type purity
   description: string
   amount: Money
-  accountId: string | null
-  categoryId: string | null
+  accountId: AccountId | null
+  categoryId: CategoryId | null
   taxAmount: Money | null
 }
 
 export interface PaymentRequest {
   id: PaymentRequestId
-  requesterId: string
-  beneficiaryId: string
+  requesterId: UserId
+  beneficiaryId: UserId
   totalAmount: Money
-  currency: string
+  currency: Currency
   justification: string
   status: PaymentRequestStatus
   lines: PaymentRequestLine[]
-  bankAccountId: string | null
-  targetLiabilityAccountId: string | null
-  submittedAt: Date | null
-  paidAt: Date | null
+  bankAccountId: BankAccountId | null
+  targetLiabilityAccountId: AccountId | null
+  submittedAt: IsoDate | null
+  paidAt: IsoDate | null
   currentApprovalStep: number
-  assignedApproverId: string | null
+  assignedApproverId: UserId | null
   sourceModule: string | null
   sourceId: string | null
 }
@@ -42,21 +54,21 @@ export enum VendorBillStatus {
 }
 
 export interface VendorBillLine {
-  id?: string
+  id?: VendorBillLineId
   description: string
   amount: Money
-  accountId: string | null
-  categoryId: string | null
-  journalLineId: string | null
+  accountId: AccountId | null
+  categoryId: CategoryId | null
+  journalLineId: JournalLineId | null
 }
 
 export interface VendorBill {
   id: VendorBillId
-  vendorId: string
+  vendorId: VendorId
   billNumber: string
-  issueDate: Date
-  dueDate: Date
-  currency: string
+  issueDate: IsoDate
+  dueDate: IsoDate
+  currency: Currency
   justification: string
   status: VendorBillStatus
   totalAmount: Money
@@ -64,11 +76,11 @@ export interface VendorBill {
 }
 
 export interface VendorBillCreate {
-  vendorId: string
+  vendorId: VendorId
   billNumber: string
-  issueDate: string
-  dueDate: string
-  currency: string
+  issueDate: IsoDate
+  dueDate: IsoDate
+  currency: Currency
   justification: string
-  lines: Omit<VendorBillLine, 'amount' | 'journalLineId'> & { amount: number }[]
+  lines: (Omit<VendorBillLine, 'amount' | 'journalLineId'> & { amount: number })[]
 }

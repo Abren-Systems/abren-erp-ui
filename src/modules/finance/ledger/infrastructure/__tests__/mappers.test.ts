@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { LedgerMapper } from '../mappers'
-import { Currency } from '../../../../../shared/domain/currency'
+import { Currency } from '../../../../../shared/domain/money'
 import type { components } from '../../../../../shared/api/generated.types'
 
 type AccountRead = components['schemas']['AccountRead']

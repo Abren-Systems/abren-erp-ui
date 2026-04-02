@@ -1,6 +1,7 @@
-import type { BankAccountId } from '@/shared/types/brand.types'
-import { Currency } from '@/shared/domain/currency'
+import type { BankAccountId, BankTransactionId } from '@/shared/types/brand.types'
+import { Currency } from '@/shared/domain/money'
 import { Money } from '@/shared/domain/money'
+import type { IsoDate } from '@/shared/domain/business-date'
 
 /**
  * Bank Account Entity.
@@ -23,10 +24,10 @@ export interface BankAccount {
  * Represents a movement of funds within a bank account.
  */
 export interface BankTransaction {
-  id: string
+  id: BankTransactionId
   accountId: BankAccountId
   amount: Money
-  date: string
+  date: IsoDate
   reference: string
   description: string
   type: 'DEBIT' | 'CREDIT'
