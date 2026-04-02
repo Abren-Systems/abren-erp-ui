@@ -23,7 +23,8 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
   {
     accessorKey: 'description',
     header: 'Description',
-    cell: ({ row }) => h('span', { class: 'text-neutral-600 truncate max-w-xs block' }, row.original.description),
+    cell: ({ row }) =>
+      h('span', { class: 'text-neutral-600 truncate max-w-xs block' }, row.original.description),
   },
   {
     accessorKey: 'status',
