@@ -11,7 +11,7 @@ Forms are the **primary interaction surface** in an ERP. Every financial transac
 
 1. **Headless Logic:** TanStack Form manages state, validation lifecycles, and submission — the UI is decoupled.
 2. **Schema-Driven Validation:** Zod schemas define validation rules as pure data. No imperative `if/else` in templates.
-3. **Adapter Integration:** The `@tanstack/zod-form-adapter` bridges TanStack Form and Zod with zero glue code.
+3. **Native Standard Schema Isolation:** Zod schemas are used directly via the [Standard Schema](https://github.com/standard-schema/standard-schema) interface, removing the need for intermediary adapter packages.
 
 ---
 
@@ -45,7 +45,6 @@ Each module's form logic lives in `application/composables/`. Forms follow the s
 ```typescript
 // modules/finance/ap/application/composables/usePaymentRequestForm.ts
 import { useForm } from '@tanstack/vue-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { paymentRequestAdapter } from '../../infrastructure/payment_request_adapter'
@@ -81,7 +80,6 @@ export function usePaymentRequestForm() {
       currencyCode: 'ETB',
       description: '',
     } satisfies PaymentRequestFormValues,
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: paymentRequestSchema,
     },

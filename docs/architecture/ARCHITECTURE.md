@@ -476,10 +476,10 @@ Comments must answer questions the code cannot. The _what_ is in the code — co
 - A workaround exists for a library bug or limitation.
 - A complex algorithm or reactive dependency chain is implemented.
 
-### 12.2 JSDoc Standards
+### 12.2 TSDoc Standards
 
 - **Module-Level**: Required for `core/` and non-trivial entries. State responsibility and constraints.
-- **Composable**: Required for all exported composables. Include an `@example` block.
+- **Composable**: Required for all exported composables. Include an `@example` block. Omit raw `{type}` markers as TypeScript is the authoritative Source of Truth (SOT).
 - **Vue Component**: Required in `<script setup>` for all components outside `shared/components/`. Describe purpose and data sourcing.
 
 ### 12.3 Type Annotations
