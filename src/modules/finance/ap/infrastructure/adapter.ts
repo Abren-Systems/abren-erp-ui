@@ -11,33 +11,119 @@ import type {
 const REQUESTS_BASE = '/finance/ap/requests'
 const BILLS_BASE = '/finance/ap/vendor-bills'
 
+/**
+ * Accounts Payable API Adapter.
+ *
+ * Provides typed HTTP methods for interacting with Payment Requests and Vendor Bills.
+ */
 export const apAdapter = {
-  // --- Payment Requests ---
-  listRequests: (): Promise<PaymentRequestDTO[]> => apiGet(REQUESTS_BASE),
+  /**
+   * Fetches the list of all Payment Requests.
+   *
+   * @returns A promise resolving to an array of PaymentRequestDTOs.
+   */
+  async listRequests(): Promise<PaymentRequestDTO[]> {
+    return apiGet(REQUESTS_BASE)
+  },
 
-  getRequest: (id: string): Promise<PaymentRequestDTO> => apiGet(`${REQUESTS_BASE}/${id}`),
+  /**
+   * Fetches a single Payment Request by ID.
+   *
+   * @param id - The unique identifier of the payment request.
+   * @returns A promise resolving to the PaymentRequestDTO.
+   */
+  async getRequest(id: string): Promise<PaymentRequestDTO> {
+    return apiGet(`${REQUESTS_BASE}/${id}`)
+  },
 
-  createRequest: (dto: PaymentRequestCreateDTO): Promise<PaymentRequestDTO> =>
-    apiPost(REQUESTS_BASE, dto),
+  /**
+   * Creates a new Payment Request.
+   *
+   * @param dto - The raw payment request creation data.
+   * @returns A promise resolving to the created PaymentRequestDTO.
+   */
+  async createRequest(dto: PaymentRequestCreateDTO): Promise<PaymentRequestDTO> {
+    return apiPost(REQUESTS_BASE, dto)
+  },
 
-  submitRequest: (id: string): Promise<PaymentRequestDTO> =>
-    apiPost(`${REQUESTS_BASE}/${id}/submit`),
+  /**
+   * Submits a draft Payment Request for approval.
+   *
+   * @param id - The unique identifier of the payment request.
+   * @returns A promise resolving to the updated PaymentRequestDTO.
+   */
+  async submitRequest(id: string): Promise<PaymentRequestDTO> {
+    return apiPost(`${REQUESTS_BASE}/${id}/submit`)
+  },
 
-  approveRequest: (id: string): Promise<PaymentRequestDTO> =>
-    apiPost(`${REQUESTS_BASE}/${id}/approve`),
+  /**
+   * Approves a submitted Payment Request.
+   *
+   * @param id - The unique identifier of the payment request.
+   * @returns A promise resolving to the updated PaymentRequestDTO.
+   */
+  async approveRequest(id: string): Promise<PaymentRequestDTO> {
+    return apiPost(`${REQUESTS_BASE}/${id}/approve`)
+  },
 
-  rejectRequest: (id: string, dto: PaymentRequestRejectDTO): Promise<PaymentRequestDTO> =>
-    apiPost(`${REQUESTS_BASE}/${id}/reject`, dto),
+  /**
+   * Rejects a submitted Payment Request with a reason.
+   *
+   * @param id - The unique identifier of the payment request.
+   * @param dto - The rejection data containing the reason.
+   * @returns A promise resolving to the updated PaymentRequestDTO.
+   */
+  async rejectRequest(id: string, dto: PaymentRequestRejectDTO): Promise<PaymentRequestDTO> {
+    return apiPost(`${REQUESTS_BASE}/${id}/reject`, dto)
+  },
 
-  payRequest: (id: string, dto: PaymentRequestPayDTO): Promise<PaymentRequestDTO> =>
-    apiPost(`${REQUESTS_BASE}/${id}/pay`, dto),
+  /**
+   * Records a payment for an approved Payment Request.
+   *
+   * @param id - The unique identifier of the payment request.
+   * @param dto - The payment details (method, reference).
+   * @returns A promise resolving to the updated PaymentRequestDTO.
+   */
+  async payRequest(id: string, dto: PaymentRequestPayDTO): Promise<PaymentRequestDTO> {
+    return apiPost(`${REQUESTS_BASE}/${id}/pay`, dto)
+  },
 
-  // --- Vendor Bills ---
-  listBills: (): Promise<VendorBillDTO[]> => apiGet(BILLS_BASE),
+  /**
+   * Fetches the list of all Vendor Bills.
+   *
+   * @returns A promise resolving to an array of VendorBillDTOs.
+   */
+  async listBills(): Promise<VendorBillDTO[]> {
+    return apiGet(BILLS_BASE)
+  },
 
-  getBill: (id: string): Promise<VendorBillDTO> => apiGet(`${BILLS_BASE}/${id}`),
+  /**
+   * Fetches a single Vendor Bill by ID.
+   *
+   * @param id - The unique identifier of the vendor bill.
+   * @returns A promise resolving to the VendorBillDTO.
+   */
+  async getBill(id: string): Promise<VendorBillDTO> {
+    return apiGet(`${BILLS_BASE}/${id}`)
+  },
 
-  createBill: (dto: VendorBillCreateDTO): Promise<VendorBillDTO> => apiPost(BILLS_BASE, dto),
+  /**
+   * Creates a new Vendor Bill.
+   *
+   * @param dto - The raw vendor bill creation data.
+   * @returns A promise resolving to the created VendorBillDTO.
+   */
+  async createBill(dto: VendorBillCreateDTO): Promise<VendorBillDTO> {
+    return apiPost(BILLS_BASE, dto)
+  },
 
-  validateBill: (id: string): Promise<VendorBillDTO> => apiPost(`${BILLS_BASE}/${id}/validate`),
+  /**
+   * Validates and posts a Vendor Bill to the ledger.
+   *
+   * @param id - The unique identifier of the vendor bill.
+   * @returns A promise resolving to the updated VendorBillDTO.
+   */
+  async validateBill(id: string): Promise<VendorBillDTO> {
+    return apiPost(`${BILLS_BASE}/${id}/validate`)
+  },
 }
