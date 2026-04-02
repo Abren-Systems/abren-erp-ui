@@ -2,6 +2,8 @@ import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
+import { ledgerKeys } from '../keys'
+import type { ApiError } from '@/shared/api/http-client'
 import type { components } from '@/shared/api/generated.types'
 
 type LedgerSettingsRead = components['schemas']['LedgerSettingsRead']
@@ -24,19 +26,21 @@ export function useLedgerSettings() {
     data: settings,
     isLoading: isFetching,
     error: fetchError,
-  } = useApiQuery<LedgerSettingsRead>(['ledger-settings'], () => ledgerAdapter.getLedgerSettings())
+  } = useApiQuery<LedgerSettingsRead>(ledgerKeys.settings(), () =>
+    ledgerAdapter.getLedgerSettings(),
+  )
 
   const {
     mutateAsync: updateSettings,
     isPending: isUpdating,
     error: updateError,
-  } = useApiMutation<void, Error, LedgerSettingsUpdate>(
+  } = useApiMutation<void, ApiError, LedgerSettingsUpdate>(
     async (data: LedgerSettingsUpdate) => {
       await ledgerAdapter.updateLedgerSettings(data)
     },
     {
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: ['ledger-settings'] })
+        void queryClient.invalidateQueries({ queryKey: ledgerKeys.settings() })
       },
     },
   )

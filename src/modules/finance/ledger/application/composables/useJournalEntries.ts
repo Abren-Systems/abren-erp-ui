@@ -3,6 +3,8 @@ import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 import { LedgerMapper } from '../../infrastructure/mappers'
+import { ledgerKeys } from '../keys'
+import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../../domain/journal-entry.types'
 import type { components } from '@/shared/api/generated.types'
 
@@ -26,14 +28,14 @@ export function useJournalEntries() {
     isLoading,
     error,
     refetch,
-  } = useApiQuery<JournalEntry[]>(['journal-entries'], async () => {
+  } = useApiQuery<JournalEntry[]>(ledgerKeys.journalEntries(), async () => {
     const dtos = await ledgerAdapter.getJournalEntries()
     return dtos.map((dto) => LedgerMapper.toJournalEntry(dto))
   })
 
   const { mutateAsync: createEntry, isPending: isCreating } = useApiMutation<
     JournalEntry,
-    Error,
+    ApiError,
     JournalEntryCreate
   >(
     async (data: JournalEntryCreate) => {
@@ -42,18 +44,18 @@ export function useJournalEntries() {
     },
     {
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+        void queryClient.invalidateQueries({ queryKey: ledgerKeys.journalEntries() })
       },
     },
   )
 
-  const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<void, Error, string>(
+  const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<void, ApiError, string>(
     async (id: string) => {
       await ledgerAdapter.postJournalEntry(id)
     },
     {
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+        void queryClient.invalidateQueries({ queryKey: ledgerKeys.journalEntries() })
       },
     },
   )

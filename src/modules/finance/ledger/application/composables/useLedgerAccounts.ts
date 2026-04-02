@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 import { LedgerMapper } from '../../infrastructure/mappers'
 import type { Account } from '../../domain/account.types'
+import { ledgerKeys } from '../keys'
 
 /**
  * Use Case: View Chart of Accounts.
@@ -19,7 +20,7 @@ export function useLedgerAccounts() {
     error,
     refetch,
   } = useQuery<Account[]>({
-    queryKey: ['ledger-accounts'],
+    queryKey: ledgerKeys.accounts(),
     queryFn: async () => {
       const dtos = await ledgerAdapter.getAccounts()
       return dtos.map((dto) => LedgerMapper.toAccount(dto))
