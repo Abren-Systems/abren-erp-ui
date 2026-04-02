@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { bankAdapter } from '../../infrastructure/bank_adapter'
 import { BankMapper } from '../../infrastructure/mappers'
 import type { BankAccount } from '../../domain/bank.types'
+import { bankKeys } from '../keys'
 
 /**
  * Use Case: View Bank Accounts.
@@ -15,7 +16,7 @@ export function useBankAccounts() {
     error,
     refetch,
   } = useQuery<BankAccount[]>({
-    queryKey: ['bank-accounts'],
+    queryKey: bankKeys.accounts(),
     queryFn: async () => {
       const dtos = await bankAdapter.getBankAccounts()
       return dtos.map((dto) => BankMapper.toBankAccount(dto))

@@ -4,6 +4,7 @@ import { BankMapper } from '../../infrastructure/mappers'
 import type { BankTransaction } from '../../domain/bank.types'
 import type { BankAccountId } from '@/shared/types/brand.types'
 import { computed } from 'vue'
+import { bankKeys } from '../keys'
 
 /**
  * Use Case: View Bank Account Transactions.
@@ -17,7 +18,7 @@ export function useBankTransactions(accountId: BankAccountId) {
     error,
     refetch,
   } = useQuery<BankTransaction[]>({
-    queryKey: ['bank-transactions', accountId],
+    queryKey: bankKeys.transactions(accountId),
     queryFn: async () => {
       const dtos = await bankAdapter.getTransactions(accountId)
       return dtos.map((dto) => BankMapper.toTransaction(dto, accountId))
