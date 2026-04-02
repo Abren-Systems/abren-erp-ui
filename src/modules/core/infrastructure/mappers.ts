@@ -1,4 +1,5 @@
 import type { User, UserStatus } from '../domain/user.types'
+import type { UserDTO } from './api.types'
 
 /**
  * Core Domain Mapper.
@@ -9,14 +10,7 @@ export class CoreMapper {
   /**
    * Transforms a raw API user response into a Domain User entity.
    */
-  static toUser(dto: {
-    id: string
-    email: string
-    role?: string
-    status?: string
-    tenant_id: string
-    last_login_at?: string | null
-  }): User {
+  static toUser(dto: UserDTO): User {
     return {
       id: dto.id,
       email: dto.email,

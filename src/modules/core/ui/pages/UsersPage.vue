@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { UserStatus, type User } from '../../domain/user.types'
+import { useUsers } from '../../application/composables/useUsers'
 
-const users: Partial<User>[] = [
-  { id: '1', email: 'admin@abren.com', role: 'Super Admin', status: UserStatus.Active },
-  { id: '2', email: 'finance@abren.com', role: 'Finance Manager', status: UserStatus.Active },
-]
+const { users, isLoading } = useUsers()
 </script>
 
 <template>
@@ -13,6 +10,9 @@ const users: Partial<User>[] = [
       <h1 class="text-2xl font-bold tracking-tight">Users</h1>
       <p class="text-sm text-neutral-500">
         Manage user accounts and permissions within your tenant.
+        <span v-if="isLoading" class="ml-2 text-xs italic opacity-50 animate-pulse"
+          >Syncing...</span
+        >
       </p>
     </header>
 
