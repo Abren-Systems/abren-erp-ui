@@ -1,4 +1,5 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/vue-query'
+import type { ApiError } from '../api/http-client'
 
 /**
  * useApiQuery
@@ -9,10 +10,10 @@ import { useQuery, type UseQueryOptions } from '@tanstack/vue-query'
  * @example
  * const { data, isLoading } = useApiQuery(['user', id], () => api.getUser(id))
  */
-export function useApiQuery<TData, TError = Error>(
-  queryKey: unknown[],
+export function useApiQuery<TData, TError = ApiError>(
+  queryKey: readonly unknown[],
   queryFn: () => Promise<TData>,
-  options?: UseQueryOptions<TData, TError>,
+  options?: Omit<UseQueryOptions<TData, TError>, 'queryKey' | 'queryFn'>,
 ) {
   return useQuery({
     queryKey,

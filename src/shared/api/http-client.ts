@@ -19,10 +19,18 @@ export interface ApiResponse<T> {
   meta?: Record<string, unknown>
 }
 
-export interface ApiError {
+export class ApiError extends Error {
   success: false
   detail: string
   code: string
+
+  constructor(detail: string, code: string = 'UNKNOWN_ERROR') {
+    super(detail)
+    this.name = 'ApiError'
+    this.success = false
+    this.detail = detail
+    this.code = code
+  }
 }
 
 export interface PaginatedResponse<T> {
@@ -80,7 +88,7 @@ httpClient.interceptors.response.use(
 
       // Structured error from backend
       if (data?.detail) {
-        return Promise.reject(new Error(data.detail))
+        return Promise.reject(new ApiError(data.detail, data.code))
       }
     }
 
