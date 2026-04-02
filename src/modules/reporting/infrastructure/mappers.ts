@@ -1,6 +1,6 @@
 import { Money } from '@/shared/domain/money'
 import { Currency } from '@/shared/domain/currency'
-import type { DailyCashflowDTO } from './reporting_adapter'
+import type { DailyCashflowDTO } from './api.types'
 import type { DailyCashflowEntry } from '../domain/reporting.types'
 
 /**

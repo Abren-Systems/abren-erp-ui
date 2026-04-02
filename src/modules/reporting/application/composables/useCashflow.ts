@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/vue-query'
-import { reportingAdapter, type CashflowQuery } from '../../infrastructure/reporting_adapter'
+import { reportingAdapter } from '../../infrastructure/reporting_adapter'
+import type { CashflowQuery } from '../../infrastructure/api.types'
 import { ReportingMapper } from '../../infrastructure/mappers'
 import { Money } from '@/shared/domain/money'
 import { Currency } from '@/shared/domain/currency'
@@ -12,6 +13,7 @@ import { computed } from 'vue'
  * Orchestrates fetching daily cashflow data and mapping it to
  * UI-ready ViewModels and aggregated statistics.
  *
+ * @returns Reactive dashboard data including entries and aggregated stats.
  * @example
  * const { entries, stats, isLoading } = useCashflow({
  *   startDate: '2026-01-01',

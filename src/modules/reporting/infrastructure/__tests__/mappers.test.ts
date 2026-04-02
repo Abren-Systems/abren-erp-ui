@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { ReportingMapper } from '../mappers'
-import type { DailyCashflowDTO } from '../reporting_adapter'
+import type { DailyCashflowDTO } from '../api.types'
 import { Currency } from '../../../../shared/domain/currency'
 
 describe('ReportingMapper', () => {
