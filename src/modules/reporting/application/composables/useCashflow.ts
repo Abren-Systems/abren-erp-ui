@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/vue-query'
 import { reportingAdapter } from '../../infrastructure/reporting_adapter'
 import type { CashflowQuery } from '../../infrastructure/api.types'
+import { reportingKeys } from '../keys'
 import { ReportingMapper } from '../../infrastructure/mappers'
 import { Money } from '@/shared/domain/money'
 import { Currency } from '@/shared/domain/currency'
@@ -27,7 +28,7 @@ export function useCashflow(query: CashflowQuery) {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['reporting', 'cashflow', query],
+    queryKey: reportingKeys.cashflow(query),
     queryFn: async () => {
       const dtos = await reportingAdapter.getDailyCashflow(query)
       return dtos.map((dto) => ReportingMapper.toDailyCashflowEntry(dto))
