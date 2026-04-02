@@ -16,6 +16,7 @@ import type {
   UserId,
   ModuleId,
   PaymentRequestId,
+  VendorBillId,
   JournalEntryId,
 } from '../types/brand.types'
 import { toId } from '../types/brand.types'
@@ -34,7 +35,8 @@ export interface AppEventMetadata {
 /**
  * Standardized Event Wrapper
  */
-export interface AppEvent<T> {
+export interface AppEvent<K extends keyof EventMap, T = EventMap[K]> {
+  readonly type: K
   readonly metadata: AppEventMetadata
   readonly payload: T
 }
@@ -45,6 +47,8 @@ export type EventMap = {
   'payment-request:approved': { id: PaymentRequestId }
   'payment-request:rejected': { id: PaymentRequestId; reason: string }
   'payment-request:paid': { id: PaymentRequestId; amount: Money }
+  'vendor-bill:created': { id: VendorBillId }
+  'vendor-bill:validated': { id: VendorBillId }
   'journal-entry:posted': { id: JournalEntryId; entryNumber: string }
   'journal-entry:voided': { id: JournalEntryId }
   'tenant:feature-toggled': { feature: string; enabled: boolean }
@@ -53,7 +57,7 @@ export type EventMap = {
 }
 
 // ── Implementation ────────────────────────────────────
-type Handler<T> = (event: AppEvent<T>) => void
+type Handler<T> = (event: AppEvent<keyof EventMap, T>) => void
 
 class TypedEventBus {
   private listeners = new Map<string, Set<Handler<unknown>>>()
@@ -70,17 +74,18 @@ class TypedEventBus {
     const handlers = this.listeners.get(event as string)
     if (!handlers) return
 
-    const appEvent: AppEvent<EventMap[K]> = {
+    const appEvent: AppEvent<K, EventMap[K]> = {
+      type: event,
       metadata: {
         id: toId<EventId>(crypto.randomUUID()),
         timestamp: new Date().toISOString(),
-        actorId: metadataOverrides?.actorId ?? null, // In production, this would pull from Auth state
+        actorId: metadataOverrides?.actorId ?? null,
         sourceModule: metadataOverrides?.sourceModule ?? toId<ModuleId>('shared'),
       },
       payload,
     }
 
-    handlers.forEach((handler) => handler(appEvent as AppEvent<unknown>))
+    handlers.forEach((handler) => handler(appEvent as AppEvent<keyof EventMap, unknown>))
   }
 
   on<K extends keyof EventMap>(event: K, handler: Handler<EventMap[K]>): () => void {
