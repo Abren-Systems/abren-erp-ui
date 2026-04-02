@@ -1,7 +1,7 @@
 # Abren ERP UI — Frontend Architectural Manifesto
 
-> **Version:** 2.0
-> **Last Updated:** March 2026
+> **Version:** 2.1
+> **Last Updated:** April 2026
 > **Status:** AUTHORITATIVE — This document is the single source of truth for all architectural decisions in the Abren ERP UI.
 > **Backend Companion:** [Backend Architecture](../../../abren-api/docs/architecture/ARCHITECTURE.md)
 
@@ -141,14 +141,12 @@ graph TD
 
 ### 3.2 Development & Quality
 
-| Tool                          | Purpose                                          |
-| ----------------------------- | ------------------------------------------------ |
-| **ESLint**                    | Code quality and import boundary enforcement     |
-| **Vitest**                    | Unit and integration testing (Vite-native)       |
-| **Vue Test Utils**            | Component testing                                |
-| **Playwright**                | End-to-end testing                               |
-| **MSW** (Mock Service Worker) | API mocking for integration tests                |
-| **openapi-typescript**        | Auto-generate TS types from backend OpenAPI spec |
+| Tool                   | Purpose                                                       |
+| ---------------------- | ------------------------------------------------------------- |
+| **ESLint**             | Code quality and global `no-console: error` enforcement       |
+| **vp check** (Custom)  | High-integrity "Voluntary Purity" check for module boundaries |
+| **Vitest**             | Unit and integration testing (Vite-native)                    |
+| **openapi-typescript** | Auto-generate TS types from backend OpenAPI spec              |
 
 ---
 
@@ -232,7 +230,7 @@ Every module infrastructure layer must implement mappers with two standardized f
 // modules/ap/infrastructure/mappers.ts
 
 import type { VendorBillDTO } from '../infrastructure/api.types'
-import type { VendorBill } from '../domain/vendor-bill.types'
+import type { VendorBill, VendorBillId } from '../domain/vendor-bill.types'
 import { Money } from '@/shared/domain/money'
 import { toId } from '@/shared/types/brand.types'
 
@@ -243,6 +241,8 @@ import { toId } from '@/shared/types/brand.types'
 export class APMapper {
   static toVendorBill(dto: VendorBillDTO): VendorBill {
     return {
+      // Branded Type enforcement in Mappers
+      // This prevents accidental cross-assignment of identifiers
       id: toId<VendorBillId>(dto.id),
       beneficiary: dto.beneficiary_name,
       amount: Money.from(dto.amount, dto.currency),
@@ -251,6 +251,13 @@ export class APMapper {
   }
 }
 ```
+
+### 5.4 Nominal Identifier Isolation (Branded Types) [MANDATORY]
+
+To prevent accidental cross-assignment of identifiers (e.g. passing a `UserId` to a function expecting a `TenantId`), we enforce **Nominal Typing** using Branded Types.
+
+- **Rule**: Every UUID or Primary Key must be wrapped in a Branded Type: `type UserId = Brand<string, 'UserId'>`.
+- **Enforcement**: Use the `toId<T>(val)` helper in Mappers. Never use raw `string` for entity identifiers in Domain or Application layers.
 
 ### 5.3 Rules
 
@@ -304,16 +311,20 @@ eventBus.on('ledger:entry-posted', ({ id }) => {
 
 ### 7.1 What Goes in Core
 
-| Directory      | Contents                                                    | Rule                           |
-| -------------- | ----------------------------------------------------------- | ------------------------------ |
-| `api/`         | HTTP client, response types, error handler                  | Infrastructure only            |
-| `auth/`        | Auth store, route guard, token types                        | Cross-cutting identity concern |
-| `composables/` | `useApiQuery`, `useApiMutation`, `useFeatureGate`           | Cross-cutting utilities        |
-| `domain/`      | `Money` VO, `Currency` enum, branded types                  | Mirrors backend Shared Kernel  |
-| `event-bus/`   | Typed event bus                                             | Module communication contract  |
-| `types/`       | `ModuleDefinition`, cross-cutting types                     | Shared contracts               |
-| `ui/`          | **Custom Design System** (components, patterns, primitives) | Module-agnostic UI             |
-| `utils/`       | Date formatters, number formatters                          | Pure utility functions         |
+| Directory      | Contents                                                    | Rule                                      |
+| -------------- | ----------------------------------------------------------- | ----------------------------------------- |
+| `api/`         | HTTP client, response types, error handler                  | Infrastructure only                       |
+| `auth/`        | Auth store, route guard, token types                        | Cross-cutting identity concern            |
+| `composables/` | `useApiQuery`, `useApiMutation`, `useFeatureGate`           | Cross-cutting utilities                   |
+| `domain/`      | `Money` VO, `Currency` enum, branded types                  | Mirrors backend Shared Kernel             |
+| `event-bus/`   | Typed event bus                                             | Module communication contract             |
+| `types/`       | `ModuleDefinition`, cross-cutting types                     | Shared contracts                          |
+| `ui/`          | **Custom Design System** (components, patterns, primitives) | Module-agnostic UI                        |
+| `utils/`       | Consolidated Pure utility functions (Barrel exported)       | `import { format } from '@/shared/utils'` |
+
+### 7.3 Utility Consolidation Rule
+
+All module-agnostic utility functions (Date, Number, String helpers) must be registered in the **Barrel Export** at `src/shared/utils/index.ts`. Modules must import from the barrel to ensure a single, audited utility surface.
 
 ### 7.2 What Does NOT Go in Core
 
@@ -466,6 +477,7 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 | **Inline styles for theming**        | Unmaintainable at scale                 | Tailwind v4 `@theme` design tokens            |
 | **Raw HTML tables**                  | No sorting, pagination, virtual scroll  | `shared/components` DataGrid (TanStack Table) |
 | **Bypassing design system**          | UI inconsistency                        | Always use `shared/components` components     |
+| **`console.log`**                    | Leaks debug data, litters production    | Use high-level error boundaries or logging    |
 
 ---
 

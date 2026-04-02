@@ -98,6 +98,7 @@ In our **Symmetry-over-Parity** model, the frontend's **Application Composables*
 | Mapper      | `{entity}.mapper.ts`    | `account.mapper.ts`     |
 | Composable  | `use{Action}.ts`        | `useLedgerAccounts.ts`  |
 | Types       | `{entity}.types.ts`     | `account.types.ts`      |
+| Branded ID  | `{entity}Id` type       | `UserId`, `TenantId`    |
 | Formatter   | `{entity}-formatter.ts` | `account-formatter.ts`  |
 | Routes      | `routes.ts`             | —                       |
 | Entry       | `index.ts`              | —                       |
@@ -106,6 +107,7 @@ In our **Symmetry-over-Parity** model, the frontend's **Application Composables*
 
 - **DTOs**: Raw as-received-from-server types (from `generated.types.ts`).
 - **Domain Types**: Clean, reactive frontend-owned interfaces.
+- **Nominal IDs (Branded)**: Mandated for all primary keys (e.g. `UserId`) to prevent type-unsafe assignment.
 - **View Models**: UI-specific derivations (colors, labels, permissions).
 
 ### Composable Naming (Action Alignment)
@@ -250,9 +252,10 @@ To maintain full-stack integrity, the frontend must mirror the backend's domain 
 
 When creating a new module (e.g., `procurement`):
 
-- [ ] 1. **Domain Types**: Define `domain/{entity}.types.ts` (The UI-owned source of truth).
+- [ ] 1. **Domain Types**: Define `domain/{entity}.types.ts` (Include **Branded IDs** for all identifiers).
 - [ ] 2. **Infrastructure Adapter**: Define `infrastructure/{module}_adapter.ts` (Fetches **DTOs** using `apiGet/apiPost`).
-- [ ] 3. **Mapper-as-Factory**: Implement `toViewModel()` and `toDTO()` factory logic (The Integrity Firewall).
+- [ ] 3. **Mapper-as-Factory**: Implement `toViewModel()` and `toDTO()` factory logic (Include **Nominal ID** wrapping via `toId<T>`).
 - [ ] 4. **Application Facade**: Create `application/composables/use{Entity}` using TanStack Query.
 - [ ] 5. **UI Orchestration**: Build `ui/pages/` and `ui/components/` as view-only compositions.
-- [ ] 6. **Registration**: Export `ModuleDefinition` in `index.ts` and register in `src/modules/registry.ts`.
+- [ ] 6. **Quality Gate**: Run `vp check` and `npm run lint` to ensure zero boundary/console violations.
+- [ ] 7. **Registration**: Export `ModuleDefinition` in `index.ts` and register in `src/modules/registry.ts`.
