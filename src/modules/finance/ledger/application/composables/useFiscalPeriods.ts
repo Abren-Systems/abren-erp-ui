@@ -1,55 +1,53 @@
-import { ref, onMounted } from 'vue'
+import { useApiQuery } from '@/shared/composables/useApiQuery'
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
+import { LedgerMapper } from '../../infrastructure/mappers'
+import type { FiscalPeriod } from '../../domain/fiscal-period.types'
 import type { components } from '@/shared/api/generated.types'
 
-type FiscalPeriodRead = components['schemas']['FiscalPeriodRead']
 type FiscalPeriodCreate = components['schemas']['FiscalPeriodCreate']
 
 /**
- * Composable for managing Fiscal Periods.
+ * Use Case: Manage Fiscal Periods.
+ *
+ * Provides access to the list of financial periods and allows
+ * creating new periods for ledger locking.
  */
 export function useFiscalPeriods() {
-  const periods = ref<FiscalPeriodRead[]>([])
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const fetchPeriods = async () => {
-    isLoading.value = true
-    error.value = null
-    try {
-      periods.value = await ledgerAdapter.getFiscalPeriods()
-    } catch (err) {
-      error.value = 'Failed to load fiscal periods'
-      console.error(err)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const createPeriod = async (data: FiscalPeriodCreate) => {
-    isLoading.value = true
-    try {
-      const newPeriod = await ledgerAdapter.createFiscalPeriod(data)
-      periods.value.push(newPeriod)
-      return newPeriod
-    } catch (err) {
-      error.value = 'Failed to create fiscal period'
-      console.error(err)
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  onMounted(() => {
-    void fetchPeriods()
+  const {
+    data: periods,
+    isLoading,
+    error,
+    refetch,
+  } = useApiQuery<FiscalPeriod[]>(['fiscal-periods'], async () => {
+    const dtos = await ledgerAdapter.getFiscalPeriods()
+    return dtos.map((dto) => LedgerMapper.toFiscalPeriod(dto))
   })
+
+  const { mutateAsync: createPeriod, isPending: isCreating } = useApiMutation<
+    FiscalPeriod,
+    Error,
+    FiscalPeriodCreate
+  >(
+    async (data: FiscalPeriodCreate) => {
+      const dto = await ledgerAdapter.createFiscalPeriod(data)
+      return LedgerMapper.toFiscalPeriod(dto)
+    },
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: ['fiscal-periods'] })
+      },
+    },
+  )
 
   return {
     periods,
-    isLoading,
+    isLoading: isLoading || isCreating,
     error,
-    fetchPeriods,
+    refresh: refetch,
     createPeriod,
   }
 }

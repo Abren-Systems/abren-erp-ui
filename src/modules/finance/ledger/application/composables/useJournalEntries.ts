@@ -1,53 +1,65 @@
-import { ref, onMounted } from 'vue'
+import { useApiQuery } from '@/shared/composables/useApiQuery'
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
+import { LedgerMapper } from '../../infrastructure/mappers'
+import type { JournalEntry } from '../../domain/journal-entry.types'
 import type { components } from '@/shared/api/generated.types'
 
-type JournalEntryRead = components['schemas']['JournalEntryRead']
+type JournalEntryCreate = components['schemas']['JournalEntryCreate']
 
 /**
- * Composable for managing Journal Entries.
+ * Use Case: Manage Journal Entries.
+ *
+ * Provides access to the list of journal entries and allows
+ * creating and posting new entries.
  */
 export function useJournalEntries() {
-  const entries = ref<JournalEntryRead[]>([])
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const fetchEntries = async () => {
-    isLoading.value = true
-    error.value = null
-    try {
-      entries.value = await ledgerAdapter.getJournalEntries()
-    } catch (err) {
-      error.value = 'Failed to load journal entries'
-      console.error(err)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const postEntry = async (entryId: string) => {
-    isLoading.value = true
-    try {
-      await ledgerAdapter.postJournalEntry(entryId)
-      await fetchEntries() // Refresh list
-    } catch (err) {
-      error.value = 'Failed to post entry'
-      console.error(err)
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  onMounted(() => {
-    void fetchEntries()
+  const {
+    data: entries,
+    isLoading,
+    error,
+    refetch,
+  } = useApiQuery<JournalEntry[]>(['journal-entries'], async () => {
+    const dtos = await ledgerAdapter.getJournalEntries()
+    return dtos.map((dto) => LedgerMapper.toJournalEntry(dto))
   })
+
+  const { mutateAsync: createEntry, isPending: isCreating } = useApiMutation<
+    JournalEntry,
+    Error,
+    JournalEntryCreate
+  >(
+    async (data: JournalEntryCreate) => {
+      const dto = await ledgerAdapter.createJournalEntry(data)
+      return LedgerMapper.toJournalEntry(dto)
+    },
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      },
+    },
+  )
+
+  const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<void, Error, string>(
+    async (id: string) => {
+      await ledgerAdapter.postJournalEntry(id)
+    },
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: ['journal-entries'] })
+      },
+    },
+  )
 
   return {
     entries,
-    isLoading,
+    isLoading: isLoading || isCreating || isPosting,
     error,
-    fetchEntries,
+    refresh: refetch,
+    createEntry,
     postEntry,
   }
 }

@@ -16,6 +16,7 @@ export type RoleId = Brand<string, 'RoleId'>
 
 export type AccountId = Brand<string, 'AccountId'>
 export type JournalEntryId = Brand<string, 'JournalEntryId'>
+export type FiscalPeriodId = Brand<string, 'FiscalPeriodId'>
 export type PaymentRequestId = Brand<string, 'PaymentRequestId'>
 export type VendorBillId = Brand<string, 'VendorBillId'>
 export type WorkflowInstanceId = Brand<string, 'WorkflowInstanceId'>

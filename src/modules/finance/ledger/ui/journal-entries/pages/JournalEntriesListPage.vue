@@ -1,72 +1,52 @@
 <script setup lang="ts">
-import { h } from 'vue'
-import type { ColumnDef } from '@tanstack/vue-table'
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { useJournalEntries } from '../../../application/composables/useJournalEntries'
-import { Badge } from '@/shared/components/badge'
+import { DataGrid } from '@/shared/components/data-grid'
+import { journalEntryColumns } from '../grids/journal-entry.grid'
 import { Button } from '@/shared/components/button'
-import type { components } from '@/shared/api/generated.types'
+import { Plus, RefreshCcw } from 'lucide-vue-next'
 
-const { entries, isLoading, postEntry } = useJournalEntries()
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
+const { entries, isLoading, refresh, postEntry } = useJournalEntries()
 
-type JournalEntryRead = components['schemas']['JournalEntryRead']
-const columns: ColumnDef<JournalEntryRead>[] = [
-  { accessorKey: 'entry_number', header: 'Entry #' },
-  { accessorKey: 'date', header: 'Date' },
-  { accessorKey: 'description', header: 'Description' },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string
-      let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'secondary'
-      if (status === 'POSTED') variant = 'default'
-      if (status === 'VOIDED') variant = 'destructive'
-      if (status === 'DRAFT') variant = 'outline'
-      return h(Badge, { variant }, () => status)
-    },
-  },
-  {
-    id: 'actions',
-    header: 'Actions',
-    cell: ({ row }) => {
-      const entry = row.original
-      if (entry.status !== 'DRAFT') return null
-      return h(
-        Button,
-        {
-          size: 'sm',
-          variant: 'outline',
-          onClick: () => postEntry(entry.id),
-        },
-        () => 'Post',
-      )
-    },
-  },
-]
+const handlePost = async (id: string) => {
+  if (confirm('Are you sure you want to post this journal entry? It will become immutable.')) {
+    await postEntry(id)
+  }
+}
 </script>
 
 <template>
-  <div style="display: flex; flex-direction: column; gap: 20px; height: 100%">
-    <div style="display: flex; justify-content: space-between; align-items: center">
-      <h1 style="font-size: 22px; font-weight: 700; color: var(--color-grid-text); margin: 0">
-        Journal Entries
-      </h1>
-      <Button variant="default">New Entry</Button>
+  <div class="p-6 space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Journal Entries</h1>
+        <p class="text-sm text-neutral-500">View and manage double-entry accounting records.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <Button variant="outline" size="sm" @click="() => refresh()">
+          <RefreshCcw :class="['w-4 h-4 mr-2', isLoading && 'animate-spin']" />
+          Refresh
+        </Button>
+        <Button size="sm">
+          <Plus class="w-4 h-4 mr-2" />
+          New Entry
+        </Button>
+      </div>
     </div>
 
-    <div style="flex: 1; min-height: 0">
-      <DataGrid
-        :columns="columns"
-        :data="entries"
-        :loading="isLoading"
-        v-model:sorting="sorting"
-        v-model:row-selection="rowSelection"
-        v-model:column-visibility="columnVisibility"
-        v-model:global-filter="globalFilter"
-        placeholder="Search entries…"
-      />
-    </div>
+    <DataGrid :columns="journalEntryColumns" :data="entries ?? []" :loading="isLoading" row-id="id">
+      <template #actions="{ row }">
+        <div class="flex items-center justify-end gap-2">
+          <Button
+            v-if="row.status === 'DRAFT'"
+            variant="outline"
+            size="xs"
+            @click="handlePost(row.id)"
+          >
+            Post
+          </Button>
+          <Button variant="ghost" size="xs"> View </Button>
+        </div>
+      </template>
+    </DataGrid>
   </div>
 </template>
