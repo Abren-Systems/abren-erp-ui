@@ -1,7 +1,6 @@
 import type { components } from '@/shared/api/generated.types'
 import { type Account, AccountType } from '../domain/account.types'
 import {
-  toId,
   type AccountId,
   type JournalEntryId,
   type FiscalPeriodId,
@@ -9,7 +8,7 @@ import {
   type UserId,
 } from '@/shared/types/brand.types'
 import { Currency, Money } from '@/shared/domain/money'
-import { BusinessDate } from '@/shared/domain/business-date'
+import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { JournalEntry, JournalEntryLine } from '../domain/journal-entry.types'
 import type { FiscalPeriod, FiscalPeriodStatus } from '../domain/fiscal-period.types'
 
@@ -37,7 +36,7 @@ export class LedgerMapper {
     const currency = Currency.ETB
 
     return {
-      id: toId<AccountId>(dto.id),
+      id: CommonMapper.toBrandedId<AccountId>(dto.id),
       code: String(dto.code), // Convert numeric code to string for UI
       name: dto.name,
       type: dto.account_type.toUpperCase() as AccountType,
@@ -57,11 +56,15 @@ export class LedgerMapper {
     const currency = (dto.currency as Currency) || Currency.ETB
 
     return {
-      id: toId<JournalLineId>(dto.id),
-      accountId: toId<AccountId>(dto.account_id),
+      id: CommonMapper.toBrandedId<JournalLineId>(dto.id),
+      accountId: CommonMapper.toBrandedId<AccountId>(dto.account_id),
       description: dto.description || '',
-      debit: dto.is_debit ? Money.from(parseFloat(dto.amount), currency) : Money.zero(currency),
-      credit: !dto.is_debit ? Money.from(parseFloat(dto.amount), currency) : Money.zero(currency),
+      debit: dto.is_debit
+        ? CommonMapper.toMoney(parseFloat(dto.amount), currency)
+        : Money.zero(currency),
+      credit: !dto.is_debit
+        ? CommonMapper.toMoney(parseFloat(dto.amount), currency)
+        : Money.zero(currency),
     }
   }
 
@@ -73,14 +76,14 @@ export class LedgerMapper {
    */
   static toJournalEntry(dto: JournalEntryRead): JournalEntry {
     return {
-      id: toId<JournalEntryId>(dto.id),
+      id: CommonMapper.toBrandedId<JournalEntryId>(dto.id),
       entryNumber: dto.entry_number,
       status: dto.status as 'DRAFT' | 'POSTED' | 'VOIDED',
-      entryDate: BusinessDate.fromIso(dto.date),
+      entryDate: CommonMapper.toDate(dto.date)!,
       description: dto.description,
-      createdBy: toId<UserId>('system'), // Missing from DTO, defaulting
+      createdBy: CommonMapper.toBrandedId<UserId>('system'), // Missing from DTO, defaulting
       lines: (dto.lines || []).map((ln) => this.mapJournalLine(ln)),
-      createdAt: BusinessDate.today(), // Missing from DTO, defaulting
+      createdAt: CommonMapper.toDate(new Date().toISOString())!, // Missing from DTO, defaulting
     }
   }
 
@@ -92,13 +95,13 @@ export class LedgerMapper {
    */
   static toFiscalPeriod(dto: FiscalPeriodRead): FiscalPeriod {
     return {
-      id: toId<FiscalPeriodId>(dto.id),
+      id: CommonMapper.toBrandedId<FiscalPeriodId>(dto.id),
       name: dto.name,
-      startDate: BusinessDate.fromIso(dto.start_date),
-      endDate: BusinessDate.fromIso(dto.end_date),
+      startDate: CommonMapper.toDate(dto.start_date)!,
+      endDate: CommonMapper.toDate(dto.end_date)!,
       status: dto.status as FiscalPeriodStatus,
       isAdjustmentPeriod: false, // Missing from DTO
-      createdAt: BusinessDate.today(), // Missing from DTO
+      createdAt: CommonMapper.toDate(new Date().toISOString())!, // Missing from DTO
     }
   }
 }

@@ -1,7 +1,6 @@
 import { h } from 'vue'
 import { type ColumnDef } from '@tanstack/vue-table'
-import { DataGridColumnHeader } from '@/shared/components/data-grid'
-import * as formatter from '../utils/account-formatter'
+import { DataGridColumnHeader, BadgeCell } from '@/shared/components/data-grid'
 import type { Account } from '../../../domain/account.types'
 
 /**
@@ -20,8 +19,7 @@ export const accountColumns: ColumnDef<Account>[] = [
       h(
         'span',
         {
-          style:
-            'font-family: var(--font-mono); font-size: 11.5px; color: var(--color-grid-text-muted);',
+          class: 'font-mono text-[11.5px] text-neutral-500',
         },
         row.getValue('code'),
       ),
@@ -31,7 +29,7 @@ export const accountColumns: ColumnDef<Account>[] = [
     size: 300,
     enableSorting: true,
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Name' }),
-    cell: ({ row }) => h('span', { style: 'font-weight: 500;' }, row.getValue('name')),
+    cell: ({ row }) => h('span', { class: 'font-medium' }, row.getValue('name')),
   },
   {
     accessorKey: 'type',
@@ -40,24 +38,14 @@ export const accountColumns: ColumnDef<Account>[] = [
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Type' }),
     cell: ({ row }) => {
       const type = row.getValue<string>('type')
-      const color = formatter.getAccountTypeColor(type)
-      return h(
-        'span',
-        {
-          style: `
-          display: inline-block;
-          font-size: 10.5px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          color: ${color};
-          background: color-mix(in srgb, ${color} 12%, transparent);
-          padding: 2px 6px;
-          border-radius: 3px;
-        `,
-        },
-        type,
-      )
+      const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+        ASSET: 'default',
+        LIABILITY: 'destructive',
+        EQUITY: 'secondary',
+        REVENUE: 'default',
+        EXPENSE: 'outline',
+      }
+      return h(BadgeCell, { status: type, variants })
     },
   },
   {
@@ -65,8 +53,7 @@ export const accountColumns: ColumnDef<Account>[] = [
     size: 80,
     enableSorting: false,
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Currency' }),
-    cell: ({ row }) =>
-      h('span', { style: 'text-align: right; display: block;' }, row.getValue('currency') ?? '—'),
+    cell: ({ row }) => h('span', { class: 'text-right block' }, row.getValue('currency') ?? '—'),
   },
   {
     accessorKey: 'isActive',
@@ -75,20 +62,13 @@ export const accountColumns: ColumnDef<Account>[] = [
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Status' }),
     cell: ({ row }) => {
       const isActive = row.getValue<boolean>('isActive')
-      return h(
-        'span',
-        {
-          style: `
-          display: inline-block;
-          font-size: 10.5px; font-weight: 600;
-          color: ${isActive ? '#10b981' : 'var(--color-grid-text-muted)'};
-          background: ${isActive ? 'color-mix(in srgb, #10b981 12%, transparent)' : 'transparent'};
-          padding: 2px 6px; border-radius: 3px;
-          text-transform: uppercase; letter-spacing: 0.04em;
-        `,
+      return h(BadgeCell, {
+        status: isActive ? 'ACTIVE' : 'INACTIVE',
+        variants: {
+          ACTIVE: 'default',
+          INACTIVE: 'secondary',
         },
-        formatter.getAccountStatusLabel(isActive),
-      )
+      })
     },
   },
 ]

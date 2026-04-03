@@ -1,7 +1,6 @@
-import { useApiQuery } from '@/shared/composables/useApiQuery'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { bankAdapter } from '../../infrastructure/bank_adapter'
 import { BankMapper } from '../../infrastructure/mappers'
-import type { BankAccount } from '../../domain/bank.types'
 import { bankKeys } from '../keys'
 
 /**
@@ -15,12 +14,10 @@ export function useBankAccounts() {
     isPending,
     error,
     refetch,
-  } = useApiQuery<BankAccount[]>(
+  } = useResourceQuery(
     bankKeys.accounts(),
-    async () => {
-      const dtos = await bankAdapter.getBankAccounts()
-      return dtos.map((dto) => BankMapper.toBankAccount(dto))
-    },
+    () => bankAdapter.getBankAccounts(),
+    (dtos) => dtos.map((dto) => BankMapper.toBankAccount(dto)),
     { staleTime: 1000 * 60 * 5 }, // 5 minutes
   )
 

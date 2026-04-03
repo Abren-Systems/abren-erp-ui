@@ -1,8 +1,7 @@
 import type { FiscalPeriod } from '../../domain/fiscal-period.types'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
-import { BusinessDate } from '@/shared/domain/business-date'
-import { Badge } from '@/shared/components/badge'
+import { DateCell, BadgeCell } from '@/shared/components/data-grid'
 
 /**
  * Grid definition for Fiscal Periods.
@@ -16,20 +15,20 @@ export const fiscalPeriodColumns: ColumnDef<FiscalPeriod>[] = [
   {
     accessorKey: 'startDate',
     header: 'Start Date',
-    cell: ({ row }) => BusinessDate.format(row.original.startDate),
+    cell: ({ row }) => h(DateCell, { date: row.original.startDate }),
   },
   {
     accessorKey: 'endDate',
     header: 'End Date',
-    cell: ({ row }) => BusinessDate.format(row.original.endDate),
+    cell: ({ row }) => h(DateCell, { date: row.original.endDate }),
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => {
-      const status = row.original.status
-      const variant = status === 'OPEN' ? 'default' : 'secondary'
-      return h(Badge, { variant }, () => status)
-    },
+    cell: ({ row }) =>
+      h(BadgeCell, {
+        status: row.original.status,
+        variants: { OPEN: 'default', CLOSED: 'secondary' },
+      }),
   },
 ]

@@ -1,8 +1,7 @@
 import type { JournalEntry } from '../../domain/journal-entry.types'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
-import { BusinessDate } from '@/shared/domain/business-date'
-import { Badge } from '@/shared/components/badge'
+import { DateCell, BadgeCell } from '@/shared/components/data-grid'
 
 /**
  * Grid definition for Journal Entries.
@@ -19,7 +18,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
   {
     accessorKey: 'entryDate',
     header: 'Date',
-    cell: ({ row }) => BusinessDate.format(row.original.entryDate),
+    cell: ({ row }) => h(DateCell, { date: row.original.entryDate }),
   },
   {
     accessorKey: 'description',
@@ -30,16 +29,19 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => {
-      const status = row.original.status
-      const variant =
-        status === 'POSTED' ? 'default' : status === 'VOIDED' ? 'destructive' : 'secondary'
-      return h(Badge, { variant }, () => status)
-    },
+    cell: ({ row }) =>
+      h(BadgeCell, {
+        status: row.original.status,
+        variants: {
+          POSTED: 'default',
+          VOIDED: 'destructive',
+          DRAFT: 'secondary',
+        },
+      }),
   },
   {
     accessorKey: 'createdAt',
     header: 'Created',
-    cell: ({ row }) => BusinessDate.format(row.original.createdAt),
+    cell: ({ row }) => h(DateCell, { date: row.original.createdAt }),
   },
 ]

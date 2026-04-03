@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import { type ColumnDef } from '@tanstack/vue-table'
-import { DataGridColumnHeader } from '@/shared/components/data-grid'
+import { DataGridColumnHeader, MoneyCell, BadgeCell } from '@/shared/components/data-grid'
 import type { BankAccount } from '../../domain/bank.types'
 
 /**
@@ -15,20 +15,14 @@ export const bankAccountColumns: ColumnDef<BankAccount>[] = [
     size: 250,
     enableSorting: true,
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Account Name' }),
-    cell: ({ row }) =>
-      h(
-        'span',
-        { style: 'font-weight: 600; color: var(--color-grid-text);' },
-        row.getValue('accountName'),
-      ),
+    cell: ({ row }) => h('span', { class: 'font-semibold' }, row.getValue('accountName')),
   },
   {
     accessorKey: 'bankName',
     size: 180,
     enableSorting: true,
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Bank' }),
-    cell: ({ row }) =>
-      h('span', { style: 'color: var(--color-grid-text-muted);' }, row.getValue('bankName')),
+    cell: ({ row }) => h('span', { class: 'text-neutral-500' }, row.getValue('bankName')),
   },
   {
     accessorKey: 'accountNumber',
@@ -36,28 +30,14 @@ export const bankAccountColumns: ColumnDef<BankAccount>[] = [
     enableSorting: false,
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Account Number' }),
     cell: ({ row }) =>
-      h(
-        'span',
-        { style: 'font-family: var(--font-mono); font-size: 11.5px; opacity: 0.8;' },
-        row.getValue('accountNumber'),
-      ),
+      h('span', { class: 'font-mono text-[11.5px] opacity-80' }, row.getValue('accountNumber')),
   },
   {
     accessorKey: 'balance',
     size: 150,
     enableSorting: true,
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Current Balance' }),
-    cell: ({ row }) => {
-      const balance = row.original.balance
-      return h(
-        'span',
-        {
-          style:
-            'text-align: right; display: block; font-weight: 600; font-family: var(--font-mono);',
-        },
-        balance.format(),
-      )
-    },
+    cell: ({ row }) => h(MoneyCell, { amount: row.original.balance, class: 'block text-right' }),
   },
   {
     accessorKey: 'status',
@@ -66,31 +46,12 @@ export const bankAccountColumns: ColumnDef<BankAccount>[] = [
     header: ({ column }) => h(DataGridColumnHeader, { column, title: 'Status' }),
     cell: ({ row }) => {
       const status = row.getValue<string>('status')
-      // status can be 'ACTIVE' | 'INACTIVE' | 'FROZEN'
-      const colors: Record<string, string> = {
-        ACTIVE: '#10b981',
-        INACTIVE: '#6b7280',
-        FROZEN: '#ef4444',
+      const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+        ACTIVE: 'default',
+        INACTIVE: 'secondary',
+        FROZEN: 'destructive',
       }
-      const color = colors[status] || colors.INACTIVE
-
-      return h(
-        'span',
-        {
-          style: `
-            display: inline-block;
-            font-size: 10.5px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: ${color};
-            background: color-mix(in srgb, ${color} 12%, transparent);
-            padding: 2px 6px;
-            border-radius: 3px;
-          `,
-        },
-        status,
-      )
+      return h(BadgeCell, { status, variants })
     },
   },
 ]

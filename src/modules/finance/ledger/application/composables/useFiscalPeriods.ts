@@ -1,5 +1,5 @@
-import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 import { ledgerKeys } from '../keys'
@@ -28,10 +28,11 @@ export function useFiscalPeriods() {
     isLoading,
     error,
     refetch,
-  } = useApiQuery<FiscalPeriod[]>(ledgerKeys.fiscalPeriods(), async () => {
-    const dtos = await ledgerAdapter.getFiscalPeriods()
-    return dtos.map((dto) => LedgerMapper.toFiscalPeriod(dto))
-  })
+  } = useResourceQuery(
+    ledgerKeys.fiscalPeriods(),
+    () => ledgerAdapter.getFiscalPeriods(),
+    (dtos) => dtos.map((dto) => LedgerMapper.toFiscalPeriod(dto)),
+  )
 
   const { mutateAsync: createPeriod, isPending: isCreating } = useApiMutation<
     FiscalPeriod,

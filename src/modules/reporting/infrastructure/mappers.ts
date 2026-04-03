@@ -1,6 +1,5 @@
-import { Money } from '@/shared/domain/money'
 import { Currency } from '@/shared/domain/money'
-import { BusinessDate } from '@/shared/domain/business-date'
+import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { DailyCashflowDTO } from './api.types'
 import type { DailyCashflowEntry } from '../domain/reporting.types'
 
@@ -16,12 +15,12 @@ export class ReportingMapper {
       : Currency.USD
 
     return {
-      date: BusinessDate.fromIso(dto.date),
-      actualInflow: Money.from(dto.total_inflow, currency),
-      actualOutflow: Money.from(dto.total_outflow, currency),
-      projectedInflow: Money.from(dto.projected_inflow, currency),
-      projectedOutflow: Money.from(dto.projected_outflow, currency),
-      netCashflow: Money.from(dto.net_cashflow, currency),
+      date: CommonMapper.toDate(dto.date)!,
+      actualInflow: CommonMapper.toMoney(dto.total_inflow, currency),
+      actualOutflow: CommonMapper.toMoney(dto.total_outflow, currency),
+      projectedInflow: CommonMapper.toMoney(dto.projected_inflow, currency),
+      projectedOutflow: CommonMapper.toMoney(dto.projected_outflow, currency),
+      netCashflow: CommonMapper.toMoney(dto.net_cashflow, currency),
     }
   }
 }

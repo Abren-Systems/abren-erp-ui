@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/vue-query'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { reportingAdapter } from '../../infrastructure/reporting_adapter'
 import type { CashflowQuery } from '../../infrastructure/api.types'
 import { reportingKeys } from '../keys'
 import { ReportingMapper } from '../../infrastructure/mappers'
-import { Money, Currency } from '@/shared/domain/money'
+import { Money, type Currency } from '@/shared/domain/money'
 import type { CashflowStats } from '../../domain/reporting.types'
 import { computed } from 'vue'
 
@@ -26,14 +26,12 @@ export function useCashflow(query: CashflowQuery) {
     isLoading,
     error,
     refetch,
-  } = useQuery({
-    queryKey: reportingKeys.cashflow(query),
-    queryFn: async () => {
-      const dtos = await reportingAdapter.getDailyCashflow(query)
-      return dtos.map((dto) => ReportingMapper.toDailyCashflowEntry(dto))
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  })
+  } = useResourceQuery(
+    reportingKeys.cashflow(query),
+    () => reportingAdapter.getDailyCashflow(query),
+    (dtos) => dtos.map((dto) => ReportingMapper.toDailyCashflowEntry(dto)),
+    { staleTime: 1000 * 60 * 5 }, // 5 minutes
+  )
 
   /**
    * Aggregates stats from the fetched entries.

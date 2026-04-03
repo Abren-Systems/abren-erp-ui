@@ -1,7 +1,6 @@
-import { useQuery } from '@tanstack/vue-query'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 import { LedgerMapper } from '../../infrastructure/mappers'
-import type { Account } from '../../domain/account.types'
 import { ledgerKeys } from '../keys'
 
 /**
@@ -19,14 +18,12 @@ export function useLedgerAccounts() {
     isPending,
     error,
     refetch,
-  } = useQuery<Account[]>({
-    queryKey: ledgerKeys.accounts(),
-    queryFn: async () => {
-      const dtos = await ledgerAdapter.getAccounts()
-      return dtos.map((dto) => LedgerMapper.toAccount(dto))
-    },
-    staleTime: 1000 * 60 * 5,
-  })
+  } = useResourceQuery(
+    ledgerKeys.accounts(),
+    () => ledgerAdapter.getAccounts(),
+    (dtos) => dtos.map((dto) => LedgerMapper.toAccount(dto)),
+    { staleTime: 1000 * 60 * 5 },
+  )
 
   return {
     accounts,

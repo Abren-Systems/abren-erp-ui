@@ -1,5 +1,5 @@
-import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 import { LedgerMapper } from '../../infrastructure/mappers'
@@ -28,10 +28,11 @@ export function useJournalEntries() {
     isLoading,
     error,
     refetch,
-  } = useApiQuery<JournalEntry[]>(ledgerKeys.journalEntries(), async () => {
-    const dtos = await ledgerAdapter.getJournalEntries()
-    return dtos.map((dto) => LedgerMapper.toJournalEntry(dto))
-  })
+  } = useResourceQuery(
+    ledgerKeys.journalEntries(),
+    () => ledgerAdapter.getJournalEntries(),
+    (dtos) => dtos.map((dto) => LedgerMapper.toJournalEntry(dto)),
+  )
 
   const { mutateAsync: createEntry, isPending: isCreating } = useApiMutation<
     JournalEntry,

@@ -1,6 +1,6 @@
 import { h } from 'vue'
-import { BusinessDate } from '@/shared/domain/business-date'
 import type { ColumnDef } from '@tanstack/vue-table'
+import { DateCell } from '@/shared/components/data-grid'
 import type { PendingApproval } from '../../domain/workflows.types'
 
 export const workflowColumns: ColumnDef<PendingApproval>[] = [
@@ -30,9 +30,6 @@ export const workflowColumns: ColumnDef<PendingApproval>[] = [
   {
     accessorKey: 'submittedAt',
     header: 'Requested On',
-    cell: ({ row }) => {
-      const date = row.original.submittedAt
-      return date ? BusinessDate.format(date) : '-'
-    },
+    cell: ({ row }) => h(DateCell, { date: row.original.submittedAt }),
   },
 ]
