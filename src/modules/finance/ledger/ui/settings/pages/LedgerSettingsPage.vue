@@ -13,15 +13,14 @@ import {
 import { Label } from '@/shared/components/label'
 import { watch } from 'vue'
 import { useForm } from '@tanstack/vue-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
 
 const { settings, isLoading, updateSettings } = useLedgerSettings()
 const { accounts } = useLedgerAccounts()
 
 const ledgerSettingsSchema = z.object({
-  default_bridge_account_id: z.string().optional(),
-  pr_payable_account_id: z.string().optional(),
+  default_bridge_account_id: z.string(),
+  pr_payable_account_id: z.string(),
 })
 
 type LedgerSettingsFormValues = z.infer<typeof ledgerSettingsSchema>
@@ -30,8 +29,7 @@ const form = useForm({
   defaultValues: {
     default_bridge_account_id: '',
     pr_payable_account_id: '',
-  } satisfies LedgerSettingsFormValues,
-  validatorAdapter: zodValidator(),
+  } as LedgerSettingsFormValues,
   validators: {
     onChange: ledgerSettingsSchema,
   },
