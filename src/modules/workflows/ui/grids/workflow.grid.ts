@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import { BusinessDate } from '@/shared/domain/business-date'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { PendingApproval } from '../../domain/models/workflow.types'
+import type { PendingApproval } from '../../domain/workflows.types'
 
 export const workflowColumns: ColumnDef<PendingApproval>[] = [
   {

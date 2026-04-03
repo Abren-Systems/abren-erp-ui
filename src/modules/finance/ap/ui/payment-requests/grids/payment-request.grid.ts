@@ -1,7 +1,6 @@
 import { h } from 'vue'
-import { BusinessDate } from '@/shared/domain/business-date'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { Badge } from '@/shared/components/badge'
+import { MoneyCell, DateCell, BadgeCell } from '@/shared/components/data-grid'
 import type { PaymentRequest } from '../../../domain/ap.types'
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -32,24 +31,17 @@ export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   {
     accessorKey: 'totalAmount',
     header: 'Amount',
-    cell: ({ row }) =>
-      h('span', { class: 'font-bold tabular-nums' }, row.original.totalAmount.format()),
+    cell: ({ row }) => h(MoneyCell, { amount: row.original.totalAmount }),
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) =>
-      h(
-        Badge,
-        { variant: STATUS_VARIANT[row.original.status] ?? 'outline' },
-        () => row.original.status,
-      ),
+    cell: ({ row }) => h(BadgeCell, { status: row.original.status, variants: STATUS_VARIANT }),
   },
   {
     accessorKey: 'submittedAt',
     header: 'Submitted',
-    cell: ({ row }) =>
-      row.original.submittedAt ? BusinessDate.format(row.original.submittedAt, 'en-ET') : '—',
+    cell: ({ row }) => h(DateCell, { date: row.original.submittedAt }),
   },
   {
     accessorKey: 'currentApprovalStep',

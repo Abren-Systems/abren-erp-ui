@@ -9,5 +9,10 @@ export { default as DataGridEmpty } from './core/DataGridEmpty.vue'
 export { default as DataGridColumnHeader } from './plugins/DataGridColumnHeader.vue'
 export { default as DataGridToolbar } from './plugins/DataGridToolbar.vue'
 
+// ── Shared Cells ─────────────────────────────────────────
+export { default as MoneyCell } from './cells/MoneyCell.vue'
+export { default as DateCell } from './cells/DateCell.vue'
+export { default as BadgeCell } from './cells/BadgeCell.vue'
+
 // ── Helper ───────────────────────────────────────────────
 export { useDataGrid } from '../../composables/useDataGrid'

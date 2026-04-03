@@ -1,5 +1,5 @@
-import { Money, Currency } from '@/shared/domain/money'
-import { BusinessDate } from '@/shared/domain/business-date'
+import { type Currency } from '@/shared/domain/money'
+import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type {
   PaymentRequestDTO,
   PaymentRequestLineDTO,
@@ -25,7 +25,6 @@ import type {
   JournalLineId,
   VendorId,
 } from '@/shared/types/brand.types'
-import { toId } from '@/shared/types/brand.types'
 
 /**
  * Accounts Payable Mapper-as-Factory.
@@ -44,12 +43,19 @@ export class APMapper {
     parentCurrency: Currency,
   ): PaymentRequestLine {
     return {
-      id: toId<PaymentRequestLineId>(lineDto.id),
+      id: CommonMapper.toBrandedId<PaymentRequestLineId>(lineDto.id),
       description: lineDto.description,
-      amount: Money.from(lineDto.amount, parentCurrency),
-      accountId: lineDto.account_id ? toId<AccountId>(lineDto.account_id) : null,
-      categoryId: lineDto.category_id ? toId<CategoryId>(lineDto.category_id) : null,
-      taxAmount: lineDto.tax_amount != null ? Money.from(lineDto.tax_amount, parentCurrency) : null,
+      amount: CommonMapper.toMoney(lineDto.amount, parentCurrency),
+      accountId: lineDto.account_id
+        ? CommonMapper.toBrandedId<AccountId>(lineDto.account_id)
+        : null,
+      categoryId: lineDto.category_id
+        ? CommonMapper.toBrandedId<CategoryId>(lineDto.category_id)
+        : null,
+      taxAmount:
+        lineDto.tax_amount != null
+          ? CommonMapper.toMoney(lineDto.tax_amount, parentCurrency)
+          : null,
     }
   }
 
@@ -60,22 +66,26 @@ export class APMapper {
     const currency = dto.currency as Currency
 
     return {
-      id: toId<PaymentRequestId>(dto.id),
-      requesterId: toId<UserId>(dto.requester_id),
-      beneficiaryId: toId<UserId>(dto.beneficiary_id),
-      totalAmount: Money.from(dto.total_amount, currency),
+      id: CommonMapper.toBrandedId<PaymentRequestId>(dto.id),
+      requesterId: CommonMapper.toBrandedId<UserId>(dto.requester_id),
+      beneficiaryId: CommonMapper.toBrandedId<UserId>(dto.beneficiary_id),
+      totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
       currency: currency,
       justification: dto.justification,
       status: dto.status as PaymentRequestStatus,
       lines: dto.lines.map((ln) => this.mapPRLine(ln, currency)),
-      bankAccountId: dto.bank_account_id ? toId<BankAccountId>(dto.bank_account_id) : null,
-      targetLiabilityAccountId: dto.target_liability_account_id
-        ? toId<AccountId>(dto.target_liability_account_id)
+      bankAccountId: dto.bank_account_id
+        ? CommonMapper.toBrandedId<BankAccountId>(dto.bank_account_id)
         : null,
-      submittedAt: dto.submitted_at ? BusinessDate.fromIso(dto.submitted_at) : null,
-      paidAt: dto.paid_at ? BusinessDate.fromIso(dto.paid_at) : null,
+      targetLiabilityAccountId: dto.target_liability_account_id
+        ? CommonMapper.toBrandedId<AccountId>(dto.target_liability_account_id)
+        : null,
+      submittedAt: CommonMapper.toDate(dto.submitted_at),
+      paidAt: CommonMapper.toDate(dto.paid_at),
       currentApprovalStep: dto.current_approval_step,
-      assignedApproverId: dto.assigned_approver_id ? toId<UserId>(dto.assigned_approver_id) : null,
+      assignedApproverId: dto.assigned_approver_id
+        ? CommonMapper.toBrandedId<UserId>(dto.assigned_approver_id)
+        : null,
       sourceModule: dto.source_module,
       sourceId: dto.source_id,
     }
@@ -91,12 +101,14 @@ export class APMapper {
     parentCurrency: Currency,
   ): VendorBillLine {
     return {
-      id: dto.id ? toId<VendorBillLineId>(dto.id) : undefined,
+      id: dto.id ? CommonMapper.toBrandedId<VendorBillLineId>(dto.id) : undefined,
       description: dto.description,
-      amount: Money.from(dto.amount, parentCurrency),
-      accountId: dto.account_id ? toId<AccountId>(dto.account_id) : null,
-      categoryId: dto.category_id ? toId<CategoryId>(dto.category_id) : null,
-      journalLineId: dto.journal_line_id ? toId<JournalLineId>(dto.journal_line_id) : null,
+      amount: CommonMapper.toMoney(dto.amount, parentCurrency),
+      accountId: dto.account_id ? CommonMapper.toBrandedId<AccountId>(dto.account_id) : null,
+      categoryId: dto.category_id ? CommonMapper.toBrandedId<CategoryId>(dto.category_id) : null,
+      journalLineId: dto.journal_line_id
+        ? CommonMapper.toBrandedId<JournalLineId>(dto.journal_line_id)
+        : null,
     }
   }
 
@@ -108,15 +120,15 @@ export class APMapper {
     const lines = dto.lines.map((ln) => this.mapVendorBillLine(ln, currency))
 
     return {
-      id: toId<VendorBillId>(dto.id),
-      vendorId: toId<VendorId>(dto.vendor_id),
+      id: CommonMapper.toBrandedId<VendorBillId>(dto.id),
+      vendorId: CommonMapper.toBrandedId<VendorId>(dto.vendor_id),
       billNumber: dto.bill_number,
-      issueDate: BusinessDate.fromIso(dto.issue_date),
-      dueDate: BusinessDate.fromIso(dto.due_date),
+      issueDate: CommonMapper.toDate(dto.issue_date)!,
+      dueDate: CommonMapper.toDate(dto.due_date)!,
       currency: currency,
       justification: dto.justification,
       status: dto.status,
-      totalAmount: Money.from(dto.total_amount, currency),
+      totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
       lines,
     }
   }

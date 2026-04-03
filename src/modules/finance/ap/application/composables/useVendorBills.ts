@@ -1,4 +1,4 @@
-import { useApiQuery } from '@/shared/composables/useApiQuery'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { apAdapter } from '../../infrastructure/ap_adapter'
 import { APMapper } from '../../infrastructure/mappers'
 import { apKeys } from '../keys'
@@ -18,13 +18,10 @@ export function useVendorBills() {
     isLoading,
     error,
     refetch,
-  } = useApiQuery(
+  } = useResourceQuery(
     apKeys.vendorBills(),
-    async () => {
-      const dtos = await apAdapter.listBills()
-      return dtos.map((dto) => APMapper.toVendorBill(dto))
-    },
-    { staleTime: 1000 * 60 }, // 1 minute
+    () => apAdapter.listBills(),
+    (dtos) => dtos.map((dto) => APMapper.toVendorBill(dto)),
   )
 
   return { bills, isLoading, error, refetch }

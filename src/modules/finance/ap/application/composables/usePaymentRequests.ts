@@ -1,4 +1,4 @@
-import { useApiQuery } from '@/shared/composables/useApiQuery'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { apAdapter } from '../../infrastructure/ap_adapter'
 import { APMapper } from '../../infrastructure/mappers'
 import { apKeys } from '../keys'
@@ -18,13 +18,10 @@ export function usePaymentRequests() {
     isLoading,
     error,
     refetch,
-  } = useApiQuery(
+  } = useResourceQuery(
     apKeys.paymentRequests(),
-    async () => {
-      const dtos = await apAdapter.listRequests()
-      return dtos.map((dto) => APMapper.toPaymentRequest(dto))
-    },
-    { staleTime: 1000 * 60 }, // 1 minute
+    () => apAdapter.listRequests(),
+    (dtos) => dtos.map((dto) => APMapper.toPaymentRequest(dto)),
   )
 
   return { requests, isLoading, error, refetch }

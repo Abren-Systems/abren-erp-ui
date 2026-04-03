@@ -1,8 +1,13 @@
 import { h } from 'vue'
-import { BusinessDate } from '@/shared/domain/business-date'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { Badge } from '@/shared/components/badge'
+import { MoneyCell, DateCell, BadgeCell } from '@/shared/components/data-grid'
 import type { VendorBill } from '../../../domain/ap.types'
+
+const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  DRAFT: 'secondary',
+  VALIDATED: 'default',
+  PAID: 'secondary',
+}
 
 export const vendorBillColumns: ColumnDef<VendorBill>[] = [
   {
@@ -13,30 +18,22 @@ export const vendorBillColumns: ColumnDef<VendorBill>[] = [
   {
     accessorKey: 'issueDate',
     header: 'Issue Date',
-    cell: ({ row }) => BusinessDate.format(row.original.issueDate),
+    cell: ({ row }) => h(DateCell, { date: row.original.issueDate }),
   },
   {
     accessorKey: 'dueDate',
     header: 'Due Date',
-    cell: ({ row }) => BusinessDate.format(row.original.dueDate),
+    cell: ({ row }) => h(DateCell, { date: row.original.dueDate }),
   },
   {
     accessorKey: 'totalAmount',
     header: 'Amount',
     cell: ({ row }) =>
-      h('div', { class: 'text-right font-mono' }, row.original.totalAmount.format()),
+      h(MoneyCell, { amount: row.original.totalAmount, class: 'block text-right' }),
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => {
-      const status = row.original.status
-      const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
-        DRAFT: 'secondary',
-        VALIDATED: 'default',
-        PAID: 'secondary',
-      }
-      return h(Badge, { variant: (variants[status] || 'default') as 'default' }, () => status)
-    },
+    cell: ({ row }) => h(BadgeCell, { status: row.original.status, variants: STATUS_VARIANT }),
   },
 ]

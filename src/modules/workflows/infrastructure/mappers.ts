@@ -1,5 +1,5 @@
 import type { PendingApprovalDTO } from './api.types'
-import type { PendingApproval } from '../domain/models/workflow.types'
+import type { PendingApproval } from '../domain/workflows.types'
 import type { WorkflowInstanceId, RoleId } from '@/shared/types/brand.types'
 import { toId } from '@/shared/types/brand.types'
 import { BusinessDate } from '@/shared/domain/business-date'

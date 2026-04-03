@@ -150,9 +150,29 @@ graph TD
 
 ---
 
-## 4. Module Architecture
+## 4. Refined DRY Patterns (Alignment Standards)
 
-### 4.1 What Is a Module?
+### 4.1 Shared DataGrid Cells
+
+To maintain consistency and reduce boilerplate in `*.grid.ts` definitions, we use specialized cell components:
+
+- `MoneyCell`: Standardizes monetary display with currency alignment.
+- `DateCell`: Uniform date formatting via `BusinessDate`.
+- `BadgeCell`: Map domain statuses to design system variants in one place.
+
+### 4.2 Resource Query Composables
+
+Use cases that simply fetch a list of domain objects should use the `useResourceQuery` higher-order composable. This centralizes caching logic, error handling, and transformation (mapping).
+
+### 4.3 Mapper-as-Factory Standard
+
+Mappers should inherit from a `BaseMapper` (where applicable) or use shared mapping utilities to handle common transformations like `Money` objects and `BusinessDate` strings consistently across all modules.
+
+---
+
+## 5. Module Architecture
+
+### 5.1 What Is a Module?
 
 A **module** is a self-contained directory under `src/modules/` that represents one backend bounded context. It owns its:
 
@@ -165,7 +185,7 @@ A **module** is a self-contained directory under `src/modules/` that represents 
 - **Routes** (lazy-loaded route definitions)
 - **Registration** (`index.ts` — `ModuleDefinition` export)
 
-### 4.2 Module Internal Structure (Mandatory)
+### 5.2 Module Internal Structure (Mandatory)
 
 ```
 src/modules/{module-name}/
@@ -179,7 +199,7 @@ src/modules/{module-name}/
 │       └── utils/   # UI-specific formatters
 ```
 
-### 4.3 Module Registration Pattern
+### 5.3 Module Registration Pattern
 
 Each module exports a `ModuleDefinition` in its `index.ts`. The router aggregates these dynamically:
 
@@ -198,7 +218,7 @@ export const ledgerModule: ModuleDefinition = {
 }
 ```
 
-### 4.4 Module Rules
+### 5.4 Module Rules
 
 1. **No cross-module imports**: `finance/ledger/` must NEVER import from `finance/ap/`.
 2. **Public API**: If Module A needs data from Module B, it goes through the Event Bus or a Core type.
@@ -209,9 +229,9 @@ export const ledgerModule: ModuleDefinition = {
 
 ---
 
-## 5. The Mapper-as-Factory Pattern (Anti-Corruption Layer)
+## 6. The Mapper-as-Factory Pattern (Anti-Corruption Layer)
 
-### 5.1 Why Mapper-as-Factory?
+### 6.1 Why Mapper-as-Factory?
 
 The backend evolves independently. **DTOs** (Data Transfer Objects) are the raw, volatile shapes from the server. The Mapper-as-Factory ensures:
 
@@ -219,7 +239,7 @@ The backend evolves independently. **DTOs** (Data Transfer Objects) are the raw,
 2.  **Integrity**: DTOs (raw data) are "sanitized" and transformed into high-integrity **Domain Models** or **ViewModels** (encapsulated logic).
 3.  **Predictability**: Every component receives the same predictable data shape regardless of API versioning.
 
-### 5.2 The Contract
+### 6.2 The Contract
 
 Every module infrastructure layer must implement mappers with two standardized factory functions:
 
@@ -252,14 +272,14 @@ export class APMapper {
 }
 ```
 
-### 5.4 Nominal Identifier Isolation (Branded Types) [MANDATORY]
+### 6.3 Nominal Identifier Isolation (Branded Types) [MANDATORY]
 
 To prevent accidental cross-assignment of identifiers (e.g. passing a `UserId` to a function expecting a `TenantId`), we enforce **Nominal Typing** using Branded Types.
 
 - **Rule**: Every UUID or Primary Key must be wrapped in a Branded Type: `type UserId = Brand<string, 'UserId'>`.
 - **Enforcement**: Use the `toId<T>(val)` helper in Mappers. Never use raw `string` for entity identifiers in Domain or Application layers.
 
-### 5.3 Rules
+### 6.4 Rules
 
 - **Absolute Shielding**: Components **NEVER** consume raw API DTOs. They receive `ViewModels` or `Domain Models` from the Mapper Factory.
 - **Pure Logic**: Mappers are **pure functions** — no side effects, no API calls, no store access.
@@ -267,9 +287,9 @@ To prevent accidental cross-assignment of identifiers (e.g. passing a `UserId` t
 
 ---
 
-## 6. Cross-Module Communication
+## 7. Cross-Module Communication
 
-### 6.1 The Event Bus
+### 7.1 The Event Bus
 
 Modules communicate via a typed Event Bus in `core/`. This mirrors the backend's domain event system.
 
@@ -283,7 +303,7 @@ type EventMap = {
 }
 ```
 
-### 6.2 When to Use What
+### 7.2 When to Use What
 
 | Scenario                   | Mechanism         | Example                             |
 | -------------------------- | ----------------- | ----------------------------------- |
@@ -292,7 +312,7 @@ type EventMap = {
 | Module → Module reactivity | Event Bus         | Payment paid → Refresh journal list |
 | Global cross-cutting state | Core Store (Auth) | `useAuthStore().currentUser`        |
 
-### 6.3 Anti-Pattern: Direct Imports
+### 7.3 Anti-Pattern: Direct Imports
 
 ```typescript
 // ❌ BANNED: Module A importing Module B's internals
@@ -307,9 +327,9 @@ eventBus.on('ledger:entry-posted', ({ id }) => {
 
 ---
 
-## 7. Core Infrastructure (`src/shared/`)
+## 8. Core Infrastructure (`src/shared/`)
 
-### 7.1 What Goes in Core
+### 8.1 What Goes in Core
 
 | Directory      | Contents                                                    | Rule                                      |
 | -------------- | ----------------------------------------------------------- | ----------------------------------------- |
@@ -322,22 +342,22 @@ eventBus.on('ledger:entry-posted', ({ id }) => {
 | `ui/`          | **Custom Design System** (components, patterns, primitives) | Module-agnostic UI                        |
 | `utils/`       | Consolidated Pure utility functions (Barrel exported)       | `import { format } from '@/shared/utils'` |
 
-### 7.3 Utility Consolidation Rule
-
-All module-agnostic utility functions (Date, Number, String helpers) must be registered in the **Barrel Export** at `src/shared/utils/index.ts`. Modules must import from the barrel to ensure a single, audited utility surface.
-
-### 7.2 What Does NOT Go in Core
+### 8.2 What Does NOT Go in Core
 
 - Business logic specific to any module
 - Components that are only used by one module
 - Module-specific types or interfaces
 - Module API clients (these belong in each module's `api/` directory)
 
+### 8.3 Utility Consolidation Rule
+
+All module-agnostic utility functions (Date, Number, String helpers) must be registered in the **Barrel Export** at `src/shared/utils/index.ts`. Modules must import from the barrel to ensure a single, audited utility surface.
+
 ---
 
-## 8. API Design Standards (Frontend Perspective)
+## 9. API Design Standards (Frontend Perspective)
 
-### 8.1 Consuming Action-Oriented Endpoints
+### 9.1 Consuming Action-Oriented Endpoints
 
 The backend exposes action-oriented endpoints (`POST /{id}/submit`, `POST /{id}/approve`). The frontend mirrors this with action-specific composables:
 
@@ -350,7 +370,7 @@ POST /payment-requests/{id}/reject   → useRejectRequest()
 POST /payment-requests/{id}/pay      → usePayRequest()
 ```
 
-### 8.2 Response Envelope Handling
+### 9.2 Response Envelope Handling
 
 All backend responses follow the envelope `{ success, data, meta }` or `{ success, detail, code }`. The core HTTP client handles this via **two mechanisms**:
 
@@ -389,15 +409,15 @@ export const ledgerAdapter = {
 }
 ```
 
-### 8.3 Idempotency Key Integration
+### 9.3 Idempotency Key Integration
 
 All mutating requests (`POST`, `PUT`, `PATCH`) automatically attach an `Idempotency-Key` header via the core HTTP client interceptor.
 
-### 8.4 Strict API Error Typing
+### 9.4 Strict API Error Typing
 
 Our shared wrappers `useApiQuery` and `useApiMutation` must enforce `TError = ApiError`. This maps directly to the backend's structured error envelope `{ success: false, detail: string, code: string }`, eliminating `any` casting and ensuring typo-free error handling in the UI.
 
-### 8.5 Query Key Factory Pattern (TanStack Query)
+### 9.5 Query Key Factory Pattern (TanStack Query)
 
 To avoid silent failures during cache invalidation caused by hardcoded String arrays (e.g. `['payment-requests']`), every module MUST define a single source of truth for its query keys in the application layer.
 
@@ -414,11 +434,9 @@ All Use Case Composables must consume this factory instead of hardcoded strings.
 
 ---
 
-## 9. Hybrid Authorization Model (UI Perspective)
+## 10. Hybrid Authorization Model (UI Perspective)
 
-The UI works in concert with the backend's multi-layered security model. **Two distinct mechanisms** control visibility and access:
-
-### 9.1 Feature Gates (Tenant-Level)
+### 10.1 Feature Gates (Tenant-Level)
 
 Feature gates control whether a **tenant** has access to an entire module or capability. These are configured per-tenant in the backend and surfaced via `TenantInfo.features`.
 
@@ -435,7 +453,7 @@ beforeEnter: () => guardRoute() // Redirects to feature-disabled page
 
 **Use for:** Module visibility, premium feature gating, tenant plan restrictions.
 
-### 9.2 RBAC Permissions (User-Level)
+### 10.2 RBAC Permissions (User-Level)
 
 Permissions control whether a **user** can perform a specific action within an enabled module. Each `ModuleDefinition` declares its required permissions, and the auth store provides a `hasPermission()` helper.
 
@@ -453,7 +471,7 @@ function hasPermission(permission: string): boolean {
 
 **Use for:** Button visibility, action authorization, menu item filtering.
 
-### 9.3 ABAC (Data Sovereignty)
+### 10.3 ABAC (Data Sovereignty)
 
 The UI is strictly **stateless and tenant-scoped**. It relies on the backend to filter resources based on attribute ownership (tenant ID, department, data scope). The UI's responsibility is to:
 
@@ -463,7 +481,7 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 ---
 
-## 10. Anti-Pattern Catalog (Banned List)
+## 11. Anti-Pattern Catalog (Banned List)
 
 | Anti-Pattern                         | Why It Fails                            | Alternative                                   |
 | ------------------------------------ | --------------------------------------- | --------------------------------------------- |
@@ -481,7 +499,7 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 ---
 
-## 11. Related Documentation
+## 12. Related Documentation
 
 | Document                                         | Description                                           |
 | ------------------------------------------------ | ----------------------------------------------------- |
@@ -494,9 +512,9 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 | [Development Guide](../DEVELOPMENT.md)           | Local setup, coding standards, and conventions        |
 | [Repository Strategy](../REPOSITORY_STRATEGY.md) | How the UI repo coexists with the API repo            |
 
-## 12. Quality & Documentation Standards
+## 13. Quality & Documentation Standards
 
-### 12.1 In-Code Documentation Philosophy
+### 13.1 In-Code Documentation Philosophy
 
 Comments must answer questions the code cannot. The _what_ is in the code — comments explain the _why_, the _tradeoff_, or the _constraint_ that led to a decision.
 
@@ -507,13 +525,13 @@ Comments must answer questions the code cannot. The _what_ is in the code — co
 - A workaround exists for a library bug or limitation.
 - A complex algorithm or reactive dependency chain is implemented.
 
-### 12.2 TSDoc Standards
+### 13.2 TSDoc Standards
 
 - **Module-Level**: Required for `core/` and non-trivial entries. State responsibility and constraints.
 - **Composable**: Required for all exported composables. Include an `@example` block. Omit raw `{type}` markers as TypeScript is the authoritative Source of Truth (SOT).
 - **Vue Component**: Required in `<script setup>` for all components outside `shared/components/`. Describe purpose and data sourcing.
 
-### 12.3 Type Annotations
+### 13.3 Type Annotations
 
 Mandatory everywhere. `any` is strictly banned — use `unknown` with type guards.
 
