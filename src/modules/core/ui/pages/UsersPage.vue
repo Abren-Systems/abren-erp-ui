@@ -1,34 +1,84 @@
 <script setup lang="ts">
+import { h } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { Button } from '@/shared/components/button'
+import { Badge } from '@/shared/components/badge'
 import { useUsers } from '../../application/composables/useUsers'
-import { userColumns } from '../grids/user.grid'
+import type { User } from '../../domain/user.types'
 
-const { users, isLoading } = useUsers()
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
+const { users, isPending } = useUsers()
+const gridState = useDataGrid()
+
+const userColumns = [
+  {
+    accessorKey: 'email',
+    header: 'Identity (Email)',
+    cell: ({ row }: { row: { original: User } }) => {
+      return h('div', { class: 'font-medium' }, row.original.email)
+    },
+  },
+  {
+    accessorKey: 'status',
+    header: 'Account Status',
+    cell: ({ row }: { row: { original: User } }) => {
+      const status = row.original.status
+      const variant =
+        status === 'ACTIVE' ? 'default' : status === 'PENDING' ? 'outline' : 'secondary'
+      return h(Badge, { variant }, () => status)
+    },
+  },
+  {
+    accessorKey: 'roles',
+    header: 'Assigned Boundaries',
+    cell: ({ row }: { row: { original: User } }) => {
+      const roles = row.original.roles || []
+
+      if (roles.length === 0)
+        return h('span', { class: 'text-muted-foreground italic' }, 'No Access')
+
+      return h(
+        'div',
+        { class: 'flex gap-1 flex-wrap' },
+        roles.map((r) => h(Badge, { variant: 'secondary', class: 'text-xs' }, () => r.name)),
+      )
+    },
+  },
+  {
+    accessorKey: 'lastLoginAt',
+    header: 'Last Authorized',
+    cell: ({ row }: { row: { original: User } }) => {
+      const date = row.original.lastLoginAt
+      if (!date) return 'Never'
+      return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(
+        date,
+      )
+    },
+  },
+]
+
+function handleRowClick(user: User) {
+  console.log('Open User RBAC Assignment Sidebar for:', user.id)
+}
 </script>
 
 <template>
   <div class="p-6 space-y-6">
-    <header>
-      <h1 class="text-2xl font-bold tracking-tight">Users</h1>
-      <p class="text-sm text-neutral-500">
-        Manage user accounts and permissions within your tenant.
-      </p>
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Users & Access</h1>
+        <p class="text-sm text-muted-foreground mt-1">
+          Manage tenant user accounts and bind them to restricted boundaries.
+        </p>
+      </div>
+      <Button @click="console.log('Invite User')"> Invite User </Button>
     </header>
 
     <DataGrid
-      v-model:sorting="sorting"
-      v-model:row-selection="rowSelection"
-      v-model:column-visibility="columnVisibility"
-      v-model:global-filter="globalFilter"
       :data="users || []"
       :columns="userColumns"
-      :loading="isLoading"
-      placeholder="Search users…"
+      :loading="isPending"
+      :state="gridState"
+      @row-click="handleRowClick"
     />
-
-    <div class="p-8 text-center text-neutral-400 border-2 border-dashed rounded-xl">
-      <p>Fine-grained User & RBAC Management (Coming Soon)</p>
-    </div>
   </div>
 </template>

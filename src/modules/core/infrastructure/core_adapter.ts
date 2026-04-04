@@ -1,18 +1,40 @@
-import { apiGet } from '@/shared/api/http-client'
-import type { UserDTO } from './api.types'
+import { apiGet, apiPost } from '@/shared/api/http-client'
+import type {
+  UserDTO,
+  RoleDTO,
+  PermissionDTO,
+  RoleCreateDTO,
+  UserRoleAssignmentDTO,
+} from './api.types'
 
 /**
- * Core API Adapter.
- *
- * Provides typed HTTP methods for interacting with core identity and tenant services.
+ * Core Services API Adapter
+ * Handles Auth, Tenant, and Identity/RBAC.
  */
 export const coreAdapter = {
-  /**
-   * Fetches the list of all users within the current tenant.
-   *
-   * @returns A promise resolving to an array of UserDTOs.
-   */
-  async listUsers(): Promise<UserDTO[]> {
+  // Existing Stub
+  async getMe(): Promise<UserDTO> {
+    return apiGet<UserDTO>('/core/auth/me')
+  },
+
+  // RBAC endpoints
+  async getUsers(): Promise<UserDTO[]> {
     return apiGet<UserDTO[]>('/core/users')
+  },
+
+  async getRoles(): Promise<RoleDTO[]> {
+    return apiGet<RoleDTO[]>('/core/roles')
+  },
+
+  async getPermissions(): Promise<PermissionDTO[]> {
+    return apiGet<PermissionDTO[]>('/core/permissions')
+  },
+
+  async createRole(dto: RoleCreateDTO): Promise<RoleDTO> {
+    return apiPost<RoleDTO>('/core/roles', dto)
+  },
+
+  async assignRole(dto: UserRoleAssignmentDTO): Promise<void> {
+    return apiPost<void>(`/core/users/${dto.user_id}/roles`, { role_id: dto.role_id })
   },
 }

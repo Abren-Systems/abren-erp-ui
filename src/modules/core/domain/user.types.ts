@@ -1,23 +1,26 @@
-import type { TenantId, UserId } from '@/shared/types/brand.types'
-import type { IsoDate } from '@/shared/domain/business-date'
+import type { UserId, TenantId, RoleId } from '@/shared/types/brand.types'
 
-/**
- * User Status
- */
-export enum UserStatus {
-  Active = 'Active',
-  Inactive = 'Inactive',
-  Suspended = 'Suspended',
+export interface Role {
+  id: RoleId
+  tenantId: TenantId
+  name: string
+  description: string | null
+  isSystem: boolean
+  permissions: string[]
 }
 
-/**
- * Core User Entity (Domain Model).
- */
+export interface UserRoleAssignment {
+  roleId: RoleId
+  name: string
+}
+
+export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING'
+
 export interface User {
   id: UserId
-  email: string
-  role: string
-  status: UserStatus
   tenantId: TenantId
-  lastLoginAt: IsoDate | null
+  email: string
+  status: UserStatus
+  roles: UserRoleAssignment[]
+  lastLoginAt: Date | null
 }
