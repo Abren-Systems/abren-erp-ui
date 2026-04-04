@@ -1,34 +1,45 @@
-import { useResourceQuery } from '@/shared/composables/useResourceQuery'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { coreAdapter } from '../../infrastructure/core_adapter'
-import { CoreMapper } from '../../infrastructure/mappers'
+import { IdentityMapper } from '../../infrastructure/mappers'
 import { coreKeys } from '../keys'
+import type { User } from '../../domain/user.types'
+import type { UserRoleAssignmentDTO } from '../../infrastructure/api.types'
 
 /**
- * Use Case: View Tenant Users.
- *
- * Fetches the list of users and maps them to domain entities.
- *
- * @returns Reactive list of users and loading state.
- * @example
- * const { users, isLoading } = useUsers()
+ * Use Case: Manage Users and Assignments
  */
 export function useUsers() {
+  const queryClient = useQueryClient()
+
   const {
     data: users,
-    isLoading,
+    isPending,
     error,
     refetch,
-  } = useResourceQuery(
-    coreKeys.users(),
-    () => coreAdapter.listUsers(),
-    (dtos) => dtos.map((dto) => CoreMapper.toUser(dto)),
-    { staleTime: 1000 * 60 * 5 }, // 5 minutes
-  )
+  } = useQuery<User[], Error>({
+    queryKey: coreKeys.users(),
+    queryFn: async () => {
+      const dtos = await coreAdapter.getUsers()
+      return dtos.map((dto) => IdentityMapper.toUser(dto))
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+
+  const { mutateAsync: assignRole, isPending: isAssigning } = useMutation({
+    mutationFn: async (payload: UserRoleAssignmentDTO) => {
+      await coreAdapter.assignRole(payload)
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: coreKeys.users() })
+    },
+  })
 
   return {
     users,
-    isLoading,
+    isPending,
     error,
-    refresh: refetch,
+    refetch,
+    assignRole,
+    isAssigning,
   }
 }

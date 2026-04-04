@@ -1,25 +1,39 @@
-import { CommonMapper } from '@/shared/infrastructure/mappers'
-import { type UserId, type TenantId } from '@/shared/types/brand.types'
-import type { User, UserStatus } from '../domain/user.types'
-import type { UserDTO } from './api.types'
+import { toId } from '@/shared/types/brand.types'
+import type { TenantId, UserId, RoleId } from '@/shared/types/brand.types'
+import type { UserDTO, RoleDTO, UserRoleDTO } from './api.types'
+import type { User, Role, UserRoleAssignment } from '../domain/user.types'
 
 /**
- * Core Domain Mapper.
- *
- * Handles common transformations for the platform engine (Users, Tenants).
+ * Identity Mapper
+ * Protects domain logic from external API payload drift.
  */
-export class CoreMapper {
-  /**
-   * Transforms a raw API user response into a Domain User entity.
-   */
+export class IdentityMapper {
+  static toRole(dto: RoleDTO): Role {
+    return {
+      id: toId<RoleId>(dto.id),
+      tenantId: toId<TenantId>(dto.tenant_id),
+      name: dto.name,
+      description: dto.description ?? null,
+      isSystem: dto.is_system ?? false,
+      permissions: dto.permissions ?? [],
+    }
+  }
+
+  static toUserRoleAssignment(dto: UserRoleDTO): UserRoleAssignment {
+    return {
+      roleId: toId<RoleId>(dto.role_id),
+      name: dto.name,
+    }
+  }
+
   static toUser(dto: UserDTO): User {
     return {
-      id: CommonMapper.toBrandedId<UserId>(dto.id),
+      id: toId<UserId>(dto.id),
+      tenantId: toId<TenantId>(dto.tenant_id),
       email: dto.email,
-      role: dto.role || 'User',
-      status: (dto.status as UserStatus) || 'Active',
-      tenantId: CommonMapper.toBrandedId<TenantId>(dto.tenant_id),
-      lastLoginAt: CommonMapper.toDate(dto.last_login_at),
+      status: dto.status,
+      roles: (dto.roles ?? []).map((r) => this.toUserRoleAssignment(r)),
+      lastLoginAt: dto.last_login_at ? new Date(dto.last_login_at) : null,
     }
   }
 }
