@@ -6,9 +6,14 @@ export const workflowsModule: PlatformEngine = {
   name: 'Workflows',
   category: 'platform',
   routes,
-  permissions: ['workflows.view'],
+  permissions: ['workflows:read', 'workflows:write'],
   menuItems: [
-    { label: 'Inbox', route: 'WorkflowInbox', icon: 'inbox' },
-    { label: 'States', route: 'WorkflowsStates', icon: 'git-branch' },
+    { label: 'Inbox', route: 'workflows.inbox', icon: 'inbox', permissions: ['workflows:read'] },
+    {
+      label: 'States',
+      route: 'workflows.states',
+      icon: 'git-branch',
+      permissions: ['workflows:read'],
+    },
   ],
 }

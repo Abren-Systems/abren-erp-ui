@@ -4,10 +4,10 @@ import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { workflowColumns } from '../grids/workflow.grid'
 import { usePendingApprovals } from '../../application/composables/usePendingApprovals'
 import WorkflowActionDialog from '../components/WorkflowActionDialog.vue'
-import type { PendingApproval } from '../../domain/models/workflow.types'
+import type { PendingApproval } from '../../domain/workflows.types'
 
 const { tasks, isLoading, refresh } = usePendingApprovals()
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
+const gridState = useDataGrid()
 
 const selectedTask = ref<PendingApproval | null>(null)
 const isDialogOpen = ref(false)
@@ -33,13 +33,10 @@ function handleSuccess() {
     </header>
 
     <DataGrid
-      v-model:sorting="sorting"
-      v-model:row-selection="rowSelection"
-      v-model:column-visibility="columnVisibility"
-      v-model:global-filter="globalFilter"
       :data="tasks || []"
       :columns="workflowColumns"
       :loading="isLoading"
+      :state="gridState"
       @row-click="handleRowClick"
     />
 

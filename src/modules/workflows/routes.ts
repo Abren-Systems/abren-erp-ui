@@ -3,12 +3,13 @@ import { h } from 'vue'
 export default [
   {
     path: 'inbox',
-    name: 'WorkflowInbox',
+    name: 'workflows.inbox',
     component: () => import('./ui/pages/WorkflowInboxPage.vue'),
+    meta: { title: 'Workflow Inbox', permissions: ['workflows:read'] },
   },
   {
     path: 'states',
-    name: 'WorkflowsStates',
+    name: 'workflows.states',
     component: () =>
       Promise.resolve({
         render: () =>
@@ -18,5 +19,6 @@ export default [
             'Workflows States (Stub)',
           ),
       }),
+    meta: { title: 'Workflows States', permissions: ['workflows:read'] },
   },
 ]
