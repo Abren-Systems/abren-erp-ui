@@ -30,6 +30,14 @@ export type CategoryId = Brand<string, 'CategoryId'>
 export type BankAccountId = Brand<string, 'BankAccountId'>
 export type BankTransactionId = Brand<string, 'BankTransactionId'>
 export type WorkflowInstanceId = Brand<string, 'WorkflowInstanceId'>
+export type WarehouseId = Brand<string, 'WarehouseId'>
+export type ItemId = Brand<string, 'ItemId'>
+export type ProductId = Brand<string, 'ProductId'>
+export type StockItemId = Brand<string, 'StockItemId'>
+export type BatchId = Brand<string, 'BatchId'>
+export type SerialNumberId = Brand<string, 'SerialNumberId'>
+export type AdjustmentId = Brand<string, 'AdjustmentId'>
+export type StockMovementId = Brand<string, 'StockMovementId'>
 
 /**
  * Utility function to safely cast a raw string DTO ID into a Domain Branded ID.

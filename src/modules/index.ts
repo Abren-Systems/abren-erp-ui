@@ -4,6 +4,7 @@ import { bankModule } from './finance/bank'
 import { apModule } from './finance/ap'
 import { reportingModule } from './reporting'
 import { workflowsModule } from './workflows'
+import { inventoryModule } from './inventory'
 import type { BusinessDomain, PlatformEngine } from '@/shared/types/module.types'
 
 /**
@@ -16,6 +17,7 @@ export const businessModules: BusinessDomain[] = [
   bankModule,
   apModule,
   reportingModule,
+  inventoryModule,
 ]
 
 export const platformModules: PlatformEngine[] = [coreModule, workflowsModule]
