@@ -15,7 +15,7 @@
     "test:unit": "vp test",
     "test:unit:watch": "vp test --watch",
     "test:e2e": "playwright test",
-    "generate-types": "npx openapi-typescript http://localhost:8000/api/v1/openapi.json -o src/core/api/generated.types.ts",
+    "generate-types": "npx openapi-typescript ../abren-api/openapi.json -o src/core/api/generated.types.ts",
     "prepare": "husky"
   },
   "dependencies": {
