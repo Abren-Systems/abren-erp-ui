@@ -41,11 +41,11 @@ export class BankMapper {
     return {
       id: CommonMapper.toBrandedId<BankTransactionId>(dto.id),
       accountId,
-      amount: CommonMapper.toMoney(dto.amount, dto.currency),
-      date: CommonMapper.toDate(dto.date)!,
-      reference: dto.reference,
+      amount: CommonMapper.toMoney(dto.amount, dto.currency_code),
+      date: CommonMapper.toDate(dto.transaction_date)!,
+      reference: dto.reference ?? '',
       description: dto.description,
-      type: dto.type as 'DEBIT' | 'CREDIT',
+      type: dto.transaction_type as 'DEBIT' | 'CREDIT',
     }
   }
 }

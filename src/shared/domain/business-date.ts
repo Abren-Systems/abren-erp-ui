@@ -12,8 +12,8 @@ export class BusinessDate {
    * In a real app, this would include regex validation.
    */
   static fromIso(isoString: string): IsoDate {
-    // Optimization: Skip validation for now, just brand it.
-    return isoString as IsoDate
+    // Truncate to YYYY-MM-DD if a full timestamp is provided.
+    return isoString.split('T')[0] as IsoDate
   }
 
   static today(): IsoDate {
