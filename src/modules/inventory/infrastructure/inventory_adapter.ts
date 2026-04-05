@@ -8,33 +8,48 @@ import type {
   AdjustmentCreateDTO,
   AdjustmentDTO,
 } from './api.types'
+import {
+  WarehouseSchema,
+  ItemSchema,
+  StockLevelSchema,
+  BatchSchema,
+  SerialNumberSchema,
+  AdjustmentSchema,
+} from './schemas'
 
 /**
  * Inventory API Adapter
  * Handles all HTTP interactions for the Inventory boundary.
+ * Enforces runtime validation via Zod at the boundary.
  */
 export const inventoryAdapter = {
   async getWarehouses(): Promise<WarehouseDTO[]> {
-    return apiGet<WarehouseDTO[]>('/inventory/warehouses')
+    const raw = await apiGet<unknown[]>('/inventory/warehouses')
+    return raw.map((item) => WarehouseSchema.parse(item))
   },
 
   async getItems(): Promise<ItemDTO[]> {
-    return apiGet<ItemDTO[]>('/inventory/items')
+    const raw = await apiGet<unknown[]>('/inventory/items')
+    return raw.map((item) => ItemSchema.parse(item))
   },
 
   async getStockByWarehouse(warehouseId: string): Promise<StockLevelDTO[]> {
-    return apiGet<StockLevelDTO[]>(`/inventory/warehouses/${warehouseId}/stock`)
+    const raw = await apiGet<unknown[]>(`/inventory/warehouses/${warehouseId}/stock`)
+    return raw.map((item) => StockLevelSchema.parse(item))
   },
 
   async getBatches(itemId: string): Promise<BatchDTO[]> {
-    return apiGet<BatchDTO[]>(`/inventory/items/${itemId}/batches`)
+    const raw = await apiGet<unknown[]>(`/inventory/items/${itemId}/batches`)
+    return raw.map((item) => BatchSchema.parse(item))
   },
 
   async getSerials(itemId: string): Promise<SerialNumberDTO[]> {
-    return apiGet<SerialNumberDTO[]>(`/inventory/items/${itemId}/serials`)
+    const raw = await apiGet<unknown[]>(`/inventory/items/${itemId}/serials`)
+    return raw.map((item) => SerialNumberSchema.parse(item))
   },
 
   async postAdjustment(dto: AdjustmentCreateDTO): Promise<AdjustmentDTO> {
-    return apiPost<AdjustmentDTO>('/inventory/adjustments', dto)
+    const raw = await apiPost<unknown>('/inventory/adjustments', dto)
+    return AdjustmentSchema.parse(raw)
   },
 }

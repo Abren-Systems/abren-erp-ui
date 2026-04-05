@@ -47,8 +47,8 @@ export class InventoryMapper {
       id: toId<StockItemId>(dto.stock_item_id),
       warehouseId: toId<WarehouseId>(dto.warehouse_id),
       itemId: toId<ItemId>(dto.item_id),
-      quantity: dto.quantity,
-      totalValue: dto.total_value,
+      quantity: Number(dto.quantity),
+      totalValue: Number(dto.total_value),
       batchId: null, // Extended fields to be populated if needed in future
       serialId: null,
     }
