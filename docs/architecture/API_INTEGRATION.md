@@ -12,9 +12,11 @@
 ┌─────────────────────────────────────────────────────┐
 │ Core HTTP Client (shared/api/) │ ← Response Envelope Unwrap
 ├─────────────────────────────────────────────────────┤
-│ Adapter (infrastructure/{m}\_adapter.ts) │ ← Fetches **DTOs** from API
+│ Adapter (infrastructure/{m}\_adapter.ts) │ ← Fetches & **Parses (Zod)**
 ├─────────────────────────────────────────────────────┤
-│ Mapper (infrastructure/mappers.ts) │ ← Converts **DTO** ↔ **Domain Type**
+│ Schemas (infrastructure/schemas.ts) │ ← Fail-Fast Boundary
+├─────────────────────────────────────────────────────┤
+│ Mapper (infrastructure/mappers.ts) │ ← Converts **DTO** ↔ **Domain**
 ├─────────────────────────────────────────────────────┤
 │ Application (application/composables/use\*.ts) │ ← Orchestrates via **TanStack Query**
 └─────────────────────────────────────────────────────┘
@@ -130,8 +132,28 @@ Each module has a typed **Adapter** that wraps the shared HTTP client. Adapters 
 ### 3.1 Rules
 
 - **Return raw DTOs**: Adapters must never call Mappers or return ViewModels.
+- **Fail-Fast Validation**: All incoming data MUST be validated via Zod schemas before being returned.
 - **One Adapter per module**: No shared "mega API" files.
 - **Action-Oriented Names**: Method names must match backend endpoints (`submit`, `void`, `post`).
+
+### 3.2 Gold Standard Adapter Implementation
+
+```typescript
+// modules/inventory/infrastructure/inventory_adapter.ts
+import { apiGet, apiPost } from '@/shared/api/http-client'
+import { WarehouseSchema, ItemSchema } from './schemas'
+import type { WarehouseDTO, ItemDTO } from './api.types'
+
+export const inventoryAdapter = {
+  async getWarehouses(): Promise<WarehouseDTO[]> {
+    // 1. Fetch raw data from shared client
+    const raw = await apiGet<unknown[]>('/inventory/warehouses')
+
+    // 2. Validate and cast at the boundary (Fail-Fast)
+    return raw.map((item) => WarehouseSchema.parse(item))
+  },
+}
+```
 
 ---
 

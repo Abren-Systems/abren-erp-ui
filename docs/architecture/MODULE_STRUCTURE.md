@@ -54,6 +54,7 @@ src/modules/{module}/
 │
 ├── infrastructure/          # [Firewall] Anti-Corruption Layer (ACL)
 │   ├── mappers.ts           # [MANDATORY] Mapper-as-Factory (DTO ↔ UI Model)
+│   ├── schemas.ts           # [MANDATORY] Zod Validation (Fail-Fast Shield)
 │   ├── {module}_adapter.ts  # [I/O] Typed API Communication
 │   └── api.types.ts         # Backend DTO interfaces (Source: Backend OpenAPI)
 │
@@ -253,9 +254,10 @@ To maintain full-stack integrity, the frontend must mirror the backend's domain 
 When creating a new module (e.g., `procurement`):
 
 - [ ] 1. **Domain Types**: Define `domain/{entity}.types.ts` (Include **Branded IDs** for all identifiers).
-- [ ] 2. **Infrastructure Adapter**: Define `infrastructure/{module}_adapter.ts` (Fetches **DTOs** using `apiGet/apiPost`).
-- [ ] 3. **Mapper-as-Factory**: Implement `toViewModel()` and `toDTO()` factory logic (Include **Nominal ID** wrapping via `toId<T>`).
-- [ ] 4. **Application Facade**: Create `application/composables/use{Entity}` using TanStack Query.
-- [ ] 5. **UI Orchestration**: Build `ui/pages/` and `ui/components/` as view-only compositions.
-- [ ] 6. **Quality Gate**: Run `vp check` and `npm run lint` to ensure zero boundary/console violations.
-- [ ] 7. **Registration**: Export `ModuleDefinition` in `index.ts` and register in `src/modules/registry.ts`.
+- [ ] 2. **Zod Validation**: Define `infrastructure/schemas.ts` for all incoming API objects.
+- [ ] 3. **Infrastructure Adapter**: Define `infrastructure/{module}_adapter.ts` (Parses **DTOs** using Zod schemas).
+- [ ] 4. **Mapper-as-Factory**: Implement `toViewModel()` and `toDTO()` factory logic.
+- [ ] 5. **Application Facade**: Create `application/composables/use{Entity}` using TanStack Query.
+- [ ] 6. **UI Orchestration**: Build `ui/pages/` and `ui/components/` as view-only compositions.
+- [ ] 7. **Quality Gate**: Run `vp check` and `npm run lint` to ensure zero boundary/console violations.
+- [ ] 8. **Registration**: Export `ModuleDefinition` in `index.ts` and register in `src/modules/registry.ts`.

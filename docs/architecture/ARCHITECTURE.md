@@ -285,6 +285,15 @@ To prevent accidental cross-assignment of identifiers (e.g. passing a `UserId` t
 - **Pure Logic**: Mappers are **pure functions** — no side effects, no API calls, no store access.
 - **Test Mandatory**: Mappers have **100% unit test coverage**.
 
+### 6.5 Fail-Fast Boundary (Zod Shielding) [MANDATORY]
+
+To prevent malformed or unexpected backend data from contaminating the reactive state and causing silent UI failures, we enforce **Runtime Schema Validation** at the outermost edge of the infrastructure layer.
+
+- **The Rule**: Every response from an internal API must be parsed by a Zod schema before being passed to a Mapper.
+- **Location**: Zod schemas live in `src/modules/{module}/infrastructure/schemas.ts`.
+- **Implementation**: The `adapter.ts` is responsible for calling `Schema.parse(rawData)`.
+- **Why**: This ensures that structural mismatches between the Backend DTO and the Domain's expectations are caught immediately at the network boundary with a clear stack trace, rather than as cryptic "cannot read property of undefined" errors in deep UI components.
+
 ---
 
 ## 7. Cross-Module Communication
