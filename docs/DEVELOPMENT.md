@@ -78,9 +78,9 @@ refactor(core): extract idempotency key generator
 test(payment-requests): add mapper unit tests
 ```
 
-### 4.3 Staging Workflow
+### 4.3 Main Branch Workflow
 
-Before every merge to `staging` or `main`:
+Before every merge to `main`:
 
 1. `vp check` — Ensure type-check, lint, and format pass.
 2. `vp test` — Ensure all unit and integration tests pass.

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useJournalEntries } from '../../../application/composables/useJournalEntries'
 import { DataGrid } from '@/shared/components/data-grid'
-import { journalEntryColumns } from '../grids/journal-entry.grid'
+import { journalEntryColumns } from '../../grids/journal-entry.grid'
 import { Button } from '@/shared/components/button'
 import { Plus, RefreshCcw } from 'lucide-vue-next'
 
