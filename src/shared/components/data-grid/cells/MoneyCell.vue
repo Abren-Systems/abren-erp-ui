@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h } from 'vue'
 import { Money } from '@/shared/domain/money'
-import { cn } from '@/shared/utils'
+import { cn } from '@/shared/lib'
 
 interface MoneyCellProps {
   amount: Money

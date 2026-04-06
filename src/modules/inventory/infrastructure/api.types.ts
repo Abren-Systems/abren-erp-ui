@@ -2,7 +2,7 @@
  * Inventory Module API DTOs
  * Synchronized with backend via OpenAPI generated types
  */
-import type { components } from '@/core/api/generated.types'
+import type { components } from '@/shared/api/generated.types'
 
 type Schemas = components['schemas']
 

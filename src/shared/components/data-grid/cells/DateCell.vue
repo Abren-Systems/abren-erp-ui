@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BusinessDate, type IsoDate } from '@/shared/domain/business-date'
-import { cn } from '@/shared/utils'
+import { cn } from '@/shared/lib'
 
 interface DateCellProps {
   date: IsoDate | null | undefined

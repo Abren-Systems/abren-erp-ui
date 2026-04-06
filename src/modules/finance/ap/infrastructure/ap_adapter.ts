@@ -1,5 +1,5 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
-import { PaymentRequestSchema, PaymentRequestStatsSchema, VendorBillSchema } from './schemas'
+import { PaymentRequestSchema, PaymentRequestStatsSchema, VendorBillSchema } from './api.schemas'
 import type {
   PaymentRequestDTO,
   PaymentRequestCreateDTO,

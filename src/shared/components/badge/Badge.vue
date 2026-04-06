@@ -8,7 +8,7 @@
  * <Badge variant="success">Paid</Badge>
  */
 import { badgeVariants, type BadgeVariants } from './index'
-import { cn } from '@/shared/utils'
+import { cn } from '@/shared/lib'
 
 interface BadgeProps {
   variant?: BadgeVariants['variant']

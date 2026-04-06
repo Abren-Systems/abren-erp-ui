@@ -6,7 +6,7 @@ import {
   useForwardProps,
 } from 'radix-vue'
 import { ChevronDown } from 'lucide-vue-next'
-import { cn } from '@/shared/utils'
+import { cn } from '@/shared/lib'
 
 const props = defineProps<SelectScrollDownButtonProps & { class?: HTMLAttributes['class'] }>()
 

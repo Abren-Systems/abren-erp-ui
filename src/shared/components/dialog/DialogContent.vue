@@ -7,7 +7,7 @@ import {
   DialogPortal,
   useForwardPropsEmits,
 } from 'radix-vue'
-import { cn } from '@/shared/utils'
+import { cn } from '@/shared/lib'
 
 const props = defineProps<DialogContentProps & { class?: string }>()
 const emits = defineEmits<DialogContentEmits>()

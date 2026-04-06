@@ -1,6 +1,6 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
 import type { CalculateTaxRequest, TaxRuleDTO, TaxCalculationResponse } from './api.types'
-import { TaxRuleSchema, TaxCalculationResponseSchema } from './schemas'
+import { TaxRuleSchema, TaxCalculationResponseSchema } from './api.schemas'
 import { TaxMapper } from './mappers'
 import type { TaxRule, TaxCalculationResult } from '../domain/tax.types'
 import { z } from 'zod'
