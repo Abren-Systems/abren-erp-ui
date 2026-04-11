@@ -1,28 +1,23 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { Button } from "@/shared/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/shared/components/card";
+import { useRouter } from 'vue-router'
+import { Button } from '@/shared/components/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/components/select";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
-import { Textarea } from "@/shared/components/textarea";
-import { useCreatePaymentRequest } from "../../../application/composables/useCreatePaymentRequest";
-import { Trash2, Plus } from "lucide-vue-next";
+} from '@/shared/components/select'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
+import { Textarea } from '@/shared/components/textarea'
+import { useCreatePaymentRequest } from '../../../application/composables/useCreatePaymentRequest'
+import { Trash2, Plus, AlertCircle } from 'lucide-vue-next'
+import { Alert, AlertDescription, AlertTitle } from '@/shared/components/alert'
 
-const router = useRouter();
-const { form } = useCreatePaymentRequest();
+const router = useRouter()
+const { form, error: submissionError } = useCreatePaymentRequest()
 </script>
 
 <template>
@@ -41,12 +36,24 @@ const { form } = useCreatePaymentRequest();
       </p>
     </div>
 
+    <!-- Global Submission Error -->
+    <Alert v-if="submissionError" variant="destructive">
+      <AlertCircle class="h-4 w-4" />
+      <AlertTitle>Error creating request</AlertTitle>
+      <AlertDescription>
+        {{
+          submissionError.detail ||
+          'An unexpected error occurred. Please check the fields and try again.'
+        }}
+      </AlertDescription>
+    </Alert>
+
     <form
       class="space-y-6"
       @submit.prevent="
         (e) => {
-          e.stopPropagation();
-          form.handleSubmit();
+          e.stopPropagation()
+          form.handleSubmit()
         }
       "
     >
@@ -59,22 +66,15 @@ const { form } = useCreatePaymentRequest();
           <form.Field name="beneficiaryId">
             <template #default="{ field, state }">
               <div class="grid gap-1.5">
-                <Label :for="field.name"
-                  >Beneficiary ID <span class="text-rose-500">*</span></Label
-                >
+                <Label :for="field.name">Beneficiary ID <span class="text-rose-500">*</span></Label>
                 <Input
                   :id="field.name"
                   :model-value="field.state.value"
                   placeholder="UUID of the payee"
-                  @update:model-value="
-                    (val) => field.handleChange(val as string)
-                  "
+                  @update:model-value="(val) => field.handleChange(val as string)"
                 />
-                <p
-                  v-if="state.meta.errors.length"
-                  class="text-xs text-rose-500"
-                >
-                  {{ state.meta.errors.join(", ") }}
+                <p v-if="state.meta.errors.length" class="text-xs text-rose-500">
+                  {{ state.meta.errors.join(', ') }}
                 </p>
               </div>
             </template>
@@ -87,9 +87,7 @@ const { form } = useCreatePaymentRequest();
                   <Label :for="field.name">Currency</Label>
                   <Select
                     :model-value="field.state.value"
-                    @update:model-value="
-                      (val) => field.handleChange(val as string)
-                    "
+                    @update:model-value="(val) => field.handleChange(val as string)"
                   >
                     <SelectTrigger :id="field.name">
                       <SelectValue placeholder="Select currency" />
@@ -111,9 +109,7 @@ const { form } = useCreatePaymentRequest();
                     :id="field.name"
                     :model-value="field.state.value ?? ''"
                     placeholder="UUID — leave blank for finance"
-                    @update:model-value="
-                      (val) => field.handleChange((val as string) || null)
-                    "
+                    @update:model-value="(val) => field.handleChange((val as string) || null)"
                   />
                 </div>
               </template>
@@ -123,23 +119,16 @@ const { form } = useCreatePaymentRequest();
           <form.Field name="justification">
             <template #default="{ field, state }">
               <div class="grid gap-1.5">
-                <Label :for="field.name"
-                  >Justification <span class="text-rose-500">*</span></Label
-                >
+                <Label :for="field.name">Justification <span class="text-rose-500">*</span></Label>
                 <Textarea
                   :id="field.name"
                   :model-value="field.state.value"
                   rows="3"
                   placeholder="Business justification (reviewed by approvers)…"
-                  @update:model-value="
-                    (val) => field.handleChange(val as string)
-                  "
+                  @update:model-value="(val) => field.handleChange(val as string)"
                 />
-                <p
-                  v-if="state.meta.errors.length"
-                  class="text-xs text-rose-500"
-                >
-                  {{ state.meta.errors.join(", ") }}
+                <p v-if="state.meta.errors.length" class="text-xs text-rose-500">
+                  {{ state.meta.errors.join(', ') }}
                 </p>
               </div>
             </template>
@@ -154,8 +143,7 @@ const { form } = useCreatePaymentRequest();
             <div>
               <CardTitle>Line Items</CardTitle>
               <CardDescription>
-                Each line maps to an expense. Add GL account or category for
-                automatic posting.
+                Each line maps to an expense. Add GL account or category for automatic posting.
               </CardDescription>
             </div>
             <form.Field name="lines">
@@ -184,17 +172,12 @@ const { form } = useCreatePaymentRequest();
         <CardContent class="space-y-4">
           <form.Field name="lines">
             <template #default="{ field }">
-              <div
-                v-for="(_, idx) in field.state.value"
-                :key="idx"
-                class="space-y-4"
-              >
+              <div v-for="(_, idx) in field.state.value" :key="idx" class="space-y-4">
                 <div
                   class="grid grid-cols-12 gap-4 items-start border border-neutral-100 rounded-lg p-4 bg-neutral-50/30"
                 >
                   <div class="col-span-12 flex justify-between items-center">
-                    <span
-                      class="text-xs font-bold text-neutral-400 uppercase tracking-wider"
+                    <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider"
                       >Line #{{ (idx as number) + 1 }}</span
                     >
                     <Button
@@ -216,9 +199,7 @@ const { form } = useCreatePaymentRequest();
                           size="sm"
                           :model-value="lineField.state.value"
                           placeholder="e.g. Monthly Rent"
-                          @update:model-value="
-                            (val) => lineField.handleChange(val as string)
-                          "
+                          @update:model-value="(val) => lineField.handleChange(val as string)"
                         />
                       </div>
                     </template>
@@ -233,9 +214,7 @@ const { form } = useCreatePaymentRequest();
                           type="number"
                           step="0.01"
                           :model-value="lineField.state.value"
-                          @update:model-value="
-                            (val) => lineField.handleChange(Number(val))
-                          "
+                          @update:model-value="(val) => lineField.handleChange(Number(val))"
                         />
                       </div>
                     </template>
@@ -249,9 +228,7 @@ const { form } = useCreatePaymentRequest();
                           size="sm"
                           :model-value="lineField.state.value"
                           placeholder="UUID"
-                          @update:model-value="
-                            (val) => lineField.handleChange(val as string)
-                          "
+                          @update:model-value="(val) => lineField.handleChange(val as string)"
                         />
                       </div>
                     </template>
@@ -265,9 +242,7 @@ const { form } = useCreatePaymentRequest();
                           size="sm"
                           :model-value="lineField.state.value"
                           placeholder="UUID"
-                          @update:model-value="
-                            (val) => lineField.handleChange(val as string)
-                          "
+                          @update:model-value="(val) => lineField.handleChange(val as string)"
                         />
                       </div>
                     </template>
@@ -282,9 +257,7 @@ const { form } = useCreatePaymentRequest();
                           type="number"
                           step="0.01"
                           :model-value="lineField.state.value"
-                          @update:model-value="
-                            (val) => lineField.handleChange(Number(val))
-                          "
+                          @update:model-value="(val) => lineField.handleChange(Number(val))"
                         />
                       </div>
                     </template>
@@ -295,16 +268,10 @@ const { form } = useCreatePaymentRequest();
           </form.Field>
 
           <!-- Computed total -->
-          <div
-            class="flex justify-between items-center pt-4 border-t border-neutral-200"
-          >
-            <div
-              class="text-sm font-bold text-neutral-800 flex items-baseline gap-2"
-            >
+          <div class="flex justify-between items-center pt-4 border-t border-neutral-200">
+            <div class="text-sm font-bold text-neutral-800 flex items-baseline gap-2">
               Total:
-              <span
-                class="text-xl font-black tracking-tight font-mono text-blue-600"
-              >
+              <span class="text-xl font-black tracking-tight font-mono text-blue-600">
                 <form.Field name="currency">
                   <template #default="{ field: currencyField }">
                     {{ currencyField.state.value }}
@@ -314,11 +281,7 @@ const { form } = useCreatePaymentRequest();
                   <template #default="{ field: linesField }">
                     {{
                       (linesField.state.value ?? [])
-                        .reduce(
-                          (s: number, l: any) =>
-                            s + (parseFloat(l.amount) || 0),
-                          0,
-                        )
+                        .reduce((s: number, l: any) => s + (Number(l.amount) || 0), 0)
                         .toFixed(2)
                     }}
                   </template>
@@ -343,7 +306,7 @@ const { form } = useCreatePaymentRequest();
             type="submit"
             :disabled="!state.canSubmit || state.isSubmitting"
           >
-            {{ state.isSubmitting ? "Creating…" : "Create Request" }}
+            {{ state.isSubmitting ? 'Creating…' : 'Create Request' }}
           </Button>
         </form.Subscribe>
       </div>

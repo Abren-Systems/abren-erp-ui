@@ -1,22 +1,23 @@
-import { useApiMutation } from "@/shared/composables/useApiMutation";
-import { useQueryClient } from "@tanstack/vue-query";
-import type { PaymentRequestId } from "@/shared/types/brand.types";
-import { apAdapter } from "../../infrastructure/ap_adapter";
-import { apKeys } from "../keys";
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useQueryClient } from '@tanstack/vue-query'
+import { type MaybeRefOrGetter, toValue } from 'vue'
+import type { PaymentRequestId } from '@/shared/types/brand.types'
+import { apAdapter } from '../../infrastructure/ap_adapter'
+import { apKeys } from '../keys'
 
 /**
  * Use Case: Approve a Payment Request.
  *
  * Initiates the approval transition for a pending payment request.
- * Invalidates relevant query keys on success.
+ * Supports reactive IDs.
  *
- * @param id - The unique identifier of the payment request to approve.
+ * @param id - The unique identifier (or Ref/Getter) of the payment request.
  * @returns Reactive approval state and mutate function.
  * @example
- * const { approve, isPending } = useApprovePaymentRequest(toId<PaymentRequestId>('pr_123'))
+ * const { approve, isPending } = useApprovePaymentRequest(() => selectedId.value)
  */
-export function useApprovePaymentRequest(id: PaymentRequestId) {
-  const queryClient = useQueryClient();
+export function useApprovePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
+  const queryClient = useQueryClient()
 
   const {
     mutateAsync: approve,
@@ -24,19 +25,22 @@ export function useApprovePaymentRequest(id: PaymentRequestId) {
     error,
   } = useApiMutation<void>(
     async () => {
-      await apAdapter.approveRequest(id);
+      const unwrappedId = toValue(id)
+      if (!unwrappedId) throw new Error('Missing Payment Request ID')
+      await apAdapter.approveRequest(unwrappedId)
     },
     {
       onSuccess: () => {
+        const unwrappedId = toValue(id)
         void queryClient.invalidateQueries({
-          queryKey: apKeys.paymentRequest(id),
-        });
+          queryKey: apKeys.paymentRequest(unwrappedId),
+        })
         void queryClient.invalidateQueries({
           queryKey: apKeys.paymentRequests(),
-        });
+        })
       },
     },
-  );
+  )
 
-  return { approve, isPending, error };
+  return { approve, isPending, error }
 }

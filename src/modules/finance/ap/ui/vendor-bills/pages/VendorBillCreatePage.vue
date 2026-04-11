@@ -1,28 +1,22 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { Button } from "@/shared/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/shared/components/card";
+import { useRouter } from 'vue-router'
+import { Button } from '@/shared/components/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/components/select";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
-import { Textarea } from "@/shared/components/textarea";
-import { useCreateVendorBill } from "../../../application/composables/useCreateVendorBill";
-import { Trash2, Plus } from "lucide-vue-next";
+} from '@/shared/components/select'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
+import { Textarea } from '@/shared/components/textarea'
+import { useCreateVendorBill } from '../../../application/composables/useCreateVendorBill'
+import { Trash2, Plus } from 'lucide-vue-next'
 
-const router = useRouter();
-const { form } = useCreateVendorBill();
+const router = useRouter()
+const { form } = useCreateVendorBill()
 </script>
 
 <template>
@@ -36,17 +30,15 @@ const { form } = useCreateVendorBill();
         ← Back to Bills
       </button>
       <h1 class="text-2xl font-bold tracking-tight">Register Vendor Bill</h1>
-      <p class="text-sm text-neutral-500">
-        Record a supplier invoice to generate an AP accrual.
-      </p>
+      <p class="text-sm text-neutral-500">Record a supplier invoice to generate an AP accrual.</p>
     </div>
 
     <form
       class="space-y-6"
       @submit.prevent="
         (e) => {
-          e.stopPropagation();
-          form.handleSubmit();
+          e.stopPropagation()
+          form.handleSubmit()
         }
       "
     >
@@ -60,22 +52,15 @@ const { form } = useCreateVendorBill();
             <form.Field name="vendorId">
               <template #default="{ field, state }">
                 <div class="flex-1 grid gap-1.5">
-                  <Label :for="field.name"
-                    >Vendor ID <span class="text-rose-500">*</span></Label
-                  >
+                  <Label :for="field.name">Vendor ID <span class="text-rose-500">*</span></Label>
                   <Input
                     :id="field.name"
                     :model-value="field.state.value"
                     placeholder="UUID of the supplier"
-                    @update:model-value="
-                      (val) => field.handleChange(val as string)
-                    "
+                    @update:model-value="(val) => field.handleChange(val as string)"
                   />
-                  <p
-                    v-if="state.meta.errors.length"
-                    class="text-xs text-rose-500"
-                  >
-                    {{ state.meta.errors.join(", ") }}
+                  <p v-if="state.meta.errors.length" class="text-xs text-rose-500">
+                    {{ state.meta.errors.join(', ') }}
                   </p>
                 </div>
               </template>
@@ -84,22 +69,15 @@ const { form } = useCreateVendorBill();
             <form.Field name="billNumber">
               <template #default="{ field, state }">
                 <div class="flex-1 grid gap-1.5">
-                  <Label :for="field.name"
-                    >Bill Number <span class="text-rose-500">*</span></Label
-                  >
+                  <Label :for="field.name">Bill Number <span class="text-rose-500">*</span></Label>
                   <Input
                     :id="field.name"
                     :model-value="field.state.value"
                     placeholder="e.g. INV-2023-001"
-                    @update:model-value="
-                      (val) => field.handleChange(val as string)
-                    "
+                    @update:model-value="(val) => field.handleChange(val as string)"
                   />
-                  <p
-                    v-if="state.meta.errors.length"
-                    class="text-xs text-rose-500"
-                  >
-                    {{ state.meta.errors.join(", ") }}
+                  <p v-if="state.meta.errors.length" class="text-xs text-rose-500">
+                    {{ state.meta.errors.join(', ') }}
                   </p>
                 </div>
               </template>
@@ -115,9 +93,7 @@ const { form } = useCreateVendorBill();
                     :id="field.name"
                     type="date"
                     :model-value="field.state.value"
-                    @update:model-value="
-                      (val) => field.handleChange(val as string)
-                    "
+                    @update:model-value="(val) => field.handleChange(val as string)"
                   />
                 </div>
               </template>
@@ -131,9 +107,7 @@ const { form } = useCreateVendorBill();
                     :id="field.name"
                     type="date"
                     :model-value="field.state.value"
-                    @update:model-value="
-                      (val) => field.handleChange(val as string)
-                    "
+                    @update:model-value="(val) => field.handleChange(val as string)"
                   />
                 </div>
               </template>
@@ -145,9 +119,7 @@ const { form } = useCreateVendorBill();
                   <Label :for="field.name">Currency</Label>
                   <Select
                     :model-value="field.state.value"
-                    @update:model-value="
-                      (val) => field.handleChange(val as string)
-                    "
+                    @update:model-value="(val) => field.handleChange(val as string)"
                   >
                     <SelectTrigger :id="field.name">
                       <SelectValue placeholder="Select currency" />
@@ -165,23 +137,16 @@ const { form } = useCreateVendorBill();
           <form.Field name="justification">
             <template #default="{ field, state }">
               <div class="grid gap-1.5">
-                <Label :for="field.name"
-                  >Justification <span class="text-rose-500">*</span></Label
-                >
+                <Label :for="field.name">Justification <span class="text-rose-500">*</span></Label>
                 <Textarea
                   :id="field.name"
                   :model-value="field.state.value"
                   rows="2"
                   placeholder="Description of the purchase…"
-                  @update:model-value="
-                    (val) => field.handleChange(val as string)
-                  "
+                  @update:model-value="(val) => field.handleChange(val as string)"
                 />
-                <p
-                  v-if="state.meta.errors.length"
-                  class="text-xs text-rose-500"
-                >
-                  {{ state.meta.errors.join(", ") }}
+                <p v-if="state.meta.errors.length" class="text-xs text-rose-500">
+                  {{ state.meta.errors.join(', ') }}
                 </p>
               </div>
             </template>
@@ -195,9 +160,7 @@ const { form } = useCreateVendorBill();
           <div class="flex items-center justify-between">
             <div>
               <CardTitle>Bill Lines (Expenses)</CardTitle>
-              <CardDescription
-                >Line items to be accrued to expense accounts.</CardDescription
-              >
+              <CardDescription>Line items to be accrued to expense accounts.</CardDescription>
             </div>
             <form.Field name="lines">
               <template #default="{ field }">
@@ -224,17 +187,12 @@ const { form } = useCreateVendorBill();
         <CardContent class="space-y-4">
           <form.Field name="lines">
             <template #default="{ field }">
-              <div
-                v-for="(_, idx) in field.state.value"
-                :key="idx"
-                class="space-y-4"
-              >
+              <div v-for="(_, idx) in field.state.value" :key="idx" class="space-y-4">
                 <div
                   class="grid grid-cols-12 gap-4 items-start border border-neutral-100 rounded-lg p-4 bg-neutral-50/30"
                 >
                   <div class="col-span-12 flex justify-between items-center">
-                    <span
-                      class="text-xs font-bold text-neutral-400 uppercase tracking-wider"
+                    <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider"
                       >Line #{{ (idx as number) + 1 }}</span
                     >
                     <Button
@@ -256,9 +214,7 @@ const { form } = useCreateVendorBill();
                           size="sm"
                           :model-value="lineField.state.value"
                           placeholder="e.g. Server Hosting"
-                          @update:model-value="
-                            (val) => lineField.handleChange(val as string)
-                          "
+                          @update:model-value="(val) => lineField.handleChange(val as string)"
                         />
                       </div>
                     </template>
@@ -273,9 +229,7 @@ const { form } = useCreateVendorBill();
                           type="number"
                           step="0.01"
                           :model-value="lineField.state.value"
-                          @update:model-value="
-                            (val) => lineField.handleChange(Number(val))
-                          "
+                          @update:model-value="(val) => lineField.handleChange(Number(val))"
                         />
                       </div>
                     </template>
@@ -289,9 +243,7 @@ const { form } = useCreateVendorBill();
                           size="sm"
                           :model-value="lineField.state.value"
                           placeholder="GL Account UUID"
-                          @update:model-value="
-                            (val) => lineField.handleChange(val as string)
-                          "
+                          @update:model-value="(val) => lineField.handleChange(val as string)"
                         />
                       </div>
                     </template>
@@ -305,9 +257,7 @@ const { form } = useCreateVendorBill();
                           size="sm"
                           :model-value="lineField.state.value"
                           placeholder="Procurement UUID"
-                          @update:model-value="
-                            (val) => lineField.handleChange(val as string)
-                          "
+                          @update:model-value="(val) => lineField.handleChange(val as string)"
                         />
                       </div>
                     </template>
@@ -318,16 +268,10 @@ const { form } = useCreateVendorBill();
           </form.Field>
 
           <!-- Computed total -->
-          <div
-            class="flex justify-between items-center pt-4 border-t border-neutral-200"
-          >
-            <div
-              class="text-sm font-bold text-neutral-800 flex items-baseline gap-2"
-            >
+          <div class="flex justify-between items-center pt-4 border-t border-neutral-200">
+            <div class="text-sm font-bold text-neutral-800 flex items-baseline gap-2">
               Gross Total:
-              <span
-                class="text-xl font-black tracking-tight font-mono text-blue-600"
-              >
+              <span class="text-xl font-black tracking-tight font-mono text-blue-600">
                 <form.Field name="currency">
                   <template #default="{ field: currencyField }">
                     {{ currencyField.state.value }}
@@ -337,11 +281,7 @@ const { form } = useCreateVendorBill();
                   <template #default="{ field: linesField }">
                     {{
                       (linesField.state.value ?? [])
-                        .reduce(
-                          (s: number, l: any) =>
-                            s + (parseFloat(l.amount) || 0),
-                          0,
-                        )
+                        .reduce((s: number, l: any) => s + (parseFloat(l.amount) || 0), 0)
                         .toFixed(2)
                     }}
                   </template>
@@ -354,10 +294,7 @@ const { form } = useCreateVendorBill();
 
       <!-- Submit -->
       <div class="flex justify-end gap-3">
-        <Button
-          variant="outline"
-          type="button"
-          @click="router.push({ name: 'VendorBillsList' })"
+        <Button variant="outline" type="button" @click="router.push({ name: 'VendorBillsList' })"
           >Cancel</Button
         >
         <form.Subscribe v-slot="state">
@@ -366,7 +303,7 @@ const { form } = useCreateVendorBill();
             type="submit"
             :disabled="!state.canSubmit || state.isSubmitting"
           >
-            {{ state.isSubmitting ? "Registering…" : "Register Bill" }}
+            {{ state.isSubmitting ? 'Registering…' : 'Register Bill' }}
           </Button>
         </form.Subscribe>
       </div>

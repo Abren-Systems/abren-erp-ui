@@ -1,6 +1,7 @@
-import { useApiQuery } from "./useApiQuery";
-import type { UseQueryOptions } from "@tanstack/vue-query";
-import type { ApiError } from "../api/http-client";
+import { useApiQuery } from './useApiQuery'
+import type { UseQueryOptions, QueryKey } from '@tanstack/vue-query'
+import type { MaybeRefOrGetter } from 'vue'
+import type { ApiError } from '../api/http-client'
 
 /**
  * useResourceQuery — Higher-order composable for domain resource fetching.
@@ -16,20 +17,20 @@ import type { ApiError } from "../api/http-client";
  * @param options - Additional TanStack Query options.
  */
 export function useResourceQuery<TDTO, TDomain, TError = ApiError>(
-  queryKey: readonly unknown[],
+  queryKey: MaybeRefOrGetter<QueryKey>,
   adapterFn: () => Promise<TDTO>,
   mapperFn: (dto: TDTO) => TDomain,
-  options?: Omit<UseQueryOptions<TDomain, TError>, "queryKey" | "queryFn">,
+  options?: Omit<UseQueryOptions<TDomain, TError>, 'queryKey' | 'queryFn'>,
 ) {
   return useApiQuery<TDomain, TError>(
     queryKey,
     async () => {
-      const dto = await adapterFn();
-      return mapperFn(dto);
+      const dto = await adapterFn()
+      return mapperFn(dto)
     },
     {
       staleTime: 1000 * 60, // 1 minute default for domain resources
       ...options,
     },
-  );
+  )
 }

@@ -1,7 +1,7 @@
-import { useResourceQuery } from "@/shared/composables/useResourceQuery";
-import { apAdapter } from "../../infrastructure/ap_adapter";
-import { APMapper } from "../../infrastructure/mappers";
-import { apKeys } from "../keys";
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
+import { apAdapter } from '../../infrastructure/ap_adapter'
+import { APMapper } from '../../infrastructure/mappers'
+import { apKeys } from '../keys'
 
 /**
  * Use Case: View Payment Requests List.
@@ -22,7 +22,7 @@ export function usePaymentRequests() {
     apKeys.paymentRequests(),
     () => apAdapter.listRequests(),
     (dtos) => dtos.map((dto) => APMapper.toPaymentRequest(dto)),
-  );
+  )
 
-  return { requests, isLoading, error, refetch };
+  return { requests, isLoading, error, refetch }
 }

@@ -1,8 +1,8 @@
-import { useApiQuery } from "@/shared/composables/useApiQuery";
-import type { VendorBillId } from "@/shared/types/brand.types";
-import { apAdapter } from "../../infrastructure/ap_adapter";
-import { APMapper } from "../../infrastructure/mappers";
-import { apKeys } from "../keys";
+import { useApiQuery } from '@/shared/composables/useApiQuery'
+import type { VendorBillId } from '@/shared/types/brand.types'
+import { apAdapter } from '../../infrastructure/ap_adapter'
+import { APMapper } from '../../infrastructure/mappers'
+import { apKeys } from '../keys'
 
 /**
  * Use Case: View a Single Vendor Bill.
@@ -22,11 +22,11 @@ export function useVendorBill(id: VendorBillId) {
   } = useApiQuery(
     apKeys.vendorBill(id),
     async () => {
-      const dto = await apAdapter.getBill(id);
-      return APMapper.toVendorBill(dto);
+      const dto = await apAdapter.getBill(id)
+      return APMapper.toVendorBill(dto)
     },
     { staleTime: 1000 * 30 }, // 30 seconds
-  );
+  )
 
-  return { bill, isLoading, error };
+  return { bill, isLoading, error }
 }

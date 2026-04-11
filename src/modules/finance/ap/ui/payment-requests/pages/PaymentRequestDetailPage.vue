@@ -1,85 +1,72 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
-import { Button } from "@/shared/components/button";
-import { Badge } from "@/shared/components/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/shared/components/card";
-import { usePaymentRequest } from "../../../application/composables/usePaymentRequest";
-import { useSubmitPaymentRequest } from "../../../application/composables/useSubmitPaymentRequest";
-import { useApprovePaymentRequest } from "../../../application/composables/useApprovePaymentRequest";
-import { useRejectPaymentRequest } from "../../../application/composables/useRejectPaymentRequest";
-import { usePayPaymentRequest } from "../../../application/composables/usePayPaymentRequest";
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { Button } from '@/shared/components/button'
+import { Badge } from '@/shared/components/badge'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
+import { usePaymentRequest } from '../../../application/composables/usePaymentRequest'
+import { useSubmitPaymentRequest } from '../../../application/composables/useSubmitPaymentRequest'
+import { useApprovePaymentRequest } from '../../../application/composables/useApprovePaymentRequest'
+import { useRejectPaymentRequest } from '../../../application/composables/useRejectPaymentRequest'
+import { usePayPaymentRequest } from '../../../application/composables/usePayPaymentRequest'
 
-const props = defineProps<{ id: string }>();
-const router = useRouter();
+const props = defineProps<{ id: string }>()
+const router = useRouter()
 
-const { request, isLoading } = usePaymentRequest(props.id);
+const { request, isLoading } = usePaymentRequest(props.id)
 
-const { submit, isPending: isSubmitting } = useSubmitPaymentRequest(props.id);
-const { approve, isPending: isApproving } = useApprovePaymentRequest(props.id);
-const { reject, isPending: isRejecting } = useRejectPaymentRequest(props.id);
-const { pay, isPending: isPaying } = usePayPaymentRequest(props.id);
+const { submit, isPending: isSubmitting } = useSubmitPaymentRequest(props.id)
+const { approve, isPending: isApproving } = useApprovePaymentRequest(props.id)
+const { reject, isPending: isRejecting } = useRejectPaymentRequest(props.id)
+const { pay, isPending: isPaying } = usePayPaymentRequest(props.id)
 
 // Reject modal state
-const showRejectModal = ref(false);
-const rejectReason = ref("");
+const showRejectModal = ref(false)
+const rejectReason = ref('')
 
 // Pay form state
-const showPayForm = ref(false);
-const paymentMethod = ref("BANK_TRANSFER");
-const disbursementReference = ref("");
+const showPayForm = ref(false)
+const paymentMethod = ref('BANK_TRANSFER')
+const disbursementReference = ref('')
 
 const isActionPending = computed(
-  () =>
-    isSubmitting.value ||
-    isApproving.value ||
-    isRejecting.value ||
-    isPaying.value,
-);
+  () => isSubmitting.value || isApproving.value || isRejecting.value || isPaying.value,
+)
 
-const STATUS_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  DRAFT: "outline",
-  SUBMITTED: "secondary",
-  APPROVED: "default",
-  REJECTED: "destructive",
-  PAID: "default",
-};
+const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  DRAFT: 'outline',
+  SUBMITTED: 'secondary',
+  APPROVED: 'default',
+  REJECTED: 'destructive',
+  PAID: 'default',
+}
 
 async function handleSubmit() {
-  if (confirm("Submit this request for approval?")) {
-    await submit();
+  if (confirm('Submit this request for approval?')) {
+    await submit()
   }
 }
 
 async function handleApprove() {
-  if (confirm("Approve this payment request?")) {
-    await approve();
+  if (confirm('Approve this payment request?')) {
+    await approve()
   }
 }
 
 async function handleReject() {
-  if (!rejectReason.value.trim()) return;
-  await reject(rejectReason.value);
-  showRejectModal.value = false;
-  rejectReason.value = "";
+  if (!rejectReason.value.trim()) return
+  await reject(rejectReason.value)
+  showRejectModal.value = false
+  rejectReason.value = ''
 }
 
 async function handlePay() {
-  if (!paymentMethod.value || !disbursementReference.value.trim()) return;
+  if (!paymentMethod.value || !disbursementReference.value.trim()) return
   await pay({
     payment_method: paymentMethod.value,
     disbursement_reference: disbursementReference.value,
-  });
-  showPayForm.value = false;
+  })
+  showPayForm.value = false
 }
 </script>
 
@@ -103,9 +90,7 @@ async function handlePay() {
     </div>
 
     <!-- Loading state -->
-    <div v-if="isLoading" class="text-neutral-500 text-sm py-12 text-center">
-      Loading…
-    </div>
+    <div v-if="isLoading" class="text-neutral-500 text-sm py-12 text-center">Loading…</div>
 
     <template v-else-if="request">
       <!-- Metadata -->
@@ -141,11 +126,11 @@ async function handlePay() {
             </div>
             <div v-if="request.submittedAt">
               <dt class="text-neutral-500">Submitted</dt>
-              <dd>{{ request.submittedAt.toLocaleDateString("en-ET") }}</dd>
+              <dd>{{ request.submittedAt.toLocaleDateString('en-ET') }}</dd>
             </div>
             <div v-if="request.paidAt">
               <dt class="text-neutral-500">Paid</dt>
-              <dd>{{ request.paidAt.toLocaleDateString("en-ET") }}</dd>
+              <dd>{{ request.paidAt.toLocaleDateString('en-ET') }}</dd>
             </div>
           </dl>
         </CardContent>
@@ -161,18 +146,10 @@ async function handlePay() {
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-neutral-200">
-                <th class="text-left py-2 text-neutral-500 font-medium">
-                  Description
-                </th>
-                <th class="text-right py-2 text-neutral-500 font-medium">
-                  Amount
-                </th>
-                <th class="text-left py-2 text-neutral-500 font-medium pl-4">
-                  GL Account
-                </th>
-                <th class="text-left py-2 text-neutral-500 font-medium pl-4">
-                  Category
-                </th>
+                <th class="text-left py-2 text-neutral-500 font-medium">Description</th>
+                <th class="text-right py-2 text-neutral-500 font-medium">Amount</th>
+                <th class="text-left py-2 text-neutral-500 font-medium pl-4">GL Account</th>
+                <th class="text-left py-2 text-neutral-500 font-medium pl-4">Category</th>
               </tr>
             </thead>
             <tbody>
@@ -186,19 +163,15 @@ async function handlePay() {
                   {{ line.amount.format() }}
                 </td>
                 <td class="py-2 pl-4">
-                  <code
-                    v-if="line.accountId"
-                    class="text-xs text-neutral-400"
-                    >{{ line.accountId.slice(0, 8) }}</code
-                  >
+                  <code v-if="line.accountId" class="text-xs text-neutral-400">{{
+                    line.accountId.slice(0, 8)
+                  }}</code>
                   <span v-else class="text-neutral-300 text-xs">—</span>
                 </td>
                 <td class="py-2 pl-4">
-                  <code
-                    v-if="line.categoryId"
-                    class="text-xs text-neutral-400"
-                    >{{ line.categoryId.slice(0, 8) }}</code
-                  >
+                  <code v-if="line.categoryId" class="text-xs text-neutral-400">{{
+                    line.categoryId.slice(0, 8)
+                  }}</code>
                   <span v-else class="text-neutral-300 text-xs">—</span>
                 </td>
               </tr>
@@ -234,11 +207,7 @@ async function handlePay() {
 
           <!-- SUBMITTED → Approve / Reject -->
           <template v-if="request.status === 'SUBMITTED'">
-            <Button
-              variant="default"
-              :disabled="isActionPending"
-              @click="handleApprove"
-            >
+            <Button variant="default" :disabled="isActionPending" @click="handleApprove">
               Approve
             </Button>
             <Button
@@ -266,9 +235,7 @@ async function handlePay() {
       <Card v-if="showRejectModal" class="border-danger-200 bg-danger-50">
         <CardHeader>
           <CardTitle>Rejection Reason</CardTitle>
-          <CardDescription
-            >This will be visible to the requester.</CardDescription
-          >
+          <CardDescription>This will be visible to the requester.</CardDescription>
         </CardHeader>
         <CardContent class="space-y-3">
           <textarea
@@ -286,9 +253,7 @@ async function handlePay() {
             >
               Confirm Rejection
             </Button>
-            <Button variant="outline" size="sm" @click="showRejectModal = false"
-              >Cancel</Button
-            >
+            <Button variant="outline" size="sm" @click="showRejectModal = false">Cancel</Button>
           </div>
         </CardContent>
       </Card>
@@ -297,16 +262,11 @@ async function handlePay() {
       <Card v-if="showPayForm" class="border-primary-200">
         <CardHeader>
           <CardTitle>Record Payment</CardTitle>
-          <CardDescription
-            >Enter disbursement details to finalise the
-            payment.</CardDescription
-          >
+          <CardDescription>Enter disbursement details to finalise the payment.</CardDescription>
         </CardHeader>
         <CardContent class="space-y-3">
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-1"
-              >Payment Method</label
-            >
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Payment Method</label>
             <select
               v-model="paymentMethod"
               class="w-full border border-neutral-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -336,9 +296,7 @@ async function handlePay() {
             >
               Confirm Payment
             </Button>
-            <Button variant="outline" size="sm" @click="showPayForm = false"
-              >Cancel</Button
-            >
+            <Button variant="outline" size="sm" @click="showPayForm = false">Cancel</Button>
           </div>
         </CardContent>
       </Card>

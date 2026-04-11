@@ -1,21 +1,24 @@
-import { useApiMutation } from "@/shared/composables/useApiMutation";
-import { useQueryClient } from "@tanstack/vue-query";
-import { apAdapter } from "../../infrastructure/ap_adapter";
-import type { PaymentRequestRejectDTO } from "../../infrastructure/api.types";
-import { apKeys } from "../keys";
-import type { ApiError } from "@/shared/api/http-client";
-import type { PaymentRequestId } from "@/shared/types/brand.types";
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useQueryClient } from '@tanstack/vue-query'
+import { type MaybeRefOrGetter, toValue } from 'vue'
+import type { PaymentRequestId } from '@/shared/types/brand.types'
+import { apAdapter } from '../../infrastructure/ap_adapter'
+import { apKeys } from '../keys'
+import type { ApiError } from '@/shared/api/http-client'
 
 /**
  * Use Case: Reject a Payment Request.
  *
- * @param id - The unique identifier of the payment request to reject.
- * @returns Mutation state and reject function.
+ * Rejects a submitted payment request with a mandatory reason.
+ * Supports reactive IDs.
+ *
+ * @param id - The unique identifier (or Ref/Getter) of the payment request.
+ * @returns Reactive rejection state and mutate function.
  * @example
- * const { reject, isPending } = useRejectPaymentRequest(toId<PaymentRequestId>('pr_123'))
+ * const { reject, isPending } = useRejectPaymentRequest(() => selectedId.value)
  */
-export function useRejectPaymentRequest(id: PaymentRequestId) {
-  const queryClient = useQueryClient();
+export function useRejectPaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
+  const queryClient = useQueryClient()
 
   const {
     mutateAsync: reject,
@@ -23,20 +26,22 @@ export function useRejectPaymentRequest(id: PaymentRequestId) {
     error,
   } = useApiMutation<void, ApiError, string>(
     async (reason: string) => {
-      const dto: PaymentRequestRejectDTO = { reason };
-      await apAdapter.rejectRequest(id, dto);
+      const unwrappedId = toValue(id)
+      if (!unwrappedId) throw new Error('Missing Payment Request ID')
+      await apAdapter.rejectRequest(unwrappedId, { reason })
     },
     {
       onSuccess: () => {
+        const unwrappedId = toValue(id)
         void queryClient.invalidateQueries({
-          queryKey: apKeys.paymentRequest(id),
-        });
+          queryKey: apKeys.paymentRequest(unwrappedId),
+        })
         void queryClient.invalidateQueries({
           queryKey: apKeys.paymentRequests(),
-        });
+        })
       },
     },
-  );
+  )
 
-  return { reject, isPending, error };
+  return { reject, isPending, error }
 }

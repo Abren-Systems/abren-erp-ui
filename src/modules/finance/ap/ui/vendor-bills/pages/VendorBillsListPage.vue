@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { DataGrid, useDataGrid } from "@/shared/components/data-grid";
-import { Button } from "@/shared/components/button";
-import { vendorBillColumns } from "../grids/vendor-bill.grid";
-import { useVendorBills } from "../../../application/composables/useVendorBills";
-import type { VendorBill } from "../../../domain/ap.types";
+import { useRouter } from 'vue-router'
+import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { Button } from '@/shared/components/button'
+import { vendorBillColumns } from '../grids/vendor-bill.grid'
+import { useVendorBills } from '../../../application/composables/useVendorBills'
+import type { VendorBill } from '../../../domain/ap.types'
 
-const router = useRouter();
-const { bills, isLoading } = useVendorBills();
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
+const router = useRouter()
+const { bills, isLoading } = useVendorBills()
+const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
 function handleRowClick(bill: VendorBill) {
-  void router.push({ name: "VendorBillDetail", params: { id: bill.id } });
+  void router.push({ name: 'VendorBillDetail', params: { id: bill.id } })
 }
 
 function handleCreate() {
-  void router.push({ name: "VendorBillCreate" });
+  void router.push({ name: 'VendorBillCreate' })
 }
 </script>
 
@@ -24,9 +24,7 @@ function handleCreate() {
     <header class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Vendor Bills</h1>
-        <p class="text-sm text-neutral-500">
-          Manage inbound supplier invoices and AP accruals.
-        </p>
+        <p class="text-sm text-neutral-500">Manage inbound supplier invoices and AP accruals.</p>
       </div>
       <Button variant="default" @click="handleCreate">New Bill</Button>
     </header>

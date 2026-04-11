@@ -1,8 +1,8 @@
-import { useApiMutation } from "@/shared/composables/useApiMutation";
-import { useQueryClient } from "@tanstack/vue-query";
-import type { VendorBillId } from "@/shared/types/brand.types";
-import { apAdapter } from "../../infrastructure/ap_adapter";
-import { apKeys } from "../keys";
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useQueryClient } from '@tanstack/vue-query'
+import type { VendorBillId } from '@/shared/types/brand.types'
+import { apAdapter } from '../../infrastructure/ap_adapter'
+import { apKeys } from '../keys'
 
 /**
  * Use Case: Validate a Vendor Bill.
@@ -13,7 +13,7 @@ import { apKeys } from "../keys";
  * @returns Mutation state and validate function.
  */
 export function useValidateVendorBill(id: VendorBillId) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const {
     mutateAsync: validate,
@@ -21,15 +21,15 @@ export function useValidateVendorBill(id: VendorBillId) {
     error,
   } = useApiMutation<void>(
     async () => {
-      await apAdapter.validateBill(id);
+      await apAdapter.validateBill(id)
     },
     {
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: apKeys.vendorBill(id) });
-        void queryClient.invalidateQueries({ queryKey: apKeys.vendorBills() });
+        void queryClient.invalidateQueries({ queryKey: apKeys.vendorBill(id) })
+        void queryClient.invalidateQueries({ queryKey: apKeys.vendorBills() })
       },
     },
-  );
+  )
 
-  return { validate, isPending, error };
+  return { validate, isPending, error }
 }

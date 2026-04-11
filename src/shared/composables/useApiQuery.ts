@@ -1,5 +1,6 @@
-import { useQuery, type UseQueryOptions } from "@tanstack/vue-query";
-import type { ApiError } from "../api/http-client";
+import { useQuery, type UseQueryOptions, type QueryKey } from '@tanstack/vue-query'
+import { toValue, type MaybeRefOrGetter } from 'vue'
+import type { ApiError } from '../api/http-client'
 
 /**
  * useApiQuery
@@ -11,14 +12,14 @@ import type { ApiError } from "../api/http-client";
  * const { data, isLoading } = useApiQuery(['user', id], () => api.getUser(id))
  */
 export function useApiQuery<TData, TError = ApiError>(
-  queryKey: readonly unknown[],
+  queryKey: MaybeRefOrGetter<QueryKey>,
   queryFn: () => Promise<TData>,
-  options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">,
+  options?: Omit<UseQueryOptions<TData, TError>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery({
-    queryKey,
+  return useQuery(() => ({
+    queryKey: toValue(queryKey),
     queryFn,
     staleTime: 1000 * 60 * 5, // 5 minutes default
     ...options,
-  });
+  }))
 }

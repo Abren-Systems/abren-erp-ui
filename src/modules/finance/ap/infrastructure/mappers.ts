@@ -1,11 +1,11 @@
-import { type Currency } from "@/shared/domain/money";
-import { CommonMapper } from "@/shared/infrastructure/mappers";
+import { type Currency } from '@/shared/domain/money'
+import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type {
   PaymentRequestDTO,
   PaymentRequestLineDTO,
   VendorBillDTO,
   VendorBillLineDTO,
-} from "./api.types";
+} from './api.types'
 import type {
   PaymentRequest,
   PaymentRequestLine,
@@ -13,7 +13,7 @@ import type {
   VendorBill,
   VendorBillLine,
   VendorBillStatus,
-} from "../domain/ap.types";
+} from '../domain/ap.types'
 import type {
   PaymentRequestId,
   PaymentRequestLineId,
@@ -25,7 +25,7 @@ import type {
   BankAccountId,
   JournalLineId,
   VendorId,
-} from "@/shared/types/brand.types";
+} from '@/shared/types/brand.types'
 
 /**
  * Accounts Payable Mapper-as-Factory.
@@ -57,14 +57,14 @@ export class APMapper {
         lineDto.tax_amount != null
           ? CommonMapper.toMoney(lineDto.tax_amount, parentCurrency)
           : null,
-    };
+    }
   }
 
   /**
    * Transforms a raw Payment Request DTO into a Domain Model.
    */
   static toPaymentRequest(dto: PaymentRequestDTO): PaymentRequest {
-    const currency = dto.currency as Currency;
+    const currency = dto.currency as Currency
 
     return {
       id: CommonMapper.toBrandedId<PaymentRequestId>(dto.id),
@@ -74,9 +74,7 @@ export class APMapper {
       currency: currency,
       justification: dto.justification,
       status: dto.status as PaymentRequestStatus,
-      lines: dto.lines.map((ln: PaymentRequestLineDTO) =>
-        this.mapPRLine(ln, currency),
-      ),
+      lines: dto.lines.map((ln: PaymentRequestLineDTO) => this.mapPRLine(ln, currency)),
       bankAccountId: dto.bank_account_id
         ? CommonMapper.toBrandedId<BankAccountId>(dto.bank_account_id)
         : null,
@@ -91,7 +89,7 @@ export class APMapper {
         : null,
       sourceModule: null,
       sourceId: null,
-    };
+    }
   }
 
   // --- Vendor Bill Mappers ---
@@ -104,31 +102,23 @@ export class APMapper {
     parentCurrency: Currency,
   ): VendorBillLine {
     return {
-      id: dto.id
-        ? CommonMapper.toBrandedId<VendorBillLineId>(dto.id)
-        : undefined,
+      id: dto.id ? CommonMapper.toBrandedId<VendorBillLineId>(dto.id) : undefined,
       description: dto.description,
       amount: CommonMapper.toMoney(dto.amount, parentCurrency),
-      accountId: dto.account_id
-        ? CommonMapper.toBrandedId<AccountId>(dto.account_id)
-        : null,
-      categoryId: dto.category_id
-        ? CommonMapper.toBrandedId<CategoryId>(dto.category_id)
-        : null,
+      accountId: dto.account_id ? CommonMapper.toBrandedId<AccountId>(dto.account_id) : null,
+      categoryId: dto.category_id ? CommonMapper.toBrandedId<CategoryId>(dto.category_id) : null,
       journalLineId: dto.journal_line_id
         ? CommonMapper.toBrandedId<JournalLineId>(dto.journal_line_id)
         : null,
-    };
+    }
   }
 
   /**
    * Transforms a raw Vendor Bill DTO into a Domain Model.
    */
   static toVendorBill(dto: VendorBillDTO): VendorBill {
-    const currency = dto.currency as Currency;
-    const lines = dto.lines.map((ln: VendorBillLineDTO) =>
-      this.mapVendorBillLine(ln, currency),
-    );
+    const currency = dto.currency as Currency
+    const lines = dto.lines.map((ln: VendorBillLineDTO) => this.mapVendorBillLine(ln, currency))
 
     return {
       id: CommonMapper.toBrandedId<VendorBillId>(dto.id),
@@ -137,10 +127,10 @@ export class APMapper {
       issueDate: CommonMapper.toDate(dto.issue_date)!,
       dueDate: CommonMapper.toDate(dto.due_date)!,
       currency: currency,
-      justification: dto.justification ?? "",
+      justification: dto.justification ?? '',
       status: dto.status as VendorBillStatus,
       totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
       lines,
-    };
+    }
   }
 }

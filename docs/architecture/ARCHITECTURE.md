@@ -206,16 +206,16 @@ Each module exports a `ModuleDefinition` in its `index.ts`. The router aggregate
 ```typescript
 // modules/finance/ledger/index.ts
 export const ledgerModule: ModuleDefinition = {
-  id: "ledger",
-  name: "General Ledger",
-  category: "business",
-  routes: () => import("./routes").then((m) => m.default),
-  permissions: ["ledger.view", "ledger.edit"],
+  id: 'ledger',
+  name: 'General Ledger',
+  category: 'business',
+  routes: () => import('./routes').then((m) => m.default),
+  permissions: ['ledger.view', 'ledger.edit'],
   menuItems: [
-    { label: "Chart of Accounts", route: "LedgerCoa", icon: "book-open" },
-    { label: "Journal Entries", route: "LedgerJournals", icon: "file-text" },
+    { label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' },
+    { label: 'Journal Entries', route: 'LedgerJournals', icon: 'file-text' },
   ],
-};
+}
 ```
 
 ### 5.4 Module Rules
@@ -249,10 +249,10 @@ Every module infrastructure layer must implement mappers with two standardized f
 ```typescript
 // modules/ap/infrastructure/mappers.ts
 
-import type { VendorBillDTO } from "../infrastructure/api.types";
-import type { VendorBill, VendorBillId } from "../domain/vendor-bill.types";
-import { Money } from "@/shared/domain/money";
-import { toId } from "@/shared/types/brand.types";
+import type { VendorBillDTO } from '../infrastructure/api.types'
+import type { VendorBill, VendorBillId } from '../domain/vendor-bill.types'
+import { Money } from '@/shared/domain/money'
+import { toId } from '@/shared/types/brand.types'
 
 /**
  * Mapper-as-Factory for AP.
@@ -267,7 +267,7 @@ export class APMapper {
       beneficiary: dto.beneficiary_name,
       amount: Money.from(dto.amount, dto.currency),
       status: dto.status,
-    };
+    }
   }
 }
 ```
@@ -321,11 +321,11 @@ Modules communicate via a typed Event Bus in `core/`. This mirrors the backend's
 ```typescript
 // core/event-bus/event-bus.ts
 type EventMap = {
-  "payment-request:submitted": { id: string };
-  "payment-request:paid": { id: string; amount: Money };
-  "journal-entry:posted": { id: string; entryNumber: string };
-  "tenant:feature-toggled": { feature: string; enabled: boolean };
-};
+  'payment-request:submitted': { id: string }
+  'payment-request:paid': { id: string; amount: Money }
+  'journal-entry:posted': { id: string; entryNumber: string }
+  'tenant:feature-toggled': { feature: string; enabled: boolean }
+}
 ```
 
 ### 7.2 When to Use What
@@ -341,13 +341,13 @@ type EventMap = {
 
 ```typescript
 // ❌ BANNED: Module A importing Module B's internals
-import { useLedgerStore } from "@/modules/finance/ledger/stores/ledger.store";
+import { useLedgerStore } from '@/modules/finance/ledger/stores/ledger.store'
 
 // ✅ CORRECT: Listen via Event Bus
-eventBus.on("ledger:entry-posted", ({ id }) => {
+eventBus.on('ledger:entry-posted', ({ id }) => {
   // React to the event within our own module
-  refreshRelatedData(id);
-});
+  refreshRelatedData(id)
+})
 ```
 
 ---
@@ -404,12 +404,9 @@ All backend responses follow the envelope `{ success, data, meta }` or `{ succes
 
 ```typescript
 // core/api/http-client.ts — Typed helpers that unwrap the envelope
-export async function apiGet<T>(
-  url: string,
-  config?: AxiosRequestConfig,
-): Promise<T> {
-  const response = await httpClient.get<ApiResponse<T>>(url, config);
-  return response.data.data; // Extracts { success, data, meta } → T
+export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  const response = await httpClient.get<ApiResponse<T>>(url, config)
+  return response.data.data // Extracts { success, data, meta } → T
 }
 
 export async function apiPost<T>(
@@ -417,8 +414,8 @@ export async function apiPost<T>(
   body?: unknown,
   config?: AxiosRequestConfig,
 ): Promise<T> {
-  const response = await httpClient.post<ApiResponse<T>>(url, body, config);
-  return response.data.data;
+  const response = await httpClient.post<ApiResponse<T>>(url, body, config)
+  return response.data.data
 }
 // apiPut, apiPatch, apiDelete follow the same pattern.
 ```
@@ -427,14 +424,14 @@ Module adapters import these helpers exclusively — never raw `httpClient`:
 
 ```typescript
 // modules/finance/ledger/infrastructure/ledger_adapter.ts
-import { apiGet } from "@/shared/api/http-client";
+import { apiGet } from '@/shared/api/http-client'
 
 export const ledgerAdapter = {
   async getAccounts(): Promise<Account[]> {
-    const dtos = await apiGet<AccountRead[]>("/finance/ledger/accounts");
-    return dtos.map(mapAccount);
+    const dtos = await apiGet<AccountRead[]>('/finance/ledger/accounts')
+    return dtos.map(mapAccount)
   },
-};
+}
 ```
 
 ### 9.3 Idempotency Key Integration
@@ -452,10 +449,10 @@ To avoid silent failures during cache invalidation caused by hardcoded String ar
 ```typescript
 // src/modules/{module}/application/keys.ts
 export const moduleKeys = {
-  all: ["module"] as const,
-  lists: () => [...moduleKeys.all, "lists"] as const,
+  all: ['module'] as const,
+  lists: () => [...moduleKeys.all, 'lists'] as const,
   detail: (id: string) => [...moduleKeys.all, id] as const,
-};
+}
 ```
 
 All Use Case Composables must consume this factory instead of hardcoded strings.
@@ -531,6 +528,7 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 | Document                                         | Description                                           |
 | ------------------------------------------------ | ----------------------------------------------------- |
+| [UX Architecture Manifesto](UX_ARCHITECTURE.md)  | The interactive behavior and workflow OS standards    |
 | [Module Structure](MODULE_STRUCTURE.md)          | Detailed module boundaries and folder conventions     |
 | [State Management](STATE_MANAGEMENT.md)          | Pinia store patterns and reactive state flows         |
 | [API Integration](API_INTEGRATION.md)            | HTTP client, mapper patterns, OpenAPI type generation |
