@@ -3,31 +3,56 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/shared/components/button'
 import { Badge } from '@/shared/components/badge'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
+import {
+  ArrowLeft,
+  MoreHorizontal,
+  History,
+  CheckCircle,
+  Send,
+} from 'lucide-vue-next'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/shared/components/dropdown-menu'
 import { usePaymentRequest } from '../../../application/composables/usePaymentRequest'
 import { useSubmitPaymentRequest } from '../../../application/composables/useSubmitPaymentRequest'
 import { useApprovePaymentRequest } from '../../../application/composables/useApprovePaymentRequest'
 import { useRejectPaymentRequest } from '../../../application/composables/useRejectPaymentRequest'
 import { usePayPaymentRequest } from '../../../application/composables/usePayPaymentRequest'
+import { usePermissions } from '@/shared/auth/usePermissions'
+import PaymentRequestTraceDrawer from '../components/PaymentRequestTraceDrawer.vue'
+import PaymentRequestRejectModal from '../components/PaymentRequestRejectModal.vue'
+import PaymentRequestPayModal from '../components/PaymentRequestPayModal.vue'
+
+/**
+ * Stage 2: Focus Canvas — Payment Request Detail Page.
+ *
+ * Progressive Disclosure flow (UX_ARCHITECTURE.md §2):
+ *   PaymentRequestsListPage → THIS PAGE → TraceDrawer / ActionModals
+ *
+ * Action Surface (3-tier hierarchy per UX_ARCHITECTURE.md §6):
+ *   Primary:  Submit (DRAFT), Approve (SUBMITTED), Pay (APPROVED)
+ *   Secondary: View Trace
+ *   Tertiary: Reject (destructive, via overflow + RejectModal)
+ */
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
+const { hasPermission } = usePermissions()
 
 const { request, isLoading } = usePaymentRequest(props.id)
-
 const { submit, isPending: isSubmitting } = useSubmitPaymentRequest(props.id)
 const { approve, isPending: isApproving } = useApprovePaymentRequest(props.id)
 const { reject, isPending: isRejecting } = useRejectPaymentRequest(props.id)
 const { pay, isPending: isPaying } = usePayPaymentRequest(props.id)
 
-// Reject modal state
-const showRejectModal = ref(false)
-const rejectReason = ref('')
-
-// Pay form state
-const showPayForm = ref(false)
-const paymentMethod = ref('BANK_TRANSFER')
-const disbursementReference = ref('')
+// Overlay state
+const isTraceOpen = ref(false)
+const isRejectModalOpen = ref(false)
+const isPayModalOpen = ref(false)
 
 const isActionPending = computed(
   () => isSubmitting.value || isApproving.value || isRejecting.value || isPaying.value,
@@ -42,264 +67,204 @@ const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | '
 }
 
 async function handleSubmit() {
-  if (confirm('Submit this request for approval?')) {
-    await submit()
-  }
+  await submit()
 }
 
 async function handleApprove() {
-  if (confirm('Approve this payment request?')) {
-    await approve()
-  }
+  await approve()
 }
 
-async function handleReject() {
-  if (!rejectReason.value.trim()) return
-  await reject(rejectReason.value)
-  showRejectModal.value = false
-  rejectReason.value = ''
+async function handleReject(reason: string) {
+  await reject(reason)
+  isRejectModalOpen.value = false
 }
 
-async function handlePay() {
-  if (!paymentMethod.value || !disbursementReference.value.trim()) return
-  await pay({
-    payment_method: paymentMethod.value,
-    disbursement_reference: disbursementReference.value,
-  })
-  showPayForm.value = false
+async function handlePay(data: { payment_method: string; disbursement_reference: string }) {
+  await pay(data)
+  isPayModalOpen.value = false
+}
+
+function goBack() {
+  router.push({ name: 'PaymentRequestsList' })
 }
 </script>
 
 <template>
-  <div class="p-6 space-y-6 max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <button
-          class="text-sm text-neutral-500 hover:text-neutral-900 flex items-center gap-1 mb-1"
-          @click="router.push({ name: 'PaymentRequestsList' })"
-        >
-          ← Back to Requests
-        </button>
-        <h1 class="text-2xl font-bold tracking-tight">Payment Request</h1>
-        <code class="text-xs text-neutral-400 font-mono">{{ id }}</code>
+  <div v-if="isLoading && !request" class="flex h-full items-center justify-center">
+    <p class="text-sm text-neutral-500">Loading payment request…</p>
+  </div>
+
+  <div v-else-if="request" class="flex h-full flex-col">
+    <!-- ── Header / Action Surface ──────────────────────────── -->
+    <div class="flex shrink-0 items-center justify-between border-b px-6 py-4">
+      <div class="flex items-center gap-4">
+        <Button variant="ghost" size="icon" @click="goBack">
+          <ArrowLeft class="h-4 w-4" />
+        </Button>
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-lg font-semibold tracking-tight">Payment Request</h1>
+            <Badge :variant="STATUS_VARIANT[request.status]">
+              {{ request.status }}
+            </Badge>
+          </div>
+          <p class="mt-0.5 font-mono text-xs text-neutral-400">{{ request.id }}</p>
+        </div>
       </div>
-      <Badge v-if="request" :variant="STATUS_VARIANT[request.status]">
-        {{ request.status }}
-      </Badge>
+
+      <!-- Action Surface: 3-tier hierarchy -->
+      <div class="flex items-center gap-2">
+
+        <!-- Secondary: Trace -->
+        <Button variant="outline" size="sm" @click="isTraceOpen = true">
+          <History class="mr-1.5 h-3.5 w-3.5" />
+          Trace
+        </Button>
+
+        <!-- Primary: Submit (DRAFT → SUBMITTED) -->
+        <Button
+          v-if="request.status === 'DRAFT' && hasPermission('ap:submit_request')"
+          size="sm"
+          :disabled="isActionPending"
+          @click="handleSubmit"
+        >
+          <Send class="mr-1.5 h-3.5 w-3.5" />
+          Submit for Approval
+        </Button>
+
+        <!-- Primary: Approve (SUBMITTED → APPROVED) -->
+        <Button
+          v-if="request.status === 'SUBMITTED' && hasPermission('ap:approve_request')"
+          size="sm"
+          :disabled="isActionPending"
+          @click="handleApprove"
+        >
+          <CheckCircle class="mr-1.5 h-3.5 w-3.5" />
+          Approve
+        </Button>
+
+        <!-- Primary: Pay (APPROVED → PAID) -->
+        <Button
+          v-if="request.status === 'APPROVED' && hasPermission('ap:pay_request')"
+          size="sm"
+          :disabled="isActionPending"
+          @click="isPayModalOpen = true"
+        >
+          Mark as Paid
+        </Button>
+
+        <!-- Tertiary: Overflow for destructive/secondary actions -->
+        <DropdownMenu v-if="request.status === 'SUBMITTED' && hasPermission('ap:approve_request')">
+          <DropdownMenuTrigger as-child>
+            <Button variant="ghost" size="icon" class="h-8 w-8">
+              <MoreHorizontal class="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              class="text-destructive"
+              @click="isRejectModalOpen = true"
+            >
+              Reject Request
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
 
-    <!-- Loading state -->
-    <div v-if="isLoading" class="text-neutral-500 text-sm py-12 text-center">Loading…</div>
+    <!-- ── Main Canvas: Request Details ──────────────────────── -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+      <!-- Metadata summary -->
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div class="rounded-lg border p-4">
+          <p class="text-xs font-medium uppercase text-neutral-400">Total Amount</p>
+          <p class="mt-1 text-xl font-bold tabular-nums">{{ request.totalAmount.format() }}</p>
+        </div>
+        <div class="rounded-lg border p-4">
+          <p class="text-xs font-medium uppercase text-neutral-400">Currency</p>
+          <p class="mt-1 font-mono text-lg font-semibold">{{ request.currency }}</p>
+        </div>
+        <div class="rounded-lg border p-4">
+          <p class="text-xs font-medium uppercase text-neutral-400">Approval Step</p>
+          <p class="mt-1 text-lg font-semibold">Step {{ request.currentApprovalStep }}</p>
+        </div>
+        <div class="rounded-lg border p-4">
+          <p class="text-xs font-medium uppercase text-neutral-400">Lines</p>
+          <p class="mt-1 text-lg font-semibold">{{ request.lines.length }}</p>
+        </div>
+      </div>
 
-    <template v-else-if="request">
-      <!-- Metadata -->
-      <Card>
-        <CardHeader>
-          <CardTitle>Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <dt class="text-neutral-500">Beneficiary</dt>
-              <dd class="font-medium font-mono text-xs">
-                {{ request.beneficiaryId }}
-              </dd>
-            </div>
-            <div>
-              <dt class="text-neutral-500">Total Amount</dt>
-              <dd class="font-bold text-lg">
-                {{ request.totalAmount.format() }}
-              </dd>
-            </div>
-            <div>
-              <dt class="text-neutral-500">Currency</dt>
-              <dd>{{ request.currency }}</dd>
-            </div>
-            <div>
-              <dt class="text-neutral-500">Approval Step</dt>
-              <dd>Step {{ request.currentApprovalStep }}</dd>
-            </div>
-            <div class="col-span-2">
-              <dt class="text-neutral-500">Justification</dt>
-              <dd class="mt-1 text-neutral-900">{{ request.justification }}</dd>
-            </div>
-            <div v-if="request.submittedAt">
-              <dt class="text-neutral-500">Submitted</dt>
-              <dd>{{ request.submittedAt.toLocaleDateString('en-ET') }}</dd>
-            </div>
-            <div v-if="request.paidAt">
-              <dt class="text-neutral-500">Paid</dt>
-              <dd>{{ request.paidAt.toLocaleDateString('en-ET') }}</dd>
-            </div>
-          </dl>
-        </CardContent>
-      </Card>
+      <!-- Justification -->
+      <div class="rounded-lg border p-4">
+        <p class="mb-1 text-xs font-medium uppercase text-neutral-400">Justification</p>
+        <p class="text-sm text-neutral-700">{{ request.justification }}</p>
+      </div>
 
       <!-- Line Items -->
-      <Card>
-        <CardHeader>
-          <CardTitle>Line Items</CardTitle>
-          <CardDescription>{{ request.lines.length }} item(s)</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div>
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-500">
+          Line Items
+        </h2>
+        <div class="overflow-hidden rounded-lg border">
           <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-neutral-200">
-                <th class="text-left py-2 text-neutral-500 font-medium">Description</th>
-                <th class="text-right py-2 text-neutral-500 font-medium">Amount</th>
-                <th class="text-left py-2 text-neutral-500 font-medium pl-4">GL Account</th>
-                <th class="text-left py-2 text-neutral-500 font-medium pl-4">Category</th>
+            <thead class="bg-neutral-50 dark:bg-neutral-900">
+              <tr>
+                <th class="px-4 py-2.5 text-left font-medium text-neutral-500">Description</th>
+                <th class="px-4 py-2.5 text-right font-medium text-neutral-500 tabular-nums">Amount</th>
+                <th class="px-4 py-2.5 text-left font-medium text-neutral-500">GL Account</th>
+                <th class="px-4 py-2.5 text-left font-medium text-neutral-500">Category</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="line in request.lines"
                 :key="line.id"
-                class="border-b border-neutral-100 last:border-0"
+                class="border-t transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30"
               >
-                <td class="py-2">{{ line.description }}</td>
-                <td class="py-2 text-right font-mono font-semibold">
+                <td class="px-4 py-2.5">{{ line.description }}</td>
+                <td class="px-4 py-2.5 text-right tabular-nums font-semibold">
                   {{ line.amount.format() }}
                 </td>
-                <td class="py-2 pl-4">
-                  <code v-if="line.accountId" class="text-xs text-neutral-400">{{
-                    line.accountId.slice(0, 8)
-                  }}</code>
-                  <span v-else class="text-neutral-300 text-xs">—</span>
+                <td class="px-4 py-2.5 font-mono text-xs text-neutral-500">
+                  {{ line.accountId?.slice(0, 8) ?? '—' }}
                 </td>
-                <td class="py-2 pl-4">
-                  <code v-if="line.categoryId" class="text-xs text-neutral-400">{{
-                    line.categoryId.slice(0, 8)
-                  }}</code>
-                  <span v-else class="text-neutral-300 text-xs">—</span>
+                <td class="px-4 py-2.5 font-mono text-xs text-neutral-500">
+                  {{ line.categoryId?.slice(0, 8) ?? '—' }}
                 </td>
               </tr>
-            </tbody>
-            <tfoot>
-              <tr class="border-t border-neutral-200">
-                <td class="py-2 font-semibold">Total</td>
-                <td class="py-2 text-right font-bold font-mono">
+              <tr class="border-t bg-neutral-50/50 font-semibold dark:bg-neutral-900/20">
+                <td class="px-4 py-2.5">Total</td>
+                <td class="px-4 py-2.5 text-right tabular-nums font-bold">
                   {{ request.totalAmount.format() }}
                 </td>
                 <td colspan="2" />
               </tr>
-            </tfoot>
+            </tbody>
           </table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+    </div>
 
-      <!-- Actions -->
-      <Card>
-        <CardHeader>
-          <CardTitle>Actions</CardTitle>
-        </CardHeader>
-        <CardContent class="flex flex-wrap gap-3">
-          <!-- DRAFT → Submit -->
-          <Button
-            v-if="request.status === 'DRAFT'"
-            variant="default"
-            :disabled="isActionPending"
-            @click="handleSubmit"
-          >
-            Submit for Approval
-          </Button>
+    <!-- ── Stage 3: TraceDrawer ───────────────────────────────── -->
+    <PaymentRequestTraceDrawer
+      v-model:open="isTraceOpen"
+      :request="request"
+    />
 
-          <!-- SUBMITTED → Approve / Reject -->
-          <template v-if="request.status === 'SUBMITTED'">
-            <Button variant="default" :disabled="isActionPending" @click="handleApprove">
-              Approve
-            </Button>
-            <Button
-              variant="destructive"
-              :disabled="isActionPending"
-              @click="showRejectModal = true"
-            >
-              Reject
-            </Button>
-          </template>
+    <!-- ── Guard: Reject ActionModal (destructive) ────────────── -->
+    <PaymentRequestRejectModal
+      v-model:open="isRejectModalOpen"
+      :is-pending="isRejecting"
+      @confirm="handleReject"
+    />
 
-          <!-- APPROVED → Pay -->
-          <Button
-            v-if="request.status === 'APPROVED'"
-            variant="default"
-            :disabled="isActionPending"
-            @click="showPayForm = true"
-          >
-            Mark as Paid
-          </Button>
-        </CardContent>
-      </Card>
-
-      <!-- Reject reason form (inline) -->
-      <Card v-if="showRejectModal" class="border-danger-200 bg-danger-50">
-        <CardHeader>
-          <CardTitle>Rejection Reason</CardTitle>
-          <CardDescription>This will be visible to the requester.</CardDescription>
-        </CardHeader>
-        <CardContent class="space-y-3">
-          <textarea
-            v-model="rejectReason"
-            class="w-full border border-neutral-200 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
-            rows="3"
-            placeholder="State the reason for rejection (min. 5 characters)…"
-          />
-          <div class="flex gap-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              :disabled="rejectReason.trim().length < 5 || isRejecting"
-              @click="handleReject"
-            >
-              Confirm Rejection
-            </Button>
-            <Button variant="outline" size="sm" @click="showRejectModal = false">Cancel</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <!-- Pay form (inline) -->
-      <Card v-if="showPayForm" class="border-primary-200">
-        <CardHeader>
-          <CardTitle>Record Payment</CardTitle>
-          <CardDescription>Enter disbursement details to finalise the payment.</CardDescription>
-        </CardHeader>
-        <CardContent class="space-y-3">
-          <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-1">Payment Method</label>
-            <select
-              v-model="paymentMethod"
-              class="w-full border border-neutral-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="BANK_TRANSFER">Bank Transfer</option>
-              <option value="CHECK">Cheque</option>
-              <option value="CASH">Cash</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-1"
-              >Reference / Transaction #</label
-            >
-            <input
-              v-model="disbursementReference"
-              type="text"
-              class="w-full border border-neutral-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="e.g. TRX-2026-0318-99"
-            />
-          </div>
-          <div class="flex gap-2">
-            <Button
-              variant="default"
-              size="sm"
-              :disabled="!disbursementReference.trim() || isPaying"
-              @click="handlePay"
-            >
-              Confirm Payment
-            </Button>
-            <Button variant="outline" size="sm" @click="showPayForm = false">Cancel</Button>
-          </div>
-        </CardContent>
-      </Card>
-    </template>
+    <!-- ── Guard: Pay ActionModal ─────────────────────────────── -->
+    <PaymentRequestPayModal
+      v-model:open="isPayModalOpen"
+      :total-amount="request.totalAmount.format()"
+      :is-pending="isPaying"
+      @confirm="handlePay"
+    />
   </div>
 </template>

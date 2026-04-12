@@ -7,11 +7,7 @@ export default [
     name: 'PaymentRequestsList',
     component: () => import('./ui/payment-requests/pages/PaymentRequestsListPage.vue'),
   },
-  {
-    path: 'requests/create',
-    name: 'PaymentRequestCreate',
-    component: () => import('./ui/payment-requests/pages/PaymentRequestCreatePage.vue'),
-  },
+
   {
     path: 'requests/:id',
     name: 'PaymentRequestDetail',
