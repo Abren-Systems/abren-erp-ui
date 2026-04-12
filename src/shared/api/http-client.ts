@@ -19,17 +19,23 @@ export interface ApiResponse<T> {
   meta?: Record<string, unknown>;
 }
 
+export interface ApiFieldError {
+  code: string;
+  field: string;
+  message: string;
+}
+
 export class ApiError extends Error {
   success: false;
-  detail: string;
   code: string;
+  details?: ApiFieldError[];
 
-  constructor(detail: string, code: string = "UNKNOWN_ERROR") {
-    super(detail);
+  constructor(message: string, code: string = "UNKNOWN_ERROR", details?: ApiFieldError[]) {
+    super(message);
     this.name = "ApiError";
     this.success = false;
-    this.detail = detail;
     this.code = code;
+    this.details = details;
   }
 }
 
@@ -86,9 +92,17 @@ httpClient.interceptors.response.use(
         }
       }
 
-      // Structured error from backend
+      // Structured error envelope from backend (The Error Contract)
+      if (data?.error) {
+        return Promise.reject(
+          new ApiError(data.error.message, data.error.code, data.error.details)
+        );
+      }
+
+      // Fallback for raw FastAPI errors missing the envelope
       if (data?.detail) {
-        return Promise.reject(new ApiError(data.detail, data.code));
+        const message = typeof data.detail === "string" ? data.detail : "Validation failed";
+        return Promise.reject(new ApiError(message, "UNKNOWN_ERROR"));
       }
     }
 

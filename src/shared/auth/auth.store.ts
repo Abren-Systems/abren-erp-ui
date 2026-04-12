@@ -34,6 +34,7 @@ export interface CurrentUser {
   tenantId: TenantId;
   email: string;
   isActive: boolean;
+  permissions: string[];
 }
 
 export interface TenantInfo {
@@ -87,6 +88,10 @@ export const useAuthStore = defineStore("auth", () => {
     return tenantFeatures.value[feature] === true;
   }
 
+  function hasPermission(permission: string): boolean {
+    return currentUser.value?.permissions?.includes(permission) ?? false;
+  }
+
   async function hydrateSession(): Promise<boolean> {
     try {
       const [userProfileDTO, tenantDTO] = await Promise.all([
@@ -136,6 +141,7 @@ export const useAuthStore = defineStore("auth", () => {
     hydrateSession,
     login,
     hasFeature,
+    hasPermission,
     logout,
     $reset,
   };

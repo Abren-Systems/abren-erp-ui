@@ -49,7 +49,13 @@ modules/{area}/{module}/
 ├── domain/                # 1. PURE BUSINESS LOGIC (Entities, Value Objects)
 ├── application/           # 2. ORCHESTRATION (Use Cases, Composables)
 ├── infrastructure/        # 3. EXTERNAL WORLD (Adapters, Mappers, DTO re-exports)
-└── ui/                    # 4. PRESENTATION (Pages, Components, Grids, Pinia)
+├── ui/                    # 4. PRESENTATION (Organized by Feature Slices)
+│   ├── feature-a/         # E.g. 'accounts'
+│   │   ├── pages/         # Stateful orchestrators
+│   │   ├── components/    # Feature-specific components
+│   │   └── store/         # Ephemeral feature state
+│   └── feature-b/         # E.g. 'journal-entries'
+└── routes.ts              # Module-level route registration
 ```
 
 ---
@@ -59,7 +65,7 @@ modules/{area}/{module}/
 Pages are the stateful entry points of a module. They compose shared **Engines** (DataGrid) with module-specific **Application Logic** (Composables). List view pages must be Pluralized (e.g. `VendorBillsListPage`).
 
 ```vue
-<!-- modules/finance/ledger/ui/pages/LedgerAccountsPage.vue -->
+<!-- modules/finance/ledger/ui/accounts/pages/ChartOfAccountsListPage.vue -->
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { DataGrid, useDataGrid } from "@/shared/components/data-grid";
@@ -139,14 +145,15 @@ All queries must use `useQuery`, all mutations must use `useApiMutation`.
 
 ```typescript
 // modules/finance/ledger/application/composables/useLedgerAccounts.ts
-import { useQuery } from "@tanstack/vue-query";
+import { useResourceQuery } from "@/shared/composables/useResourceQuery";
 import { ledgerAdapter } from "../../infrastructure/ledger_adapter";
 import { LedgerMapper } from "../../infrastructure/mappers";
+import { ledgerKeys } from "../keys";
 
 /**
  * Use Case: View Ledger Accounts.
  *
- * Fetches and maps raw ledger DTOs into high-integrity domain models.
+ * Uses `useResourceQuery` to fetch, map, and cache high-integrity domain models.
  *
  * @returns Reactive accounts state and refetch capability.
  */
@@ -156,14 +163,12 @@ export function useLedgerAccounts() {
     isPending,
     error,
     refetch,
-  } = useQuery({
-    queryKey: ["ledger-accounts"],
-    queryFn: async () => {
-      const dtos = await ledgerAdapter.getAccounts();
-      return dtos.map((dto) => LedgerMapper.toAccount(dto));
-    },
-    staleTime: 1000 * 60 * 5,
-  });
+  } = useResourceQuery(
+    ledgerKeys.accounts(), // queryKey from centralized factories
+    () => ledgerAdapter.getAccounts(), // fetch DTOs
+    (dtos) => dtos.map((dto) => LedgerMapper.toAccount(dto)), // Mapping logic
+    { staleTime: 1000 * 60 * 5 }
+  );
 
   return { accounts, isPending, error, refetch };
 }
@@ -258,6 +263,9 @@ type FormValues = z.infer<typeof vendorBillSchema>;
  * Use Case: Create Vendor Bill.
  *
  * Manages form state and native Zod validation.
+ * Uses an explicit Error Contract: catches Application/API error codes 
+ * (e.g., `VENDOR_NOT_FOUND`) and explicitly maps them to localized UI fields
+ * to prevent backend schema bleed.
  */
 export function useCreateVendorBill() {
   const form = useForm({
@@ -291,6 +299,28 @@ export const apKeys = {
 // In composables:
 void queryClient.invalidateQueries({ queryKey: apKeys.paymentRequests() });
 ```
+
+---
+
+## Pattern 8: RBAC & Permissions
+
+The frontend natively mirrors backend RBAC guards using `usePermissions`.
+Permissions must be bound to route transitions via `meta.permission` in `routes.ts`, and dynamically hide actionable elements using Vue directives like `v-if="hasPermission('ledger:create_entry')"`.
+
+---
+
+## Pattern 9: High-Integrity UI Component Naming
+
+To maintain IDE discoverability and semantic clarity in large ERP domains, UI components must follow strict Action-Suffixed conventions:
+- **Pages**: `[Domain][Action]Page.vue` (e.g., `VendorBillsListPage.vue`). Stateful entry points.
+- **Forms**: `[Domain][Action]Form.vue` (e.g., `VendorBillCreateForm.vue`). The stateless or purely UI layer for a form.
+- **Drawers/Modals**: `[Domain][Action]Drawer.vue` (e.g., `ChartOfAccountsEditDrawer.vue`). Stateful floating orchestrators.
+
+---
+
+## Pattern 10: App Shell Navigation Injection
+
+Modules must define a `menu.ts` file alongside `routes.ts`. This configuration exports the module's desired sidebar navigation structures, tying each path to a Reka UI icon, localized label, and an RBAC `permission`. The central app shell's Sidebar dynamically aggregates these menus to render the exact navigation tree permitted to the user.
 
 ---
 

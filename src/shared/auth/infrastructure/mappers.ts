@@ -22,6 +22,7 @@ export class AuthMapper {
       tenantId: toId<TenantId>(dto.tenant_id),
       email: dto.email,
       isActive: dto.is_active,
+      permissions: dto.permissions ?? [],
     };
   }
 

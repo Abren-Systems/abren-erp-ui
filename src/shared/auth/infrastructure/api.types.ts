@@ -7,6 +7,7 @@ export interface UserProfileDTO {
   tenant_id: string;
   email: string;
   is_active: boolean;
+  permissions: string[];
 }
 
 export interface TenantInfoDTO {
