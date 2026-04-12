@@ -206,7 +206,8 @@ Every transactional UI feature expresses itself through these standardized compo
 | **Queue** | `[Domain]ListPage.vue` | Stage 1: Full-screen DataGrid |
 | **Focus Canvas** | `[Domain]DetailPage.vue` | Stage 2: Isolated entity work |
 | **Provenance** | `[Domain]TraceDrawer.vue` | Stage 3: Lazy-loaded audit overlay |
-| **Creation** | `[Domain]CreateDrawer.vue` | Wizard-style slide-out for new entities |
+| **Macro-Create** | `[Domain]CreatePage.vue` | Full page for creating complex entities (grids, line items) |
+| **Micro-Create** | `[Domain]CreateDrawer.vue` | Slide-out for simple taxonomies (e.g., tags, fiscal periods) |
 | **Form** | `[Domain][Action]Form.vue` | Headless presentation layer for a form |
 | **Confirmation** | `[Domain]ActionModal.vue` | Interruptive confirmation for destructive operations |
 

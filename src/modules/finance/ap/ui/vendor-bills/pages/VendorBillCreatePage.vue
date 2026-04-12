@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-} from '@/shared/components/sheet'
+import { useRouter } from 'vue-router'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
 import { Button } from '@/shared/components/button'
 import {
   Select,
@@ -23,47 +17,54 @@ import { Trash2, Plus, AlertCircle } from 'lucide-vue-next'
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/alert'
 
 /**
- * VendorBillCreateDrawer — Slide-out creation form.
+ * VendorBillCreatePage — Dedicated creation form.
  *
- * Hosts the full TanStack Form for creating new Vendor Bills.
+ * Uses the Macro-Create pattern (Full Page) to support complex 
+ * tabular line items and maximum data density.
  */
 
-defineProps<{ open: boolean }>()
-const emit = defineEmits<{ (e: 'update:open', val: boolean): void }>()
-
+const router = useRouter()
 const { form, error: submissionError } = useCreateVendorBill()
+
+function goBack() {
+  router.push({ name: 'VendorBillsList' })
+}
 </script>
 
 <template>
-  <Sheet :open="open" @update:open="emit('update:open', $event)">
-    <SheetContent class="sm:max-w-[700px] flex flex-col h-full">
-      <SheetHeader>
-        <SheetTitle>Register Vendor Bill</SheetTitle>
-        <SheetDescription>
-          Record a supplier invoice to generate an AP accrual.
-        </SheetDescription>
-      </SheetHeader>
+  <div class="p-6 space-y-6 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div>
+      <button
+        class="mb-2 flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+        @click="goBack"
+      >
+        ← Back to Bills
+      </button>
+      <h1 class="text-2xl font-bold tracking-tight">Register Vendor Bill</h1>
+      <p class="text-sm text-neutral-500">
+        Record a supplier invoice to generate an AP accrual.
+      </p>
+    </div>
 
-      <!-- Scroll container -->
-      <div class="flex-1 overflow-y-auto py-6">
-        <!-- Submission Error -->
-        <Alert v-if="submissionError" variant="destructive" class="mb-6">
-          <AlertCircle class="h-4 w-4" />
-          <AlertTitle>Error registering bill</AlertTitle>
-          <AlertDescription>
-            {{ submissionError.detail ?? 'An unexpected error occurred.' }}
-          </AlertDescription>
-        </Alert>
+    <!-- Submission Error -->
+    <Alert v-if="submissionError" variant="destructive" class="mb-6">
+      <AlertCircle class="h-4 w-4" />
+      <AlertTitle>Error registering bill</AlertTitle>
+      <AlertDescription>
+        {{ submissionError.detail ?? 'An unexpected error occurred.' }}
+      </AlertDescription>
+    </Alert>
 
-        <form
-          class="space-y-6"
-          @submit.prevent="(e) => { (e as Event).stopPropagation(); form.handleSubmit() }"
-        >
-          <!-- Bill Details -->
-          <div class="space-y-4">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">
-              Bill Details
-            </h3>
+    <form
+      class="space-y-6"
+      @submit.prevent="(e) => { (e as Event).stopPropagation(); form.handleSubmit() }"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle>Bill Details</CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
 
             <div class="flex gap-4">
               <form.Field name="vendorId">
@@ -169,29 +170,34 @@ const { form, error: submissionError } = useCreateVendorBill()
               </template>
             </form.Field>
           </div>
+        </CardContent>
+      </Card>
 
-          <!-- Line Items -->
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">
-                Bill Lines (Expenses)
-              </h3>
-              <form.Field name="lines">
-                <template #default="{ field }">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    type="button"
-                    class="h-7 text-xs"
-                    @click="
-                      field.pushValue({ description: '', amount: 0, accountId: '', categoryId: '' })
-                    "
-                  >
-                    <Plus class="mr-1 h-3 w-3" /> Add Line
-                  </Button>
-                </template>
-              </form.Field>
-            </div>
+      <!-- Line Items -->
+      <Card>
+        <CardHeader>
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold tracking-tight">
+              Expense Lines
+            </h3>
+            <form.Field name="lines">
+              <template #default="{ field }">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  class="h-8 text-xs"
+                  @click="
+                    field.pushValue({ description: '', amount: 0, accountId: '', categoryId: '' })
+                  "
+                >
+                  <Plus class="mr-1 h-3 w-3" /> Add Line
+                </Button>
+              </template>
+            </form.Field>
+          </div>
+        </CardHeader>
+        <CardContent class="space-y-4">
 
             <form.Field name="lines">
               <template #default="{ field }">
@@ -278,23 +284,21 @@ const { form, error: submissionError } = useCreateVendorBill()
                     </div>
                   </div>
                 </div>
-              </template>
-            </form.Field>
-          </div>
-        </form>
-      </div>
+          </form.Field>
+        </CardContent>
+      </Card>
 
-      <SheetFooter class="border-t pt-4">
-        <Button variant="outline" @click="emit('update:open', false)">Cancel</Button>
+      <div class="flex justify-end gap-3 pt-4">
+        <Button variant="outline" type="button" @click="goBack">Cancel</Button>
         <form.Subscribe v-slot="state">
           <Button
             :disabled="!state.canSubmit || state.isSubmitting"
-            @click="form.handleSubmit()"
+            type="submit"
           >
             {{ state.isSubmitting ? 'Registering…' : 'Register Bill' }}
           </Button>
         </form.Subscribe>
-      </SheetFooter>
-    </SheetContent>
-  </Sheet>
+      </div>
+    </form>
+  </div>
 </template>

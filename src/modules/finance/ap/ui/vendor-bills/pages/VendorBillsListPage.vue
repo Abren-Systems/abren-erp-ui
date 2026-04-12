@@ -8,13 +8,13 @@ import { vendorBillColumns } from '../grids/vendor-bill.grid'
 import { useVendorBills } from '../../../application/composables/useVendorBills'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import type { VendorBill } from '../../../domain/ap.types'
-import VendorBillCreateDrawer from '../components/VendorBillCreateDrawer.vue'
 
 /**
  * Stage 1: Queue — Vendor Bills List Page.
  *
  * Progressive Disclosure flow (UX_ARCHITECTURE.md §2):
  *   THIS PAGE → router.push(VendorBillDetail) → VendorBillDetailPage
+ *   THIS PAGE → router.push(VendorBillCreate) → VendorBillCreatePage
  */
 
 const router = useRouter()
@@ -22,10 +22,12 @@ const { hasPermission } = usePermissions()
 const { bills, isLoading } = useVendorBills()
 const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
-const isCreateOpen = ref(false)
-
 function handleRowClick(bill: VendorBill) {
   void router.push({ name: 'VendorBillDetail', params: { id: bill.id } })
+}
+
+function handleCreate() {
+  void router.push({ name: 'VendorBillCreate' })
 }
 </script>
 
@@ -62,7 +64,7 @@ function handleRowClick(bill: VendorBill) {
             v-if="hasPermission('ap:create_bill')"
             size="sm"
             class="h-[26px] px-2.5 text-xs"
-            @click="isCreateOpen = true"
+            @click="handleCreate"
           >
             <Plus :size="13" class="mr-1" />
             New Bill
@@ -70,8 +72,5 @@ function handleRowClick(bill: VendorBill) {
         </template>
       </DataGrid>
     </div>
-
-    <!-- Creation Drawer -->
-    <VendorBillCreateDrawer v-model:open="isCreateOpen" />
   </div>
 </template>

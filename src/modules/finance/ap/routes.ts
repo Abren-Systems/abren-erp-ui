@@ -9,6 +9,11 @@ export default [
   },
 
   {
+    path: 'requests/create',
+    name: 'PaymentRequestCreate',
+    component: () => import('./ui/payment-requests/pages/PaymentRequestCreatePage.vue'),
+  },
+  {
     path: 'requests/:id',
     name: 'PaymentRequestDetail',
     component: () => import('./ui/payment-requests/pages/PaymentRequestDetailPage.vue'),
@@ -21,7 +26,11 @@ export default [
     name: 'VendorBillsList',
     component: () => import('./ui/vendor-bills/pages/VendorBillsListPage.vue'),
   },
-
+  {
+    path: 'vendor-bills/create',
+    name: 'VendorBillCreate',
+    component: () => import('./ui/vendor-bills/pages/VendorBillCreatePage.vue'),
+  },
   {
     path: 'vendor-bills/:id',
     name: 'VendorBillDetail',

@@ -8,13 +8,13 @@ import { paymentRequestColumns } from '../grids/payment-request.grid'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import type { PaymentRequest } from '../../../domain/ap.types'
-import PaymentRequestCreateDrawer from '../components/PaymentRequestCreateDrawer.vue'
 
 /**
  * Stage 1: Queue — Payment Requests List Page.
  *
  * Progressive Disclosure flow (UX_ARCHITECTURE.md §2):
  *   THIS PAGE → router.push(PaymentRequestDetail) → PaymentRequestDetailPage
+ *   THIS PAGE → router.push(PaymentRequestCreate) → PaymentRequestCreatePage
  *
  * Density: Maximum. No inline mutations. No pane splitting.
  * Row clicks navigate cleanly to the Focus Canvas (Detail page).
@@ -25,10 +25,12 @@ const { hasPermission } = usePermissions()
 const { requests, isLoading, refetch } = usePaymentRequests()
 const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
-const isCreateOpen = ref(false)
-
 function handleRowClick(pr: PaymentRequest) {
   void router.push({ name: 'PaymentRequestDetail', params: { id: pr.id } })
+}
+
+function handleCreate() {
+  void router.push({ name: 'PaymentRequestCreate' })
 }
 </script>
 
@@ -65,7 +67,7 @@ function handleRowClick(pr: PaymentRequest) {
             v-if="hasPermission('ap:create_request')"
             size="sm"
             class="h-[26px] px-2.5 text-xs"
-            @click="isCreateOpen = true"
+            @click="handleCreate"
           >
             <Plus :size="13" class="mr-1" />
             New Request
@@ -73,8 +75,5 @@ function handleRowClick(pr: PaymentRequest) {
         </template>
       </DataGrid>
     </div>
-
-    <!-- Creation Drawer -->
-    <PaymentRequestCreateDrawer v-model:open="isCreateOpen" />
   </div>
 </template>

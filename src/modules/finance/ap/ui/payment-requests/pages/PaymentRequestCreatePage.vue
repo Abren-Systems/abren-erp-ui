@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-} from '@/shared/components/sheet'
+import { useRouter } from 'vue-router'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
 import { Button } from '@/shared/components/button'
 import {
   Select,
@@ -23,48 +17,54 @@ import { Trash2, Plus, AlertCircle } from 'lucide-vue-next'
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/alert'
 
 /**
- * PaymentRequestCreateDrawer — Slide-out creation form.
+ * PaymentRequestCreatePage — Dedicated creation form.
  *
- * Hosts the full TanStack Form for creating new Payment Requests.
- * On success, closes the drawer and lets the List Page queue refresh via TanStack Query.
+ * Uses the Macro-Create pattern (Full Page) to support complex 
+ * tabular line items and maximum data density.
  */
 
-const props = defineProps<{ open: boolean }>()
-const emit = defineEmits<{ (e: 'update:open', val: boolean): void }>()
-
+const router = useRouter()
 const { form, error: submissionError } = useCreatePaymentRequest()
+
+function goBack() {
+  router.push({ name: 'PaymentRequestsList' })
+}
 </script>
 
 <template>
-  <Sheet :open="open" @update:open="emit('update:open', $event)">
-    <SheetContent class="sm:max-w-[680px] flex flex-col h-full">
-      <SheetHeader>
-        <SheetTitle>New Payment Request</SheetTitle>
-        <SheetDescription>
-          Standalone request — accrual entry generated automatically on approval.
-        </SheetDescription>
-      </SheetHeader>
+  <div class="p-6 space-y-6 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div>
+      <button
+        class="mb-2 flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+        @click="goBack"
+      >
+        ← Back to Requests
+      </button>
+      <h1 class="text-2xl font-bold tracking-tight">New Payment Request</h1>
+      <p class="text-sm text-neutral-500">
+        Standalone request — accrual entry generated automatically on approval.
+      </p>
+    </div>
 
-      <!-- Scroll container -->
-      <div class="flex-1 overflow-y-auto py-6">
-        <!-- Submission Error -->
-        <Alert v-if="submissionError" variant="destructive" class="mb-6">
-          <AlertCircle class="h-4 w-4" />
-          <AlertTitle>Error creating request</AlertTitle>
-          <AlertDescription>
-            {{ submissionError.detail ?? 'An unexpected error occurred.' }}
-          </AlertDescription>
-        </Alert>
+    <!-- Submission Error -->
+    <Alert v-if="submissionError" variant="destructive" class="mb-6">
+      <AlertCircle class="h-4 w-4" />
+      <AlertTitle>Error creating request</AlertTitle>
+      <AlertDescription>
+        {{ submissionError.detail ?? 'An unexpected error occurred.' }}
+      </AlertDescription>
+    </Alert>
 
-        <form
-          class="space-y-6"
-          @submit.prevent="(e) => { (e as Event).stopPropagation(); form.handleSubmit() }"
-        >
-          <!-- Request Details -->
-          <div class="space-y-4">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">
-              Request Details
-            </h3>
+    <form
+      class="space-y-6"
+      @submit.prevent="(e) => { (e as Event).stopPropagation(); form.handleSubmit() }"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle>Request Details</CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
 
             <form.Field name="beneficiaryId">
               <template #default="{ field, state }">
@@ -137,27 +137,30 @@ const { form, error: submissionError } = useCreatePaymentRequest()
               </template>
             </form.Field>
           </div>
+        </CardContent>
+      </Card>
 
-          <!-- Line Items -->
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">
-                Line Items
-              </h3>
-              <form.Field name="lines">
-                <template #default="{ field }">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    type="button"
-                    class="h-7 text-xs"
-                    @click="field.pushValue({ description: '', amount: 0, accountId: '', categoryId: '', taxAmount: 0 })"
-                  >
-                    <Plus class="mr-1 h-3 w-3" /> Add Line
-                  </Button>
-                </template>
-              </form.Field>
-            </div>
+      <!-- Line Items -->
+      <Card>
+        <CardHeader>
+          <div class="flex items-center justify-between">
+            <CardTitle>Line Items</CardTitle>
+            <form.Field name="lines">
+              <template #default="{ field }">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  class="h-7 text-xs"
+                  @click="field.pushValue({ description: '', amount: 0, accountId: '', categoryId: '', taxAmount: 0 })"
+                >
+                  <Plus class="mr-1 h-3 w-3" /> Add Line
+                </Button>
+              </template>
+            </form.Field>
+          </div>
+        </CardHeader>
+        <CardContent class="space-y-4">
 
             <form.Field name="lines">
               <template #default="{ field }">
@@ -214,23 +217,21 @@ const { form, error: submissionError } = useCreatePaymentRequest()
                     </form.Field>
                   </div>
                 </div>
-              </template>
-            </form.Field>
-          </div>
-        </form>
-      </div>
+          </form.Field>
+        </CardContent>
+      </Card>
 
-      <SheetFooter class="border-t pt-4">
-        <Button variant="outline" @click="emit('update:open', false)">Cancel</Button>
+      <div class="flex justify-end gap-3 pt-4">
+        <Button variant="outline" type="button" @click="goBack">Cancel</Button>
         <form.Subscribe v-slot="state">
           <Button
             :disabled="!state.canSubmit || state.isSubmitting"
-            @click="form.handleSubmit()"
+            type="submit"
           >
             {{ state.isSubmitting ? 'Creating…' : 'Create Request' }}
           </Button>
         </form.Subscribe>
-      </SheetFooter>
-    </SheetContent>
-  </Sheet>
+      </div>
+    </form>
+  </div>
 </template>
