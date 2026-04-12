@@ -1,10 +1,6 @@
-import { apiGet, httpClient } from "@/shared/api/http-client";
-import type { ApiResponse } from "@/shared/api/http-client";
-import type {
-  LoginResponseDTO,
-  TenantInfoDTO,
-  UserProfileDTO,
-} from "./api.types";
+import { apiGet, httpClient } from '@/shared/api/http-client'
+import type { ApiResponse } from '@/shared/api/http-client'
+import type { LoginResponseDTO, TenantInfoDTO, UserProfileDTO } from './api.types'
 
 /**
  * Auth API Adapter.
@@ -22,21 +18,17 @@ export const authAdapter = {
    * @returns A promise resolving to the raw login response.
    */
   async login(email: string, password: string): Promise<LoginResponseDTO> {
-    const formData = new URLSearchParams();
-    formData.set("username", email);
-    formData.set("password", password);
+    const formData = new URLSearchParams()
+    formData.set('username', email)
+    formData.set('password', password)
 
-    const response = await httpClient.post<ApiResponse<LoginResponseDTO>>(
-      "/auth/login",
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+    const response = await httpClient.post<ApiResponse<LoginResponseDTO>>('/auth/login', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-    );
+    })
 
-    return response.data.data;
+    return response.data.data
   },
 
   /**
@@ -45,7 +37,7 @@ export const authAdapter = {
    * @returns A promise resolving to the raw UserProfileDTO.
    */
   async getCurrentUser(): Promise<UserProfileDTO> {
-    return apiGet<UserProfileDTO>("/core/users/me");
+    return apiGet<UserProfileDTO>('/core/users/me')
   },
 
   /**
@@ -54,6 +46,6 @@ export const authAdapter = {
    * @returns A promise resolving to the raw TenantInfoDTO.
    */
   async getCurrentTenant(): Promise<TenantInfoDTO> {
-    return apiGet<TenantInfoDTO>("/core/tenants/current");
+    return apiGet<TenantInfoDTO>('/core/tenants/current')
   },
-};
+}

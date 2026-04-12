@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { Button } from "@/shared/components/button";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
-import { useApprovalAction } from "../../application/composables/useApprovalAction";
+import { reactive, ref } from 'vue'
+import { Button } from '@/shared/components/button'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
+import { useApprovalAction } from '../../application/composables/useApprovalAction'
 
 const props = defineProps<{
-  instanceId: string;
-  targetState: string;
-  isOpen: boolean;
-}>();
+  instanceId: string
+  targetState: string
+  isOpen: boolean
+}>()
 
-const emit = defineEmits(["close", "success"]);
+const emit = defineEmits(['close', 'success'])
 
-const { mutateAsync: submitAction, isPending } = useApprovalAction();
-const comments = ref("");
+const { mutateAsync: submitAction, isPending } = useApprovalAction()
+const comments = ref('')
 
-async function handleAction(action: "APPROVE" | "REJECT") {
+async function handleAction(action: 'APPROVE' | 'REJECT') {
   try {
     await submitAction({
       instanceId: props.instanceId,
       action,
       comments: comments.value,
-    });
-    emit("success");
-    emit("close");
+    })
+    emit('success')
+    emit('close')
   } catch (e) {
-    console.error("Failed to submit approval", e);
+    console.error('Failed to submit approval', e)
   }
 }
 </script>
@@ -56,21 +56,11 @@ async function handleAction(action: "APPROVE" | "REJECT") {
       </div>
 
       <footer class="flex items-center justify-end gap-3 pt-4">
-        <Button variant="outline" @click="emit('close')" :disabled="isPending">
-          Cancel
-        </Button>
-        <Button
-          variant="destructive"
-          @click="handleAction('REJECT')"
-          :disabled="isPending"
-        >
+        <Button variant="outline" @click="emit('close')" :disabled="isPending"> Cancel </Button>
+        <Button variant="destructive" @click="handleAction('REJECT')" :disabled="isPending">
           Reject
         </Button>
-        <Button
-          variant="default"
-          @click="handleAction('APPROVE')"
-          :disabled="isPending"
-        >
+        <Button variant="default" @click="handleAction('APPROVE')" :disabled="isPending">
           Approve
         </Button>
       </footer>

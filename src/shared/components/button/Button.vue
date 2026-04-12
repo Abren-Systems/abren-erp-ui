@@ -10,20 +10,20 @@
  *   Submit Request
  * </Button>
  */
-import type { HTMLAttributes } from "vue";
-import { Primitive, type PrimitiveProps } from "radix-vue";
-import { cn } from "@/shared/lib";
-import { type ButtonVariants, buttonVariants } from "./index";
+import type { HTMLAttributes } from 'vue'
+import { Primitive, type PrimitiveProps } from 'radix-vue'
+import { cn } from '@/shared/lib'
+import { type ButtonVariants, buttonVariants } from './index'
 
 interface Props extends PrimitiveProps {
-  variant?: ButtonVariants["variant"];
-  size?: ButtonVariants["size"];
-  class?: HTMLAttributes["class"];
+  variant?: ButtonVariants['variant']
+  size?: ButtonVariants['size']
+  class?: HTMLAttributes['class']
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  as: "button",
-});
+  as: 'button',
+})
 </script>
 
 <template>

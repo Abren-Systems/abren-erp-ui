@@ -6,13 +6,13 @@ import {
   DialogOverlay,
   DialogPortal,
   useForwardPropsEmits,
-} from "radix-vue";
-import { cn } from "@/shared/lib";
+} from 'radix-vue'
+import { cn } from '@/shared/lib'
 
-const props = defineProps<DialogContentProps & { class?: string }>();
-const emits = defineEmits<DialogContentEmits>();
+const props = defineProps<DialogContentProps & { class?: string }>()
+const emits = defineEmits<DialogContentEmits>()
 
-const forwarded = useForwardPropsEmits(props, emits);
+const forwarded = useForwardPropsEmits(props, emits)
 </script>
 
 <template>

@@ -60,8 +60,8 @@ function handleCancel() {
         <DialogTitle>Execute Payment</DialogTitle>
         <DialogDescription>
           Record disbursement details for
-          <span class="font-semibold">{{ totalAmount }}</span>.
-          This will create a journal entry in the General Ledger.
+          <span class="font-semibold">{{ totalAmount }}</span
+          >. This will create a journal entry in the General Ledger.
         </DialogDescription>
       </DialogHeader>
 
@@ -94,10 +94,7 @@ function handleCancel() {
 
       <DialogFooter>
         <Button variant="outline" @click="handleCancel">Cancel</Button>
-        <Button
-          :disabled="!disbursementRef.trim() || isPending"
-          @click="handleConfirm"
-        >
+        <Button :disabled="!disbursementRef.trim() || isPending" @click="handleConfirm">
           {{ isPending ? 'Processing…' : 'Confirm Payment' }}
         </Button>
       </DialogFooter>

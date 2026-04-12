@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 /**
  * DailyCashflowSchema — Architectural shielding for reporting data.
@@ -14,4 +14,4 @@ export const DailyCashflowSchema = z.object({
   projected_outflow: z.string(),
   net_cashflow: z.string(),
   currency_code: z.string(),
-});
+})

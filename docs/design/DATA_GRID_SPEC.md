@@ -377,27 +377,27 @@ DataGrid/
 ```ts
 export interface GridColumnDef<TData> {
   /** Unique column id, maps to TanStack Table accessorKey */
-  id: string;
-  accessorKey: keyof TData | string;
-  label: string;
+  id: string
+  accessorKey: keyof TData | string
+  label: string
   /** Controls cell renderer + inline editor selection */
-  type: "text" | "number" | "currency" | "date" | "status" | "badge";
+  type: 'text' | 'number' | 'currency' | 'date' | 'status' | 'badge'
   /** Pixel width. Defaults per §2.2 */
-  width?: number;
-  minWidth?: number;
-  maxWidth?: number;
+  width?: number
+  minWidth?: number
+  maxWidth?: number
   /** Text alignment override. Defaults: text→left, number/currency→right, status→center */
-  align?: "left" | "right" | "center";
-  sortable?: boolean;
-  filterable?: boolean;
-  editable?: boolean;
-  pinned?: "left" | "right";
+  align?: 'left' | 'right' | 'center'
+  sortable?: boolean
+  filterable?: boolean
+  editable?: boolean
+  pinned?: 'left' | 'right'
   /** Accessor for display value. If omitted, raw value is used. */
-  formatter?: (value: unknown, row: TData) => string;
+  formatter?: (value: unknown, row: TData) => string
   /** Short label for column menu; falls back to label */
-  headerTooltip?: string;
+  headerTooltip?: string
   /** If true, inline editor will require a non-empty value */
-  required?: boolean;
+  required?: boolean
 }
 ```
 
@@ -421,7 +421,7 @@ The grid component is a **controlled component** — it emits state changes via 
 
 ```ts
 // In the page component:
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
+const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 ```
 
 ## 17.1 useDataGrid() — Returns
@@ -528,14 +528,14 @@ Because the backend uses `version_id` (Optimistic Concurrency Control), a 409 Co
 
 ```ts
 interface GridView {
-  id: string;
-  name: string;
-  userId: string; // personal, or null for shared
-  tenantId: string;
-  filters: ColumnFiltersState;
-  sorting: SortingState;
-  columnVisibility: VisibilityState;
-  globalFilter: string;
+  id: string
+  name: string
+  userId: string // personal, or null for shared
+  tenantId: string
+  filters: ColumnFiltersState
+  sorting: SortingState
+  columnVisibility: VisibilityState
+  globalFilter: string
 }
 ```
 

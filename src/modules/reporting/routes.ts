@@ -1,17 +1,17 @@
-import type { RouteRecordRaw } from "vue-router";
-import CashflowDashboard from "./ui/CashflowDashboard.vue";
+import type { RouteRecordRaw } from 'vue-router'
+import CashflowDashboard from './ui/CashflowDashboard.vue'
 
 export const reportingRoutes: RouteRecordRaw[] = [
   {
-    path: "/business/reporting",
-    name: "reporting.dashboard",
+    path: '/business/reporting',
+    name: 'reporting.dashboard',
     component: CashflowDashboard,
     meta: {
-      title: "Reporting Dashboard",
+      title: 'Reporting Dashboard',
       requiresAuth: true,
-      module: "reporting",
+      module: 'reporting',
     },
   },
-];
+]
 
-export default reportingRoutes;
+export default reportingRoutes

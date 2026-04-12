@@ -6,6 +6,6 @@
  */
 
 export const AUTH_KEYS = {
-  ACCESS_TOKEN: "abren_access_token",
-  REFRESH_TOKEN: "abren_refresh_token",
-} as const;
+  ACCESS_TOKEN: 'abren_access_token',
+  REFRESH_TOKEN: 'abren_refresh_token',
+} as const

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { Button } from "@/shared/components/button";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
+import { ref } from 'vue'
+import { Button } from '@/shared/components/button'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
 import {
   Sheet,
   SheetContent,
@@ -10,35 +10,35 @@ import {
   SheetTitle,
   SheetDescription,
   SheetFooter,
-} from "@/shared/components/sheet";
-import { useFiscalPeriods } from "../../../application/composables/useFiscalPeriods";
+} from '@/shared/components/sheet'
+import { useFiscalPeriods } from '../../../application/composables/useFiscalPeriods'
 
 /**
  * FiscalPeriodCreateDrawer — Slide-out for creating new fiscal periods.
  */
 
-const props = defineProps<{ open: boolean }>();
-const emit = defineEmits<{ (e: "update:open", val: boolean): void }>();
+const props = defineProps<{ open: boolean }>()
+const emit = defineEmits<{ (e: 'update:open', val: boolean): void }>()
 
-const { createPeriod, isLoading } = useFiscalPeriods();
+const { createPeriod, isLoading } = useFiscalPeriods()
 
 const form = ref({
-  name: "",
-  start_date: "",
-  end_date: "",
-});
+  name: '',
+  start_date: '',
+  end_date: '',
+})
 
 async function handleSubmit() {
-  if (!form.value.name || !form.value.start_date || !form.value.end_date) return;
+  if (!form.value.name || !form.value.start_date || !form.value.end_date) return
 
   try {
     await createPeriod({
       name: form.value.name,
       start_date: form.value.start_date as unknown as Date,
       end_date: form.value.end_date as unknown as Date,
-    });
-    emit("update:open", false);
-    form.value = { name: "", start_date: "", end_date: "" };
+    })
+    emit('update:open', false)
+    form.value = { name: '', start_date: '', end_date: '' }
   } catch {
     // Error Contract handles field errors
   }
@@ -58,11 +58,7 @@ async function handleSubmit() {
       <form class="py-6 space-y-5" @submit.prevent="handleSubmit">
         <div class="grid gap-2">
           <Label for="fp-name">Period Name <span class="text-destructive">*</span></Label>
-          <Input
-            id="fp-name"
-            v-model="form.name"
-            placeholder="e.g. FY 2026 Q1"
-          />
+          <Input id="fp-name" v-model="form.name" placeholder="e.g. FY 2026 Q1" />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -84,7 +80,7 @@ async function handleSubmit() {
             type="submit"
             :disabled="!form.name || !form.start_date || !form.end_date || isLoading"
           >
-            {{ isLoading ? "Creating…" : "Create Period" }}
+            {{ isLoading ? 'Creating…' : 'Create Period' }}
           </Button>
         </SheetFooter>
       </form>

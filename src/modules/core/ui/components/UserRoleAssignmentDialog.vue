@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed } from 'vue'
 import {
   Dialog,
   DialogContent,
@@ -7,46 +7,46 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/shared/components/dialog";
-import { Button } from "@/shared/components/button";
+} from '@/shared/components/dialog'
+import { Button } from '@/shared/components/button'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/components/select";
-import { Label } from "@/shared/components/label";
-import { useRoles } from "../../application/composables/useRoles";
-import { useUsers } from "../../application/composables/useUsers";
-import type { User } from "../../domain/user.types";
+} from '@/shared/components/select'
+import { Label } from '@/shared/components/label'
+import { useRoles } from '../../application/composables/useRoles'
+import { useUsers } from '../../application/composables/useUsers'
+import type { User } from '../../domain/user.types'
 
 const props = defineProps<{
-  user: User | null;
-  open: boolean;
-}>();
+  user: User | null
+  open: boolean
+}>()
 
 const emit = defineEmits<{
-  (e: "update:open", value: boolean): void;
-}>();
+  (e: 'update:open', value: boolean): void
+}>()
 
-const { roles, isRolesPending } = useRoles();
-const { assignRole, isAssigning } = useUsers();
+const { roles, isRolesPending } = useRoles()
+const { assignRole, isAssigning } = useUsers()
 
-const selectedRoleId = ref<string>("");
+const selectedRoleId = ref<string>('')
 
 async function handleAssign() {
-  if (!props.user || !selectedRoleId.value) return;
+  if (!props.user || !selectedRoleId.value) return
 
   try {
     await assignRole({
       user_id: props.user.id,
       role_id: selectedRoleId.value,
-    });
-    emit("update:open", false);
-    selectedRoleId.value = "";
+    })
+    emit('update:open', false)
+    selectedRoleId.value = ''
   } catch (err) {
-    console.error("Failed to assign role:", err);
+    console.error('Failed to assign role:', err)
   }
 }
 </script>
@@ -57,7 +57,8 @@ async function handleAssign() {
       <DialogHeader>
         <DialogTitle>Assign Role</DialogTitle>
         <DialogDescription>
-          Grant additional access boundaries to <strong>{{ user?.email }}</strong>.
+          Grant additional access boundaries to <strong>{{ user?.email }}</strong
+          >.
         </DialogDescription>
       </DialogHeader>
 
@@ -69,11 +70,7 @@ async function handleAssign() {
               <SelectValue placeholder="Select a boundary..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem
-                v-for="role in roles"
-                :key="role.id"
-                :value="role.id"
-              >
+              <SelectItem v-for="role in roles" :key="role.id" :value="role.id">
                 {{ role.name }}
               </SelectItem>
             </SelectContent>
@@ -85,18 +82,11 @@ async function handleAssign() {
       </div>
 
       <DialogFooter>
-        <Button
-          variant="outline"
-          @click="emit('update:open', false)"
-          :disabled="isAssigning"
-        >
+        <Button variant="outline" @click="emit('update:open', false)" :disabled="isAssigning">
           Cancel
         </Button>
-        <Button
-          @click="handleAssign"
-          :disabled="!selectedRoleId || isAssigning"
-        >
-          {{ isAssigning ? "Assigning..." : "Assign Boundary" }}
+        <Button @click="handleAssign" :disabled="!selectedRoleId || isAssigning">
+          {{ isAssigning ? 'Assigning...' : 'Assign Boundary' }}
         </Button>
       </DialogFooter>
     </DialogContent>

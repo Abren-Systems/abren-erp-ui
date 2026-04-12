@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { DataGrid, useDataGrid } from "@/shared/components/data-grid";
-import { workflowColumns } from "../grids/workflow.grid";
-import { usePendingApprovals } from "../../application/composables/usePendingApprovals";
-import WorkflowActionDialog from "../components/WorkflowActionDialog.vue";
-import type { PendingApproval } from "../../domain/workflows.types";
+import { ref } from 'vue'
+import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { workflowColumns } from '../grids/workflow.grid'
+import { usePendingApprovals } from '../../application/composables/usePendingApprovals'
+import WorkflowActionDialog from '../components/WorkflowActionDialog.vue'
+import type { PendingApproval } from '../../domain/workflows.types'
 
-const { tasks, isLoading, refresh } = usePendingApprovals();
-const gridState = useDataGrid();
+const { tasks, isLoading, refresh } = usePendingApprovals()
+const gridState = useDataGrid()
 
-const selectedTask = ref<PendingApproval | null>(null);
-const isDialogOpen = ref(false);
+const selectedTask = ref<PendingApproval | null>(null)
+const isDialogOpen = ref(false)
 
 function handleRowClick(task: PendingApproval) {
-  selectedTask.value = task;
-  isDialogOpen.value = true;
+  selectedTask.value = task
+  isDialogOpen.value = true
 }
 
 function handleSuccess() {
-  refresh();
-  selectedTask.value = null;
+  refresh()
+  selectedTask.value = null
 }
 </script>
 
@@ -28,9 +28,7 @@ function handleSuccess() {
     <header class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Workflow Inbox</h1>
-        <p class="text-sm text-neutral-500">
-          Review and approve pending tasks across all modules.
-        </p>
+        <p class="text-sm text-neutral-500">Review and approve pending tasks across all modules.</p>
       </div>
     </header>
 

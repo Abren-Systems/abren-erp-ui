@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import { cn } from "@/shared/lib";
+import { cn } from '@/shared/lib'
 
 interface CardProps {
-  class?: string;
+  class?: string
 }
 
-defineProps<CardProps>();
+defineProps<CardProps>()
 </script>
 
 <template>
-  <div
-    :class="
-      cn(
-        'rounded-xl border border-neutral-200 bg-white shadow-sm',
-        $props.class,
-      )
-    "
-  >
+  <div :class="cn('rounded-xl border border-neutral-200 bg-white shadow-sm', $props.class)">
     <slot />
   </div>
 </template>

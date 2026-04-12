@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { DropdownMenuLabel, type DropdownMenuLabelProps } from "radix-vue";
-import { cn } from "@/shared/lib";
+import { DropdownMenuLabel, type DropdownMenuLabelProps } from 'radix-vue'
+import { cn } from '@/shared/lib'
 
-const props = defineProps<
-  DropdownMenuLabelProps & { class?: string; inset?: boolean }
->();
+const props = defineProps<DropdownMenuLabelProps & { class?: string; inset?: boolean }>()
 </script>
 
 <template>
   <DropdownMenuLabel
     v-bind="props"
-    :class="
-      cn('px-2 py-1.5 text-sm font-semibold', inset && 'pl-8', $props.class)
-    "
+    :class="cn('px-2 py-1.5 text-sm font-semibold', inset && 'pl-8', $props.class)"
   >
     <slot />
   </DropdownMenuLabel>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { Button } from "@/shared/components/button";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
+import { ref } from 'vue'
+import { Button } from '@/shared/components/button'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
 import {
   Sheet,
   SheetContent,
@@ -10,28 +10,28 @@ import {
   SheetTitle,
   SheetDescription,
   SheetFooter,
-} from "@/shared/components/sheet";
+} from '@/shared/components/sheet'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/components/select";
-import { useLedgerAccounts } from "../../../application/composables/useLedgerAccounts";
-import { AccountType } from "../../../domain/account.types";
+} from '@/shared/components/select'
+import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
+import { AccountType } from '../../../domain/account.types'
 
-const props = defineProps<{ open: boolean }>();
-const emit = defineEmits<{ (e: "update:open", val: boolean): void }>();
+const props = defineProps<{ open: boolean }>()
+const emit = defineEmits<{ (e: 'update:open', val: boolean): void }>()
 
-const { accounts, createAccount, isCreating } = useLedgerAccounts();
+const { accounts, createAccount, isCreating } = useLedgerAccounts()
 
 const form = ref({
-  name: "",
+  name: '',
   code: null as number | null,
-  account_type: "ASSET",
+  account_type: 'ASSET',
   parent_id: null as string | null,
-});
+})
 
 const accountTypes = [
   AccountType.ASSET,
@@ -39,10 +39,10 @@ const accountTypes = [
   AccountType.EQUITY,
   AccountType.REVENUE,
   AccountType.EXPENSE,
-];
+]
 
 async function handleSubmit() {
-  if (!form.value.name || !form.value.code) return;
+  if (!form.value.name || !form.value.code) return
 
   try {
     await createAccount({
@@ -50,19 +50,19 @@ async function handleSubmit() {
       code: form.value.code,
       account_type: form.value.account_type,
       parent_id: form.value.parent_id,
-    });
-    
-    emit("update:open", false);
-    
+    })
+
+    emit('update:open', false)
+
     // Reset form
     form.value = {
-      name: "",
+      name: '',
       code: null,
-      account_type: "ASSET",
+      account_type: 'ASSET',
       parent_id: null,
-    };
+    }
   } catch (err) {
-    console.error("Failed to create account:", err);
+    console.error('Failed to create account:', err)
   }
 }
 </script>
@@ -81,12 +81,7 @@ async function handleSubmit() {
         <div class="grid grid-cols-2 gap-4">
           <div class="grid gap-2">
             <Label for="code">Account Code <span class="text-rose-500">*</span></Label>
-            <Input
-              id="code"
-              type="number"
-              v-model.number="form.code"
-              placeholder="e.g. 1010"
-            />
+            <Input id="code" type="number" v-model.number="form.code" placeholder="e.g. 1010" />
           </div>
 
           <div class="grid gap-2">
@@ -128,11 +123,7 @@ async function handleSubmit() {
         </div>
 
         <SheetFooter class="pt-6 border-t mt-6">
-          <Button
-            variant="outline"
-            type="button"
-            @click="emit('update:open', false)"
-          >
+          <Button variant="outline" type="button" @click="emit('update:open', false)">
             Cancel
           </Button>
           <Button
@@ -140,7 +131,7 @@ async function handleSubmit() {
             type="submit"
             :disabled="!form.name || !form.code || isCreating"
           >
-            {{ isCreating ? "Creating…" : "Save Account" }}
+            {{ isCreating ? 'Creating…' : 'Save Account' }}
           </Button>
         </SheetFooter>
       </form>

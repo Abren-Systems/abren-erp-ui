@@ -1,21 +1,10 @@
-import { apiGet, apiPost } from "@/shared/api/http-client";
-import { CommonMapper } from "@/shared/infrastructure/mappers";
-import type { BankAccountId } from "@/shared/types/brand.types";
-import type {
-  BankAccount,
-  BankTransaction,
-  ScheduledPayment,
-} from "../domain/bank.types";
-import type {
-  CreateScheduledPaymentRequest,
-  ScheduledPaymentDTO,
-} from "./api.types";
-import {
-  BankAccountSchema,
-  BankTransactionSchema,
-  ScheduledPaymentSchema,
-} from "./api.schemas";
-import { BankMapper } from "./mappers";
+import { apiGet, apiPost } from '@/shared/api/http-client'
+import { CommonMapper } from '@/shared/infrastructure/mappers'
+import type { BankAccountId } from '@/shared/types/brand.types'
+import type { BankAccount, BankTransaction, ScheduledPayment } from '../domain/bank.types'
+import type { CreateScheduledPaymentRequest, ScheduledPaymentDTO } from './api.types'
+import { BankAccountSchema, BankTransactionSchema, ScheduledPaymentSchema } from './api.schemas'
+import { BankMapper } from './mappers'
 
 /**
  * Bank API Adapter
@@ -30,11 +19,9 @@ export const bankAdapter = {
    * @returns List of validated and mapped BankAccounts.
    */
   async getBankAccounts(): Promise<BankAccount[]> {
-    const raw = (await apiGet<unknown[]>("/finance/bank/accounts")) || [];
-    const dtos = raw.map((item) => BankAccountSchema.parse(item));
-    return CommonMapper.mapCollection(dtos, (dto) =>
-      BankMapper.toBankAccount(dto),
-    );
+    const raw = (await apiGet<unknown[]>('/finance/bank/accounts')) || []
+    const dtos = raw.map((item) => BankAccountSchema.parse(item))
+    return CommonMapper.mapCollection(dtos, (dto) => BankMapper.toBankAccount(dto))
   },
 
   /**
@@ -44,12 +31,9 @@ export const bankAdapter = {
    * @returns List of validated and mapped BankTransactions.
    */
   async getTransactions(accountId: BankAccountId): Promise<BankTransaction[]> {
-    const raw =
-      (await apiGet<unknown[]>(
-        `/finance/bank/accounts/${accountId}/transactions`,
-      )) || [];
-    const dtos = raw.map((item) => BankTransactionSchema.parse(item));
-    return dtos.map((dto) => BankMapper.toTransaction(dto, accountId));
+    const raw = (await apiGet<unknown[]>(`/finance/bank/accounts/${accountId}/transactions`)) || []
+    const dtos = raw.map((item) => BankTransactionSchema.parse(item))
+    return dtos.map((dto) => BankMapper.toTransaction(dto, accountId))
   },
 
   /**
@@ -58,12 +42,9 @@ export const bankAdapter = {
    * @returns List of validated and mapped ScheduledPayments.
    */
   async getScheduledPayments(): Promise<ScheduledPayment[]> {
-    const raw =
-      (await apiGet<unknown[]>("/finance/bank/scheduled-payments")) || [];
-    const dtos = raw.map((item) => ScheduledPaymentSchema.parse(item));
-    return CommonMapper.mapCollection(dtos, (dto) =>
-      BankMapper.toScheduledPayment(dto),
-    );
+    const raw = (await apiGet<unknown[]>('/finance/bank/scheduled-payments')) || []
+    const dtos = raw.map((item) => ScheduledPaymentSchema.parse(item))
+    return CommonMapper.mapCollection(dtos, (dto) => BankMapper.toScheduledPayment(dto))
   },
 
   /**
@@ -72,15 +53,10 @@ export const bankAdapter = {
    * @param data - The scheduled payment request payload.
    * @returns The created and validated ScheduledPayment domain model.
    */
-  async createScheduledPayment(
-    data: CreateScheduledPaymentRequest,
-  ): Promise<ScheduledPayment> {
-    const raw = await apiPost<ScheduledPaymentDTO>(
-      "/finance/bank/scheduled-payments",
-      data,
-    );
-    const dto = ScheduledPaymentSchema.parse(raw);
-    return BankMapper.toScheduledPayment(dto);
+  async createScheduledPayment(data: CreateScheduledPaymentRequest): Promise<ScheduledPayment> {
+    const raw = await apiPost<ScheduledPaymentDTO>('/finance/bank/scheduled-payments', data)
+    const dto = ScheduledPaymentSchema.parse(raw)
+    return BankMapper.toScheduledPayment(dto)
   },
 
   /**
@@ -92,8 +68,8 @@ export const bankAdapter = {
   async releaseScheduledPayment(paymentId: string): Promise<ScheduledPayment> {
     const raw = await apiPost<ScheduledPaymentDTO>(
       `/finance/bank/scheduled-payments/${paymentId}/release`,
-    );
-    const dto = ScheduledPaymentSchema.parse(raw);
-    return BankMapper.toScheduledPayment(dto);
+    )
+    const dto = ScheduledPaymentSchema.parse(raw)
+    return BankMapper.toScheduledPayment(dto)
   },
-};
+}

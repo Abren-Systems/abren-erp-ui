@@ -46,65 +46,65 @@ Mappers are the most critical unit tests. They ensure that backend changes to DT
 
 ```typescript
 // modules/finance/ap/infrastructure/__tests__/payment-request.mapper.test.ts
-import { describe, it, expect } from "vitest";
-import { toViewModel, toDTO } from "../payment_request.mapper";
-import type { PaymentRequestDTO } from "../api.types";
+import { describe, it, expect } from 'vitest'
+import { toViewModel, toDTO } from '../payment_request.mapper'
+import type { PaymentRequestDTO } from '../api.types'
 
-describe("PaymentRequest Mapper (Factory)", () => {
+describe('PaymentRequest Mapper (Factory)', () => {
   const baseDTO: PaymentRequestDTO = {
-    id: "550e8400-e29b-41d4-a716-446655440000",
-    beneficiary_name: "Acme Corp",
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    beneficiary_name: 'Acme Corp',
     amount: 15000.5,
-    currency: "ETB",
-    status: "DRAFT",
+    currency: 'ETB',
+    status: 'DRAFT',
     bank_account_id: null,
     submitted_at: null,
     paid_at: null,
     current_approval_step: 0,
     assigned_approver_id: null,
-  };
+  }
 
-  it("maps DTO to ViewModel (toViewModel)", () => {
-    const vm = toViewModel(baseDTO);
-    expect(vm.beneficiary).toBe("Acme Corp");
-    expect(vm.amount.amount).toBe(15000.5);
-    expect(vm.canSubmit).toBe(true);
-  });
+  it('maps DTO to ViewModel (toViewModel)', () => {
+    const vm = toViewModel(baseDTO)
+    expect(vm.beneficiary).toBe('Acme Corp')
+    expect(vm.amount.amount).toBe(15000.5)
+    expect(vm.canSubmit).toBe(true)
+  })
 
-  it("maps Form Values to DTO (toDTO)", () => {
-    const formValues = { beneficiaryName: "New Corp", amount: 500 };
-    const dto = toDTO(formValues);
-    expect(dto.beneficiary_name).toBe("New Corp");
-    expect(dto.amount).toBe(500);
-  });
+  it('maps Form Values to DTO (toDTO)', () => {
+    const formValues = { beneficiaryName: 'New Corp', amount: 500 }
+    const dto = toDTO(formValues)
+    expect(dto.beneficiary_name).toBe('New Corp')
+    expect(dto.amount).toBe(500)
+  })
 
-  it("handles edge cases (e.g. null dates)", () => {
-    const vm = toViewModel(baseDTO);
-    expect(vm.submittedAt).toBeNull();
-  });
-});
+  it('handles edge cases (e.g. null dates)', () => {
+    const vm = toViewModel(baseDTO)
+    expect(vm.submittedAt).toBeNull()
+  })
+})
 ```
 
 ### 3.2 Value Object Tests
 
 ```typescript
 // core/domain/__tests__/money.test.ts
-import { describe, it, expect } from "vitest";
-import { Money, Currency } from "../money";
+import { describe, it, expect } from 'vitest'
+import { Money, Currency } from '../money'
 
-describe("Money (Value Object)", () => {
-  it("adds same-currency amounts", () => {
-    const a = Money.from(100, Currency.ETB);
-    const b = Money.from(50.25, Currency.ETB);
-    expect(a.add(b).amount).toBe(150.25);
-  });
+describe('Money (Value Object)', () => {
+  it('adds same-currency amounts', () => {
+    const a = Money.from(100, Currency.ETB)
+    const b = Money.from(50.25, Currency.ETB)
+    expect(a.add(b).amount).toBe(150.25)
+  })
 
-  it("throws on cross-currency addition", () => {
-    const etb = Money.from(100, Currency.ETB);
-    const usd = Money.from(50, Currency.USD);
-    expect(() => etb.add(usd)).toThrow();
-  });
-});
+  it('throws on cross-currency addition', () => {
+    const etb = Money.from(100, Currency.ETB)
+    const usd = Money.from(50, Currency.USD)
+    expect(() => etb.add(usd)).toThrow()
+  })
+})
 ```
 
 ### 3.3 Composable Tests (Application Side-Effects)
@@ -113,26 +113,24 @@ Testing a Composable (UI Facade) requires asserting that the correct **Side Effe
 
 ```typescript
 // modules/finance/ap/application/composables/__tests__/usePayRequest.test.ts
-import { describe, it, expect, vi } from "vitest";
-import { usePayRequest } from "../usePayRequest";
+import { describe, it, expect, vi } from 'vitest'
+import { usePayRequest } from '../usePayRequest'
 
-describe("usePayRequest (Application Facade)", () => {
-  it("triggers toast and cache invalidation on success", async () => {
-    const { payRequest } = usePayRequest();
-    const toast = useToast(); // mocked
-    const queryClient = useQueryClient(); // mocked
+describe('usePayRequest (Application Facade)', () => {
+  it('triggers toast and cache invalidation on success', async () => {
+    const { payRequest } = usePayRequest()
+    const toast = useToast() // mocked
+    const queryClient = useQueryClient() // mocked
 
-    await payRequest("123", { amount: 500 });
+    await payRequest('123', { amount: 500 })
 
     // Verify Side Effects
-    expect(toast.success).toHaveBeenCalledWith(
-      expect.stringContaining("Success"),
-    );
+    expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('Success'))
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: ["payment-requests"],
-    });
-  });
-});
+      queryKey: ['payment-requests'],
+    })
+  })
+})
 ```
 
 ### 3.4 Grid Configuration Tests (UI Layer)
@@ -141,19 +139,19 @@ Tests that the column definitions have correct formatters and alignment.
 
 ```typescript
 // modules/finance/ledger/ui/grids/__tests__/account.grid.test.ts
-import { describe, it, expect } from "vitest";
-import { accountColumns } from "../account.grid";
+import { describe, it, expect } from 'vitest'
+import { accountColumns } from '../account.grid'
 
-describe("Account Grid Configuration", () => {
-  it("defines the Code column with correct alignment", () => {
-    const col = accountColumns.find((c) => c.id === "code");
-    expect(col.meta?.align).toBe("left");
-  });
+describe('Account Grid Configuration', () => {
+  it('defines the Code column with correct alignment', () => {
+    const col = accountColumns.find((c) => c.id === 'code')
+    expect(col.meta?.align).toBe('left')
+  })
 
-  it("assigns the Currency formatter to the balance column", () => {
+  it('assigns the Currency formatter to the balance column', () => {
     // ... verify formatter logic
-  });
-});
+  })
+})
 ```
 
 ---
@@ -219,32 +217,28 @@ E2E tests cover **critical business paths** only. They run against the actual ba
 
 ```typescript
 // tests/e2e/payment-request-lifecycle.spec.ts
-import { test, expect } from "@playwright/test";
+import { test, expect } from '@playwright/test'
 
-test("complete payment request lifecycle", async ({ page }) => {
+test('complete payment request lifecycle', async ({ page }) => {
   // Login
-  await page.goto("/login");
-  await page.fill('[data-testid="email"]', "finance@acme.com");
-  await page.fill('[data-testid="password"]', "test123");
-  await page.click('[data-testid="login-button"]');
-  await expect(page).toHaveURL("/app/dashboard");
+  await page.goto('/login')
+  await page.fill('[data-testid="email"]', 'finance@acme.com')
+  await page.fill('[data-testid="password"]', 'test123')
+  await page.click('[data-testid="login-button"]')
+  await expect(page).toHaveURL('/app/dashboard')
 
   // Create request
-  await page.click('[data-testid="nav-payment-requests"]');
-  await page.click('[data-testid="create-request"]');
-  await page.fill('[data-testid="beneficiary"]', "Supplier XYZ");
-  await page.fill('[data-testid="amount"]', "50000");
-  await page.click('[data-testid="save-draft"]');
-  await expect(page.locator('[data-testid="status-badge"]')).toHaveText(
-    "Draft",
-  );
+  await page.click('[data-testid="nav-payment-requests"]')
+  await page.click('[data-testid="create-request"]')
+  await page.fill('[data-testid="beneficiary"]', 'Supplier XYZ')
+  await page.fill('[data-testid="amount"]', '50000')
+  await page.click('[data-testid="save-draft"]')
+  await expect(page.locator('[data-testid="status-badge"]')).toHaveText('Draft')
 
   // Submit for approval
-  await page.click('[data-testid="submit-button"]');
-  await expect(page.locator('[data-testid="status-badge"]')).toHaveText(
-    "Submitted",
-  );
-});
+  await page.click('[data-testid="submit-button"]')
+  await expect(page.locator('[data-testid="status-badge"]')).toHaveText('Submitted')
+})
 ```
 
 ---

@@ -1,5 +1,5 @@
-import { useMutation, type UseMutationOptions } from "@tanstack/vue-query";
-import type { ApiError } from "../api/http-client";
+import { useMutation, type UseMutationOptions } from '@tanstack/vue-query'
+import type { ApiError } from '../api/http-client'
 
 /**
  * useApiMutation
@@ -10,20 +10,12 @@ import type { ApiError } from "../api/http-client";
  * @example
  * const { mutateAsync } = useApiMutation((data) => api.updateUser(data))
  */
-export function useApiMutation<
-  TData,
-  TError = ApiError,
-  TVariables = void,
-  TContext = unknown,
->(
+export function useApiMutation<TData, TError = ApiError, TVariables = void, TContext = unknown>(
   mutationFn: (variables: TVariables) => Promise<TData>,
-  options?: Omit<
-    UseMutationOptions<TData, TError, TVariables, TContext>,
-    "mutationFn"
-  >,
+  options?: Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationFn'>,
 ) {
   return useMutation({
     mutationFn,
     ...options,
-  });
+  })
 }

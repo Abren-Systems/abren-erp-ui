@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { MoreHorizontal } from "lucide-vue-next";
-import { Button } from "@/shared/components/button";
+import { MoreHorizontal } from 'lucide-vue-next'
+import { Button } from '@/shared/components/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/shared/components/dropdown-menu";
-import type { Action } from "../types";
+} from '@/shared/components/dropdown-menu'
+import type { Action } from '../types'
 
 defineProps<{
-  row: unknown;
-  actions: Action<unknown>[];
-}>();
+  row: unknown
+  actions: Action<unknown>[]
+}>()
 </script>
 
 <template>
@@ -31,11 +31,7 @@ defineProps<{
           :class="action.variant === 'destructive' ? 'text-danger-600' : ''"
           @click="action.onClick(row)"
         >
-          <component
-            :is="action.icon"
-            v-if="action.icon"
-            class="mr-2 h-4 w-4"
-          />
+          <component :is="action.icon" v-if="action.icon" class="mr-2 h-4 w-4" />
           {{ action.label }}
         </DropdownMenuItem>
       </DropdownMenuContent>

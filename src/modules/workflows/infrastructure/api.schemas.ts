@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 /**
  * Zod Schemas for Workflows Module.
@@ -13,11 +13,11 @@ export const PendingApprovalSchema = z.object({
   target_state: z.string().nullable(),
   required_role: z.string().nullable(),
   submitted_at: z.string().datetime().nullable(),
-});
+})
 
 export const WorkflowTemplateSchema = z.object({
   id: z.string().uuid(),
   code: z.string(),
   name: z.string(),
   entity_type: z.string(),
-});
+})

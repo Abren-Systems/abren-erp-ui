@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { Badge } from "@/shared/components/badge";
-import { cn } from "@/shared/lib";
+import { Badge } from '@/shared/components/badge'
+import { cn } from '@/shared/lib'
 
 interface BadgeCellProps {
-  status: string;
-  variants: Record<string, "default" | "secondary" | "destructive" | "outline">;
-  class?: string;
+  status: string
+  variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'>
+  class?: string
 }
 
-defineProps<BadgeCellProps>();
+defineProps<BadgeCellProps>()
 </script>
 
 <template>

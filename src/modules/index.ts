@@ -1,14 +1,11 @@
-import { coreModule } from "./core";
-import { ledgerModule } from "./finance/ledger";
-import { bankModule } from "./finance/bank";
-import { apModule } from "./finance/ap";
-import { reportingModule } from "./reporting";
-import { workflowsModule } from "./workflows";
-import { inventoryModule } from "./inventory";
-import type {
-  BusinessDomain,
-  PlatformEngine,
-} from "@/shared/types/module.types";
+import { coreModule } from './core'
+import { ledgerModule } from './finance/ledger'
+import { bankModule } from './finance/bank'
+import { apModule } from './finance/ap'
+import { reportingModule } from './reporting'
+import { workflowsModule } from './workflows'
+import { inventoryModule } from './inventory'
+import type { BusinessDomain, PlatformEngine } from '@/shared/types/module.types'
 
 /**
  * Categorized Module Registry
@@ -21,9 +18,9 @@ export const businessModules: BusinessDomain[] = [
   apModule,
   reportingModule,
   inventoryModule,
-];
+]
 
-export const platformModules: PlatformEngine[] = [coreModule, workflowsModule];
+export const platformModules: PlatformEngine[] = [coreModule, workflowsModule]
 
 // All modules for convenience (e.g. router)
-export const allModules = [...businessModules, ...platformModules];
+export const allModules = [...businessModules, ...platformModules]

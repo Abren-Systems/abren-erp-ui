@@ -1,4 +1,4 @@
-import { toId } from "@/shared/types/brand.types";
+import { toId } from '@/shared/types/brand.types'
 import type {
   WarehouseId,
   ItemId,
@@ -6,7 +6,7 @@ import type {
   StockItemId,
   BatchId,
   SerialNumberId,
-} from "@/shared/types/brand.types";
+} from '@/shared/types/brand.types'
 import type {
   WarehouseDTO,
   ItemDTO,
@@ -14,14 +14,8 @@ import type {
   BatchDTO,
   SerialNumberDTO,
   TrackingMode,
-} from "./api.types";
-import type {
-  Warehouse,
-  Item,
-  StockItem,
-  Batch,
-  SerialNumber,
-} from "../domain/types";
+} from './api.types'
+import type { Warehouse, Item, StockItem, Batch, SerialNumber } from '../domain/types'
 
 /**
  * Mapper-as-Factory for the Inventory Module.
@@ -35,7 +29,7 @@ export class InventoryMapper {
       code: dto.code,
       isActive: dto.is_active,
       isQuarantine: dto.is_quarantine,
-    };
+    }
   }
 
   static toItem(dto: ItemDTO): Item {
@@ -45,7 +39,7 @@ export class InventoryMapper {
       sku: dto.sku,
       name: dto.name,
       trackingMode: dto.tracking_mode as TrackingMode,
-    };
+    }
   }
 
   static toStockItem(dto: StockLevelDTO): StockItem {
@@ -57,7 +51,7 @@ export class InventoryMapper {
       totalValue: Number(dto.total_value),
       batchId: null, // Extended fields to be populated if needed in future
       serialId: null,
-    };
+    }
   }
 
   static toBatch(dto: BatchDTO): Batch {
@@ -67,7 +61,7 @@ export class InventoryMapper {
       batchNumber: dto.batch_number,
       productionDate: dto.production_date ?? null,
       expiryDate: dto.expiry_date ?? null,
-    };
+    }
   }
 
   static toSerialNumber(dto: SerialNumberDTO): SerialNumber {
@@ -77,6 +71,6 @@ export class InventoryMapper {
       serialNumber: dto.serial_number,
       currentStockItemId: null, // TBD or populated by join
       isAvailable: dto.is_available,
-    };
+    }
   }
 }

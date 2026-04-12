@@ -52,9 +52,7 @@ function handleCancel() {
       </DialogHeader>
 
       <div class="grid gap-2 py-4">
-        <Label for="reject-reason">
-          Reason <span class="text-destructive">*</span>
-        </Label>
+        <Label for="reject-reason"> Reason <span class="text-destructive">*</span> </Label>
         <textarea
           id="reject-reason"
           v-model="reason"

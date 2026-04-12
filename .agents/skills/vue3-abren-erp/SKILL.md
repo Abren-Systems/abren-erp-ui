@@ -67,27 +67,27 @@ Pages are the stateful entry points of a module. They compose shared **Engines**
 ```vue
 <!-- modules/finance/ledger/ui/accounts/pages/ChartOfAccountsListPage.vue -->
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { DataGrid, useDataGrid } from "@/shared/components/data-grid";
-import { Button } from "@/shared/components/button";
-import { useLedgerAccounts } from "../../application/composables/useLedgerAccounts";
-import { accountColumns } from "../grids/account.grid";
+import { useRouter } from 'vue-router'
+import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { Button } from '@/shared/components/button'
+import { useLedgerAccounts } from '../../application/composables/useLedgerAccounts'
+import { accountColumns } from '../grids/account.grid'
 
 /**
  * Page: Ledger Accounts List.
  *
  * Orchestrates the Chart of Accounts grid and interaction logic.
  */
-const router = useRouter();
+const router = useRouter()
 
 // 1. Application Layer (Domain state)
-const { accounts, isPending, error } = useLedgerAccounts();
+const { accounts, isPending, error } = useLedgerAccounts()
 
 // 2. UI Layer (Local ephemeral grid state)
-const { gridState } = useDataGrid();
+const { gridState } = useDataGrid()
 
 function handleRowClick(account: any) {
-  router.push({ name: "ledger.account-detail", params: { id: account.id } });
+  router.push({ name: 'ledger.account-detail', params: { id: account.id } })
 }
 </script>
 
@@ -97,9 +97,7 @@ function handleRowClick(account: any) {
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Chart of Accounts</h1>
       </div>
-      <Button @click="router.push({ name: 'ledger.account-create' })">
-        New Account
-      </Button>
+      <Button @click="router.push({ name: 'ledger.account-create' })"> New Account </Button>
     </header>
 
     <DataGrid
@@ -121,19 +119,19 @@ Pinia is strictly for **ephemeral UI state**. **NEVER** duplicate domain data (S
 
 ```typescript
 // modules/finance/ledger/ui/store/ledger-ui.store.ts
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export const useLedgerUIStore = defineStore("ledger-ui", () => {
-  const isFilterPanelVisible = ref(false);
-  const density = ref<"comfortable" | "compact">("compact");
+export const useLedgerUIStore = defineStore('ledger-ui', () => {
+  const isFilterPanelVisible = ref(false)
+  const density = ref<'comfortable' | 'compact'>('compact')
 
   function toggleFilters() {
-    isFilterPanelVisible.value = !isFilterPanelVisible.value;
+    isFilterPanelVisible.value = !isFilterPanelVisible.value
   }
 
-  return { isFilterPanelVisible, density, toggleFilters };
-});
+  return { isFilterPanelVisible, density, toggleFilters }
+})
 ```
 
 ---
@@ -145,10 +143,10 @@ All queries must use `useQuery`, all mutations must use `useApiMutation`.
 
 ```typescript
 // modules/finance/ledger/application/composables/useLedgerAccounts.ts
-import { useResourceQuery } from "@/shared/composables/useResourceQuery";
-import { ledgerAdapter } from "../../infrastructure/ledger_adapter";
-import { LedgerMapper } from "../../infrastructure/mappers";
-import { ledgerKeys } from "../keys";
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
+import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
+import { LedgerMapper } from '../../infrastructure/mappers'
+import { ledgerKeys } from '../keys'
 
 /**
  * Use Case: View Ledger Accounts.
@@ -167,10 +165,10 @@ export function useLedgerAccounts() {
     ledgerKeys.accounts(), // queryKey from centralized factories
     () => ledgerAdapter.getAccounts(), // fetch DTOs
     (dtos) => dtos.map((dto) => LedgerMapper.toAccount(dto)), // Mapping logic
-    { staleTime: 1000 * 60 * 5 }
-  );
+    { staleTime: 1000 * 60 * 5 },
+  )
 
-  return { accounts, isPending, error, refetch };
+  return { accounts, isPending, error, refetch }
 }
 ```
 
@@ -182,12 +180,12 @@ Adapters handle HTTP state and return **raw DTOs**.
 
 ```typescript
 // modules/finance/ledger/infrastructure/api.types.ts
-import type { components } from "@/shared/api/generated.types";
-export type AccountDTO = components["schemas"]["AccountRead"];
+import type { components } from '@/shared/api/generated.types'
+export type AccountDTO = components['schemas']['AccountRead']
 
 // modules/finance/ledger/infrastructure/ledger_adapter.ts
-import { apiGet } from "@/shared/api/http-client";
-import type { AccountDTO } from "./api.types";
+import { apiGet } from '@/shared/api/http-client'
+import type { AccountDTO } from './api.types'
 
 /**
  * Ledger API Adapter.
@@ -201,9 +199,9 @@ export const ledgerAdapter = {
    * @returns A promise resolving to an array of raw AccountDTOs.
    */
   async getAccounts(): Promise<AccountDTO[]> {
-    return apiGet<AccountDTO[]>("/finance/ledger/accounts");
+    return apiGet<AccountDTO[]>('/finance/ledger/accounts')
   },
-};
+}
 ```
 
 ---
@@ -214,10 +212,10 @@ Mappers transform incoming DTOs into inside **Domain Entities**, safely casting 
 
 ```typescript
 // modules/finance/ap/infrastructure/mappers.ts
-import { Money } from "@/shared/domain/money";
-import { toId } from "@/shared/types/brand.types";
-import type { VendorBillId } from "@/shared/types/brand.types";
-import type { VendorBillDTO } from "./api.types";
+import { Money } from '@/shared/domain/money'
+import { toId } from '@/shared/types/brand.types'
+import type { VendorBillId } from '@/shared/types/brand.types'
+import type { VendorBillDTO } from './api.types'
 
 /**
  * Mapper-as-Factory for Accounts Payable.
@@ -236,7 +234,7 @@ export class APMapper {
       id: toId<VendorBillId>(dto.id),
       vendorId: dto.vendor_id,
       totalAmount: Money.from(dto.total_amount, dto.currency as Currency),
-    };
+    }
   }
 }
 ```
@@ -249,36 +247,36 @@ Forms use **TanStack Form** with **Native Standard Schema** support. We omit int
 
 ```typescript
 // modules/finance/ap/application/composables/useCreateVendorBill.ts
-import { useForm } from "@tanstack/vue-form";
-import { z } from "zod";
+import { useForm } from '@tanstack/vue-form'
+import { z } from 'zod'
 
 const vendorBillSchema = z.object({
-  vendorId: z.string().min(1, "Vendor required"),
+  vendorId: z.string().min(1, 'Vendor required'),
   amount: z.coerce.number().positive(),
-});
+})
 
-type FormValues = z.infer<typeof vendorBillSchema>;
+type FormValues = z.infer<typeof vendorBillSchema>
 
 /**
  * Use Case: Create Vendor Bill.
  *
  * Manages form state and native Zod validation.
- * Uses an explicit Error Contract: catches Application/API error codes 
+ * Uses an explicit Error Contract: catches Application/API error codes
  * (e.g., `VENDOR_NOT_FOUND`) and explicitly maps them to localized UI fields
  * to prevent backend schema bleed.
  */
 export function useCreateVendorBill() {
   const form = useForm({
-    defaultValues: { vendorId: "", amount: 0 } satisfies FormValues,
+    defaultValues: { vendorId: '', amount: 0 } satisfies FormValues,
     validators: {
       onChange: vendorBillSchema, // Native Standard Schema integration
     },
     onSubmit: async ({ value }) => {
       /* Submission logic */
     },
-  });
+  })
 
-  return { form };
+  return { form }
 }
 ```
 
@@ -291,13 +289,13 @@ To avoid silent caching failures, **NEVER** use hardcoded string arrays for quer
 ```typescript
 // modules/finance/ap/application/keys.ts
 export const apKeys = {
-  all: ["ap"] as const,
-  paymentRequests: () => [...apKeys.all, "payment-requests"] as const,
+  all: ['ap'] as const,
+  paymentRequests: () => [...apKeys.all, 'payment-requests'] as const,
   paymentRequest: (id: string) => [...apKeys.paymentRequests(), id] as const,
-};
+}
 
 // In composables:
-void queryClient.invalidateQueries({ queryKey: apKeys.paymentRequests() });
+void queryClient.invalidateQueries({ queryKey: apKeys.paymentRequests() })
 ```
 
 ---
@@ -312,6 +310,7 @@ Permissions must be bound to route transitions via `meta.permission` in `routes.
 ## Pattern 9: High-Integrity UI Component Naming
 
 To maintain IDE discoverability and semantic clarity in large ERP domains, UI components must follow strict Action-Suffixed conventions:
+
 - **Pages**: `[Domain][Action]Page.vue` (e.g., `VendorBillsListPage.vue`). Stateful entry points.
 - **Forms**: `[Domain][Action]Form.vue` (e.g., `VendorBillCreateForm.vue`). The stateless or purely UI layer for a form.
 - **Drawers/Modals**: `[Domain][Action]Drawer.vue` (e.g., `ChartOfAccountsEditDrawer.vue`). Stateful floating orchestrators.
@@ -330,15 +329,15 @@ Always use these path aliases:
 
 ```typescript
 // ✅ Correct imports
-import { Money } from "@/shared/domain/money";
-import { apiGet } from "@/shared/api/http-client";
-import { eventBus } from "@/shared/event-bus/event-bus";
+import { Money } from '@/shared/domain/money'
+import { apiGet } from '@/shared/api/http-client'
+import { eventBus } from '@/shared/event-bus/event-bus'
 
 // ✅ Module-internal (relative preferred)
-import { useLedgerUIStore } from "../ui/store/ledger-ui.store";
+import { useLedgerUIStore } from '../ui/store/ledger-ui.store'
 
 // ❌ BANNED: Cross-module internal imports
-import { useLedgerStore } from "@/modules/ledger/ui/store/ledger-ui.store";
+import { useLedgerStore } from '@/modules/ledger/ui/store/ledger-ui.store'
 ```
 
 ---

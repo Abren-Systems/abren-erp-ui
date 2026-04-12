@@ -1,11 +1,11 @@
-import { useResourceQuery } from "@/shared/composables/useResourceQuery";
-import { reportingAdapter } from "../../infrastructure/reporting_adapter";
-import type { CashflowQuery } from "../../infrastructure/api.types";
-import { reportingKeys } from "../keys";
-import { ReportingMapper } from "../../infrastructure/mappers";
-import { Money, type Currency } from "@/shared/domain/money";
-import type { CashflowStats } from "../../domain/reporting.types";
-import { computed } from "vue";
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
+import { reportingAdapter } from '../../infrastructure/reporting_adapter'
+import type { CashflowQuery } from '../../infrastructure/api.types'
+import { reportingKeys } from '../keys'
+import { ReportingMapper } from '../../infrastructure/mappers'
+import { Money, type Currency } from '@/shared/domain/money'
+import type { CashflowStats } from '../../domain/reporting.types'
+import { computed } from 'vue'
 
 /**
  * Use Case: View Daily Cashflow Dashboard.
@@ -31,26 +31,26 @@ export function useCashflow(query: CashflowQuery) {
     () => reportingAdapter.getDailyCashflow(query),
     (dtos) => dtos.map((dto) => ReportingMapper.toDailyCashflowEntry(dto)),
     { staleTime: 1000 * 60 * 5 }, // 5 minutes
-  );
+  )
 
   /**
    * Aggregates stats from the fetched entries.
    */
   const stats = computed<CashflowStats | null>(() => {
-    const entriesValue = entries.value;
-    if (!entriesValue || entriesValue.length === 0) return null;
+    const entriesValue = entries.value
+    if (!entriesValue || entriesValue.length === 0) return null
 
-    const currency = entriesValue[0]!.actualInflow.currency as Currency;
-    let totalIn = Money.zero(currency);
-    let totalOut = Money.zero(currency);
-    let totalProjectedIn = Money.zero(currency);
-    let totalProjectedOut = Money.zero(currency);
+    const currency = entriesValue[0]!.actualInflow.currency as Currency
+    let totalIn = Money.zero(currency)
+    let totalOut = Money.zero(currency)
+    let totalProjectedIn = Money.zero(currency)
+    let totalProjectedOut = Money.zero(currency)
 
     for (const entry of entries.value) {
-      totalIn = totalIn.add(entry.actualInflow);
-      totalOut = totalOut.add(entry.actualOutflow);
-      totalProjectedIn = totalProjectedIn.add(entry.projectedInflow);
-      totalProjectedOut = totalProjectedOut.add(entry.projectedOutflow);
+      totalIn = totalIn.add(entry.actualInflow)
+      totalOut = totalOut.add(entry.actualOutflow)
+      totalProjectedIn = totalProjectedIn.add(entry.projectedInflow)
+      totalProjectedOut = totalProjectedOut.add(entry.projectedOutflow)
     }
 
     return {
@@ -58,8 +58,8 @@ export function useCashflow(query: CashflowQuery) {
       totalActualOutflow: totalOut,
       projectedExposure: totalProjectedIn.subtract(totalProjectedOut),
       netCashPosition: totalIn.subtract(totalOut),
-    };
-  });
+    }
+  })
 
   return {
     entries,
@@ -67,5 +67,5 @@ export function useCashflow(query: CashflowQuery) {
     isLoading,
     error,
     refresh: refetch,
-  };
+  }
 }

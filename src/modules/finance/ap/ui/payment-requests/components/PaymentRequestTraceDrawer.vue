@@ -47,9 +47,7 @@ const emit = defineEmits<{
               <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-neutral-400" />
               <div class="flex-1">
                 <p class="text-sm font-medium">Created</p>
-                <p class="text-xs text-neutral-500">
-                  Requested by {{ request.requesterId }}
-                </p>
+                <p class="text-xs text-neutral-500">Requested by {{ request.requesterId }}</p>
               </div>
               <Badge variant="outline" class="text-xs">DRAFT</Badge>
             </div>

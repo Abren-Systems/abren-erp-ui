@@ -44,51 +44,51 @@ Each module's form logic lives in `application/composables/`. Forms follow the s
 
 ```typescript
 // modules/finance/ap/application/composables/usePaymentRequestForm.ts
-import { useForm } from "@tanstack/vue-form";
-import { z } from "zod";
-import { useApiMutation } from "@/shared/composables/useApiMutation";
-import { paymentRequestAdapter } from "../../infrastructure/payment_request_adapter";
-import { toDTO } from "../../infrastructure/payment_request.mapper";
+import { useForm } from '@tanstack/vue-form'
+import { z } from 'zod'
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { paymentRequestAdapter } from '../../infrastructure/payment_request_adapter'
+import { toDTO } from '../../infrastructure/payment_request.mapper'
 
 // ── Schema (Symmetric with Domain Logic) ──────────────────
 const paymentRequestSchema = z.object({
-  beneficiaryName: z.string().min(1, "Beneficiary is required"),
-  amount: z.number().positive("Amount must be positive"),
-  currencyCode: z.string().length(3, "Must be a valid ISO 4217 currency code"),
+  beneficiaryName: z.string().min(1, 'Beneficiary is required'),
+  amount: z.number().positive('Amount must be positive'),
+  currencyCode: z.string().length(3, 'Must be a valid ISO 4217 currency code'),
   description: z.string().max(500).optional(),
-});
+})
 
-type PaymentRequestFormValues = z.infer<typeof paymentRequestSchema>;
+type PaymentRequestFormValues = z.infer<typeof paymentRequestSchema>
 
 // ── Composable ────────────────────────────────────────
 export function usePaymentRequestForm() {
   const { mutateAsync, isPending, error } = useApiMutation(
     async (values: PaymentRequestFormValues) => {
       // 1. TRANSFORM: UI values → Backend DTO via Mapper Factory
-      const dto = toDTO(values);
+      const dto = toDTO(values)
 
       // 2. IO: Send hardened DTO to the Adapter
       // (Idempotency-Key is handled by useApiMutation/httpClient)
-      return paymentRequestAdapter.create(dto);
+      return paymentRequestAdapter.create(dto)
     },
-  );
+  )
 
   const form = useForm({
     defaultValues: {
-      beneficiaryName: "",
+      beneficiaryName: '',
       amount: 0,
-      currencyCode: "ETB",
-      description: "",
+      currencyCode: 'ETB',
+      description: '',
     } satisfies PaymentRequestFormValues,
     validators: {
       onChange: paymentRequestSchema,
     },
     onSubmit: async ({ value }) => {
-      await mutateAsync(value);
+      await mutateAsync(value)
     },
-  });
+  })
 
-  return { form, isPending, error };
+  return { form, isPending, error }
 }
 ```
 
@@ -100,12 +100,12 @@ Pages import the form composable and bind fields declaratively using the design 
 
 ```vue
 <script setup lang="ts">
-import { usePaymentRequestForm } from "../../application/composables/usePaymentRequestForm";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
-import { Button } from "@/shared/components/button";
+import { usePaymentRequestForm } from '../../application/composables/usePaymentRequestForm'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
+import { Button } from '@/shared/components/button'
 
-const { form, isPending } = usePaymentRequestForm();
+const { form, isPending } = usePaymentRequestForm()
 </script>
 
 <template>
@@ -127,7 +127,7 @@ const { form, isPending } = usePaymentRequestForm();
     </form.Field>
 
     <Button type="submit" :disabled="isPending">
-      {{ isPending ? "Submitting..." : "Create Request" }}
+      {{ isPending ? 'Submitting...' : 'Create Request' }}
     </Button>
   </form>
 </template>
@@ -159,10 +159,8 @@ const { form, isPending } = usePaymentRequestForm();
 
 ```typescript
 // core/validation/validators.ts
-export const isoDateString = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD");
-export const positiveAmount = z.number().positive("Must be a positive amount");
+export const isoDateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD')
+export const positiveAmount = z.number().positive('Must be a positive amount')
 ```
 
 ---

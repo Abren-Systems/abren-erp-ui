@@ -30,9 +30,7 @@ const emit = defineEmits<{
     <SheetContent class="sm:max-w-[480px] overflow-y-auto">
       <SheetHeader>
         <SheetTitle>Trace: Vendor Bill</SheetTitle>
-        <SheetDescription>
-          Workflow history and financial impact of this bill.
-        </SheetDescription>
+        <SheetDescription> Workflow history and financial impact of this bill. </SheetDescription>
       </SheetHeader>
 
       <div class="space-y-6 py-6">
@@ -46,9 +44,7 @@ const emit = defineEmits<{
               <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-neutral-400" />
               <div class="flex-1">
                 <p class="text-sm font-medium">Draft Registered</p>
-                <p class="text-xs text-neutral-500">
-                  Bill {{ bill.billNumber }} inputted.
-                </p>
+                <p class="text-xs text-neutral-500">Bill {{ bill.billNumber }} inputted.</p>
               </div>
               <Badge variant="outline" class="text-xs">DRAFT</Badge>
             </div>
@@ -60,23 +56,16 @@ const emit = defineEmits<{
               <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
               <div class="flex-1">
                 <p class="text-sm font-medium">Validated & Accrued</p>
-                <p class="text-xs text-neutral-500">
-                  AP Accrual posted to General Ledger.
-                </p>
+                <p class="text-xs text-neutral-500">AP Accrual posted to General Ledger.</p>
               </div>
               <Badge variant="default" class="text-xs">VALIDATED</Badge>
             </div>
 
-            <div
-              v-if="bill.status === 'PAID'"
-              class="flex items-start gap-3 rounded-md border p-3"
-            >
+            <div v-if="bill.status === 'PAID'" class="flex items-start gap-3 rounded-md border p-3">
               <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
               <div class="flex-1">
                 <p class="text-sm font-medium">Marked as Paid</p>
-                <p class="text-xs text-neutral-500">
-                  Via Payment Request link.
-                </p>
+                <p class="text-xs text-neutral-500">Via Payment Request link.</p>
               </div>
               <Badge variant="default" class="text-xs">PAID</Badge>
             </div>

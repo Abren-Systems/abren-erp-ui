@@ -45,16 +45,16 @@ function handleFileSelect(e: Event) {
 
 function processFile(file: File) {
   errorMsg.value = ''
-  
+
   if (props.maxSizeMB && file.size > props.maxSizeMB * 1024 * 1024) {
     errorMsg.value = `File exceeds maximum size of ${props.maxSizeMB}MB.`
     return
   }
-  
+
   // Basic accept check (could be expanded)
   if (props.accept && !file.type.match(props.accept.replace('/*', '.*'))) {
-     errorMsg.value = `Invalid file type. Accepted: ${props.accept}`
-     return
+    errorMsg.value = `Invalid file type. Accepted: ${props.accept}`
+    return
   }
 
   selectedFile.value = file
@@ -84,7 +84,9 @@ onUnmounted(() => {
       v-if="!selectedFile"
       class="relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors"
       :class="[
-        isDragging ? 'border-blue-500 bg-blue-50/50' : 'border-neutral-300 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-900/50'
+        isDragging
+          ? 'border-blue-500 bg-blue-50/50'
+          : 'border-neutral-300 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-900/50',
       ]"
       @dragenter="handleDragEnter"
       @dragover="handleDragEnter"
@@ -115,19 +117,24 @@ onUnmounted(() => {
       class="flex items-center justify-between rounded-lg border border-neutral-200 bg-neutral-50 p-3 pr-2 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
     >
       <div class="flex items-center space-x-3 overflow-hidden">
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300"
+        >
           <File class="h-5 w-5" />
         </div>
         <div class="overflow-hidden">
           <p class="truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
             {{ selectedFile.name }}
           </p>
-          <p class="text-xs text-neutral-500">
-            {{ (selectedFile.size / 1024).toFixed(1) }} KB
-          </p>
+          <p class="text-xs text-neutral-500">{{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
         </div>
       </div>
-      <Button variant="ghost" size="icon" class="h-8 w-8 text-neutral-500 hover:text-destructive" @click="clearFile">
+      <Button
+        variant="ghost"
+        size="icon"
+        class="h-8 w-8 text-neutral-500 hover:text-destructive"
+        @click="clearFile"
+      >
         <X class="h-4 w-4" />
       </Button>
     </div>

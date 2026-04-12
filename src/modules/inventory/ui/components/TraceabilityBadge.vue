@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { Badge } from "@/shared/components/badge";
+import { computed } from 'vue'
+import { Badge } from '@/shared/components/badge'
 
 const props = defineProps<{
-  isQuarantine?: boolean;
-  isAvailable?: boolean;
-  trackingMode?: "NONE" | "BATCH" | "SERIAL";
-}>();
+  isQuarantine?: boolean
+  isAvailable?: boolean
+  trackingMode?: 'NONE' | 'BATCH' | 'SERIAL'
+}>()
 
 const statusText = computed(() => {
-  if (props.isQuarantine) return "Quarantined";
-  if (props.isAvailable === false) return "Reserved / Expired";
-  if (props.trackingMode) return `Tracked: ${props.trackingMode}`;
-  return "Available";
-});
+  if (props.isQuarantine) return 'Quarantined'
+  if (props.isAvailable === false) return 'Reserved / Expired'
+  if (props.trackingMode) return `Tracked: ${props.trackingMode}`
+  return 'Available'
+})
 
 const variant = computed(() => {
-  if (props.isQuarantine) return "destructive";
-  if (props.isAvailable === false) return "secondary";
-  if (props.trackingMode === "BATCH") return "default";
-  if (props.trackingMode === "SERIAL") return "outline";
-  return "default"; // Need to ensure fallback matches expected types in our shadcn badge
-});
+  if (props.isQuarantine) return 'destructive'
+  if (props.isAvailable === false) return 'secondary'
+  if (props.trackingMode === 'BATCH') return 'default'
+  if (props.trackingMode === 'SERIAL') return 'outline'
+  return 'default' // Need to ensure fallback matches expected types in our shadcn badge
+})
 </script>
 
 <template>

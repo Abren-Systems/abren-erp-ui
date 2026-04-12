@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
-import { Button } from "@/shared/components/button";
-import { Badge } from "@/shared/components/badge";
-import {
-  ArrowLeft,
-  MoreHorizontal,
-  History,
-  Pencil,
-} from "lucide-vue-next";
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { Button } from '@/shared/components/button'
+import { Badge } from '@/shared/components/badge'
+import { ArrowLeft, MoreHorizontal, History, Pencil } from 'lucide-vue-next'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/shared/components/dropdown-menu";
-import { useLedgerAccounts } from "../../../application/composables/useLedgerAccounts";
-import { usePermissions } from "@/shared/auth/usePermissions";
-import AccountTraceDrawer from "../components/AccountTraceDrawer.vue";
+} from '@/shared/components/dropdown-menu'
+import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
+import { usePermissions } from '@/shared/auth/usePermissions'
+import AccountTraceDrawer from '../components/AccountTraceDrawer.vue'
 
 /**
  * Stage 2: Focus Canvas — Chart of Accounts Detail Page.
@@ -31,36 +26,34 @@ import AccountTraceDrawer from "../components/AccountTraceDrawer.vue";
  *   Tertiary:  Deactivate (destructive, behind overflow)
  */
 
-const props = defineProps<{ accountId: string }>();
-const router = useRouter();
-const { hasPermission } = usePermissions();
+const props = defineProps<{ accountId: string }>()
+const router = useRouter()
+const { hasPermission } = usePermissions()
 
 // Pull from cache — the list query will have already fetched all accounts
-const { accounts, isCreating } = useLedgerAccounts();
-const account = computed(
-  () => accounts.value?.find((a) => a.id === props.accountId) ?? null,
-);
+const { accounts, isCreating } = useLedgerAccounts()
+const account = computed(() => accounts.value?.find((a) => a.id === props.accountId) ?? null)
 
-const isTraceOpen = ref(false);
-const isRenaming = ref(false);
-const newName = ref("");
+const isTraceOpen = ref(false)
+const isRenaming = ref(false)
+const newName = ref('')
 
 function startRename() {
-  newName.value = account.value?.name ?? "";
-  isRenaming.value = true;
+  newName.value = account.value?.name ?? ''
+  isRenaming.value = true
 }
 
 function goBack() {
-  router.push({ name: "LedgerCoa" });
+  router.push({ name: 'LedgerCoa' })
 }
 
-const typeVariants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-  ASSET: "default",
-  LIABILITY: "destructive",
-  EQUITY: "secondary",
-  REVENUE: "default",
-  EXPENSE: "outline",
-};
+const typeVariants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  ASSET: 'default',
+  LIABILITY: 'destructive',
+  EQUITY: 'secondary',
+  REVENUE: 'default',
+  EXPENSE: 'outline',
+}
 </script>
 
 <template>
@@ -114,9 +107,7 @@ const typeVariants: Record<string, "default" | "secondary" | "destructive" | "ou
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuSeparator />
-            <DropdownMenuItem class="text-destructive">
-              Deactivate Account
-            </DropdownMenuItem>
+            <DropdownMenuItem class="text-destructive"> Deactivate Account </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -135,21 +126,21 @@ const typeVariants: Record<string, "default" | "secondary" | "destructive" | "ou
         </div>
         <div class="rounded-lg border p-4">
           <p class="text-xs font-medium uppercase text-neutral-400">Status</p>
-          <p class="mt-1 text-lg font-semibold" :class="account.isActive ? 'text-green-600' : 'text-neutral-400'">
-            {{ account.isActive ? "Active" : "Inactive" }}
+          <p
+            class="mt-1 text-lg font-semibold"
+            :class="account.isActive ? 'text-green-600' : 'text-neutral-400'"
+          >
+            {{ account.isActive ? 'Active' : 'Inactive' }}
           </p>
         </div>
         <div class="rounded-lg border p-4">
           <p class="text-xs font-medium uppercase text-neutral-400">Currency</p>
-          <p class="mt-1 font-mono text-lg font-semibold">{{ account.currency ?? "—" }}</p>
+          <p class="mt-1 font-mono text-lg font-semibold">{{ account.currency ?? '—' }}</p>
         </div>
       </div>
     </div>
 
     <!-- ── Stage 3: AccountTraceDrawer ───────────────────────── -->
-    <AccountTraceDrawer
-      v-model:open="isTraceOpen"
-      :account="account"
-    />
+    <AccountTraceDrawer v-model:open="isTraceOpen" :account="account" />
   </div>
 </template>

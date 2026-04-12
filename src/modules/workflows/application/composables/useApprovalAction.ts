@@ -1,8 +1,8 @@
-import { useApiMutation } from "@/shared/composables/useApiMutation";
-import { workflowsAdapter } from "../../infrastructure/workflows_adapter";
-import { eventBus } from "@/shared/event-bus/event-bus";
-import { useQueryClient } from "@tanstack/vue-query";
-import { workflowKeys } from "../keys";
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { workflowsAdapter } from '../../infrastructure/workflows_adapter'
+import { eventBus } from '@/shared/event-bus/event-bus'
+import { useQueryClient } from '@tanstack/vue-query'
+import { workflowKeys } from '../keys'
 
 /**
  * Use Case: Submit a Workflow Approval Decision.
@@ -16,7 +16,7 @@ import { workflowKeys } from "../keys";
  * approve({ instanceId: '123', action: 'APPROVE', comments: 'Approved' })
  */
 export function useApprovalAction() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   return useApiMutation(
     async ({
@@ -24,22 +24,22 @@ export function useApprovalAction() {
       action,
       comments,
     }: {
-      instanceId: string;
-      action: "APPROVE" | "REJECT";
-      comments: string;
+      instanceId: string
+      action: 'APPROVE' | 'REJECT'
+      comments: string
     }) => {
-      await workflowsAdapter.submitDecision(instanceId, { action, comments });
+      await workflowsAdapter.submitDecision(instanceId, { action, comments })
     },
     {
       onSuccess: () => {
         // Invalidate the task list
         void queryClient.invalidateQueries({
           queryKey: workflowKeys.pendingTasks(),
-        });
+        })
 
         // Emit global event for other modules
-        eventBus.emit("workflow:action-completed", {});
+        eventBus.emit('workflow:action-completed', {})
       },
     },
-  );
+  )
 }

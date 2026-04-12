@@ -1,5 +1,5 @@
-import type { components } from "@/shared/api/generated.types";
-import { type Account, AccountType } from "../domain/account.types";
+import type { components } from '@/shared/api/generated.types'
+import { type Account, AccountType } from '../domain/account.types'
 import {
   type AccountId,
   type JournalEntryId,
@@ -8,22 +8,16 @@ import {
   type UserId,
   type ValueDate,
   type CurrencyCode,
-} from "@/shared/types/brand.types";
-import { Currency, Money } from "@/shared/domain/money";
-import { CommonMapper } from "@/shared/infrastructure/mappers";
-import type {
-  JournalEntry,
-  JournalEntryLine,
-} from "../domain/journal-entry.types";
-import type {
-  FiscalPeriod,
-  FiscalPeriodStatus,
-} from "../domain/fiscal-period.types";
+} from '@/shared/types/brand.types'
+import { Currency, Money } from '@/shared/domain/money'
+import { CommonMapper } from '@/shared/infrastructure/mappers'
+import type { JournalEntry, JournalEntryLine } from '../domain/journal-entry.types'
+import type { FiscalPeriod, FiscalPeriodStatus } from '../domain/fiscal-period.types'
 
-type AccountRead = components["schemas"]["AccountRead"];
-type JournalEntryRead = components["schemas"]["JournalEntryRead"];
-type JournalLineRead = components["schemas"]["JournalLineRead"];
-type FiscalPeriodRead = components["schemas"]["FiscalPeriodRead"];
+type AccountRead = components['schemas']['AccountRead']
+type JournalEntryRead = components['schemas']['JournalEntryRead']
+type JournalLineRead = components['schemas']['JournalLineRead']
+type FiscalPeriodRead = components['schemas']['FiscalPeriodRead']
 
 /**
  * Ledger Mapper-as-Factory.
@@ -41,7 +35,7 @@ export class LedgerMapper {
   static toAccount(dto: AccountRead): Account {
     // Backend currently doesn't provide currency_code in AccountRead,
     // defaulting to functional currency (ETB) for now.
-    const currency = Currency.ETB;
+    const currency = Currency.ETB
 
     return {
       id: CommonMapper.toBrandedId<AccountId>(dto.id),
@@ -51,7 +45,7 @@ export class LedgerMapper {
       currency: currency,
       isActive: dto.is_active,
       balance: Money.zero(currency),
-    };
+    }
   }
 
   /**
@@ -61,12 +55,12 @@ export class LedgerMapper {
    * @returns A validated JournalEntryLine domain model.
    */
   private static mapJournalLine(dto: JournalLineRead): JournalEntryLine {
-    const currency = (dto.currency as Currency) || Currency.ETB;
+    const currency = (dto.currency as Currency) || Currency.ETB
 
     return {
       id: CommonMapper.toBrandedId<JournalLineId>(dto.id),
       accountId: CommonMapper.toBrandedId<AccountId>(dto.account_id),
-      description: dto.description || "",
+      description: dto.description || '',
       debit: dto.is_debit
         ? CommonMapper.toMoney(parseFloat(dto.amount), currency)
         : Money.zero(currency),
@@ -76,19 +70,12 @@ export class LedgerMapper {
 
       // FX Awareness & Traceability (Enriched in hardening session)
       originalAmount: dto.original_amount
-        ? CommonMapper.toMoney(
-            dto.original_amount,
-            dto.original_currency || currency,
-          )
+        ? CommonMapper.toMoney(dto.original_amount, dto.original_currency || currency)
         : undefined,
       originalCurrency: (dto.original_currency as CurrencyCode) || undefined,
-      baseAmount: dto.base_amount
-        ? CommonMapper.toMoney(dto.base_amount, currency)
-        : undefined,
-      exchangeRate: dto.exchange_rate
-        ? parseFloat(dto.exchange_rate)
-        : undefined,
-    };
+      baseAmount: dto.base_amount ? CommonMapper.toMoney(dto.base_amount, currency) : undefined,
+      exchangeRate: dto.exchange_rate ? parseFloat(dto.exchange_rate) : undefined,
+    }
   }
 
   /**
@@ -101,13 +88,13 @@ export class LedgerMapper {
     return {
       id: CommonMapper.toBrandedId<JournalEntryId>(dto.id),
       entryNumber: dto.entry_number,
-      status: dto.status as "DRAFT" | "POSTED" | "VOIDED",
+      status: dto.status as 'DRAFT' | 'POSTED' | 'VOIDED',
       entryDate: CommonMapper.toDate(dto.date) as unknown as ValueDate,
       description: dto.description,
-      createdBy: CommonMapper.toBrandedId<UserId>("system"),
+      createdBy: CommonMapper.toBrandedId<UserId>('system'),
       lines: (dto.lines || []).map((ln) => this.mapJournalLine(ln)),
       createdAt: dto.created_at || new Date().toISOString(),
-    };
+    }
   }
 
   /**
@@ -125,6 +112,6 @@ export class LedgerMapper {
       status: dto.status as FiscalPeriodStatus,
       isAdjustmentPeriod: false,
       createdAt: dto.created_at || new Date().toISOString(),
-    };
+    }
   }
 }

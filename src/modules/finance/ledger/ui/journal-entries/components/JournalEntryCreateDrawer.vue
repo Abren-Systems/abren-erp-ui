@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
-import { Button } from "@/shared/components/button";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { Button } from '@/shared/components/button'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
 import {
   Sheet,
   SheetContent,
@@ -11,17 +11,17 @@ import {
   SheetTitle,
   SheetDescription,
   SheetFooter,
-} from "@/shared/components/sheet";
+} from '@/shared/components/sheet'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/components/select";
-import { Plus, Trash2 } from "lucide-vue-next";
-import { useJournalEntries } from "../../../application/composables/useJournalEntries";
-import { useLedgerAccounts } from "../../../application/composables/useLedgerAccounts";
+} from '@/shared/components/select'
+import { Plus, Trash2 } from 'lucide-vue-next'
+import { useJournalEntries } from '../../../application/composables/useJournalEntries'
+import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
 
 /**
  * JournalEntryCreateDrawer — Multi-line double-entry creation form.
@@ -30,65 +30,65 @@ import { useLedgerAccounts } from "../../../application/composables/useLedgerAcc
  * On success, navigates directly to the new entry's Detail (Focus Canvas).
  */
 
-const props = defineProps<{ open: boolean }>();
-const emit = defineEmits<{ (e: "update:open", val: boolean): void }>();
+const props = defineProps<{ open: boolean }>()
+const emit = defineEmits<{ (e: 'update:open', val: boolean): void }>()
 
-const router = useRouter();
-const { createEntry, isLoading } = useJournalEntries();
-const { accounts } = useLedgerAccounts();
+const router = useRouter()
+const { createEntry, isLoading } = useJournalEntries()
+const { accounts } = useLedgerAccounts()
 
 type LineItem = {
-  account_id: string;
-  description: string;
-  amount: string;
-  is_debit: boolean;
-  currency: string;
-};
+  account_id: string
+  description: string
+  amount: string
+  is_debit: boolean
+  currency: string
+}
 
 const form = ref({
-  date: new Date().toISOString().split("T")[0],
-  description: "",
-  base_currency: "ETB",
+  date: new Date().toISOString().split('T')[0],
+  description: '',
+  base_currency: 'ETB',
   lines: [
-    { account_id: "", description: "", amount: "", is_debit: true, currency: "ETB" },
-    { account_id: "", description: "", amount: "", is_debit: false, currency: "ETB" },
+    { account_id: '', description: '', amount: '', is_debit: true, currency: 'ETB' },
+    { account_id: '', description: '', amount: '', is_debit: false, currency: 'ETB' },
   ] as LineItem[],
-});
+})
 
 const totalDebits = computed(() =>
   form.value.lines
     .filter((l) => l.is_debit)
     .reduce((sum, l) => sum + (parseFloat(l.amount) || 0), 0),
-);
+)
 const totalCredits = computed(() =>
   form.value.lines
     .filter((l) => !l.is_debit)
     .reduce((sum, l) => sum + (parseFloat(l.amount) || 0), 0),
-);
+)
 const isBalanced = computed(
   () =>
     totalDebits.value > 0 &&
     totalCredits.value > 0 &&
     Math.abs(totalDebits.value - totalCredits.value) < 0.001,
-);
+)
 
 function addLine(isDebit: boolean) {
   form.value.lines.push({
-    account_id: "",
-    description: "",
-    amount: "",
+    account_id: '',
+    description: '',
+    amount: '',
     is_debit: isDebit,
-    currency: "ETB",
-  });
+    currency: 'ETB',
+  })
 }
 
 function removeLine(index: number) {
-  if (form.value.lines.length <= 2) return;
-  form.value.lines.splice(index, 1);
+  if (form.value.lines.length <= 2) return
+  form.value.lines.splice(index, 1)
 }
 
 async function handleSubmit() {
-  if (!isBalanced.value) return;
+  if (!isBalanced.value) return
   try {
     const entry = await createEntry({
       date: form.value.date as unknown as Date,
@@ -101,15 +101,15 @@ async function handleSubmit() {
         is_debit: l.is_debit,
         currency: l.currency,
       })),
-    });
+    })
 
-    emit("update:open", false);
+    emit('update:open', false)
     // Progressive Disclosure: navigate immediately to the Focus Canvas
     if (entry?.id) {
       void router.push({
-        name: "LedgerJournalDetail",
+        name: 'LedgerJournalDetail',
         params: { entryId: entry.id },
-      });
+      })
     }
   } catch {
     // Error handling via the Error Contract in the composable
@@ -177,22 +177,25 @@ async function handleSubmit() {
               v-for="(line, idx) in form.lines"
               :key="idx"
               class="grid grid-cols-[1fr_100px_60px_28px] gap-2 items-start rounded-md border p-3"
-              :class="line.is_debit ? 'border-blue-100 bg-blue-50/30 dark:border-blue-900/30 dark:bg-blue-900/10' : 'border-green-100 bg-green-50/30 dark:border-green-900/30 dark:bg-green-900/10'"
+              :class="
+                line.is_debit
+                  ? 'border-blue-100 bg-blue-50/30 dark:border-blue-900/30 dark:bg-blue-900/10'
+                  : 'border-green-100 bg-green-50/30 dark:border-green-900/30 dark:bg-green-900/10'
+              "
             >
               <div class="grid gap-1.5">
-                <span class="text-[10px] font-semibold uppercase tracking-wider" :class="line.is_debit ? 'text-blue-500' : 'text-green-500'">
-                  {{ line.is_debit ? "DEBIT" : "CREDIT" }}
+                <span
+                  class="text-[10px] font-semibold uppercase tracking-wider"
+                  :class="line.is_debit ? 'text-blue-500' : 'text-green-500'"
+                >
+                  {{ line.is_debit ? 'DEBIT' : 'CREDIT' }}
                 </span>
                 <Select v-model="line.account_id">
                   <SelectTrigger class="h-8 text-xs">
                     <SelectValue placeholder="Select account…" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem
-                      v-for="acc in accounts"
-                      :key="acc.id"
-                      :value="acc.id"
-                    >
+                    <SelectItem v-for="acc in accounts" :key="acc.id" :value="acc.id">
                       {{ acc.code }} — {{ acc.name }}
                     </SelectItem>
                   </SelectContent>
@@ -200,7 +203,9 @@ async function handleSubmit() {
               </div>
 
               <div class="grid gap-1.5">
-                <span class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Amount</span>
+                <span class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400"
+                  >Amount</span
+                >
                 <Input
                   v-model="line.amount"
                   type="number"
@@ -212,7 +217,9 @@ async function handleSubmit() {
               </div>
 
               <div class="grid gap-1.5">
-                <span class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">CCY</span>
+                <span class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400"
+                  >CCY</span
+                >
                 <Select v-model="line.currency">
                   <SelectTrigger class="h-8 text-xs">
                     <SelectValue />
@@ -240,14 +247,15 @@ async function handleSubmit() {
 
           <!-- Balance indicator -->
           <div class="mt-3 flex items-center justify-between rounded-md border px-4 py-2 text-sm">
-            <span class="text-neutral-500">Debits: <strong class="tabular-nums">{{ totalDebits.toFixed(2) }}</strong></span>
-            <span
-              class="font-medium"
-              :class="isBalanced ? 'text-green-600' : 'text-destructive'"
+            <span class="text-neutral-500"
+              >Debits: <strong class="tabular-nums">{{ totalDebits.toFixed(2) }}</strong></span
             >
-              {{ isBalanced ? "✓ Balanced" : "✗ Unbalanced" }}
+            <span class="font-medium" :class="isBalanced ? 'text-green-600' : 'text-destructive'">
+              {{ isBalanced ? '✓ Balanced' : '✗ Unbalanced' }}
             </span>
-            <span class="text-neutral-500">Credits: <strong class="tabular-nums">{{ totalCredits.toFixed(2) }}</strong></span>
+            <span class="text-neutral-500"
+              >Credits: <strong class="tabular-nums">{{ totalCredits.toFixed(2) }}</strong></span
+            >
           </div>
         </div>
       </form>
@@ -258,7 +266,7 @@ async function handleSubmit() {
           :disabled="!form.description || !form.date || !isBalanced || isLoading"
           @click="handleSubmit"
         >
-          {{ isLoading ? "Creating…" : "Save as Draft" }}
+          {{ isLoading ? 'Creating…' : 'Save as Draft' }}
         </Button>
       </SheetFooter>
     </SheetContent>

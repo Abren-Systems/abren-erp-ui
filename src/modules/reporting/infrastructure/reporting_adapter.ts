@@ -1,6 +1,6 @@
-import { apiGet } from "@/shared/api/http-client";
-import type { DailyCashflowDTO, CashflowQuery } from "./api.types";
-import { DailyCashflowSchema } from "./api.schemas";
+import { apiGet } from '@/shared/api/http-client'
+import type { DailyCashflowDTO, CashflowQuery } from './api.types'
+import { DailyCashflowSchema } from './api.schemas'
 
 /**
  * Reporting API Adapter.
@@ -19,10 +19,10 @@ export const reportingAdapter = {
     const params = new URLSearchParams({
       start_date: query.startDate,
       end_date: query.endDate,
-    });
+    })
     const raw = (await apiGet<DailyCashflowDTO[]>(
       `/reporting/daily-cashflow?${params.toString()}`,
-    )) as unknown[];
-    return raw.map((item) => DailyCashflowSchema.parse(item));
+    )) as unknown[]
+    return raw.map((item) => DailyCashflowSchema.parse(item))
   },
-};
+}

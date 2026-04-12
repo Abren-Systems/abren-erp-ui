@@ -1,11 +1,11 @@
-import { useApiMutation } from "@/shared/composables/useApiMutation";
-import { useResourceQuery } from "@/shared/composables/useResourceQuery";
-import { useQueryClient } from "@tanstack/vue-query";
-import { ledgerAdapter } from "../../infrastructure/ledger_adapter";
-import { LedgerMapper } from "../../infrastructure/mappers";
-import { ledgerKeys } from "../keys";
-import type { ApiError } from "@/shared/api/http-client";
-import type { JournalEntry } from "../../domain/journal-entry.types";
+import { useApiMutation } from '@/shared/composables/useApiMutation'
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
+import { useQueryClient } from '@tanstack/vue-query'
+import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
+import { LedgerMapper } from '../../infrastructure/mappers'
+import { ledgerKeys } from '../keys'
+import type { ApiError } from '@/shared/api/http-client'
+import type { JournalEntry } from '../../domain/journal-entry.types'
 
 /**
  * Use Case: Focus on a single Journal Entry.
@@ -21,7 +21,7 @@ import type { JournalEntry } from "../../domain/journal-entry.types";
  * const { entry, postEntry, voidEntry, isLoading } = useJournalEntry(props.entryId)
  */
 export function useJournalEntry(entryId: string) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const {
     data: entry,
@@ -32,7 +32,7 @@ export function useJournalEntry(entryId: string) {
     ledgerKeys.journalEntry(entryId),
     () => ledgerAdapter.getJournalEntry(entryId),
     (dto) => LedgerMapper.toJournalEntry(dto),
-  );
+  )
 
   /**
    * State-Advancing Action: DRAFT → POSTED.
@@ -44,20 +44,20 @@ export function useJournalEntry(entryId: string) {
     void
   >(
     async () => {
-      const dto = await ledgerAdapter.postJournalEntry(entryId);
-      return LedgerMapper.toJournalEntry(dto);
+      const dto = await ledgerAdapter.postJournalEntry(entryId)
+      return LedgerMapper.toJournalEntry(dto)
     },
     {
       onSuccess: (updated) => {
         // Update the single-entry cache immediately for instant UI feedback
-        queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated);
+        queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated)
         // Invalidate the list so the queue reflects the state change
         void queryClient.invalidateQueries({
           queryKey: ledgerKeys.journalEntries(),
-        });
+        })
       },
     },
-  );
+  )
 
   /**
    * Tertiary Action: POSTED → VOIDED.
@@ -69,18 +69,18 @@ export function useJournalEntry(entryId: string) {
     { reason: string }
   >(
     async ({ reason }) => {
-      const dto = await ledgerAdapter.voidJournalEntry(entryId, { reason });
-      return LedgerMapper.toJournalEntry(dto);
+      const dto = await ledgerAdapter.voidJournalEntry(entryId, { reason })
+      return LedgerMapper.toJournalEntry(dto)
     },
     {
       onSuccess: (updated) => {
-        queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated);
+        queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated)
         void queryClient.invalidateQueries({
           queryKey: ledgerKeys.journalEntries(),
-        });
+        })
       },
     },
-  );
+  )
 
   return {
     entry,
@@ -89,5 +89,5 @@ export function useJournalEntry(entryId: string) {
     refetch,
     postEntry,
     voidEntry,
-  };
+  }
 }

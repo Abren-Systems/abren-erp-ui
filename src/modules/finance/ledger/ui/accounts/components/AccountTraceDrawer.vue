@@ -5,8 +5,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from "@/shared/components/sheet";
-import type { Account } from "../../../domain/account.types";
+} from '@/shared/components/sheet'
+import type { Account } from '../../../domain/account.types'
 
 /**
  * Stage 3: AccountTraceDrawer — Account Provenance.
@@ -16,13 +16,13 @@ import type { Account } from "../../../domain/account.types";
  */
 
 defineProps<{
-  open: boolean;
-  account: Account;
-}>();
+  open: boolean
+  account: Account
+}>()
 
 const emit = defineEmits<{
-  (e: "update:open", val: boolean): void;
-}>();
+  (e: 'update:open', val: boolean): void
+}>()
 </script>
 
 <template>
@@ -30,9 +30,7 @@ const emit = defineEmits<{
     <SheetContent class="sm:max-w-[480px] overflow-y-auto">
       <SheetHeader>
         <SheetTitle>Trace: {{ account.code }} — {{ account.name }}</SheetTitle>
-        <SheetDescription>
-          Journal entries posted to this account.
-        </SheetDescription>
+        <SheetDescription> Journal entries posted to this account. </SheetDescription>
       </SheetHeader>
 
       <div class="space-y-6 py-6">
@@ -52,12 +50,12 @@ const emit = defineEmits<{
                 :class="account.isActive ? 'text-green-600' : 'text-neutral-400'"
                 class="font-medium"
               >
-                {{ account.isActive ? "Active" : "Inactive" }}
+                {{ account.isActive ? 'Active' : 'Inactive' }}
               </span>
             </div>
             <div class="flex justify-between">
               <span class="text-neutral-500">Currency</span>
-              <span class="font-mono font-medium">{{ account.currency ?? "Multi-currency" }}</span>
+              <span class="font-mono font-medium">{{ account.currency ?? 'Multi-currency' }}</span>
             </div>
           </div>
         </section>
@@ -68,8 +66,8 @@ const emit = defineEmits<{
             Recent Postings
           </h3>
           <p class="text-sm text-neutral-500">
-            Transaction history for this account will be displayed here.
-            Filter journal entries by account to view all postings.
+            Transaction history for this account will be displayed here. Filter journal entries by
+            account to view all postings.
           </p>
         </section>
       </div>

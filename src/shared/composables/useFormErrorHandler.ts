@@ -1,5 +1,5 @@
-import { nextTick } from "vue";
-import type { ApiError } from "@/shared/api/http-client";
+import { nextTick } from 'vue'
+import type { ApiError } from '@/shared/api/http-client'
 
 /**
  * useFormErrorHandler — Error Contract Adapter for TanStack Form.
@@ -21,7 +21,9 @@ import type { ApiError } from "@/shared/api/http-client";
  */
 export function useFormErrorHandler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  form: { setFieldMeta: (field: string, updater: (meta: any) => any) => void },
+  form: {
+    setFieldMeta: (field: string, updater: (meta: any) => any) => void
+  },
 ) {
   /**
    * Applies all field-level errors from an `ApiError` into the form's
@@ -32,11 +34,11 @@ export function useFormErrorHandler(
    * @returns Non-field errors that should be displayed at the form level.
    */
   function applyErrors(error: ApiError): string[] {
-    const nonFieldErrors: string[] = [];
+    const nonFieldErrors: string[] = []
 
     if (!error.details || error.details.length === 0) {
-      nonFieldErrors.push(error.message);
-      return nonFieldErrors;
+      nonFieldErrors.push(error.message)
+      return nonFieldErrors
     }
 
     for (const detail of error.details) {
@@ -45,9 +47,9 @@ export function useFormErrorHandler(
           ...meta,
           errors: [detail.message],
           errorMap: { onChange: detail.message },
-        }));
+        }))
       } else {
-        nonFieldErrors.push(detail.message);
+        nonFieldErrors.push(detail.message)
       }
     }
 
@@ -55,24 +57,23 @@ export function useFormErrorHandler(
     if (error.details.length > 0) {
       void nextTick(() => {
         // Find the first field marked with aria-invalid or our custom destructive text class
-        const firstErrorEl = document.querySelector(
-          '[aria-invalid="true"], .text-destructive'
-        );
+        const firstErrorEl = document.querySelector('[aria-invalid="true"], .text-destructive')
         if (firstErrorEl) {
-          firstErrorEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
           // Attempt to find a focusable sibling or the element itself
-          const focusable = firstErrorEl.tagName === 'INPUT'
-            ? firstErrorEl
-            : firstErrorEl.parentElement?.querySelector('input, textarea, select, button');
+          const focusable =
+            firstErrorEl.tagName === 'INPUT'
+              ? firstErrorEl
+              : firstErrorEl.parentElement?.querySelector('input, textarea, select, button')
 
-          (focusable as HTMLElement)?.focus();
+          ;(focusable as HTMLElement)?.focus()
         }
-      });
+      })
     }
 
-    return nonFieldErrors;
+    return nonFieldErrors
   }
 
-  return { applyErrors };
+  return { applyErrors }
 }

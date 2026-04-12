@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { DataGrid, useDataGrid } from "@/shared/components/data-grid";
-import { Button } from "@/shared/components/button";
-import { Plus } from "lucide-vue-next";
-import CreateAccountDrawer from "../components/CreateAccountDrawer.vue";
-import { useLedgerAccounts } from "../../../application/composables/useLedgerAccounts";
-import { accountColumns } from "../grids/account.grid";
-import { usePermissions } from "@/shared/auth/usePermissions";
-import type { Account } from "../../../domain/account.types";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { Button } from '@/shared/components/button'
+import { Plus } from 'lucide-vue-next'
+import CreateAccountDrawer from '../components/CreateAccountDrawer.vue'
+import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
+import { accountColumns } from '../grids/account.grid'
+import { usePermissions } from '@/shared/auth/usePermissions'
+import type { Account } from '../../../domain/account.types'
 
 // ── Grid state (sorting, selection, global filter) ─────────────
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid();
+const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
 // ── Application Layer Orchestration ────────────────────────────
-const { accounts: data, isPending } = useLedgerAccounts();
-const { hasPermission } = usePermissions();
-const router = useRouter();
+const { accounts: data, isPending } = useLedgerAccounts()
+const { hasPermission } = usePermissions()
+const router = useRouter()
 
-const isDrawerOpen = ref(false);
+const isDrawerOpen = ref(false)
 
 function handleRowClick(row: Account) {
-  void router.push({ name: "LedgerCoaDetail", params: { accountId: row.id } });
+  void router.push({ name: 'LedgerCoaDetail', params: { accountId: row.id } })
 }
 </script>
 
@@ -30,9 +30,7 @@ function handleRowClick(row: Account) {
     <!-- Page Header -->
     <div class="flex shrink-0 items-start justify-between">
       <div>
-        <h1 class="m-0 text-heading text-[var(--color-grid-text)]">
-          Chart of Accounts
-        </h1>
+        <h1 class="m-0 text-heading text-[var(--color-grid-text)]">Chart of Accounts</h1>
         <p class="mt-1 text-body-sm text-[var(--color-grid-text-muted)]">
           Manage your ledger accounts and financial structure.
         </p>

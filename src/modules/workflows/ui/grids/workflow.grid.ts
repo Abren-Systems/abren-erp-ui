@@ -1,44 +1,35 @@
-import { h } from "vue";
-import type { ColumnDef } from "@tanstack/vue-table";
-import { DateCell } from "@/shared/components/data-grid";
-import type { PendingApproval } from "../../domain/workflows.types";
+import { h } from 'vue'
+import type { ColumnDef } from '@tanstack/vue-table'
+import { DateCell } from '@/shared/components/data-grid'
+import type { PendingApproval } from '../../domain/workflows.types'
 
 export const workflowColumns: ColumnDef<PendingApproval>[] = [
   {
-    accessorKey: "entityType",
-    header: "Type",
-    cell: ({ row }) =>
-      h("span", { class: "font-medium" }, row.original.entityType),
+    accessorKey: 'entityType',
+    header: 'Type',
+    cell: ({ row }) => h('span', { class: 'font-medium' }, row.original.entityType),
   },
   {
-    accessorKey: "entityId",
-    header: "Reference",
+    accessorKey: 'entityId',
+    header: 'Reference',
     cell: ({ row }) => {
-      const id = row.original.entityId;
-      return h(
-        "code",
-        { class: "text-xs text-neutral-500" },
-        id ? id.slice(0, 8) : "N/A",
-      );
+      const id = row.original.entityId
+      return h('code', { class: 'text-xs text-neutral-500' }, id ? id.slice(0, 8) : 'N/A')
     },
   },
   {
-    accessorKey: "currentState",
-    header: "From",
+    accessorKey: 'currentState',
+    header: 'From',
     cell: ({ row }) =>
-      h("div", { class: "flex items-center gap-2" }, [
-        h("span", { class: "text-neutral-500" }, row.original.currentState),
-        h("span", { class: "text-neutral-300" }, "→"),
-        h(
-          "span",
-          { class: "font-bold text-primary-600" },
-          row.original.targetState || "???",
-        ),
+      h('div', { class: 'flex items-center gap-2' }, [
+        h('span', { class: 'text-neutral-500' }, row.original.currentState),
+        h('span', { class: 'text-neutral-300' }, '→'),
+        h('span', { class: 'font-bold text-primary-600' }, row.original.targetState || '???'),
       ]),
   },
   {
-    accessorKey: "submittedAt",
-    header: "Requested On",
+    accessorKey: 'submittedAt',
+    header: 'Requested On',
     cell: ({ row }) => h(DateCell, { date: row.original.submittedAt }),
   },
-];
+]

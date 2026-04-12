@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAuditStore } from "@/shared/infrastructure/audit.store";
-import { storeToRefs } from "pinia";
-import { useTimeAgo } from "@vueuse/core";
+import { useAuditStore } from '@/shared/infrastructure/audit.store'
+import { storeToRefs } from 'pinia'
+import { useTimeAgo } from '@vueuse/core'
 import {
   FileText,
   User,
@@ -10,22 +10,20 @@ import {
   CreditCard,
   History,
   Activity,
-} from "lucide-vue-next";
+} from 'lucide-vue-next'
 
-const auditStore = useAuditStore();
-const { activityLog, totalLogs } = storeToRefs(auditStore);
+const auditStore = useAuditStore()
+const { activityLog, totalLogs } = storeToRefs(auditStore)
 
 /**
  * Format the event name into a human-readable action.
  */
 function formatAction(eventName: string): string {
-  const parts = eventName.split(":");
-  const entity = parts[0] || "Activity";
-  const action = parts[1] || "";
-  const formattedEntity = entity
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
-  return `${formattedEntity} ${action}`;
+  const parts = eventName.split(':')
+  const entity = parts[0] || 'Activity'
+  const action = parts[1] || ''
+  const formattedEntity = entity.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+  return `${formattedEntity} ${action}`
 }
 
 /**
@@ -33,16 +31,16 @@ function formatAction(eventName: string): string {
  */
 function getModuleColor(module: string): string {
   switch (module.toLowerCase()) {
-    case "ap":
-      return "bg-amber-100 text-amber-700 border-amber-200";
-    case "bank":
-      return "bg-blue-100 text-blue-700 border-blue-200";
-    case "ledger":
-      return "bg-purple-100 text-purple-700 border-purple-200";
-    case "workflows":
-      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+    case 'ap':
+      return 'bg-amber-100 text-amber-700 border-amber-200'
+    case 'bank':
+      return 'bg-blue-100 text-blue-700 border-blue-200'
+    case 'ledger':
+      return 'bg-purple-100 text-purple-700 border-purple-200'
+    case 'workflows':
+      return 'bg-emerald-100 text-emerald-700 border-emerald-200'
     default:
-      return "bg-neutral-100 text-neutral-700 border-neutral-200";
+      return 'bg-neutral-100 text-neutral-700 border-neutral-200'
   }
 }
 
@@ -50,11 +48,11 @@ function getModuleColor(module: string): string {
  * Map event type to a Lucide icon.
  */
 function getEventIcon(eventName: string) {
-  if (eventName.includes("submitted")) return FileText;
-  if (eventName.includes("approved")) return CheckCircle2;
-  if (eventName.includes("rejected")) return XCircle;
-  if (eventName.includes("paid")) return CreditCard;
-  return Activity;
+  if (eventName.includes('submitted')) return FileText
+  if (eventName.includes('approved')) return CheckCircle2
+  if (eventName.includes('rejected')) return XCircle
+  if (eventName.includes('paid')) return CreditCard
+  return Activity
 }
 </script>
 
@@ -88,17 +86,12 @@ function getEventIcon(eventName: string) {
         <!-- Connector Dot -->
         <div
           class="absolute left-[-9px] top-0 w-4 h-4 rounded-full border-2 border-white"
-          :class="
-            event.type.includes('rejected') ? 'bg-error-500' : 'bg-success-500'
-          "
+          :class="event.type.includes('rejected') ? 'bg-error-500' : 'bg-success-500'"
         ></div>
 
         <!-- Event Icon -->
         <div class="flex-shrink-0 mt-1">
-          <component
-            :is="getEventIcon(event.type)"
-            class="w-4 h-4 text-neutral-400"
-          />
+          <component :is="getEventIcon(event.type)" class="w-4 h-4 text-neutral-400" />
         </div>
 
         <div class="flex flex-col flex-1 min-w-0">
@@ -153,9 +146,7 @@ function getEventIcon(eventName: string) {
         <Activity class="w-8 h-8 text-neutral-300" />
       </div>
       <p class="text-sm italic">Monitoring hardened domain event stream...</p>
-      <p
-        class="text-[10px] mt-1 opacity-60 uppercase tracking-widest font-bold"
-      >
+      <p class="text-[10px] mt-1 opacity-60 uppercase tracking-widest font-bold">
         Waiting for module activity
       </p>
     </div>

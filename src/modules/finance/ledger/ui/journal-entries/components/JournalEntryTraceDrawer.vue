@@ -5,9 +5,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from "@/shared/components/sheet";
-import { Badge } from "@/shared/components/badge";
-import type { JournalEntry } from "../../../domain/journal-entry.types";
+} from '@/shared/components/sheet'
+import { Badge } from '@/shared/components/badge'
+import type { JournalEntry } from '../../../domain/journal-entry.types'
 
 /**
  * Stage 3: TraceDrawer — Journal Entry Provenance.
@@ -18,13 +18,13 @@ import type { JournalEntry } from "../../../domain/journal-entry.types";
  */
 
 defineProps<{
-  open: boolean;
-  entry: JournalEntry;
-}>();
+  open: boolean
+  entry: JournalEntry
+}>()
 
 const emit = defineEmits<{
-  (e: "update:open", val: boolean): void;
-}>();
+  (e: 'update:open', val: boolean): void
+}>()
 </script>
 
 <template>
@@ -32,9 +32,7 @@ const emit = defineEmits<{
     <SheetContent class="sm:max-w-[480px] overflow-y-auto">
       <SheetHeader>
         <SheetTitle>Trace: {{ entry.entryNumber }}</SheetTitle>
-        <SheetDescription>
-          Audit trail, FX rates, and source document lineage.
-        </SheetDescription>
+        <SheetDescription> Audit trail, FX rates, and source document lineage. </SheetDescription>
       </SheetHeader>
 
       <div class="space-y-6 py-6">
@@ -64,9 +62,7 @@ const emit = defineEmits<{
               <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
               <div class="flex-1">
                 <p class="text-sm font-medium">Posted</p>
-                <p class="text-xs text-neutral-500">
-                  Posted by {{ entry.postedBy ?? "system" }}
-                </p>
+                <p class="text-xs text-neutral-500">Posted by {{ entry.postedBy ?? 'system' }}</p>
               </div>
               <Badge variant="default" class="text-xs">POSTED</Badge>
             </div>
@@ -110,14 +106,14 @@ const emit = defineEmits<{
                     {{ line.accountId }}
                   </td>
                   <td class="px-3 py-2 text-right tabular-nums">
-                    {{ line.originalAmount?.formatted ?? "—" }}
-                    {{ line.originalCurrency ?? "" }}
+                    {{ line.originalAmount?.formatted ?? '—' }}
+                    {{ line.originalCurrency ?? '' }}
                   </td>
                   <td class="px-3 py-2 text-right tabular-nums font-medium">
                     {{ line.exchangeRate?.toFixed(6) }}
                   </td>
                   <td class="px-3 py-2 text-right tabular-nums">
-                    {{ line.baseAmount?.formatted ?? "—" }}
+                    {{ line.baseAmount?.formatted ?? '—' }}
                   </td>
                 </tr>
               </tbody>

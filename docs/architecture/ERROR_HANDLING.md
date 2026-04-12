@@ -46,25 +46,24 @@ httpClient.interceptors.response.use(
   (response) => response.data, // Unwrap Success Envelope: { data: T } -> T
   async (error) => {
     if (error.response) {
-      const { status, data } =
-        error.response as AxiosResponse<ApiErrorResponse>;
+      const { status, data } = error.response as AxiosResponse<ApiErrorResponse>
 
       // Session expired — clear auth and redirect
       if (status === 401) {
-        handleAuthExpiry();
-        return Promise.reject(new ApiError("UNAUTHORIZED", "Session expired."));
+        handleAuthExpiry()
+        return Promise.reject(new ApiError('UNAUTHORIZED', 'Session expired.'))
       }
 
       // Handle Structured Error Envelopes: { detail: S, code: C }
       if (data && data.success === false) {
-        return Promise.reject(new ApiError(data.code, data.detail, status));
+        return Promise.reject(new ApiError(data.code, data.detail, status))
       }
     }
 
     // Fallback for timeout/network failures
-    return Promise.reject(new ApiError("NETWORK_FAILURE", error.message));
+    return Promise.reject(new ApiError('NETWORK_FAILURE', error.message))
   },
-);
+)
 ```
 
 ### 3.2 Layer 2: Mutation Composable (Module-Specific)
@@ -77,13 +76,13 @@ return useMutation({
   mutationFn: (id: string) => adapter.submit(id),
   onError: (error: Error) => {
     // Domain-specific error handling
-    toast.error(error.message || "Failed to submit the request.");
+    toast.error(error.message || 'Failed to submit the request.')
   },
   onSuccess: () => {
-    toast.success("Request submitted successfully.");
-    void queryClient.invalidateQueries({ queryKey: ["payment-requests"] });
+    toast.success('Request submitted successfully.')
+    void queryClient.invalidateQueries({ queryKey: ['payment-requests'] })
   },
-});
+})
 ```
 
 ### 3.3 Layer 3: Component (Presentation)
@@ -93,10 +92,7 @@ Components display errors from the composable's reactive `error` state. They nev
 ```vue
 <template>
   <!-- Query error — inline fallback -->
-  <div
-    v-if="error"
-    class="rounded-lg border border-danger-200 bg-danger-50 p-4"
-  >
+  <div v-if="error" class="rounded-lg border border-danger-200 bg-danger-50 p-4">
     <p class="text-sm text-danger-700">{{ error.message }}</p>
     <Button variant="outline" size="sm" @click="refetch">Retry</Button>
   </div>
@@ -130,7 +126,7 @@ export function useToast() {
     /* ... */
   }
 
-  return { success, error, warning, info };
+  return { success, error, warning, info }
 }
 ```
 
@@ -197,18 +193,18 @@ For catastrophic rendering errors (component crash, unhandled exceptions), Vue's
 ```typescript
 // core/composables/useErrorBoundary.ts (prescribed interface)
 export function useErrorBoundary() {
-  const hasError = ref(false);
-  const errorMessage = ref("");
+  const hasError = ref(false)
+  const errorMessage = ref('')
 
   onErrorCaptured((err: Error) => {
-    hasError.value = true;
-    errorMessage.value = err.message;
+    hasError.value = true
+    errorMessage.value = err.message
     // Log to monitoring service
-    console.error("[ErrorBoundary]", err);
-    return false; // Prevent propagation
-  });
+    console.error('[ErrorBoundary]', err)
+    return false // Prevent propagation
+  })
 
-  return { hasError, errorMessage };
+  return { hasError, errorMessage }
 }
 ```
 
@@ -216,10 +212,7 @@ Pages can use this to show a recovery UI instead of crashing the entire applicat
 
 ```vue
 <template>
-  <div
-    v-if="hasError"
-    class="flex flex-col items-center justify-center h-full gap-4"
-  >
+  <div v-if="hasError" class="flex flex-col items-center justify-center h-full gap-4">
     <p class="text-neutral-600">Something went wrong in this module.</p>
     <Button @click="() => window.location.reload()">Reload Page</Button>
   </div>

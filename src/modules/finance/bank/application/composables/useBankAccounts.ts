@@ -1,6 +1,6 @@
-import { useResourceQuery } from "@/shared/composables/useResourceQuery";
-import { bankAdapter } from "../../infrastructure/bank_adapter";
-import { bankKeys } from "../keys";
+import { useResourceQuery } from '@/shared/composables/useResourceQuery'
+import { bankAdapter } from '../../infrastructure/bank_adapter'
+import { bankKeys } from '../keys'
 
 /**
  * Use Case: View Bank Accounts.
@@ -18,12 +18,12 @@ export function useBankAccounts() {
     () => bankAdapter.getBankAccounts(),
     (data) => data,
     { staleTime: 1000 * 60 * 5 }, // 5 minutes
-  );
+  )
 
   return {
     accounts,
     isPending,
     error,
     refetch,
-  };
+  }
 }

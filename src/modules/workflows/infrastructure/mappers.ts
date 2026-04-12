@@ -1,7 +1,7 @@
-import { CommonMapper } from "@/shared/infrastructure/mappers";
-import type { PendingApprovalDTO } from "./api.types";
-import type { PendingApproval } from "../domain/workflows.types";
-import type { WorkflowInstanceId, RoleId } from "@/shared/types/brand.types";
+import { CommonMapper } from '@/shared/infrastructure/mappers'
+import type { PendingApprovalDTO } from './api.types'
+import type { PendingApproval } from '../domain/workflows.types'
+import type { WorkflowInstanceId, RoleId } from '@/shared/types/brand.types'
 
 /**
  * Workflow Mapper-as-Factory.
@@ -18,6 +18,6 @@ export class WorkflowMapper {
       targetState: dto.target_state,
       requiredRole: CommonMapper.toBrandedId<RoleId>(dto.required_role),
       submittedAt: CommonMapper.toDate(dto.submitted_at),
-    };
+    }
   }
 }

@@ -61,25 +61,29 @@ watch(searchQuery, (newQuery) => {
   }, props.debounceMs ?? 300)
 })
 
-watch(() => props.modelValue, async (newVal) => {
-  // If modelValue turns null/empty externally, clear selection
-  if (!newVal) {
-    selectedOption.value = null
-    searchQuery.value = ''
-    return
-  }
-  // Try to find the selected option in our current list
-  const found = options.value.find((opt) => opt.value === newVal)
-  if (found) {
-    selectedOption.value = found
-    searchQuery.value = found.label
-  } else {
-    // If not found in current options (e.g. initial load), we might need an initial fetch
-    // For simplicity, we just set the query to the ID if we don't know the label yet.
-    // In a full implementation, `fetchById` might be passed as well.
-    searchQuery.value = newVal
-  }
-}, { immediate: true })
+watch(
+  () => props.modelValue,
+  async (newVal) => {
+    // If modelValue turns null/empty externally, clear selection
+    if (!newVal) {
+      selectedOption.value = null
+      searchQuery.value = ''
+      return
+    }
+    // Try to find the selected option in our current list
+    const found = options.value.find((opt) => opt.value === newVal)
+    if (found) {
+      selectedOption.value = found
+      searchQuery.value = found.label
+    } else {
+      // If not found in current options (e.g. initial load), we might need an initial fetch
+      // For simplicity, we just set the query to the ID if we don't know the label yet.
+      // In a full implementation, `fetchById` might be passed as well.
+      searchQuery.value = newVal
+    }
+  },
+  { immediate: true },
+)
 
 function handleSelect(option: ComboboxOption) {
   selectedOption.value = option
@@ -185,10 +189,13 @@ const handleFocus = () => {
       class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-neutral-200 bg-white py-1 shadow-lg shadow-black/5 dark:border-neutral-800 dark:bg-neutral-950"
       role="listbox"
     >
-      <div v-if="isLoading && options.length === 0" class="py-6 text-center text-sm text-neutral-500">
+      <div
+        v-if="isLoading && options.length === 0"
+        class="py-6 text-center text-sm text-neutral-500"
+      >
         Searching...
       </div>
-      
+
       <div v-else-if="options.length === 0" class="py-6 text-center text-sm text-neutral-500">
         No results found.
       </div>
@@ -200,15 +207,20 @@ const handleFocus = () => {
         :aria-selected="selectedOption?.value === option.value"
         class="relative flex cursor-default select-none items-center py-2 px-3 text-sm outline-none transition-colors"
         :class="[
-          focusedIndex === index ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800' : 'text-neutral-700 dark:text-neutral-300',
-          selectedOption?.value === option.value ? 'bg-blue-50/50 text-blue-600 font-medium' : ''
+          focusedIndex === index
+            ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800'
+            : 'text-neutral-700 dark:text-neutral-300',
+          selectedOption?.value === option.value ? 'bg-blue-50/50 text-blue-600 font-medium' : '',
         ]"
         @mouseenter="focusedIndex = index"
         @click="handleSelect(option)"
       >
         <div class="flex-1 truncate">
           {{ option.label }}
-          <span v-if="option.description" class="ml-2 text-xs text-neutral-400 font-mono hidden sm:inline">
+          <span
+            v-if="option.description"
+            class="ml-2 text-xs text-neutral-400 font-mono hidden sm:inline"
+          >
             {{ option.description }}
           </span>
         </div>

@@ -1,39 +1,36 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useAuthStore } from "@/shared/auth/auth.store";
-import { Button } from "@/shared/components/button";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/shared/auth/auth.store'
+import { Button } from '@/shared/components/button'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
 
-const router = useRouter();
-const route = useRoute();
-const authStore = useAuthStore();
+const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
 
-const email = ref("");
-const password = ref("");
-const isLoading = ref(false);
-const errorMessage = ref("");
+const email = ref('')
+const password = ref('')
+const isLoading = ref(false)
+const errorMessage = ref('')
 
 async function handleLogin() {
-  isLoading.value = true;
-  errorMessage.value = "";
+  isLoading.value = true
+  errorMessage.value = ''
 
   try {
-    await authStore.login(email.value, password.value);
+    await authStore.login(email.value, password.value)
     const redirect =
-      typeof route.query.redirect === "string" &&
-      route.query.redirect.startsWith("/app")
+      typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/app')
         ? route.query.redirect
-        : "/app";
-    await router.push(redirect);
+        : '/app'
+    await router.push(redirect)
   } catch (error) {
     errorMessage.value =
-      error instanceof Error
-        ? error.message
-        : "Unable to sign in with the supplied credentials.";
+      error instanceof Error ? error.message : 'Unable to sign in with the supplied credentials.'
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 </script>
@@ -43,9 +40,7 @@ async function handleLogin() {
     class="w-full max-w-md space-y-8 rounded-2xl border border-neutral-200 bg-white p-10 shadow-xl"
   >
     <div class="text-center">
-      <h2 class="text-4xl font-bold tracking-tight text-neutral-900">
-        Abren ERP
-      </h2>
+      <h2 class="text-4xl font-bold tracking-tight text-neutral-900">Abren ERP</h2>
       <p class="mt-3 text-sm text-neutral-500 font-medium">
         Sign in to your financial operating system
       </p>
@@ -54,9 +49,7 @@ async function handleLogin() {
     <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
       <div class="space-y-5">
         <div class="space-y-2">
-          <Label for="email" class="text-neutral-700 font-semibold"
-            >Email address</Label
-          >
+          <Label for="email" class="text-neutral-700 font-semibold">Email address</Label>
           <Input
             id="email"
             v-model="email"
@@ -67,9 +60,7 @@ async function handleLogin() {
           />
         </div>
         <div class="space-y-2">
-          <Label for="password" class="text-neutral-700 font-semibold"
-            >Password</Label
-          >
+          <Label for="password" class="text-neutral-700 font-semibold">Password</Label>
           <Input
             id="password"
             v-model="password"
@@ -96,10 +87,7 @@ async function handleLogin() {
             type="checkbox"
             class="h-4.5 w-4.5 rounded-md border-neutral-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
           />
-          <label
-            for="remember-me"
-            class="text-sm text-neutral-600 cursor-pointer select-none"
-          >
+          <label for="remember-me" class="text-sm text-neutral-600 cursor-pointer select-none">
             Remember me
           </label>
         </div>

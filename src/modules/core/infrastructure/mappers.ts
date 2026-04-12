@@ -1,7 +1,7 @@
-import { toId } from "@/shared/types/brand.types";
-import type { TenantId, UserId, RoleId } from "@/shared/types/brand.types";
-import type { UserDTO, RoleDTO, UserRoleDTO } from "./api.types";
-import type { User, Role, UserRoleAssignment } from "../domain/user.types";
+import { toId } from '@/shared/types/brand.types'
+import type { TenantId, UserId, RoleId } from '@/shared/types/brand.types'
+import type { UserDTO, RoleDTO, UserRoleDTO } from './api.types'
+import type { User, Role, UserRoleAssignment } from '../domain/user.types'
 
 /**
  * Identity Mapper
@@ -16,14 +16,14 @@ export class IdentityMapper {
       description: dto.description ?? null,
       isSystem: dto.is_system ?? false,
       permissions: dto.permissions ?? [],
-    };
+    }
   }
 
   static toUserRoleAssignment(dto: UserRoleDTO): UserRoleAssignment {
     return {
       roleId: toId<RoleId>(dto.role_id),
       name: dto.name,
-    };
+    }
   }
 
   static toUser(dto: UserDTO): User {
@@ -34,6 +34,6 @@ export class IdentityMapper {
       status: dto.status,
       roles: (dto.roles ?? []).map((r) => this.toUserRoleAssignment(r)),
       lastLoginAt: dto.last_login_at ? new Date(dto.last_login_at) : null,
-    };
+    }
   }
 }

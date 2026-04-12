@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import { cn } from "@/shared/lib";
+import { cn } from '@/shared/lib'
 
 interface DialogFooterProps {
-  class?: string;
+  class?: string
 }
 
-const props = defineProps<DialogFooterProps>();
+const props = defineProps<DialogFooterProps>()
 </script>
 
 <template>
-  <div
-    :class="
-      cn(
-        'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
-        props.class,
-      )
-    "
-  >
+  <div :class="cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', props.class)">
     <slot />
   </div>
 </template>

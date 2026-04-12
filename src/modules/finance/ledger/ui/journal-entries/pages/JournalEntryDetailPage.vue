@@ -1,25 +1,19 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
-import { Button } from "@/shared/components/button";
-import { Badge } from "@/shared/components/badge";
-import {
-  ArrowLeft,
-  CheckCircle,
-  MoreHorizontal,
-  FileText,
-  History,
-} from "lucide-vue-next";
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { Button } from '@/shared/components/button'
+import { Badge } from '@/shared/components/badge'
+import { ArrowLeft, CheckCircle, MoreHorizontal, FileText, History } from 'lucide-vue-next'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/shared/components/dropdown-menu";
-import { useJournalEntry } from "../../../application/composables/useJournalEntry";
-import { usePermissions } from "@/shared/auth/usePermissions";
-import JournalEntryActionModal from "../components/JournalEntryActionModal.vue";
-import JournalEntryTraceDrawer from "../components/JournalEntryTraceDrawer.vue";
+} from '@/shared/components/dropdown-menu'
+import { useJournalEntry } from '../../../application/composables/useJournalEntry'
+import { usePermissions } from '@/shared/auth/usePermissions'
+import JournalEntryActionModal from '../components/JournalEntryActionModal.vue'
+import JournalEntryTraceDrawer from '../components/JournalEntryTraceDrawer.vue'
 
 /**
  * Stage 2: Focus Canvas — Journal Entry Detail Page.
@@ -33,42 +27,40 @@ import JournalEntryTraceDrawer from "../components/JournalEntryTraceDrawer.vue";
  *   Tertiary: Void (destructive, behind overflow + ActionModal)
  */
 
-const props = defineProps<{ entryId: string }>();
-const router = useRouter();
-const { hasPermission } = usePermissions();
+const props = defineProps<{ entryId: string }>()
+const router = useRouter()
+const { hasPermission } = usePermissions()
 
-const { entry, isLoading, postEntry, voidEntry } = useJournalEntry(
-  props.entryId,
-);
+const { entry, isLoading, postEntry, voidEntry } = useJournalEntry(props.entryId)
 
 // Drawer & Modal state
-const isTraceOpen = ref(false);
-const isVoidModalOpen = ref(false);
+const isTraceOpen = ref(false)
+const isVoidModalOpen = ref(false)
 
 // Computed display helpers
-const isDraft = computed(() => entry.value?.status === "DRAFT");
-const isPosted = computed(() => entry.value?.status === "POSTED");
-const isVoided = computed(() => entry.value?.status === "VOIDED");
+const isDraft = computed(() => entry.value?.status === 'DRAFT')
+const isPosted = computed(() => entry.value?.status === 'POSTED')
+const isVoided = computed(() => entry.value?.status === 'VOIDED')
 
 const statusVariant = computed(() => {
-  if (isDraft.value) return "secondary";
-  if (isPosted.value) return "default";
-  return "destructive";
-});
+  if (isDraft.value) return 'secondary'
+  if (isPosted.value) return 'default'
+  return 'destructive'
+})
 
 // ── Primary Action: Post ───────────────────────────────────────
 async function handlePost() {
-  await postEntry();
+  await postEntry()
 }
 
 // ── Tertiary Action: Void (called from ActionModal) ───────────
 async function handleVoid(reason: string) {
-  await voidEntry({ reason });
-  isVoidModalOpen.value = false;
+  await voidEntry({ reason })
+  isVoidModalOpen.value = false
 }
 
 function goBack() {
-  router.push({ name: "LedgerJournals" });
+  router.push({ name: 'LedgerJournals' })
 }
 </script>
 
@@ -126,10 +118,7 @@ function goBack() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              class="text-destructive"
-              @click="isVoidModalOpen = true"
-            >
+            <DropdownMenuItem class="text-destructive" @click="isVoidModalOpen = true">
               Void Entry
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -145,15 +134,11 @@ function goBack() {
           <p class="mt-1 text-sm font-medium">{{ entry.entryDate }}</p>
         </div>
         <div>
-          <p class="text-xs font-medium uppercase text-neutral-400">
-            Base Currency
-          </p>
+          <p class="text-xs font-medium uppercase text-neutral-400">Base Currency</p>
           <p class="mt-1 text-sm font-medium">ETB</p>
         </div>
         <div>
-          <p class="text-xs font-medium uppercase text-neutral-400">
-            Lines
-          </p>
+          <p class="text-xs font-medium uppercase text-neutral-400">Lines</p>
           <p class="mt-1 text-sm font-medium">{{ entry.lines.length }}</p>
         </div>
       </div>
@@ -169,8 +154,12 @@ function goBack() {
               <tr>
                 <th class="px-4 py-2.5 text-left font-medium text-neutral-500">Account</th>
                 <th class="px-4 py-2.5 text-left font-medium text-neutral-500">Description</th>
-                <th class="px-4 py-2.5 text-right font-medium text-neutral-500 tabular-nums">Debit</th>
-                <th class="px-4 py-2.5 text-right font-medium text-neutral-500 tabular-nums">Credit</th>
+                <th class="px-4 py-2.5 text-right font-medium text-neutral-500 tabular-nums">
+                  Debit
+                </th>
+                <th class="px-4 py-2.5 text-right font-medium text-neutral-500 tabular-nums">
+                  Credit
+                </th>
                 <th class="px-4 py-2.5 text-right font-medium text-neutral-500">Currency</th>
               </tr>
             </thead>
@@ -184,16 +173,16 @@ function goBack() {
                   {{ line.accountId }}
                 </td>
                 <td class="px-4 py-2.5 text-neutral-700">
-                  {{ line.description || "—" }}
+                  {{ line.description || '—' }}
                 </td>
                 <td class="px-4 py-2.5 text-right tabular-nums font-medium">
-                  {{ line.debit.amount > 0 ? line.debit.formatted : "" }}
+                  {{ line.debit.amount > 0 ? line.debit.formatted : '' }}
                 </td>
                 <td class="px-4 py-2.5 text-right tabular-nums font-medium">
-                  {{ line.credit.amount > 0 ? line.credit.formatted : "" }}
+                  {{ line.credit.amount > 0 ? line.credit.formatted : '' }}
                 </td>
                 <td class="px-4 py-2.5 text-right font-mono text-xs text-neutral-500">
-                  {{ line.originalCurrency ?? "ETB" }}
+                  {{ line.originalCurrency ?? 'ETB' }}
                 </td>
               </tr>
             </tbody>
@@ -203,10 +192,7 @@ function goBack() {
     </div>
 
     <!-- ── Stage 3: TraceDrawer (lazy, on-demand) ────────────── -->
-    <JournalEntryTraceDrawer
-      v-model:open="isTraceOpen"
-      :entry="entry"
-    />
+    <JournalEntryTraceDrawer v-model:open="isTraceOpen" :entry="entry" />
 
     <!-- ── Guard: ActionModal for destructive void ───────────── -->
     <JournalEntryActionModal

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { Column } from "@tanstack/vue-table";
-import { ArrowUp, ArrowDown, ChevronsUpDown } from "lucide-vue-next";
+import type { Column } from '@tanstack/vue-table'
+import { ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-vue-next'
 
 const props = defineProps<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  column: Column<any, unknown>;
-  title: string;
-}>();
+  column: Column<any, unknown>
+  title: string
+}>()
 
 function toggle() {
-  if (!props.column.getCanSort()) return;
-  props.column.toggleSorting(props.column.getIsSorted() === "asc");
+  if (!props.column.getCanSort()) return
+  props.column.toggleSorting(props.column.getIsSorted() === 'asc')
 }
 </script>
 
@@ -28,16 +28,8 @@ function toggle() {
     @click="toggle"
   >
     <span>{{ title }}</span>
-    <ArrowUp
-      v-if="column.getIsSorted() === 'asc'"
-      :size="12"
-      class="sort-icon active"
-    />
-    <ArrowDown
-      v-else-if="column.getIsSorted() === 'desc'"
-      :size="12"
-      class="sort-icon active"
-    />
+    <ArrowUp v-if="column.getIsSorted() === 'asc'" :size="12" class="sort-icon active" />
+    <ArrowDown v-else-if="column.getIsSorted() === 'desc'" :size="12" class="sort-icon active" />
     <ChevronsUpDown v-else :size="12" class="sort-icon muted" />
   </button>
   <span v-else class="column-header-plain">{{ title }}</span>

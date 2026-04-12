@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue'
 import {
   Dialog,
   DialogContent,
@@ -7,51 +7,51 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/shared/components/dialog";
-import { Button } from "@/shared/components/button";
-import { Input } from "@/shared/components/input";
-import { Label } from "@/shared/components/label";
-import { Textarea } from "@/shared/components/textarea";
-import { useRoles } from "../../application/composables/useRoles";
+} from '@/shared/components/dialog'
+import { Button } from '@/shared/components/button'
+import { Input } from '@/shared/components/input'
+import { Label } from '@/shared/components/label'
+import { Textarea } from '@/shared/components/textarea'
+import { useRoles } from '../../application/composables/useRoles'
 
 const props = defineProps<{
-  open: boolean;
-}>();
+  open: boolean
+}>()
 
 const emit = defineEmits<{
-  (e: "update:open", value: boolean): void;
-}>();
+  (e: 'update:open', value: boolean): void
+}>()
 
-const { createRole, isCreating, permissions } = useRoles();
+const { createRole, isCreating, permissions } = useRoles()
 
 const form = ref({
-  name: "",
-  description: "",
+  name: '',
+  description: '',
   permissions: [] as string[],
-});
+})
 
 async function handleSubmit() {
-  if (!form.value.name) return;
+  if (!form.value.name) return
 
   try {
     await createRole({
       name: form.value.name,
       description: form.value.description,
       permissions: form.value.permissions,
-    });
-    emit("update:open", false);
-    form.value = { name: "", description: "", permissions: [] };
+    })
+    emit('update:open', false)
+    form.value = { name: '', description: '', permissions: [] }
   } catch (err) {
-    console.error("Failed to create role:", err);
+    console.error('Failed to create role:', err)
   }
 }
 
 function togglePermission(code: string) {
-  const index = form.value.permissions.indexOf(code);
+  const index = form.value.permissions.indexOf(code)
   if (index > -1) {
-    form.value.permissions.splice(index, 1);
+    form.value.permissions.splice(index, 1)
   } else {
-    form.value.permissions.push(code);
+    form.value.permissions.push(code)
   }
 }
 </script>
@@ -83,7 +83,9 @@ function togglePermission(code: string) {
 
         <div class="space-y-4">
           <Label>System Permissions</Label>
-          <div class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto border rounded-md p-3 bg-neutral-50/50">
+          <div
+            class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto border rounded-md p-3 bg-neutral-50/50"
+          >
             <div
               v-for="perm in permissions"
               :key="perm.code"
@@ -108,18 +110,11 @@ function togglePermission(code: string) {
       </div>
 
       <DialogFooter class="pt-4 border-t">
-        <Button
-          variant="outline"
-          @click="emit('update:open', false)"
-          :disabled="isCreating"
-        >
+        <Button variant="outline" @click="emit('update:open', false)" :disabled="isCreating">
           Cancel
         </Button>
-        <Button
-          @click="handleSubmit"
-          :disabled="!form.name || isCreating"
-        >
-          {{ isCreating ? "Creating..." : "Save Boundary" }}
+        <Button @click="handleSubmit" :disabled="!form.name || isCreating">
+          {{ isCreating ? 'Creating...' : 'Save Boundary' }}
         </Button>
       </DialogFooter>
     </DialogContent>

@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import { cn } from "@/shared/lib";
+import { cn } from '@/shared/lib'
 
 interface DialogHeaderProps {
-  class?: string;
+  class?: string
 }
 
-const props = defineProps<DialogHeaderProps>();
+const props = defineProps<DialogHeaderProps>()
 </script>
 
 <template>
-  <div
-    :class="
-      cn('flex flex-col space-y-1.5 text-center sm:text-left', props.class)
-    "
-  >
+  <div :class="cn('flex flex-col space-y-1.5 text-center sm:text-left', props.class)">
     <slot />
   </div>
 </template>

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { h } from "vue";
-import { Money } from "@/shared/domain/money";
-import { cn } from "@/shared/lib";
+import { h } from 'vue'
+import { Money } from '@/shared/domain/money'
+import { cn } from '@/shared/lib'
 
 interface MoneyCellProps {
-  amount: Money;
-  class?: string;
+  amount: Money
+  class?: string
 }
 
-defineProps<MoneyCellProps>();
+defineProps<MoneyCellProps>()
 </script>
 
 <template>

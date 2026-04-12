@@ -1,13 +1,13 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    rows?: number;
-    colspan: number;
+    rows?: number
+    colspan: number
   }>(),
   {
     rows: 8,
   },
-);
+)
 </script>
 
 <template>

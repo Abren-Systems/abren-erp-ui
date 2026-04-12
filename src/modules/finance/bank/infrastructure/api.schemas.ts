@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 /**
  * BankAccountSchema — Architectural shielding for bank account data.
@@ -17,7 +17,7 @@ export const BankAccountSchema = z.object({
   ledger_account_id: z.string().nullable().optional(),
   is_active: z.boolean(),
   is_default: z.boolean(),
-});
+})
 
 /**
  * BankTransactionSchema — Architectural shielding for bank transaction history.
@@ -39,7 +39,7 @@ export const BankTransactionSchema = z.object({
   journal_entry_id: z.string().nullable(),
   journal_line_id: z.string().nullable(),
   source: z.string(),
-});
+})
 
 /**
  * ScheduledPaymentSchema — Architectural shielding for future bank obligations.
@@ -56,4 +56,4 @@ export const ScheduledPaymentSchema = z.object({
   status: z.string(),
   source_module: z.string().nullable().optional(),
   source_id: z.string().nullable().optional(),
-});
+})

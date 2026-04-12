@@ -27,22 +27,22 @@ Domain data (entities fetched from the API) must **never** be manually duplicate
 
 ```typescript
 // modules/finance/ledger/ui/stores/ledger-ui.store.ts
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export const useLedgerUIStore = defineStore("ledger-ui", () => {
-  const isFilterVisible = ref(false);
-  const activeView = ref<"grid" | "cards">("grid");
-  const selectedAccountId = ref<string | null>(null);
+export const useLedgerUIStore = defineStore('ledger-ui', () => {
+  const isFilterVisible = ref(false)
+  const activeView = ref<'grid' | 'cards'>('grid')
+  const selectedAccountId = ref<string | null>(null)
 
   function toggleFilters() {
-    isFilterVisible.value = !isFilterVisible.value;
+    isFilterVisible.value = !isFilterVisible.value
   }
 
   function $reset() {
-    isFilterVisible.value = false;
-    activeView.value = "grid";
-    selectedAccountId.value = null;
+    isFilterVisible.value = false
+    activeView.value = 'grid'
+    selectedAccountId.value = null
   }
 
   return {
@@ -51,8 +51,8 @@ export const useLedgerUIStore = defineStore("ledger-ui", () => {
     selectedAccountId,
     toggleFilters,
     $reset,
-  };
-});
+  }
+})
 ```
 
 ### 2.2 Key Rules
@@ -88,9 +88,9 @@ sequenceDiagram
 
 ```typescript
 // modules/finance/ap/application/composables/usePaymentRequests.ts
-import { useQuery } from "@tanstack/vue-query";
-import { paymentRequestAdapter } from "../infrastructure/payment_request_adapter";
-import { toViewModel } from "../infrastructure/payment_request.mapper";
+import { useQuery } from '@tanstack/vue-query'
+import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
+import { toViewModel } from '../infrastructure/payment_request.mapper'
 
 export function usePaymentRequests() {
   const {
@@ -98,15 +98,15 @@ export function usePaymentRequests() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["payment-requests"],
+    queryKey: ['payment-requests'],
     queryFn: async () => {
-      const dtos = await paymentRequestAdapter.list();
+      const dtos = await paymentRequestAdapter.list()
       // Always map BEFORE data enters the Query Cache
-      return dtos.map(toViewModel);
+      return dtos.map(toViewModel)
     },
-  });
+  })
 
-  return { requests, isLoading, error };
+  return { requests, isLoading, error }
 }
 ```
 
@@ -118,34 +118,34 @@ Stores **never** import other stores for domain data. When Module A's action sho
 
 ```typescript
 // modules/finance/ap/application/composables/usePayRequest.ts
-import { eventBus } from "@/shared/event-bus/event-bus";
-import { useQueryClient } from "@tanstack/vue-query";
+import { eventBus } from '@/shared/event-bus/event-bus'
+import { useQueryClient } from '@tanstack/vue-query'
 
 export function usePayRequest() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   async function payRequest(id: string, dto: PayRequestDTO) {
     // 1. Perform mutation via Adapter
-    const result = await paymentRequestAdapter.pay(id, dto);
+    const result = await paymentRequestAdapter.pay(id, dto)
 
     // 2. Refresh LOCAL cache immediately
-    void queryClient.invalidateQueries({ queryKey: ["payment-requests"] });
+    void queryClient.invalidateQueries({ queryKey: ['payment-requests'] })
 
     // 3. Notify OTHER modules (Ledger, Messaging) without importing them
-    eventBus.emit("ap:pr:paid", {
+    eventBus.emit('ap:pr:paid', {
       id: result.id,
       amount: result.amount, // Raw DTO value, receiver will map
-    });
+    })
   }
 
-  return { payRequest };
+  return { payRequest }
 }
 
 // modules/finance/ledger/application/composables/useLedgerAccounts.ts
 // Subscribes to the event — refreshes its own caches
-eventBus.on("ap:pr:paid", () => {
-  queryClient.invalidateQueries({ queryKey: ["ledger-accounts"] });
-});
+eventBus.on('ap:pr:paid', () => {
+  queryClient.invalidateQueries({ queryKey: ['ledger-accounts'] })
+})
 ```
 
 ---
@@ -156,12 +156,12 @@ For actions that should feel instant (like submitting a request), use TanStack Q
 
 ```typescript
 // modules/finance/ap/application/composables/useSubmitRequest.ts
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
-import { paymentRequestAdapter } from "../../infrastructure/payment_request_adapter";
-import type { PaymentRequest } from "../../domain/payment-request.types";
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { paymentRequestAdapter } from '../../infrastructure/payment_request_adapter'
+import type { PaymentRequest } from '../../domain/payment-request.types'
 
 export function useSubmitRequest() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (id: string) => paymentRequestAdapter.submit(id),
@@ -169,35 +169,31 @@ export function useSubmitRequest() {
     // 1. Optimistic update — modify cache BEFORE server responds
     onMutate: async (id: string) => {
       // Cancel in-flight queries to avoid overwriting our optimistic data
-      await queryClient.cancelQueries({ queryKey: ["payment-requests"] });
+      await queryClient.cancelQueries({ queryKey: ['payment-requests'] })
 
       // Snapshot the previous cache for rollback
-      const previous = queryClient.getQueryData<PaymentRequest[]>([
-        "payment-requests",
-      ]);
+      const previous = queryClient.getQueryData<PaymentRequest[]>(['payment-requests'])
 
       // Optimistically update the cached list
-      queryClient.setQueryData<PaymentRequest[]>(["payment-requests"], (old) =>
-        (old ?? []).map((pr) =>
-          pr.id === id ? { ...pr, status: "SUBMITTED" as const } : pr,
-        ),
-      );
+      queryClient.setQueryData<PaymentRequest[]>(['payment-requests'], (old) =>
+        (old ?? []).map((pr) => (pr.id === id ? { ...pr, status: 'SUBMITTED' as const } : pr)),
+      )
 
-      return { previous };
+      return { previous }
     },
 
     // 2. Rollback on failure — restore the snapshot
     onError: (_err, _id, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["payment-requests"], context.previous);
+        queryClient.setQueryData(['payment-requests'], context.previous)
       }
     },
 
     // 3. Always refetch after mutation settles (success or error)
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ["payment-requests"] });
+      void queryClient.invalidateQueries({ queryKey: ['payment-requests'] })
     },
-  });
+  })
 }
 ```
 

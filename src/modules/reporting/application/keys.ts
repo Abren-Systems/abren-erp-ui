@@ -1,4 +1,4 @@
-import type { CashflowQuery } from "../infrastructure/api.types";
+import type { CashflowQuery } from '../infrastructure/api.types'
 
 /**
  * Query Key Factory for Reporting Module
@@ -6,7 +6,6 @@ import type { CashflowQuery } from "../infrastructure/api.types";
  * Centralized source of truth for TanStack Query keys.
  */
 export const reportingKeys = {
-  all: ["reporting"] as const,
-  cashflow: (query: CashflowQuery) =>
-    [...reportingKeys.all, "cashflow", query] as const,
-};
+  all: ['reporting'] as const,
+  cashflow: (query: CashflowQuery) => [...reportingKeys.all, 'cashflow', query] as const,
+}

@@ -12,4 +12,4 @@
 // UI exports
 // export { default as TaxSettingsView } from './ui/TaxSettingsView.vue';
 
-export const taxModulePlaceholder = {};
+export const taxModulePlaceholder = {}

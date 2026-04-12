@@ -7,15 +7,15 @@
  * @example
  * <Badge variant="success">Paid</Badge>
  */
-import { badgeVariants, type BadgeVariants } from "./index";
-import { cn } from "@/shared/lib";
+import { badgeVariants, type BadgeVariants } from './index'
+import { cn } from '@/shared/lib'
 
 interface BadgeProps {
-  variant?: BadgeVariants["variant"];
-  class?: string;
+  variant?: BadgeVariants['variant']
+  class?: string
 }
 
-defineProps<BadgeProps>();
+defineProps<BadgeProps>()
 </script>
 
 <template>

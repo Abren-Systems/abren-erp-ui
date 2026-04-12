@@ -1,50 +1,50 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { DataGrid, useDataGrid } from "@/shared/components/data-grid";
-import { Button } from "@/shared/components/button";
-import { useWarehouses } from "../../application/composables/useWarehouses";
-import TraceabilityBadge from "../components/TraceabilityBadge.vue";
-import { h } from "vue";
-import type { Warehouse } from "../../domain/types";
+import { useRouter } from 'vue-router'
+import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { Button } from '@/shared/components/button'
+import { useWarehouses } from '../../application/composables/useWarehouses'
+import TraceabilityBadge from '../components/TraceabilityBadge.vue'
+import { h } from 'vue'
+import type { Warehouse } from '../../domain/types'
 
-const router = useRouter();
+const router = useRouter()
 
 // Application Layer State
-const { warehouses, isPending } = useWarehouses();
+const { warehouses, isPending } = useWarehouses()
 
 // UI Layer State
-const gridState = useDataGrid();
+const gridState = useDataGrid()
 
 const warehouseColumns = [
   {
-    accessorKey: "code",
-    header: "Warehouse Code",
+    accessorKey: 'code',
+    header: 'Warehouse Code',
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: 'name',
+    header: 'Name',
   },
   {
-    accessorKey: "isQuarantine",
-    header: "Regulatory Status",
+    accessorKey: 'isQuarantine',
+    header: 'Regulatory Status',
     cell: ({ row }: { row: { original: Warehouse } }) => {
-      return h(TraceabilityBadge, { isQuarantine: row.original.isQuarantine });
+      return h(TraceabilityBadge, { isQuarantine: row.original.isQuarantine })
     },
   },
   {
-    accessorKey: "isActive",
-    header: "Status",
+    accessorKey: 'isActive',
+    header: 'Status',
     cell: ({ row }: { row: { original: Warehouse } }) => {
-      return row.original.isActive ? "Active" : "Inactive";
+      return row.original.isActive ? 'Active' : 'Inactive'
     },
   },
-];
+]
 
 function handleRowClick(warehouse: Warehouse) {
   router.push({
-    name: "inventory.warehouse-detail",
+    name: 'inventory.warehouse-detail',
     params: { id: warehouse.id },
-  });
+  })
 }
 </script>
 
@@ -57,9 +57,7 @@ function handleRowClick(warehouse: Warehouse) {
           Manage physical locations and regulatory quarantine zones.
         </p>
       </div>
-      <Button @click="router.push({ name: 'inventory.warehouse-create' })">
-        Add Location
-      </Button>
+      <Button @click="router.push({ name: 'inventory.warehouse-create' })"> Add Location </Button>
     </header>
 
     <DataGrid

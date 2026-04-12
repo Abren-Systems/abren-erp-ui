@@ -12,50 +12,50 @@
  *   // Reset selection after a bulk action
  *   grid.resetSelection()
  */
-import { ref } from "vue";
+import { ref } from 'vue'
 import type {
   SortingState,
   RowSelectionState,
   VisibilityState,
   ColumnFiltersState,
-} from "@tanstack/vue-table";
+} from '@tanstack/vue-table'
 
 export interface DataGridState {
-  sorting: SortingState;
-  rowSelection: RowSelectionState;
-  columnVisibility: VisibilityState;
-  columnFilters: ColumnFiltersState;
-  globalFilter: string;
+  sorting: SortingState
+  rowSelection: RowSelectionState
+  columnVisibility: VisibilityState
+  columnFilters: ColumnFiltersState
+  globalFilter: string
 }
 
 export function useDataGrid() {
-  const sorting = ref<SortingState>([]);
-  const rowSelection = ref<RowSelectionState>({});
-  const columnVisibility = ref<VisibilityState>({});
-  const columnFilters = ref<ColumnFiltersState>([]);
-  const globalFilter = ref("");
+  const sorting = ref<SortingState>([])
+  const rowSelection = ref<RowSelectionState>({})
+  const columnVisibility = ref<VisibilityState>({})
+  const columnFilters = ref<ColumnFiltersState>([])
+  const globalFilter = ref('')
 
   function resetSelection() {
-    rowSelection.value = {};
+    rowSelection.value = {}
   }
 
   function resetFilters() {
     /** Clears column-level filters and the global search string. */
-    columnFilters.value = [];
-    globalFilter.value = "";
+    columnFilters.value = []
+    globalFilter.value = ''
   }
 
   function resetAll() {
     /** Full reset — restores the grid to its initial unfiltered, unselected state. */
-    sorting.value = [];
-    rowSelection.value = {};
-    columnVisibility.value = {};
-    columnFilters.value = [];
-    globalFilter.value = "";
+    sorting.value = []
+    rowSelection.value = {}
+    columnVisibility.value = {}
+    columnFilters.value = []
+    globalFilter.value = ''
   }
 
   /** Returns the number of currently selected rows. */
-  const selectedCount = () => Object.keys(rowSelection.value).length;
+  const selectedCount = () => Object.keys(rowSelection.value).length
 
   return {
     sorting,
@@ -67,5 +67,5 @@ export function useDataGrid() {
     resetSelection,
     resetFilters,
     resetAll,
-  };
+  }
 }

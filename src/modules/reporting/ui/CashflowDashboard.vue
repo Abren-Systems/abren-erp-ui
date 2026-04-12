@@ -1,54 +1,48 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useCashflow } from "../application/composables/useCashflow";
-import { BusinessDate } from "@/shared/domain/business-date";
-import ReportingChart from "./ReportingChart.vue";
-import {
-  TrendingUp,
-  TrendingDown,
-  Clock,
-  Wallet,
-  LayoutDashboard,
-} from "lucide-vue-next";
+import { computed } from 'vue'
+import { useCashflow } from '../application/composables/useCashflow'
+import { BusinessDate } from '@/shared/domain/business-date'
+import ReportingChart from './ReportingChart.vue'
+import { TrendingUp, TrendingDown, Clock, Wallet, LayoutDashboard } from 'lucide-vue-next'
 
 // Date Range (Last 30 days)
-const endDate = BusinessDate.today();
+const endDate = BusinessDate.today()
 const startDate = BusinessDate.fromIso(
-  new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]!,
-);
+  new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]!,
+)
 
-const { entries, stats: cashflowStats } = useCashflow({ startDate, endDate });
+const { entries, stats: cashflowStats } = useCashflow({ startDate, endDate })
 
 const displayStats = computed(() => [
   {
-    name: "Total Actual Inflow",
-    value: cashflowStats.value?.totalActualInflow.format() ?? "...",
+    name: 'Total Actual Inflow',
+    value: cashflowStats.value?.totalActualInflow.format() ?? '...',
     icon: TrendingUp,
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50',
   },
   {
-    name: "Total Actual Outflow",
-    value: cashflowStats.value?.totalActualOutflow.format() ?? "...",
+    name: 'Total Actual Outflow',
+    value: cashflowStats.value?.totalActualOutflow.format() ?? '...',
     icon: TrendingDown,
-    color: "text-rose-600",
-    bg: "bg-rose-50",
+    color: 'text-rose-600',
+    bg: 'bg-rose-50',
   },
   {
-    name: "Projected Exposure",
-    value: cashflowStats.value?.projectedExposure.format() ?? "...",
+    name: 'Projected Exposure',
+    value: cashflowStats.value?.projectedExposure.format() ?? '...',
     icon: Clock,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
+    color: 'text-amber-600',
+    bg: 'bg-amber-50',
   },
   {
-    name: "Net Cash Position",
-    value: cashflowStats.value?.netCashPosition.format() ?? "...",
+    name: 'Net Cash Position',
+    value: cashflowStats.value?.netCashPosition.format() ?? '...',
     icon: Wallet,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
   },
-]);
+])
 </script>
 
 <template>
@@ -60,15 +54,11 @@ const displayStats = computed(() => [
       class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100"
     >
       <div>
-        <h1
-          class="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3"
-        >
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
           <LayoutDashboard class="w-8 h-8 text-blue-600" />
           Financial Insights
         </h1>
-        <p class="text-slate-500 mt-2 text-lg">
-          Real-time dual-layer cashflow reporting.
-        </p>
+        <p class="text-slate-500 mt-2 text-lg">Real-time dual-layer cashflow reporting.</p>
       </div>
 
       <div
@@ -109,9 +99,7 @@ const displayStats = computed(() => [
             <component :is="stat.icon" :class="[stat.color, 'w-8 h-8']" />
           </div>
           <div>
-            <p
-              class="text-sm font-semibold text-slate-500 uppercase tracking-wider"
-            >
+            <p class="text-sm font-semibold text-slate-500 uppercase tracking-wider">
               {{ stat.name }}
             </p>
             <p class="text-2xl font-black text-slate-900 mt-1 tracking-tighter">
@@ -153,9 +141,7 @@ const displayStats = computed(() => [
     </div>
 
     <!-- Detailed Table Section -->
-    <section
-      class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden"
-    >
+    <section class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
       <div
         class="px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between"
       >
@@ -197,16 +183,11 @@ const displayStats = computed(() => [
               <td class="px-8 py-5 text-sm font-semibold text-amber-500">
                 {{ row.projectedOutflow.format() }}
               </td>
-              <td
-                class="px-8 py-5 text-sm font-black text-slate-900 text-right"
-              >
+              <td class="px-8 py-5 text-sm font-black text-slate-900 text-right">
                 {{ row.netCashflow.format() }}
               </td>
             </tr>
-            <tr
-              v-if="!entries || entries.length === 0"
-              class="text-center py-20 text-slate-400"
-            >
+            <tr v-if="!entries || entries.length === 0" class="text-center py-20 text-slate-400">
               <td colspan="5" class="py-20 italic">
                 No transactional data available for the selected period.
               </td>

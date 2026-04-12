@@ -1,4 +1,4 @@
-import { watch, onMounted } from "vue";
+import { watch, onMounted } from 'vue'
 
 /**
  * useFormPersistence — Resilient Form Draft Infrastructure.
@@ -18,38 +18,38 @@ export function useFormPersistence(form: any, storageKey: string) {
     () => form.state.values,
     (newValues) => {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(newValues));
+        localStorage.setItem(storageKey, JSON.stringify(newValues))
       } catch {
         // Silent failure for quota or security issues — non-critical for drafts
       }
     },
     { deep: true },
-  );
+  )
 
   /**
    * Restore form values from localStorage on mount.
    */
   onMounted(() => {
-    const saved = localStorage.getItem(storageKey);
+    const saved = localStorage.getItem(storageKey)
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
+        const parsed = JSON.parse(saved)
         // We use setValues to rehydrate the form
-        form.setValues(parsed);
+        form.setValues(parsed)
       } catch {
-        localStorage.removeItem(storageKey);
+        localStorage.removeItem(storageKey)
       }
     }
-  });
+  })
 
   /**
    * Clear the draft (should be called on successful submission).
    */
   function clearDraft() {
-    localStorage.removeItem(storageKey);
+    localStorage.removeItem(storageKey)
   }
 
   return {
     clearDraft,
-  };
+  }
 }

@@ -1,62 +1,60 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue'
 
 interface ChartData {
-  date: string;
-  actual: number;
-  projected: number;
+  date: string
+  actual: number
+  projected: number
 }
 
 const props = defineProps<{
-  data: ChartData[];
-  title: string;
-}>();
+  data: ChartData[]
+  title: string
+}>()
 
 // Calculate SVG path for "Actual"
-const svgWidth = 800;
-const svgHeight = 300;
-const padding = 40;
+const svgWidth = 800
+const svgHeight = 300
+const padding = 40
 
 const maxVal = computed(() => {
-  const vals = props.data.flatMap((d) => [d.actual, d.projected]);
-  return Math.max(...vals, 1) * 1.1;
-});
+  const vals = props.data.flatMap((d) => [d.actual, d.projected])
+  return Math.max(...vals, 1) * 1.1
+})
 
 const getX = (index: number) => {
-  return (
-    padding + (index * (svgWidth - 2 * padding)) / (props.data.length - 1 || 1)
-  );
-};
+  return padding + (index * (svgWidth - 2 * padding)) / (props.data.length - 1 || 1)
+}
 
 const getY = (val: number) => {
-  return svgHeight - padding - (val / maxVal.value) * (svgHeight - 2 * padding);
-};
+  return svgHeight - padding - (val / maxVal.value) * (svgHeight - 2 * padding)
+}
 
 const actualPath = computed(() => {
-  if (props.data.length === 0) return "";
+  if (props.data.length === 0) return ''
   return props.data.reduce((path, d, i) => {
-    const x = getX(i);
-    const y = getY(d.actual);
-    return path + (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
-  }, "");
-});
+    const x = getX(i)
+    const y = getY(d.actual)
+    return path + (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`)
+  }, '')
+})
 
 const projectedPath = computed(() => {
-  if (props.data.length === 0) return "";
+  if (props.data.length === 0) return ''
   return props.data.reduce((path, d, i) => {
-    const x = getX(i);
-    const y = getY(d.projected);
-    return path + (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
-  }, "");
-});
+    const x = getX(i)
+    const y = getY(d.projected)
+    return path + (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`)
+  }, '')
+})
 
 const areaPath = computed(() => {
-  if (props.data.length === 0) return "";
-  const firstX = getX(0);
-  const lastX = getX(props.data.length - 1);
-  const baseline = getY(0);
-  return `${actualPath.value} L ${lastX} ${baseline} L ${firstX} ${baseline} Z`;
-});
+  if (props.data.length === 0) return ''
+  const firstX = getX(0)
+  const lastX = getX(props.data.length - 1)
+  const baseline = getY(0)
+  return `${actualPath.value} L ${lastX} ${baseline} L ${firstX} ${baseline} Z`
+})
 </script>
 
 <template>

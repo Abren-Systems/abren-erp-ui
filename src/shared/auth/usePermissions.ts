@@ -1,4 +1,4 @@
-import { useAuthStore } from "./auth.store";
+import { useAuthStore } from './auth.store'
 
 /**
  * usePermissions — RBAC Guard Composable
@@ -8,7 +8,7 @@ import { useAuthStore } from "./auth.store";
  * Route guards.
  */
 export function usePermissions() {
-  const authStore = useAuthStore();
+  const authStore = useAuthStore()
 
   /**
    * Checks if the active user possesses a specific backend permission.
@@ -17,26 +17,26 @@ export function usePermissions() {
    * @returns boolean
    */
   const hasPermission = (permission: string): boolean => {
-    return authStore.hasPermission(permission);
-  };
+    return authStore.hasPermission(permission)
+  }
 
   /**
    * Checks if the active user possesses AT LEAST ONE of the listed permissions.
    */
   const hasAnyPermission = (permissions: string[]): boolean => {
-    return permissions.some(hasPermission);
-  };
+    return permissions.some(hasPermission)
+  }
 
   /**
    * Checks if the active user possesses ALL of the listed permissions.
    */
   const hasAllPermissions = (permissions: string[]): boolean => {
-    return permissions.every(hasPermission);
-  };
+    return permissions.every(hasPermission)
+  }
 
   return {
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
-  };
+  }
 }

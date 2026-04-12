@@ -1,7 +1,7 @@
-import { Currency } from "@/shared/domain/money";
-import { CommonMapper } from "@/shared/infrastructure/mappers";
-import type { DailyCashflowDTO } from "./api.types";
-import type { DailyCashflowEntry } from "../domain/reporting.types";
+import { Currency } from '@/shared/domain/money'
+import { CommonMapper } from '@/shared/infrastructure/mappers'
+import type { DailyCashflowDTO } from './api.types'
+import type { DailyCashflowEntry } from '../domain/reporting.types'
 
 /**
  * Reporting Mapper-as-Factory.
@@ -10,11 +10,9 @@ import type { DailyCashflowEntry } from "../domain/reporting.types";
  */
 export class ReportingMapper {
   static toDailyCashflowEntry(dto: DailyCashflowDTO): DailyCashflowEntry {
-    const currency = Object.values(Currency).includes(
-      dto.currency_code as Currency,
-    )
+    const currency = Object.values(Currency).includes(dto.currency_code as Currency)
       ? (dto.currency_code as Currency)
-      : Currency.USD;
+      : Currency.USD
 
     return {
       date: CommonMapper.toDate(dto.date)!,
@@ -23,6 +21,6 @@ export class ReportingMapper {
       projectedInflow: CommonMapper.toMoney(dto.projected_inflow, currency),
       projectedOutflow: CommonMapper.toMoney(dto.projected_outflow, currency),
       netCashflow: CommonMapper.toMoney(dto.net_cashflow, currency),
-    };
+    }
   }
 }

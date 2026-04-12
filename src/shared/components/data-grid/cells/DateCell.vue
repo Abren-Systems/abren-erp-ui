@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { BusinessDate, type IsoDate } from "@/shared/domain/business-date";
-import { cn } from "@/shared/lib";
+import { BusinessDate, type IsoDate } from '@/shared/domain/business-date'
+import { cn } from '@/shared/lib'
 
 interface DateCellProps {
-  date: IsoDate | null | undefined;
-  format?: string;
-  class?: string;
+  date: IsoDate | null | undefined
+  format?: string
+  class?: string
 }
 
-const props = defineProps<DateCellProps>();
+const props = defineProps<DateCellProps>()
 </script>
 
 <template>
   <span :class="cn('text-sm text-neutral-600', props.class)">
-    {{ date ? BusinessDate.format(date) : "—" }}
+    {{ date ? BusinessDate.format(date) : '—' }}
   </span>
 </template>

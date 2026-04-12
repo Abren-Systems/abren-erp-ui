@@ -99,9 +99,9 @@ The backend provides a unified response envelope. The Core HTTP Client is respon
  * T is the DTO shape (e.g., PaymentRequestDTO)
  */
 export interface ApiResponse<T> {
-  success: true;
-  data: T;
-  meta: Record<string, unknown> | null;
+  success: true
+  data: T
+  meta: Record<string, unknown> | null
 }
 
 /**
@@ -109,17 +109,17 @@ export interface ApiResponse<T> {
  * Symmetric with the backend's ErrorDetail schema.
  */
 export interface ApiErrorResponse {
-  success: false;
-  detail: string;
-  code: string;
+  success: false
+  detail: string
+  code: string
 }
 
 /**
  * The apiGet/apiPost helpers unwrap the data field automatically.
  */
 export async function apiGet<T>(url: string): Promise<T> {
-  const response = await httpClient.get<ApiResponse<T>>(url);
-  return response.data.data;
+  const response = await httpClient.get<ApiResponse<T>>(url)
+  return response.data.data
 }
 ```
 
@@ -140,19 +140,19 @@ Each module has a typed **Adapter** that wraps the shared HTTP client. Adapters 
 
 ```typescript
 // modules/inventory/infrastructure/inventory_adapter.ts
-import { apiGet, apiPost } from "@/shared/api/http-client";
-import { WarehouseSchema, ItemSchema } from "./schemas";
-import type { WarehouseDTO, ItemDTO } from "./api.types";
+import { apiGet, apiPost } from '@/shared/api/http-client'
+import { WarehouseSchema, ItemSchema } from './schemas'
+import type { WarehouseDTO, ItemDTO } from './api.types'
 
 export const inventoryAdapter = {
   async getWarehouses(): Promise<WarehouseDTO[]> {
     // 1. Fetch raw data from shared client
-    const raw = await apiGet<unknown[]>("/inventory/warehouses");
+    const raw = await apiGet<unknown[]>('/inventory/warehouses')
 
     // 2. Validate and cast at the boundary (Fail-Fast)
-    return raw.map((item) => WarehouseSchema.parse(item));
+    return raw.map((item) => WarehouseSchema.parse(item))
   },
-};
+}
 ```
 
 ---
@@ -231,7 +231,7 @@ Instead of calling service clients directly from composables, use `useApiQuery` 
 
 ```typescript
 // core/composables/useApiQuery.ts
-import { useQuery, type UseQueryOptions } from "@tanstack/vue-query";
+import { useQuery, type UseQueryOptions } from '@tanstack/vue-query'
 
 export function useApiQuery<T>(
   key: string[],
@@ -242,26 +242,26 @@ export function useApiQuery<T>(
     queryKey: key,
     queryFn: fetcher,
     ...options,
-  });
+  })
 }
 
 // core/composables/useApiMutation.ts
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
 export function useApiMutation<TData, TVariables>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   options?: { invalidateKeys?: string[][] },
 ) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn,
     onSuccess: () => {
       options?.invalidateKeys?.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
-      });
+        queryClient.invalidateQueries({ queryKey: key })
+      })
     },
-  });
+  })
 }
 ```
 
@@ -269,20 +269,20 @@ export function useApiMutation<TData, TVariables>(
 
 ```typescript
 // modules/finance/ap/application/composables/usePaymentRequests.ts
-import { useQuery } from "@tanstack/vue-query";
-import { paymentRequestAdapter } from "../infrastructure/payment_request_adapter";
-import { APMapper } from "../infrastructure/mappers";
+import { useQuery } from '@tanstack/vue-query'
+import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
+import { APMapper } from '../infrastructure/mappers'
 
 export function usePaymentRequests() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["payment-requests"],
+    queryKey: ['payment-requests'],
     queryFn: async () => {
-      const dtos = await paymentRequestAdapter.list();
-      return dtos.map(APMapper.toPaymentRequest);
+      const dtos = await paymentRequestAdapter.list()
+      return dtos.map(APMapper.toPaymentRequest)
     },
-  });
+  })
 
-  return { requests: data, isLoading, error };
+  return { requests: data, isLoading, error }
 }
 ```
 
@@ -301,32 +301,32 @@ Mappers are the **firewall** and **primary domain factory** between backend DTOs
 ```typescript
 // modules/payment-requests/types/api.types.ts (from OpenAPI codegen)
 export interface PaymentRequestDTO {
-  id: string;
-  beneficiary_name: string;
-  amount: number;
-  currency: string;
-  status: "DRAFT" | "SUBMITTED" | "APPROVED" | "REJECTED" | "PAID";
-  bank_account_id: string | null;
-  submitted_at: string | null;
-  paid_at: string | null;
-  current_approval_step: number;
-  assigned_approver_id: string | null;
+  id: string
+  beneficiary_name: string
+  amount: number
+  currency: string
+  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PAID'
+  bank_account_id: string | null
+  submitted_at: string | null
+  paid_at: string | null
+  current_approval_step: number
+  assigned_approver_id: string | null
 }
 
 // modules/payment-requests/types/view.types.ts
 export interface PaymentRequestViewModel {
-  id: string;
-  beneficiary: string; // renamed for UI clarity
-  amount: Money; // Value Object, not raw number
-  status: PaymentRequestStatus;
-  statusLabel: string; // "Draft", "Pending Approval", etc.
-  statusColor: string; // CSS class for badge color
-  canSubmit: boolean; // Derived permission
-  canApprove: boolean; // Derived permission
-  canReject: boolean; // Derived permission
-  canPay: boolean; // Derived permission
-  submittedAt: string | null; // Formatted date string
-  paidAt: string | null; // Formatted date string
+  id: string
+  beneficiary: string // renamed for UI clarity
+  amount: Money // Value Object, not raw number
+  status: PaymentRequestStatus
+  statusLabel: string // "Draft", "Pending Approval", etc.
+  statusColor: string // CSS class for badge color
+  canSubmit: boolean // Derived permission
+  canApprove: boolean // Derived permission
+  canReject: boolean // Derived permission
+  canPay: boolean // Derived permission
+  submittedAt: string | null // Formatted date string
+  paidAt: string | null // Formatted date string
 }
 ```
 
