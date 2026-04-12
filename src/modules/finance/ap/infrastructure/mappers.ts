@@ -78,15 +78,11 @@ export class APMapper {
       bankAccountId: dto.bank_account_id
         ? CommonMapper.toBrandedId<BankAccountId>(dto.bank_account_id)
         : null,
-      targetLiabilityAccountId: dto.target_liability_account_id
-        ? CommonMapper.toBrandedId<AccountId>(dto.target_liability_account_id)
-        : null,
+      targetLiabilityAccountId: null,
       submittedAt: CommonMapper.toDate(dto.submitted_at),
       paidAt: CommonMapper.toDate(dto.paid_at),
-      currentApprovalStep: dto.current_approval_step,
-      assignedApproverId: dto.assigned_approver_id
-        ? CommonMapper.toBrandedId<UserId>(dto.assigned_approver_id)
-        : null,
+      currentApprovalStep: 1,
+      assignedApproverId: null,
       sourceModule: null,
       sourceId: null,
     }

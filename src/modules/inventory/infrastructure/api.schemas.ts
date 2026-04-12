@@ -29,8 +29,14 @@ export const StockLevelSchema = z.object({
   item_id: z.string().uuid(),
   warehouse_id: z.string().uuid(),
   quantity: z.string(),
-  weighted_average_cost: z.string(),
-  total_value: z.string(),
+  weighted_average_cost: z.object({
+    amount: z.string(),
+    currency: z.string(),
+  }),
+  total_value: z.object({
+    amount: z.string(),
+    currency: z.string(),
+  }),
 })
 
 export const BatchSchema = z.object({

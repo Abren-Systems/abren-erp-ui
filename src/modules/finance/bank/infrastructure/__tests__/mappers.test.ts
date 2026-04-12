@@ -5,8 +5,8 @@ import type { components } from '../../../../../shared/api/generated.types'
 import { toId } from '../../../../../shared/types/brand.types'
 import type { BankAccountId } from '../../../../../shared/types/brand.types'
 
-type BankAccountDTO = components['schemas']['BankAccountDTO']
-type BankTransactionDTO = components['schemas']['BankTransactionDTO']
+type BankAccountDTO = components['schemas']['BankAccountSchema']
+type BankTransactionDTO = components['schemas']['BankTransactionSchema']
 
 describe('BankMapper', () => {
   describe('toBankAccount', () => {
@@ -71,10 +71,7 @@ describe('BankMapper', () => {
         transaction_type: 'DEBIT',
         reconciliation_status: 'UNRECONCILED',
         reconciled_at: null,
-        reconciled_by: null,
         journal_entry_id: null,
-        journal_line_id: null,
-        source: 'CORE',
       }
 
       const model = BankMapper.toTransaction(dto, accountId)

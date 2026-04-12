@@ -22,7 +22,10 @@ import type { ApiError } from '@/shared/api/http-client'
 export function useFormErrorHandler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: {
-    setFieldMeta: (field: string, updater: (meta: any) => any) => void
+    setFieldMeta: (
+      field: string,
+      updater: (meta: Record<string, unknown> | undefined) => Record<string, unknown>,
+    ) => void
   },
 ) {
   /**

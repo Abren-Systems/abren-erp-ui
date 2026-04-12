@@ -67,14 +67,16 @@ function clearFile() {
   emit('file-cleared')
 }
 
+const preventDefault = (e: Event) => e.preventDefault()
+
 onMounted(() => {
-  window.addEventListener('dragover', (e) => e.preventDefault())
-  window.addEventListener('drop', (e) => e.preventDefault())
+  window.addEventListener('dragover', preventDefault)
+  window.addEventListener('drop', preventDefault)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('dragover', (e) => e.preventDefault())
-  window.removeEventListener('drop', (e) => e.preventDefault())
+  window.removeEventListener('dragover', preventDefault)
+  window.removeEventListener('drop', preventDefault)
 })
 </script>
 

@@ -1,6 +1,6 @@
 import type { components } from '@/shared/api/generated.types'
 
-export type BankAccountDTO = components['schemas']['BankAccountDTO']
-export type BankTransactionDTO = components['schemas']['BankTransactionDTO']
-export type ScheduledPaymentDTO = components['schemas']['ScheduledPaymentDTO']
+export type BankAccountDTO = components['schemas']['BankAccountSchema']
+export type BankTransactionDTO = components['schemas']['BankTransactionSchema']
+export type ScheduledPaymentDTO = components['schemas']['ScheduledPaymentSchema']
 export type CreateScheduledPaymentRequest = components['schemas']['CreateScheduledPaymentRequest']

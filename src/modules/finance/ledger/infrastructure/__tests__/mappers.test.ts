@@ -16,6 +16,7 @@ describe('LedgerMapper', () => {
         name: 'Cash in Bank',
         account_type: 'ASSET',
         is_active: true,
+        requires_revaluation: false,
       }
 
       const model = LedgerMapper.toAccount(dto)

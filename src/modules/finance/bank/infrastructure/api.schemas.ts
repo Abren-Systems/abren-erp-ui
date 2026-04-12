@@ -35,10 +35,7 @@ export const BankTransactionSchema = z.object({
   transaction_type: z.string(),
   reconciliation_status: z.string(),
   reconciled_at: z.string().nullable(),
-  reconciled_by: z.string().nullable(),
   journal_entry_id: z.string().nullable(),
-  journal_line_id: z.string().nullable(),
-  source: z.string(),
 })
 
 /**
@@ -48,7 +45,7 @@ export const ScheduledPaymentSchema = z.object({
   id: z.string().uuid(),
   tenant_id: z.string().uuid(),
   bank_account_id: z.string().uuid(),
-  category: z.string(),
+  category: z.enum(['OTHER', 'RENT', 'SALARY', 'SUPPLIER', 'TAX', 'UTILITIES']),
   description: z.string(),
   amount: z.string(),
   currency_code: z.string(),

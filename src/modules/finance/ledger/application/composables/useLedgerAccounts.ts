@@ -3,6 +3,7 @@ import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
 import { LedgerMapper } from '../../infrastructure/mappers'
 import { ledgerKeys } from '../keys'
+import type { AccountCreateDTO } from '../../infrastructure/api.types'
 
 /**
  * Use Case: View and Manage Chart of Accounts.
@@ -23,7 +24,7 @@ export function useLedgerAccounts() {
   )
 
   const { mutateAsync: createAccount, isPending: isCreating } = useMutation({
-    mutationFn: (data: Record<string, unknown>) => ledgerAdapter.createAccount(data),
+    mutationFn: (data: AccountCreateDTO) => ledgerAdapter.createAccount(data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ledgerKeys.accounts() })
     },
