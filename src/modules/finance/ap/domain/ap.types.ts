@@ -82,3 +82,14 @@ export interface VendorBillCreate {
     amount: number
   })[]
 }
+
+export interface PaymentRequestStats {
+  tenantId: string
+  totalCount: number
+  draftCount: number
+  submittedCount: number
+  approvedCount: number
+  rejectedCount: number
+  paidCount: number
+  totalAmount: Money
+}

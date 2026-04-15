@@ -24,7 +24,7 @@ export function useApprovePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>)
     isPending,
     error,
   } = useApiMutation<PaymentRequest>(
-    async () => {
+    async (_: void) => {
       const unwrappedId = toValue(id)
       if (!unwrappedId) throw new Error('Missing Payment Request ID')
       return await apAdapter.approveRequest(unwrappedId)

@@ -17,10 +17,7 @@ export function usePaymentRequests() {
     isLoading,
     error,
     refetch,
-  } = useResourceQuery(
-    apKeys.paymentRequests(),
-    () => apAdapter.listRequests(),
-  )
+  } = useResourceQuery(apKeys.paymentRequests(), () => apAdapter.listRequests())
 
   return { requests, isLoading, error, refetch }
 }

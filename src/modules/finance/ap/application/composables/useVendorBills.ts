@@ -17,10 +17,7 @@ export function useVendorBills() {
     isLoading,
     error,
     refetch,
-  } = useResourceQuery(
-    apKeys.vendorBills(),
-    () => apAdapter.listBills(),
-  )
+  } = useResourceQuery(apKeys.vendorBills(), () => apAdapter.listBills())
 
   return { bills, isLoading, error, refetch }
 }
