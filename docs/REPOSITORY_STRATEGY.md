@@ -14,10 +14,11 @@ abren-erp/                           # Parent directory (NOT a git repo)
 │   ├── src/abren_erp_api/
 │   │   └── modules/
 │   │       ├── core/
-│   │       ├── accounting/
-│   │       ├── approvals/
-│   │       ├── payment_requests/
-│   │       ├── bank/
+│   │       ├── finance/ledger
+│   │       ├── finance/ap
+│   │       ├── finance/ar
+│   │       ├── finance/bank
+│   │       ├── finance/taxes
 │   │       ├── reporting/
 │   │       ├── webhooks/
 │   │       └── system/
