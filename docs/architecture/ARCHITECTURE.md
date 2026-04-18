@@ -1,3 +1,10 @@
+---
+title: "Abren ERP UI — Frontend Architectural Manifesto"
+description: "A **domain-aware frontend** for a Financial Operating System — not a collection of CRUD forms. We strictly adhere to the **Modular Monolith Mirroring** principle: the frontend is structurally aligned "
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # Abren ERP UI — Frontend Architectural Manifesto
 
 > **Version:** 2.1

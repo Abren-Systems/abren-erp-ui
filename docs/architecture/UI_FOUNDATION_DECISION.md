@@ -1,3 +1,10 @@
+---
+title: "Abren ERP - UI Foundation Architecture Decision"
+description: "_An architectural decision record evaluating UI Primitive libraries and building the foundation for our proprietary, heavily-customizable Vue 3 ERP._"
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # Abren ERP: UI Foundation Architecture Decision
 
 _An architectural decision record evaluating UI Primitive libraries and building the foundation for our proprietary, heavily-customizable Vue 3 ERP._

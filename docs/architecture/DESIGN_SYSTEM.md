@@ -1,3 +1,10 @@
+---
+title: "Abren ERP - Design System Specification"
+description: "_The definitive source of truth for visual tokens, typography, and spacing used across the Abren ERP UI._"
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # Abren ERP: Design System Specification
 
 _The definitive source of truth for visual tokens, typography, and spacing used across the Abren ERP UI._

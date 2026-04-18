@@ -1,3 +1,10 @@
+---
+title: "Abren ERP UI — Implementation Roadmap"
+description: "This roadmap governs the delivery of the Abren ERP frontend. In an architecture-first project, the UI is more than a set of features—it is the **primary validator** of the backend's hardened backbone."
+tier: frontend
+tags: [frontend]
+---
+
 # Abren ERP UI — Implementation Roadmap
 
 > **Version:** 3.0

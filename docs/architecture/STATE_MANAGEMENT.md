@@ -1,3 +1,10 @@
+---
+title: "State Management Architecture"
+description: "We distinguish between two types of state to ensure high performance and reliability:"
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # State Management Architecture
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)

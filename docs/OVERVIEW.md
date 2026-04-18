@@ -1,3 +1,10 @@
+---
+title: "Abren ERP UI — Documentation Overview"
+description: "Abren ERP UI is the **domain-aware frontend** for the Abren ERP Financial Operating System. It is not a thin CRUD skin — it is a structurally aligned, modular application that understands the same bou"
+tier: frontend
+tags: [frontend]
+---
+
 # Abren ERP UI — Documentation Overview
 
 > **Version:** 1.0

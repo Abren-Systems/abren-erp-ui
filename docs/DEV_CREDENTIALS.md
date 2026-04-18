@@ -1,3 +1,10 @@
+---
+title: "Development Credentials"
+description: "If your local database is empty, run the seed script to provision the default user:"
+tier: frontend
+tags: [frontend]
+---
+
 # Development Credentials
 
 > **For local development only. Never commit real credentials.**

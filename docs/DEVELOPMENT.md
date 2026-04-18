@@ -1,6 +1,13 @@
+---
+title: "Development Guide"
+description: "feature/{module}/{description}     e.g. feature/accounting/journal-entry-form"
+tier: frontend
+tags: [frontend]
+---
+
 # Development Guide
 
-> **Parent:** [Documentation Overview](docs/OVERVIEW.md)
+> **Parent:** [Documentation Overview](OVERVIEW.md)
 
 ---
 

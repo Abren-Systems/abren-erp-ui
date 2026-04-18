@@ -1,3 +1,10 @@
+---
+title: "Abren ERP — The Composable Business Operating System (UX Architecture)"
+description: "Before implementing the frontend views for Horizon A modules, we are establishing our ultimate UX/UI philosophy. We are elevating Abren from a 'nice-looking CRUD system' to a **Composable Business Ope"
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # Abren ERP — The Composable Business Operating System (UX Architecture)
 
 > **Status:** AUTHORITATIVE — This document dictates the UX and Interaction Philosophy for the Abren ERP frontend. It acts as the companion to the technical [Architecture Manifesto](./ARCHITECTURE.md).

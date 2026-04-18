@@ -1,3 +1,10 @@
+---
+title: "Frontend Testing Strategy"
+description: "│  E2E    │  Playwright — Critical user journeys"
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # Frontend Testing Strategy
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)

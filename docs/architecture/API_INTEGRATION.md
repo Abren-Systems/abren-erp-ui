@@ -1,3 +1,10 @@
+---
+title: "API Integration Architecture"
+description: "┌─────────────────────────────────────────────────────┐"
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # API Integration Architecture
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)

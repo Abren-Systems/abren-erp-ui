@@ -1,3 +1,10 @@
+---
+title: "Abren ERP - Product Segmentation & Architecture Strategy (v1.0)"
+description: "To support scalable Go-To-Market (GTM) packaging and technical feature-gating, the ERP's modules fall into three rigid tiers:"
+tier: frontend
+tags: [frontend, architecture]
+---
+
 # Abren ERP: Product Segmentation & Architecture Strategy (v1.0)
 
 ## 1. Executive Vision: The Ledger-First Modular Monolith
