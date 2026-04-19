@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Button } from '@/shared/components/button'
 import { Input } from '@/shared/components/input'
 import { Label } from '@/shared/components/label'
@@ -41,15 +41,23 @@ const accountTypes = [
   AccountType.EXPENSE,
 ]
 
+const error = ref<string | null>(null)
+
+const isValid = computed(() => {
+  return form.value.name.trim().length > 0 && form.value.code !== null && form.value.code > 0
+})
+
 async function handleSubmit() {
-  if (!form.value.name || !form.value.code) return
+  if (!isValid.value) return
+  error.value = null
 
   try {
     await createAccount({
       name: form.value.name,
-      code: form.value.code,
+      code: form.value.code as number,
       account_type: form.value.account_type,
-      parent_id: form.value.parent_id,
+      parent_id:
+        !form.value.parent_id || form.value.parent_id === 'none' ? null : form.value.parent_id,
     })
 
     emit('update:open', false)
@@ -61,8 +69,11 @@ async function handleSubmit() {
       account_type: 'ASSET',
       parent_id: null,
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Failed to create account:', err)
+    error.value =
+      ((err as Record<string, unknown>).detail as string) ||
+      'Failed to create account. Please check the inputs.'
   }
 }
 </script>
@@ -111,7 +122,7 @@ async function handleSubmit() {
               <SelectValue placeholder="None (Top Level Account)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None (Top Level Account)</SelectItem>
+              <SelectItem value="none">None (Top Level Account)</SelectItem>
               <SelectItem v-for="acc in accounts" :key="acc.id" :value="acc.id">
                 {{ acc.code }} - {{ acc.name }}
               </SelectItem>
@@ -122,15 +133,18 @@ async function handleSubmit() {
           </p>
         </div>
 
+        <div
+          v-if="error"
+          class="p-3 text-xs text-red-600 bg-red-50 rounded-md border border-red-100 italic"
+        >
+          {{ error }}
+        </div>
+
         <SheetFooter class="pt-6 border-t mt-6">
           <Button variant="outline" type="button" @click="emit('update:open', false)">
             Cancel
           </Button>
-          <Button
-            variant="default"
-            type="submit"
-            :disabled="!form.name || !form.code || isCreating"
-          >
+          <Button variant="default" type="submit" :disabled="!isValid || isCreating">
             {{ isCreating ? 'Creating…' : 'Save Account' }}
           </Button>
         </SheetFooter>

@@ -12,6 +12,7 @@ import {
   SheetFooter,
 } from '@/shared/components/sheet'
 import { useFiscalPeriods } from '../../../application/composables/useFiscalPeriods'
+import { computed } from 'vue'
 
 /**
  * FiscalPeriodCreateDrawer — Slide-out for creating new fiscal periods.
@@ -28,8 +29,12 @@ const form = ref({
   end_date: '',
 })
 
+const isValid = computed(() => {
+  return form.value.name.trim().length > 0 && !!form.value.start_date && !!form.value.end_date
+})
+
 async function handleSubmit() {
-  if (!form.value.name || !form.value.start_date || !form.value.end_date) return
+  if (!isValid.value) return
 
   try {
     await createPeriod({
@@ -76,10 +81,7 @@ async function handleSubmit() {
           <Button variant="outline" type="button" @click="emit('update:open', false)">
             Cancel
           </Button>
-          <Button
-            type="submit"
-            :disabled="!form.name || !form.start_date || !form.end_date || isLoading"
-          >
+          <Button type="submit" :disabled="!isValid || isLoading">
             {{ isLoading ? 'Creating…' : 'Create Period' }}
           </Button>
         </SheetFooter>

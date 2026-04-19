@@ -16,6 +16,7 @@ import { useCreatePaymentRequest } from '../../../application/composables/useCre
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
 import { Trash2, Plus, AlertCircle } from 'lucide-vue-next'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
+import SelectLedgerAccount from '@/shared/components/finance/SelectLedgerAccount.vue'
 
 /**
  * PaymentRequestCreatePage — Dedicated creation form.
@@ -215,8 +216,12 @@ function goBack() {
                   </Button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                  <form.Field :name="`lines[${idx}].description`" :index="idx">
+                <div class="grid grid-cols-12 gap-3">
+                  <form.Field
+                    :name="`lines[${idx}].description`"
+                    :index="idx"
+                    class="col-span-12 md:col-span-5"
+                  >
                     <template #default="{ field: lf }">
                       <div class="grid gap-1.5">
                         <Label class="text-xs">Description *</Label>
@@ -230,7 +235,27 @@ function goBack() {
                     </template>
                   </form.Field>
 
-                  <form.Field :name="`lines[${idx}].amount`" :index="idx">
+                  <form.Field
+                    :name="`lines[${idx}].accountId`"
+                    :index="idx"
+                    class="col-span-12 md:col-span-4"
+                  >
+                    <template #default="{ field: lf }">
+                      <div class="grid gap-1.5">
+                        <Label class="text-xs">GL Account *</Label>
+                        <SelectLedgerAccount
+                          :model-value="lf.state.value"
+                          @update:model-value="(val) => lf.handleChange(val)"
+                        />
+                      </div>
+                    </template>
+                  </form.Field>
+
+                  <form.Field
+                    :name="`lines[${idx}].amount`"
+                    :index="idx"
+                    class="col-span-12 md:col-span-3"
+                  >
                     <template #default="{ field: lf }">
                       <div class="grid gap-1.5">
                         <Label class="text-xs">Amount *</Label>

@@ -81,6 +81,11 @@ async function handlePay(data: { payment_method: string; disbursement_reference:
 function goBack() {
   router.push({ name: 'PaymentRequestsList' })
 }
+
+function formatMoney(money: any) {
+  if (!money || typeof money.format !== 'function') return '—'
+  return money.format()
+}
 </script>
 
 <template>
@@ -169,7 +174,7 @@ function goBack() {
       <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
         <div class="rounded-lg border p-4">
           <p class="text-xs font-medium uppercase text-neutral-400">Total Amount</p>
-          <p class="mt-1 text-xl font-bold tabular-nums">{{ request.totalAmount.format() }}</p>
+          <p class="mt-1 text-xl font-bold tabular-nums">{{ formatMoney(request.totalAmount) }}</p>
         </div>
         <div class="rounded-lg border p-4">
           <p class="text-xs font-medium uppercase text-neutral-400">Currency</p>
@@ -216,7 +221,7 @@ function goBack() {
               >
                 <td class="px-4 py-2.5">{{ line.description }}</td>
                 <td class="px-4 py-2.5 text-right tabular-nums font-semibold">
-                  {{ line.amount.format() }}
+                  {{ formatMoney(line.amount) }}
                 </td>
                 <td class="px-4 py-2.5 font-mono text-xs text-neutral-500">
                   {{ line.accountId?.slice(0, 8) ?? '—' }}
@@ -228,7 +233,7 @@ function goBack() {
               <tr class="border-t bg-neutral-50/50 font-semibold dark:bg-neutral-900/20">
                 <td class="px-4 py-2.5">Total</td>
                 <td class="px-4 py-2.5 text-right tabular-nums font-bold">
-                  {{ request.totalAmount.format() }}
+                  {{ formatMoney(request.totalAmount) }}
                 </td>
                 <td colspan="2" />
               </tr>
@@ -250,8 +255,9 @@ function goBack() {
 
     <!-- ── Guard: Pay ActionModal ─────────────────────────────── -->
     <PaymentRequestPayModal
+      v-slot:default
       v-model:open="isPayModalOpen"
-      :total-amount="request.totalAmount.format()"
+      :total-amount="formatMoney(request.totalAmount)"
       :is-pending="isPaying"
       @confirm="handlePay"
     />
