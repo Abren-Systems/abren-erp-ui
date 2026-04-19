@@ -16,10 +16,11 @@ Before implementing the frontend views for Horizon A modules, we are establishin
 Our True North Star is a synthesis of best-in-class philosophies:
 
 - **Structure**: Sequential Progressive Disclosure (Step-by-step Task Progression)
-- **Interaction**: Microsoft Fluent Design (Clarity & Feedback)
+- **Interaction**: **Microsoft Fluent UI Native** (Native Web Components for accessibility & performance)
+- **Aesthetic**: **Dynamics 365 Sales** (High-intensity, layered contrast, sharp 2px corners)
 - **Workflow**: Linear (State-driven UX clarity isolated by Routing)
-- **Financial UX**: Stripe Dashboard (Traceability & Precision via Contextual Drawers)
-- **Architecture**: Route-Driven Components + Ephemeral State Machinery
+- **Financial UX**: Stripe Dashboard (Traceability via Contextual Drawers)
+- **Architecture**: **Tier 1 App Primitives** + Route-Driven Components
 
 ---
 
@@ -89,12 +90,17 @@ Instead, we use a **Router-Driven Progressive Disclosure** flow. Each stage is a
 
 Each stage has an explicit density contract:
 
-| Stage                   | Density                                                     | Rationale                                                       |
-| :---------------------- | :---------------------------------------------------------- | :-------------------------------------------------------------- |
-| **Queue (ListPage)**    | Maximum — compact rows, filters, infinite scroll            | Users need to quickly scan and locate their next task           |
-| **Detail (DetailPage)** | Balanced — wide grids, collapsible sections, breathing room | Users need focus, clarity, and space to make decisions          |
-| **Trace (TraceDrawer)** | Dense provenance, but lazy-loaded                           | Heavy audit data must not compete for attention until requested |
-| **ActionModal**         | Minimal — interruptive clarity                              | Destructive actions demand singular, undistracted confirmation  |
+| **ActionModal** | Minimal — interruptive clarity | Destructive actions demand singular, undistracted confirmation |
+
+### 2.5. Layered Context & Tiered Contrast (Dynamics 365 Standard)
+
+We utilize a three-tier contrast system to create structural depth without heavy shadows or borders:
+
+1.  **Level 0: The Canvas (`#faf9f8`)**: The "desk" — a neutral, pale gray background for the entire application.
+2.  **Level 1: The Nav Anchor (`#f3f2f1`)**: The sidebar — a slightly deeper gray that houses stable navigational elements.
+3.  **Level 2: The Action Surface (`#ffffff`)**: The "paper" — stark white containers (Grids, Forms, Detail cards) that float atop the canvas to signify interactive focus.
+
+> **Principle**: High-density ERP data must always live on a **Level 2 (White)** surface to ensure maximum legibility of financial numbers and status codes.
 
 ---
 
@@ -159,9 +165,9 @@ _Sensory Guidance (Fluent)_: When a state transitions, a subtle motion guides th
 
 To prevent button clutter and decision paralysis, actions are strictly tiered:
 
-1. **Primary Actions (State-Advancing)**: Always visible and prominent (e.g., "Approve", "Pay", "Submit"). _Rule: Only actions that move the workflow forward can be primary._
-2. **Secondary Actions (Supporting)**: Visible but visually subdued (e.g., "Edit", "Attach Document", "Print").
-3. **Tertiary Actions (Rare / Destructive)**: Hidden in overflow menus (`...`) and require `ActionModal` confirmation (e.g., "Void", "Reject", "Delete").
+1. **Primary Actions (State-Advancing)**: Always visible and prominent (e.g., "Approve", "Pay", "Submit"). _Mapping: `<AppButton variant="primary" />`._
+2. **Secondary Actions (Supporting)**: Visible but visually subdued (e.g., "Edit", "Attach Document", "Print"). _Mapping: `<AppButton variant="secondary" />` or `variant="outline"`._
+3. **Tertiary Actions (Rare / Destructive)**: Hidden in overflow menus (`...`) and require `ActionModal` confirmation (e.g., "Void", "Reject", "Delete"). _Mapping: `variant="stealth"` within an overflow context._
 
 ---
 
@@ -208,14 +214,18 @@ Traceability is not an afterthought; it lives natively in the UI via Progressive
 
 Every transactional UI feature expresses itself through these standardized component types:
 
-| Component Type   | Naming Pattern             | Role in Progressive Disclosure                               |
-| :--------------- | :------------------------- | :----------------------------------------------------------- |
-| **Queue**        | `[Domain]ListPage.vue`     | Stage 1: Full-screen DataGrid                                |
-| **Focus Canvas** | `[Domain]DetailPage.vue`   | Stage 2: Isolated entity work                                |
-| **Provenance**   | `[Domain]TraceDrawer.vue`  | Stage 3: Lazy-loaded audit overlay                           |
-| **Macro-Create** | `[Domain]CreatePage.vue`   | Full page for creating complex entities (grids, line items)  |
-| **Micro-Create** | `[Domain]CreateDrawer.vue` | Slide-out for simple taxonomies (e.g., tags, fiscal periods) |
-| **Form**         | `[Domain][Action]Form.vue` | Headless presentation layer for a form                       |
-| **Confirmation** | `[Domain]ActionModal.vue`  | Interruptive confirmation for destructive operations         |
+| Component Type   | Naming Pattern             | Role in Progressive Disclosure                                  |
+| :--------------- | :------------------------- | :-------------------------------------------------------------- |
+| **Queue**        | `[Domain]ListPage.vue`     | Stage 1: Full-screen DataGrid                                   |
+| **Focus Canvas** | `[Domain]DetailPage.vue`   | Stage 2: Isolated entity work                                   |
+| **Provenance**   | `[Domain]TraceDrawer.vue`  | Stage 3: Lazy-loaded audit overlay                              |
+| **Macro-Create** | `[Domain]CreatePage.vue`   | Full page for creating complex entities (grids, line items)     |
+| **Micro-Create** | `[Domain]CreateDrawer.vue` | Slide-out for simple taxonomies (e.g., tags, fiscal periods)    |
+| **Form**         | `[Domain][Action]Form.vue` | Headless presentation layer for a form                          |
+| **Confirmation** | `[Domain]ActionModal.vue`  | Interruptive confirmation for destructive operations            |
+| **Primitive**    | `App[Type].vue`            | **Tier 1 Wrapper** (e.g., `AppButton`, `AppInput`, `AppSelect`) |
+
+> [!IMPORTANT]
+> **Vendor Shielding**: Business modules MUST NOT use raw `<fluent-*>` tags. All interaction must occur through our established **Tier 1 Primitives** to ensure reactivity and allow for global design updates without touching business logic.
 
 > **Rule**: If a component does not fit one of these types, it must be justified architecturally before creation.

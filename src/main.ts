@@ -6,6 +6,9 @@ import App from './App.vue'
 import { router } from './app/router'
 
 import './assets/main.css'
+import { initializeFluentUI } from '@/shared/theme/fluent.provider'
+
+initializeFluentUI()
 
 const app = createApp(App)
 

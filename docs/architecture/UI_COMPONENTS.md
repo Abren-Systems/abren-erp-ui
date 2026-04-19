@@ -1,151 +1,85 @@
----
-title: 'UI Component Architecture'
-description: "To ensure scalability and prevent 'component soup,' we categorize all UI elements into four distinct tiers based on their knowledge of the business domain."
-tier: frontend
-tags: [frontend, architecture]
----
+# Foundation UI Components Guide
 
-# UI Component Architecture
+This document defines the strict engineering standards for building and utilizing User Interface components within Abren ERP. We leverage the **Fluent Design System** visually, but enforce strict abstraction boundaries programmatically.
 
-> **Parent:** [Frontend Architecture](ARCHITECTURE.md)
-> **Stack:** Vue 3 + Tailwind CSS v4 + Reka UI (Headless) + shadcn-vue + Custom Design System
+## 1. The Wrapper Mandate (Vendor Shielding)
 
----
+Never import or mount a pristine generic UI component (like `<fluent-button>`) directly inside a business module.
 
-## 1. The Four-Tier Component Model
+**All fundamental interactive elements must be routed through the `App` abstraction layer.** This ensures we own the reactivity contract and can pivot styling without touching business logic.
 
-To ensure scalability and prevent "component soup," we categorize all UI elements into four distinct tiers based on their knowledge of the business domain.
+### Correct Usage (Business Layer)
 
-### Tier 1: Primitives (Atomic)
+```vue
+<template>
+  <AppButton variant="primary" @click="submitLedger"> Post Entry </AppButton>
+</template>
 
-- **Location**: `src/shared/components/`
-- **Nature**: Pure atoms (Button, Input, Checkbox, Skeleton).
-- **Knowledge**: Zero business knowledge.
-- **Enforcement**: Built on **Reka UI** (Headless) to ensure 100% WAI-ARIA compliance.
-- **Rule**: Standardized styles via Tailwind v4. No module-specific overrides allowed.
-
-### Tier 2: Shared Patterns (Core UI)
-
-- **Location**: `src/shared/components/` (e.g., `src/shared/components/data-grid/`)
-- **Nature**: Reusable organisms (FormLayout, AppModal).
-- **Knowledge**: Layout knowledge, zero business domain knowledge.
-- **Rule**: Accessible to all modules. **Must remain domain-agnostic.**
-
-### Tier 3: Domain Components (Module UI)
-
-- **Location**: `src/modules/{module}/ui/components/`
-- **Nature**: Reusable molecules (AccountBadge, PaymentStatusBadge).
-- **Knowledge**: Full knowledge of Module Domain Types.
-- **Guardrail**: **Strictly stateless** (or locally UI-stateful). **Never** fetch data or orchestrate workflows.
-- **Rule**: Purely presentational for a specific domain.
-
-### Tier 4: Feature Pages (Module UI)
-
-- **Location**: `src/modules/{module}/ui/pages/`
-- **Nature**: The "Orchestrators."
-- **Knowledge**: Full knowledge of the Use Case (Application layer).
-- **Constraint**: **NEVER** call TanStack Query or API directly. **MUST** use application composables.
-
----
-
-## 2. Component Directory Structure
-
-```
-src/
-├── shared/components/
-│   ├── button/              # Tier 1 (Primitive)
-│   ├── data-grid/           # Foundational UI Engine (Special)
-│   └── layout/              # Tier 2 (Pattern - Example)
-│
-└── modules/finance/ap/ui/payment-requests/
-    ├── components/          # Tier 3 (Domain-Owned)
-    ├── pages/               # Tier 4 (Feature Pages)
-    ├── grids/               # Grid Configuration Layer (NEW)
-    ├── store/               # Pinia Stores (NEW)
-    └── utils/               # UI Logic Layer (Formatting)
-│
-└── modules/finance/ledger/ui/
-    ├── components/          # Tier 3 (Domain-Owned)
-    ├── pages/               # Tier 4 (Feature Pages)
-    ├── grids/               # Grid Configuration Layer (NEW)
-    ├── store/               # Pinia Stores (NEW)
-    └── utils/               # UI Logic Layer (Formatting)
+<script setup>
+import { AppButton } from '@/shared/components/primitives'
+</script>
 ```
 
 ---
 
-## 4. The DataGrid Engine
+## 2. High-Density ERP Standards
 
-The DataGrid is not a standard "shared component"—it is a foundational UI engine.
+Abren ERP is a dense, operational interface. We explicitly deviate from standard web "breathing room" in favor of maximum information throughput.
 
-- **Location**: `src/shared/components/data-grid/`
-- **Structure**:
-  - `core/`: Headless engine (virtualization, keyboard nav, TanStack Table setup).
-  - `plugins/`: Generic behaviors (sorting, filtering, selection).
-- **Reasoning**: Treating the grid as an engine prevents domain leakage and ensures high-performance optimizations stay centralized.
+### 2.1. The 32px Standard
 
----
+All primary interactive elements (Buttons, Inputs, Selects) must maintain a **fixed height of 32px**. This allows for high-density tabular alignment and predictable vertical scanning.
 
-## 5. Grid Configuration Layer (New)
+### 2.2. Sharp Corners
 
-To keep `.vue` files focused on layout, move all column and grid definitions to a dedicated layer.
-
-- **Location**: `src/modules/{module}/ui/grids/`
-- **Pattern**: `{entity}.grid.ts`
-- **Example**: `account.grid.ts` exports column definitions and default visibility states.
+We reject the rounded "consumer" aesthetic. All components must target a **2px corner radius** standard via CSS variables.
 
 ---
 
-## 6. UI Logic Layer (Formatting)
+## 3. Layered Contrast Hierarchy (Canvas vs. Surface)
 
-Business logic belongs in `domain/`, but **Display Logic** belongs in `ui/utils/`.
+To create structural depth without heavy shadows, we use a three-tier layout pattern:
 
-- **Purpose**: Formatter functions (currency, dates), status-to-color mapping, icon selection.
-- **Enforcement**: Ensures components stay focused on template composition.
-
----
-
-## 7. Scaling Strategy (The Prop-Driven Flow)
-
-To keep the UI testable and high-performance, follow the **Props In, Events Out** rule:
-
-1.  **Pages** receive data from **Application Composables** (which wrap TanStack Query).
-2.  **Pages** pass raw reactive objects (Domain Types) down to **Domain Components**.
-3.  **Domain Components** decompose those objects and pass primitives (strings, numbers) down to **UI Primitives**.
-4.  **UI Primitives** emit generic events (`click`, `update:modelValue`).
-5.  **Pages** catch events and call mutation methods from the **Application Composable**.
+1.  **Level 0: The Canvas (`var(--app-canvas)`)**: The pale gray base for all pages.
+2.  **Level 1: The Nav Anchor (`var(--app-sidebar)`)**: The slightly deeper gray for stable sidebars.
+3.  **Level 2: The Action Surface (`var(--app-surface)`)**: Stark white containers. **All Data Grids and Forms must live on Level 2.**
 
 ---
 
-## 8. Hard Rules for Scalability
+## 4. Engineering with Shadow DOM & Tailwind v4
 
-| Rule                                | Rationale                                        |
-| ----------------------------------- | ------------------------------------------------ |
-| **NO TanStack Query in Pages**      | Use the application composable.                  |
-| **NO Business Logic in Components** | Components are for display and composition only. |
-| **NO API calls in Tier 1-3**        | Data fetching is an Application/Page concern.    |
-| **NO Grid Columns in .vue Files**   | Use the `ui/grids/` layer.                       |
+Abren ERP uses **Tailwind v4** (`@theme`). To style Fluent Web Components, we bridge these two worlds:
+
+### 4.1. Targeting the Shadow root
+
+Direct Tailwind classes on an `<AppButton>` only affect the custom element host. To affect the internal appearance, use **Parts** or **CSS Variables**:
+
+```css
+/* Precise internal radius mapping */
+.app-button-root {
+  --control-corner-radius: 2px;
+  --accent-fill-rest: var(--color-primary-600);
+}
+```
+
+### 4.2. Layout Mapping
+
+Use Tailwind exclusively for **Layout & Spacing** (Flex, Grid, Margin, Padding). Use Fluent tokens exclusively for **Appearance** (Color, Borders, Interaction states).
 
 ---
 
-## 9. Enterprise UI Standards [MANDATORY]
+## 5. Supported Primitives (The `App*` suite)
 
-To achieve the "High-Integrity" UX required for high-volume financial operations, all components must adhere to these three pillars:
+Located in `src/shared/components/primitives/`:
 
-### 9.1 Accessibility & Tab-to-Flow
+- **`AppButton`**: Action trigger. 32px high.
+- **`AppInput`**: Bridges `<fluent-text-field>`. Fixed 32px height.
+- **`AppSelect`**: Ensures strict nullable parsing for parent-child hierarchies.
+- **`AppBadge`**: Status indicators (Draft, Posted, Voided). Uses semantic tints.
+- **`AppDrawer`**: Contextual overlays for the "Provenance" stage of UX.
 
-ERP power users rely exclusively on the keyboard.
+---
 
-- **Rule**: Every form must sustain a logical `Tab` flow.
-- **Rule**: All custom components must implement `aria-*` attributes and keyboard event handlers (`Enter`, `Space`, `Escape`).
-- **Rule**: Focus states must be high-contrast and never suppressed.
+## 6. The Data Grid Exception
 
-### 9.2 Tabular Numbers
-
-Financial data must be perfectly aligned for scannability.
-
-- **Rule**: All monetary values, balance sheets, and counts must use the `font-variant-numeric: tabular-nums` CSS property.
-
-### 9.3 Data Density Control
-
-The UI must allow users to toggle between **Compact** (high density) and **Comfortable** (low density) modes via the `useAppDensity` core composable.
+**TanStack Table** handles structural manipulation of our grids. **Do not use `<fluent-data-grid>`**. The `DataGrid.vue` wrapper acts as the headless host. You must implement cell definitions using `App*` primitives to maintain Vue reactivity across the table rows.

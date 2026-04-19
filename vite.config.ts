@@ -8,7 +8,16 @@ import { lintConfig } from './build/vite/lint.ts'
 import { serverConfig } from './build/vite/server.ts'
 import { buildConfig } from './build/vite/build.ts'
 
-const plugins: PluginOption[] = [vue(), tailwindcss() as unknown as PluginOption]
+const plugins: PluginOption[] = [
+  vue({
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag.startsWith('fluent-'),
+      },
+    },
+  }),
+  tailwindcss() as unknown as PluginOption,
+]
 
 export default defineConfig({
   lint: lintConfig as UserConfig['lint'],
