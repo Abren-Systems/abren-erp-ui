@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Search, X } from 'lucide-vue-next'
+import { AppInput } from '@/shared/components/primitives'
 
 const props = defineProps<{
   modelValue: string
@@ -24,8 +25,7 @@ watch(
   },
 )
 
-function onInput(e: Event) {
-  const val = (e.target as HTMLInputElement).value
+function onInput(val: string) {
   localValue.value = val
   clearTimeout(debounceTimer)
   debounceTimer = setTimeout(() => emit('update:modelValue', val), 200)
@@ -39,19 +39,23 @@ function clear() {
 
 <template>
   <div class="toolbar">
-    <!-- Global search -->
+    <!-- Global search using AppInput -->
     <div class="search-wrap">
-      <Search :size="13" class="search-icon" />
-      <input
-        :value="localValue"
+      <AppInput
+        :model-value="localValue"
         :placeholder="placeholder ?? 'Search…'"
         class="search-input"
-        type="text"
-        @input="onInput"
-      />
-      <button v-if="localValue" class="clear-btn" @click="clear">
-        <X :size="12" />
-      </button>
+        @update:model-value="onInput"
+      >
+        <template #start>
+          <Search :size="14" class="search-icon" />
+        </template>
+        <template #end>
+          <button v-if="localValue" class="clear-btn" @click="clear">
+            <X :size="14" />
+          </button>
+        </template>
+      </AppInput>
     </div>
 
     <!-- Selection count badge -->
@@ -70,77 +74,54 @@ function clear() {
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 8px;
-  background: var(--color-grid-header-bg);
-  border-bottom: 1px solid var(--color-grid-header-border);
+  gap: 12px;
+  height: 48px; /* Slightly taller for Dynamics 365 style */
+  padding: 0 12px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-neutral-200);
   flex-shrink: 0;
 }
 
 .search-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
+  width: 280px;
 }
 
 .search-icon {
-  position: absolute;
-  left: 8px;
-  color: var(--color-grid-text-muted);
-  pointer-events: none;
-}
-
-.search-input {
-  height: 26px;
-  width: 220px;
-  padding: 0 28px 0 28px;
-  font-size: 12.5px;
-  border-radius: 4px;
-  border: 1px solid var(--color-grid-col-divider);
-  background: var(--color-grid-bg);
-  color: var(--color-grid-text);
-  outline: none;
-  transition: border-color 0.12s;
-}
-
-.search-input::placeholder {
-  color: var(--color-grid-text-muted);
-}
-
-.search-input:focus {
-  border-color: var(--color-primary-500);
+  color: var(--color-neutral-600);
+  margin-left: 4px;
 }
 
 .clear-btn {
-  position: absolute;
-  right: 6px;
   display: flex;
   align-items: center;
-  color: var(--color-grid-text-muted);
+  justify-content: center;
+  padding: 4px;
+  color: var(--color-neutral-600);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
-  transition: color 0.12s;
 }
+
 .clear-btn:hover {
-  color: var(--color-grid-text);
+  color: var(--color-neutral-900);
+  background: var(--color-neutral-100);
+  border-radius: 2px;
 }
 
 .selection-badge {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--color-primary-400);
-  background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
-  padding: 2px 8px;
-  border-radius: 10px;
+  color: var(--color-primary-700);
+  background: var(--color-primary-50);
+  padding: 2px 10px;
+  border-radius: 2px;
+  border: 1px solid var(--color-primary-100);
 }
 
 .toolbar-actions {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 </style>
