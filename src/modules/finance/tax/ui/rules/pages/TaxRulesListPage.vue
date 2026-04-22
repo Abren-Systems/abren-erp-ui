@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { Button } from '@/shared/components/button'
+import { AppButton } from '@/shared/components/primitives'
 import { Plus } from 'lucide-vue-next'
 import { useActiveTaxRules } from '../../../application/useTaxRules'
 import TaxRuleCreateDrawer from '../components/TaxRuleCreateDrawer.vue'
@@ -29,10 +29,10 @@ function openCreateDrawer() {
         <h1 class="text-2xl font-bold tracking-tight">Tax Rules</h1>
         <p class="text-muted-foreground">Manage your tax rates and configurations.</p>
       </div>
-      <Button @click="openCreateDrawer">
+      <AppButton @click="openCreateDrawer">
         <Plus class="mr-2 h-4 w-4" />
         New Tax Rule
-      </Button>
+      </AppButton>
     </header>
 
     <DataGrid

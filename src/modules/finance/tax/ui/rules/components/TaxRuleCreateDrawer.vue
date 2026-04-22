@@ -1,23 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-} from '@/shared/components/drawer'
-import { Button } from '@/shared/components/button'
-import { Input } from '@/shared/components/input'
-import { Label } from '@/shared/components/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/select'
+  AppDrawer,
+  AppButton,
+  AppInput,
+  AppSelect,
+} from '@/shared/components/primitives'
 import { useCreateTaxRule } from '../../../application/useTaxRules'
 import type { TaxRuleCreateDTO } from '../../../infrastructure/api.types'
 
@@ -44,6 +32,24 @@ const form = ref<TaxRuleCreateDTO>({
   gl_account_id: '',
 })
 
+const taxTypeOptions = [
+  { label: 'Value Added Tax (VAT)', value: 'VAT' },
+  { label: 'Withholding Tax (WHT)', value: 'WHT' },
+]
+
+const directionOptions = [
+  { label: 'Output (Sales)', value: 'OUTPUT' },
+  { label: 'Input (Purchases)', value: 'INPUT' },
+  { label: 'Non-Directional', value: 'NON_DIRECTIONAL' },
+]
+
+// Mock GL accounts for now - in production these would come from Ledger module
+const glAccountOptions = [
+  { label: '210100 - VAT Payable', value: '00000000-0000-0000-0000-000000000001' },
+  { label: '110500 - VAT Input (Recoverable)', value: '00000000-0000-0000-0000-000000000002' },
+  { label: '210200 - Withholding Tax Payable', value: '00000000-0000-0000-0000-000000000003' },
+]
+
 async function handleSubmit() {
   try {
     await createRule(form.value)
@@ -63,72 +69,62 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <Drawer :open="props.open" @update:open="emit('update:open', $event)">
-    <DrawerContent class="sm:max-w-[425px]">
-      <DrawerHeader>
-        <DrawerTitle>New Tax Rule</DrawerTitle>
-        <DrawerDescription> Configure a new tax rate for the system. </DrawerDescription>
-      </DrawerHeader>
+  <AppDrawer
+    :open="props.open"
+    title="New Tax Rule"
+    description="Configure a new tax rate for the system."
+    size="md"
+    @update:open="emit('update:open', $event)"
+  >
+    <div class="grid gap-4 py-4">
+      <AppInput
+        v-model="form.name"
+        label="Rule Name"
+        placeholder="e.g. Standard VAT 15%"
+        required
+      />
 
-      <div class="grid gap-4 py-4 px-4">
-        <div class="grid gap-2">
-          <Label for="name">Name</Label>
-          <Input id="name" v-model="form.name" placeholder="e.g. Standard VAT 15%" />
-        </div>
+      <AppInput
+        v-model.number="form.rate"
+        type="number"
+        label="Tax Rate (Decimal)"
+        placeholder="0.15"
+        required
+      />
+      <p class="text-[11px] text-muted-foreground -mt-3">
+        Enter as decimal (e.g. 0.15 for 15%)
+      </p>
 
-        <div class="grid gap-2">
-          <Label for="tax_type">Tax Type</Label>
-          <Select v-model="form.tax_type">
-            <SelectTrigger id="tax_type">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="VAT">VAT (Value Added Tax)</SelectItem>
-              <SelectItem value="WHT">WHT (Withholding Tax)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <AppSelect
+        v-model="form.tax_type"
+        label="Tax Type"
+        :options="taxTypeOptions"
+        required
+      />
 
-        <div class="grid gap-2">
-          <Label for="direction">Statutory Direction</Label>
-          <Select v-model="form.direction">
-            <SelectTrigger id="direction">
-              <SelectValue placeholder="Select direction" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="INPUT">Input Tax (Purchases)</SelectItem>
-              <SelectItem value="OUTPUT">Output Tax (Sales)</SelectItem>
-              <SelectItem value="NON_DIRECTIONAL">Non-Directional</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <AppSelect
+        v-model="form.direction"
+        label="Statutory Direction"
+        :options="directionOptions"
+        required
+      />
 
-        <div class="grid gap-2">
-          <Label for="rate">Rate (Decimal)</Label>
-          <Input
-            id="rate"
-            v-model.number="form.rate"
-            type="number"
-            step="0.01"
-            placeholder="0.15"
-          />
-          <p class="text-xs text-muted-foreground">Enter 0.15 for 15%</p>
-        </div>
+      <AppSelect
+        v-model="form.gl_account_id"
+        label="GL Account Mapping"
+        :options="glAccountOptions"
+        placeholder="Select a GL account"
+        required
+      />
+    </div>
 
-        <div class="grid gap-2">
-          <Label for="gl_account_id">GL Account ID (UUID)</Label>
-          <Input
-            id="gl_account_id"
-            v-model="form.gl_account_id"
-            placeholder="00000000-0000-0000-0000-000000000000"
-          />
-        </div>
-      </div>
-
-      <DrawerFooter>
-        <Button variant="outline" @click="emit('update:open', false)">Cancel</Button>
-        <Button :loading="isPending" @click="handleSubmit">Create Rule</Button>
-      </DrawerFooter>
-    </DrawerContent>
-  </Drawer>
+    <template #footer>
+      <AppButton variant="secondary" @click="emit('update:open', false)">
+        Cancel
+      </AppButton>
+      <AppButton :loading="isPending" @click="handleSubmit">
+        Create Rule
+      </AppButton>
+    </template>
+  </AppDrawer>
 </template>

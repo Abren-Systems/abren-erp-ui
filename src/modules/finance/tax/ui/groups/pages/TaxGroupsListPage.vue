@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { Button } from '@/shared/components/button'
+import { AppButton } from '@/shared/components/primitives'
 import { Plus, LayoutGrid } from 'lucide-vue-next'
 import { useActiveTaxGroups } from '../../../application/useTaxRules'
 import TaxGroupCreateDrawer from '../components/TaxGroupCreateDrawer.vue'
@@ -33,10 +33,10 @@ function openCreateDrawer() {
         </div>
         <p class="text-muted-foreground">Combine multiple tax rules into compound calculations.</p>
       </div>
-      <Button @click="openCreateDrawer">
+      <AppButton @click="openCreateDrawer">
         <Plus class="mr-2 h-4 w-4" />
         New Tax Group
-      </Button>
+      </AppButton>
     </header>
 
     <DataGrid
