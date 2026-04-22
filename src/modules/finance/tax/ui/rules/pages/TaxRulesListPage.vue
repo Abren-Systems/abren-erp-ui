@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
-import { Plus } from 'lucide-vue-next'
+import { Plus, Percent } from 'lucide-vue-next'
 import { useActiveTaxRules } from '../../../application/useTaxRules'
 import TaxRuleCreateDrawer from '../components/TaxRuleCreateDrawer.vue'
 import { taxRuleColumns } from '../grids/tax-rule.grid'
@@ -23,24 +23,42 @@ function openCreateDrawer() {
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
-    <header class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight">Tax Rules</h1>
-        <p class="text-muted-foreground">Manage your tax rates and configurations.</p>
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
+    <!-- Page Header -->
+    <div
+      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+    >
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <Percent class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
+            Tax Rules
+          </h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
+            Manage your tax rates and configurations.
+          </p>
+        </div>
       </div>
-      <AppButton @click="openCreateDrawer">
-        <Plus class="mr-2 h-4 w-4" />
-        New Tax Rule
-      </AppButton>
-    </header>
 
-    <DataGrid
-      :data="rules || []"
-      :columns="taxRuleColumns"
-      :loading="isPending"
-      :state="gridState"
-    />
+      <div class="flex items-center gap-2">
+        <AppButton variant="primary" @click="openCreateDrawer">
+          <Plus class="mr-2 h-4 w-4" />
+          New Tax Rule
+        </AppButton>
+      </div>
+    </div>
+
+    <!-- DataGrid Orchestration -->
+    <div class="min-h-0 flex-1 p-8">
+      <DataGrid
+        :data="rules || []"
+        :columns="taxRuleColumns"
+        :loading="isPending"
+        :state="gridState"
+      />
+    </div>
 
     <TaxRuleCreateDrawer v-model:open="isCreateDrawerOpen" />
   </div>

@@ -6,6 +6,9 @@ import {
   fluentOption,
   fluentDialog,
   fluentProgressRing,
+  fluentBadge,
+  fluentBreadcrumb,
+  fluentBreadcrumbItem,
 } from '@fluentui/web-components'
 
 /**
@@ -22,5 +25,8 @@ export const initializeFluentUI = () => {
     fluentOption(),
     fluentDialog(),
     fluentProgressRing(),
+    fluentBadge(),
+    fluentBreadcrumb(),
+    fluentBreadcrumbItem(),
   )
 }

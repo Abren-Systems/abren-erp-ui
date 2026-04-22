@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Button } from '@/shared/components/button'
-import { Badge } from '@/shared/components/badge'
-import { ArrowLeft, MoreHorizontal, History, CheckCircle, Send } from 'lucide-vue-next'
+import { AppButton, AppBadge } from '@/shared/components/primitives'
+import {
+  ArrowLeft,
+  MoreHorizontal,
+  History,
+  CheckCircle,
+  Send,
+  FileSpreadsheet,
+} from 'lucide-vue-next'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -52,12 +58,12 @@ const isActionPending = computed(
   () => isSubmitting.value || isApproving.value || isRejecting.value || isPaying.value,
 )
 
-const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  DRAFT: 'outline',
-  SUBMITTED: 'secondary',
-  APPROVED: 'default',
-  REJECTED: 'destructive',
-  PAID: 'default',
+const STATUS_VARIANT: Record<string, 'neutral' | 'info' | 'success' | 'danger'> = {
+  DRAFT: 'neutral',
+  SUBMITTED: 'info',
+  APPROVED: 'success',
+  REJECTED: 'danger',
+  PAID: 'success',
 }
 
 async function handleSubmit() {
@@ -96,72 +102,79 @@ function formatMoney(money: unknown) {
 
   <div v-else-if="request" class="flex h-full flex-col">
     <!-- ── Header / Action Surface ──────────────────────────── -->
-    <div class="flex shrink-0 items-center justify-between border-b px-6 py-4">
+    <div
+      class="flex shrink-0 items-center justify-between border-b border-[var(--color-neutral-200)] px-6 py-4 bg-white"
+    >
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="icon" @click="goBack">
+        <AppButton variant="stealth" @click="goBack">
           <ArrowLeft class="h-4 w-4" />
-        </Button>
+        </AppButton>
         <div>
           <div class="flex items-center gap-3">
-            <h1 class="text-lg font-semibold tracking-tight">Payment Request</h1>
-            <Badge :variant="STATUS_VARIANT[request.status]">
+            <h1 class="text-lg font-semibold tracking-tight text-[var(--color-neutral-900)]">
+              Payment Request
+            </h1>
+            <AppBadge :variant="STATUS_VARIANT[request.status]">
               {{ request.status }}
-            </Badge>
+            </AppBadge>
           </div>
-          <p class="mt-0.5 font-mono text-xs text-neutral-400">{{ request.id }}</p>
+          <p class="mt-0.5 font-mono text-xs text-[var(--color-neutral-400)]">{{ request.id }}</p>
         </div>
       </div>
 
       <!-- Action Surface: 3-tier hierarchy -->
       <div class="flex items-center gap-2">
         <!-- Secondary: Trace -->
-        <Button variant="outline" size="sm" @click="isTraceOpen = true">
+        <AppButton variant="outline" @click="isTraceOpen = true">
           <History class="mr-1.5 h-3.5 w-3.5" />
           Trace
-        </Button>
+        </AppButton>
 
         <!-- Primary: Submit (DRAFT → SUBMITTED) -->
-        <Button
+        <AppButton
           v-if="request.status === 'DRAFT' && hasPermission('ap:create')"
-          size="sm"
+          variant="primary"
           :disabled="isActionPending"
           @click="handleSubmit"
         >
           <Send class="mr-1.5 h-3.5 w-3.5" />
           Submit for Approval
-        </Button>
+        </AppButton>
 
         <!-- Primary: Approve (SUBMITTED → APPROVED) -->
-        <Button
+        <AppButton
           v-if="request.status === 'SUBMITTED' && hasPermission('ap:approve')"
-          size="sm"
+          variant="primary"
           :disabled="isActionPending"
           @click="handleApprove"
         >
           <CheckCircle class="mr-1.5 h-3.5 w-3.5" />
           Approve
-        </Button>
+        </AppButton>
 
         <!-- Primary: Pay (APPROVED → PAID) -->
-        <Button
+        <AppButton
           v-if="request.status === 'APPROVED' && hasPermission('ap:post')"
-          size="sm"
+          variant="primary"
           :disabled="isActionPending"
           @click="isPayModalOpen = true"
         >
           Mark as Paid
-        </Button>
+        </AppButton>
 
         <!-- Tertiary: Overflow for destructive/secondary actions -->
         <DropdownMenu v-if="request.status === 'SUBMITTED' && hasPermission('ap:approve')">
           <DropdownMenuTrigger as-child>
-            <Button variant="ghost" size="icon" class="h-8 w-8">
+            <AppButton variant="stealth">
               <MoreHorizontal class="h-4 w-4" />
-            </Button>
+            </AppButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuSeparator />
-            <DropdownMenuItem class="text-destructive" @click="isRejectModalOpen = true">
+            <DropdownMenuItem
+              class="text-[var(--color-danger-600)]"
+              @click="isRejectModalOpen = true"
+            >
               Reject Request
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -170,70 +183,123 @@ function formatMoney(money: unknown) {
     </div>
 
     <!-- ── Main Canvas: Request Details ──────────────────────── -->
-    <div class="flex-1 overflow-y-auto p-6 space-y-6">
-      <!-- Metadata summary -->
-      <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div class="rounded-lg border p-4">
-          <p class="text-xs font-medium uppercase text-neutral-400">Total Amount</p>
-          <p class="mt-1 text-xl font-bold tabular-nums">{{ formatMoney(request.totalAmount) }}</p>
+    <div class="flex-1 overflow-y-auto p-8 bg-[var(--app-canvas)] space-y-6">
+      <div class="max-w-5xl mx-auto">
+        <!-- Metadata summary -->
+        <div class="grid grid-cols-2 gap-6 md:grid-cols-4 mb-6">
+          <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-400)]">
+              Total Amount
+            </p>
+            <p class="mt-2 text-xl font-bold tabular-nums text-[var(--color-neutral-900)]">
+              {{ formatMoney(request.totalAmount) }}
+            </p>
+          </div>
+          <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-400)]">
+              Currency
+            </p>
+            <p class="mt-2 text-xl font-bold text-[var(--color-neutral-900)] font-mono">
+              {{ request.currency }}
+            </p>
+          </div>
+          <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-400)]">
+              Approval Step
+            </p>
+            <p class="mt-2 text-xl font-bold text-[var(--color-neutral-900)]">
+              Step {{ request.currentApprovalStep }}
+            </p>
+          </div>
+          <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-400)]">
+              Lines
+            </p>
+            <p class="mt-2 text-xl font-bold text-[var(--color-neutral-900)]">
+              {{ request.lines.length }}
+            </p>
+          </div>
         </div>
-        <div class="rounded-lg border p-4">
-          <p class="text-xs font-medium uppercase text-neutral-400">Currency</p>
-          <p class="mt-1 font-mono text-lg font-semibold">{{ request.currency }}</p>
-        </div>
-        <div class="rounded-lg border p-4">
-          <p class="text-xs font-medium uppercase text-neutral-400">Approval Step</p>
-          <p class="mt-1 text-lg font-semibold">Step {{ request.currentApprovalStep }}</p>
-        </div>
-        <div class="rounded-lg border p-4">
-          <p class="text-xs font-medium uppercase text-neutral-400">Lines</p>
-          <p class="mt-1 text-lg font-semibold">{{ request.lines.length }}</p>
-        </div>
-      </div>
 
-      <!-- Justification -->
-      <div class="rounded-lg border p-4">
-        <p class="mb-1 text-xs font-medium uppercase text-neutral-400">Justification</p>
-        <p class="text-sm text-neutral-700">{{ request.justification }}</p>
+        <!-- Justification -->
+        <div
+          class="bg-white rounded-sm border border-[var(--color-neutral-200)] p-5 shadow-sm mb-6"
+        >
+          <p
+            class="mb-2 text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-400)]"
+          >
+            Justification
+          </p>
+          <p class="text-[14px] leading-relaxed text-[var(--color-neutral-700)]">
+            {{ request.justification }}
+          </p>
+        </div>
       </div>
 
       <!-- Line Items -->
-      <div>
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-500">
-          Line Items
-        </h2>
-        <div class="overflow-hidden rounded-lg border">
+      <div
+        class="max-w-5xl mx-auto bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between px-4 py-3 border-b border-[var(--color-neutral-100)] bg-[var(--color-neutral-50)]"
+        >
+          <div class="flex items-center gap-2">
+            <FileSpreadsheet :size="16" class="text-[var(--color-neutral-500)]" />
+            <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)]">
+              Line Items
+            </h2>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
           <table class="w-full text-sm">
-            <thead class="bg-neutral-50 dark:bg-neutral-900">
+            <thead class="bg-[var(--color-neutral-50)]">
               <tr>
-                <th class="px-4 py-2.5 text-left font-medium text-neutral-500">Description</th>
-                <th class="px-4 py-2.5 text-right font-medium text-neutral-500 tabular-nums">
+                <th
+                  class="px-4 py-3 text-left font-bold text-xs uppercase tracking-wider text-[var(--color-neutral-500)]"
+                >
+                  Description
+                </th>
+                <th
+                  class="px-4 py-3 text-right font-bold text-xs uppercase tracking-wider text-[var(--color-neutral-500)] tabular-nums"
+                >
                   Amount
                 </th>
-                <th class="px-4 py-2.5 text-left font-medium text-neutral-500">GL Account</th>
-                <th class="px-4 py-2.5 text-left font-medium text-neutral-500">Category</th>
+                <th
+                  class="px-4 py-3 text-left font-bold text-xs uppercase tracking-wider text-[var(--color-neutral-500)]"
+                >
+                  GL Account
+                </th>
+                <th
+                  class="px-4 py-3 text-left font-bold text-xs uppercase tracking-wider text-[var(--color-neutral-500)]"
+                >
+                  Category
+                </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-[var(--color-neutral-100)]">
               <tr
                 v-for="line in request.lines"
                 :key="line.id"
-                class="border-t transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30"
+                class="transition-colors hover:bg-[var(--color-neutral-50)]"
               >
-                <td class="px-4 py-2.5">{{ line.description }}</td>
-                <td class="px-4 py-2.5 text-right tabular-nums font-semibold">
+                <td class="px-4 py-3 text-[var(--color-neutral-700)]">{{ line.description }}</td>
+                <td
+                  class="px-4 py-3 text-right tabular-nums font-bold text-[var(--color-neutral-900)]"
+                >
                   {{ formatMoney(line.amount) }}
                 </td>
-                <td class="px-4 py-2.5 font-mono text-xs text-neutral-500">
+                <td class="px-4 py-3 font-mono text-xs text-[var(--color-neutral-500)]">
                   {{ line.accountId?.slice(0, 8) ?? '—' }}
                 </td>
-                <td class="px-4 py-2.5 font-mono text-xs text-neutral-500">
+                <td class="px-4 py-3 font-mono text-xs text-[var(--color-neutral-500)]">
                   {{ line.categoryId?.slice(0, 8) ?? '—' }}
                 </td>
               </tr>
-              <tr class="border-t bg-neutral-50/50 font-semibold dark:bg-neutral-900/20">
-                <td class="px-4 py-2.5">Total</td>
-                <td class="px-4 py-2.5 text-right tabular-nums font-bold">
+              <tr class="bg-[var(--color-neutral-50)]/50 font-bold">
+                <td class="px-4 py-4 text-[var(--color-neutral-600)]">Total Summary</td>
+                <td
+                  class="px-4 py-4 text-right tabular-nums text-lg text-[var(--color-primary-700)]"
+                >
                   {{ formatMoney(request.totalAmount) }}
                 </td>
                 <td colspan="2" />

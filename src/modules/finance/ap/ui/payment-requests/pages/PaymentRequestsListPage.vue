@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { Button } from '@/shared/components/button'
+import { AppButton } from '@/shared/components/primitives'
 import { Card, CardContent } from '@/shared/components/card'
-import { Plus, Clock, CheckCircle2, AlertCircle, Wallet } from 'lucide-vue-next'
+import { Plus, Clock, CheckCircle2, AlertCircle, Wallet, Inbox } from 'lucide-vue-next'
 import { paymentRequestColumns } from '../grids/payment-request.grid'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
 import { usePaymentRequestStats } from '../../../application/composables/usePaymentRequestStats'
@@ -37,32 +37,48 @@ function handleCreate() {
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-4 overflow-hidden">
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Page Header & Global Action -->
-    <div class="flex shrink-0 items-end justify-between px-1">
-      <div>
-        <h1 class="m-0 text-xl font-semibold tracking-tight text-[var(--color-grid-text)]">
-          Payment Requests
-        </h1>
-        <p class="text-sm text-neutral-500">
-          Process outgoing payments and operational disbursements.
-        </p>
+    <div
+      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+    >
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <Inbox class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
+            Payment Requests
+          </h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
+            Process outgoing payments and operational disbursements.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <AppButton v-if="hasPermission('ap:create')" variant="primary" @click="handleCreate">
+          <Plus :size="14" class="mr-2" />
+          New Request
+        </AppButton>
       </div>
     </div>
 
     <!-- Operational Inlet (In-Queue Summary) -->
-    <div class="grid grid-cols-1 gap-3 md:grid-cols-4 shrink-0 px-1">
-      <Card class="border-neutral-100 shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
-        <CardContent class="p-3">
-          <div class="flex items-center gap-3">
-            <div class="rounded-lg bg-orange-50 p-2 text-orange-600">
-              <Clock :size="18" />
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-4 shrink-0 p-8 pb-4">
+      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
+        <CardContent class="p-4">
+          <div class="flex items-center gap-4">
+            <div class="rounded-sm bg-orange-50 p-2 text-orange-600 border border-orange-100">
+              <Clock :size="20" />
             </div>
             <div>
-              <p class="text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <p
+                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+              >
                 Submitted
               </p>
-              <h3 class="text-lg font-bold tabular-nums">
+              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
                 {{ isStatsLoading ? '—' : (stats?.submittedCount ?? 0) }}
               </h3>
             </div>
@@ -70,17 +86,19 @@ function handleCreate() {
         </CardContent>
       </Card>
 
-      <Card class="border-neutral-100 shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
-        <CardContent class="p-3">
-          <div class="flex items-center gap-3">
-            <div class="rounded-lg bg-blue-50 p-2 text-blue-600">
-              <CheckCircle2 :size="18" />
+      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
+        <CardContent class="p-4">
+          <div class="flex items-center gap-4">
+            <div class="rounded-sm bg-blue-50 p-2 text-blue-600 border border-blue-100">
+              <CheckCircle2 :size="20" />
             </div>
             <div>
-              <p class="text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <p
+                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+              >
                 Approved
               </p>
-              <h3 class="text-lg font-bold tabular-nums">
+              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
                 {{ isStatsLoading ? '—' : (stats?.approvedCount ?? 0) }}
               </h3>
             </div>
@@ -88,17 +106,19 @@ function handleCreate() {
         </CardContent>
       </Card>
 
-      <Card class="border-neutral-100 shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
-        <CardContent class="p-3">
-          <div class="flex items-center gap-3">
-            <div class="rounded-lg bg-red-50 p-2 text-red-600">
-              <AlertCircle :size="18" />
+      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
+        <CardContent class="p-4">
+          <div class="flex items-center gap-4">
+            <div class="rounded-sm bg-red-50 p-2 text-red-600 border border-red-100">
+              <AlertCircle :size="20" />
             </div>
             <div>
-              <p class="text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <p
+                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+              >
                 Rejected
               </p>
-              <h3 class="text-lg font-bold tabular-nums">
+              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
                 {{ isStatsLoading ? '—' : (stats?.rejectedCount ?? 0) }}
               </h3>
             </div>
@@ -106,17 +126,19 @@ function handleCreate() {
         </CardContent>
       </Card>
 
-      <Card class="border-neutral-100 shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
-        <CardContent class="p-3">
-          <div class="flex items-center gap-3">
-            <div class="rounded-lg bg-green-50 p-2 text-green-600">
-              <Wallet :size="18" />
+      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
+        <CardContent class="p-4">
+          <div class="flex items-center gap-4">
+            <div class="rounded-sm bg-green-50 p-2 text-green-600 border border-green-100">
+              <Wallet :size="20" />
             </div>
             <div>
-              <p class="text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <p
+                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+              >
                 Resolved
               </p>
-              <h3 class="text-lg font-bold tabular-nums">
+              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
                 {{ isStatsLoading ? '—' : (stats?.paidCount ?? 0) }}
               </h3>
             </div>
@@ -126,7 +148,7 @@ function handleCreate() {
     </div>
 
     <!-- Main Operational Queue (Max Density) -->
-    <div class="min-h-0 flex-1 overflow-hidden">
+    <div class="min-h-0 flex-1 px-8 pb-8">
       <DataGrid
         v-model:sorting="sorting"
         v-model:row-selection="rowSelection"
@@ -140,15 +162,7 @@ function handleCreate() {
         @row-click="handleRowClick"
       >
         <template #toolbar>
-          <Button
-            v-if="hasPermission('ap:create')"
-            size="sm"
-            class="h-[26px] px-2.5 text-xs"
-            @click="handleCreate"
-          >
-            <Plus :size="13" class="mr-1" />
-            New Request
-          </Button>
+          <!-- Contextual grid actions -->
         </template>
       </DataGrid>
     </div>

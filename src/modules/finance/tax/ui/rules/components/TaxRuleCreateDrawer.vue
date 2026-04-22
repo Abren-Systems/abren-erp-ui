@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import {
-  AppDrawer,
-  AppButton,
-  AppInput,
-  AppSelect,
-} from '@/shared/components/primitives'
+import { AppDrawer, AppButton, AppInput, AppSelect } from '@/shared/components/primitives'
 import { useCreateTaxRule } from '../../../application/useTaxRules'
 import type { TaxRuleCreateDTO } from '../../../infrastructure/api.types'
 
@@ -91,16 +86,9 @@ async function handleSubmit() {
         placeholder="0.15"
         required
       />
-      <p class="text-[11px] text-muted-foreground -mt-3">
-        Enter as decimal (e.g. 0.15 for 15%)
-      </p>
+      <p class="text-[11px] text-muted-foreground -mt-3">Enter as decimal (e.g. 0.15 for 15%)</p>
 
-      <AppSelect
-        v-model="form.tax_type"
-        label="Tax Type"
-        :options="taxTypeOptions"
-        required
-      />
+      <AppSelect v-model="form.tax_type" label="Tax Type" :options="taxTypeOptions" required />
 
       <AppSelect
         v-model="form.direction"
@@ -119,12 +107,8 @@ async function handleSubmit() {
     </div>
 
     <template #footer>
-      <AppButton variant="secondary" @click="emit('update:open', false)">
-        Cancel
-      </AppButton>
-      <AppButton :loading="isPending" @click="handleSubmit">
-        Create Rule
-      </AppButton>
+      <AppButton variant="secondary" @click="emit('update:open', false)"> Cancel </AppButton>
+      <AppButton :loading="isPending" @click="handleSubmit"> Create Rule </AppButton>
     </template>
   </AppDrawer>
 </template>

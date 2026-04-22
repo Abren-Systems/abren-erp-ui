@@ -19,8 +19,18 @@ import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { businessModules, platformModules } from '@/modules'
 import type { BusinessDomain, PlatformEngine, MenuItem } from '@/shared/types/module.types'
 import { useAuthStore } from '@/shared/auth/auth.store'
-import { Button } from '@/shared/components/button'
-import { LayoutDashboard, LogOut, ChevronRight, Library, Cpu, Settings } from 'lucide-vue-next'
+import { AppButton, AppBreadcrumb } from '@/shared/components/primitives'
+import {
+  LayoutDashboard,
+  LogOut,
+  ChevronRight,
+  Library,
+  Cpu,
+  Settings,
+  Bell,
+  Search,
+  Command,
+} from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -152,43 +162,71 @@ async function handleLogout() {
       </nav>
 
       <div class="p-4 border-t border-[var(--color-neutral-200)] bg-[var(--app-sidebar)]">
-        <Button
-          variant="ghost"
-          class="w-full justify-start text-[var(--color-danger-600)] hover:bg-[var(--color-danger-50)] h-10"
+        <AppButton
+          variant="stealth"
+          class="w-full justify-start text-[var(--color-danger-600)] hover:bg-[var(--color-danger-50)]"
           @click="handleLogout"
         >
           <LogOut class="mr-3 h-5 w-5" />
           Logout
-        </Button>
+        </AppButton>
       </div>
     </aside>
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-hidden bg-[var(--app-canvas)]">
       <header
-        class="h-16 border-b border-[var(--color-neutral-200)] bg-white flex items-center justify-between px-8 sticky top-0 z-10 shrink-0"
+        class="h-14 border-b border-[var(--color-neutral-200)] bg-white flex items-center justify-between px-6 sticky top-0 z-10 shrink-0"
       >
-        <h2 class="text-lg font-bold text-[var(--color-neutral-900)] tracking-tight">
-          {{ route.name || 'Dashboard' }}
-        </h2>
-        <div class="flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            class="rounded-full hover:bg-[var(--color-neutral-100)] h-9 w-9"
-          >
-            <Settings class="h-5 w-5 text-[var(--color-neutral-500)]" />
-          </Button>
+        <div class="flex items-center gap-6">
           <div
-            class="h-9 w-9 rounded-full border-2 border-[var(--color-primary-100)] bg-[var(--color-primary-600)] flex items-center justify-center text-white font-bold text-xs shadow-sm transition-all duration-200"
+            class="flex items-center gap-2 text-[var(--color-neutral-500)] px-3 py-1 bg-[var(--color-neutral-50)] rounded-sm border border-[var(--color-neutral-200)] cursor-text hover:bg-[var(--color-neutral-100)] transition-colors min-w-[240px]"
           >
-            AD
+            <Search :size="14" />
+            <span class="text-xs">Search global records...</span>
+            <span class="ml-auto flex items-center gap-1 text-[10px] opacity-50">
+              <Command :size="10" />
+              <span>K</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <AppButton variant="stealth">
+            <Bell :size="18" class="text-[var(--color-neutral-500)]" />
+          </AppButton>
+          <AppButton variant="stealth">
+            <Settings :size="18" class="text-[var(--color-neutral-500)]" />
+          </AppButton>
+
+          <div class="h-6 w-px bg-[var(--color-neutral-200)] mx-2" />
+
+          <div class="flex items-center gap-3 pl-2">
+            <div class="text-right hidden sm:block">
+              <p class="text-[12px] font-bold leading-none text-[var(--color-neutral-900)]">
+                Abren Admin
+              </p>
+              <p class="text-[10px] text-[var(--color-neutral-500)] mt-1">Tenant Administrator</p>
+            </div>
+            <div
+              class="h-8 w-8 rounded-full border border-[var(--color-primary-100)] bg-[var(--color-primary-600)] flex items-center justify-center text-white font-bold text-xs shadow-sm"
+            >
+              AD
+            </div>
           </div>
         </div>
       </header>
 
-      <div class="flex-1 overflow-y-auto p-10">
-        <div class="max-w-[1400px] mx-auto">
+      <!-- Sub-Header / Breadcrumb / Command Bar Area -->
+      <div
+        class="h-10 bg-white border-b border-[var(--color-neutral-200)] flex items-center justify-between px-6 shrink-0"
+      >
+        <AppBreadcrumb />
+        <div id="command-bar-portal" />
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="w-full">
           <RouterView />
         </div>
       </div>

@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { 
-  AppDrawer, 
-  AppButton, 
-  AppInput, 
-  AppSelect,
-  AppBadge 
-} from '@/shared/components/primitives'
+import { AppDrawer, AppButton, AppInput, AppSelect, AppBadge } from '@/shared/components/primitives'
 import { X, Plus } from 'lucide-vue-next'
 import { useCreateTaxGroup, useActiveTaxRules } from '../../../application/useTaxRules'
 import type { TaxGroupCreateDTO } from '../../../infrastructure/api.types'
@@ -86,12 +80,7 @@ async function handleSubmit() {
     @update:open="emit('update:open', $event)"
   >
     <div class="grid gap-6 py-4 px-1">
-      <AppInput
-        v-model="form.name"
-        label="Group Name"
-        placeholder="e.g. VAT + Excise"
-        required
-      />
+      <AppInput v-model="form.name" label="Group Name" placeholder="e.g. VAT + Excise" required />
 
       <AppSelect
         v-model="form.method"
@@ -114,17 +103,19 @@ async function handleSubmit() {
           <AppSelect
             v-model="selectedRuleId"
             placeholder="Add a rule..."
-            :options="availableRules?.map(r => ({
-              label: `${r.name} (${(r.rate * 100).toFixed(1)}%)`,
-              value: r.id,
-              disabled: form.rule_ids.includes(r.id)
-            })) || []"
+            :options="
+              availableRules?.map((r) => ({
+                label: `${r.name} (${(r.rate * 100).toFixed(1)}%)`,
+                value: r.id,
+                disabled: form.rule_ids.includes(r.id),
+              })) || []
+            "
             class="flex-1"
           />
-          <AppButton 
-            variant="secondary" 
-            class="mt-auto h-[32px] w-[32px] p-0" 
-            @click="addRule" 
+          <AppButton
+            variant="secondary"
+            class="mt-auto h-[32px] w-[32px] p-0"
+            @click="addRule"
             :disabled="!selectedRuleId"
           >
             <Plus class="h-4 w-4" />
@@ -154,12 +145,8 @@ async function handleSubmit() {
     </div>
 
     <template #footer>
-      <AppButton variant="secondary" @click="emit('update:open', false)">
-        Cancel
-      </AppButton>
-      <AppButton :loading="isPending" @click="handleSubmit">
-        Create Group
-      </AppButton>
+      <AppButton variant="secondary" @click="emit('update:open', false)"> Cancel </AppButton>
+      <AppButton :loading="isPending" @click="handleSubmit"> Create Group </AppButton>
     </template>
   </AppDrawer>
 </template>

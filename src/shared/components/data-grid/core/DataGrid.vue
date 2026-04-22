@@ -214,7 +214,7 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-header-row {
-  height: 36px; /* High-density but professional height */
+  height: 32px; /* High-density but professional height */
 }
 
 .grid-th {
@@ -235,7 +235,7 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-row {
-  height: 36px;
+  height: 32px;
   border-bottom: 1px solid var(--color-neutral-100);
   cursor: pointer;
   background: #ffffff;
@@ -270,7 +270,7 @@ const handleRowClick = (row: Row<TData>) => {
 .grid-footer {
   display: flex;
   align-items: center;
-  height: 36px;
+  height: 32px;
   padding: 0 12px;
   border-top: 1px solid var(--color-neutral-200);
   background: var(--color-neutral-50);

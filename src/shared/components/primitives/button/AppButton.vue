@@ -6,7 +6,7 @@ interface Props {
    * The visual appearance of the button.
    * Maps to Microsoft Fluent's appearance tokens.
    */
-  variant?: 'primary' | 'secondary' | 'stealth' | 'outline' | 'neutral'
+  variant?: 'primary' | 'secondary' | 'stealth' | 'outline' | 'neutral' | 'danger'
   /** Standard button behavior types */
   type?: 'button' | 'submit' | 'reset'
   /** Disables interaction */
@@ -33,6 +33,8 @@ const fluentAppearance = computed(() => {
       return 'stealth'
     case 'outline':
       return 'outline'
+    case 'danger':
+      return 'neutral' // We'll style it with custom CSS below
     case 'neutral':
     case 'secondary':
     default:
@@ -108,5 +110,20 @@ defineEmits(['click'])
 .app-button-root[appearance='accent'] {
   /* Optional: Force the specific Abren primary blue if the design token fails */
   /* --accent-fill-rest: #0078d4; */
+}
+
+/* 
+ * Danger Variant Styling
+ * Microsoft Fluent doesn't have a built-in 'destructive' appearance that matches 
+ * our theme, so we manually apply our danger tokens.
+ */
+.app-button-root.variant-danger {
+  --neutral-fill-rest: var(--color-danger-600);
+  --neutral-fill-hover: var(--color-danger-700);
+  --neutral-fill-active: var(--color-danger-800);
+  --neutral-foreground-rest: #ffffff;
+  --neutral-foreground-hover: #ffffff;
+  --neutral-foreground-active: #ffffff;
+  border-color: transparent;
 }
 </style>

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
-import { Plus } from 'lucide-vue-next'
+import { Plus, LayoutGrid } from 'lucide-vue-next'
 import CreateAccountDrawer from '../components/CreateAccountDrawer.vue'
 import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
 import { accountColumns } from '../grids/account.grid'
@@ -26,19 +26,39 @@ function handleRowClick(row: Account) {
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-6">
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Page Header -->
-    <div class="flex shrink-0 items-start justify-between p-1">
-      <div>
-        <h1 class="m-0 text-[24px] font-semibold text-[#201f1e]">Chart of Accounts</h1>
-        <p class="mt-1 text-[14px] text-[#605e5c]">
-          Manage your ledger accounts and financial structure.
-        </p>
+    <div
+      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+    >
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <LayoutGrid class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
+            Chart of Accounts
+          </h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
+            Manage your ledger accounts and financial structure.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <AppButton
+          v-if="hasPermission('ledger:manage_accounts')"
+          variant="primary"
+          @click="isDrawerOpen = true"
+        >
+          <Plus :size="14" class="mr-2" />
+          New Account
+        </AppButton>
       </div>
     </div>
 
     <!-- DataGrid Orchestration -->
-    <div class="min-h-0 flex-1 px-6 pb-6">
+    <div class="min-h-0 flex-1 p-8">
       <DataGrid
         v-model:sorting="sorting"
         v-model:row-selection="rowSelection"
@@ -54,14 +74,7 @@ function handleRowClick(row: Account) {
       >
         <!-- Toolbar actions -->
         <template #toolbar>
-          <AppButton
-            v-if="hasPermission('ledger:manage_accounts')"
-            variant="primary"
-            @click="isDrawerOpen = true"
-          >
-            <Plus :size="14" class="mr-2" />
-            New Account
-          </AppButton>
+          <!-- Grid-specific actions can go here (Export, Import) -->
         </template>
 
         <!-- Empty State Operational Action -->

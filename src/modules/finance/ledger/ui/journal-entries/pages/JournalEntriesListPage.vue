@@ -2,8 +2,8 @@
 import { ref, h, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { Button } from '@/shared/components/button'
-import { Plus, RefreshCcw } from 'lucide-vue-next'
+import { AppButton } from '@/shared/components/primitives'
+import { Plus, RefreshCcw, BookOpen } from 'lucide-vue-next'
 import { useJournalEntries } from '../../../application/composables/useJournalEntries'
 import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
 import { journalEntryColumns } from '../../grids/journal-entry.grid'
@@ -37,19 +37,40 @@ function handleRowClick(row: JournalEntry) {
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-5">
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Page Header -->
-    <div class="flex shrink-0 items-start justify-between">
-      <div>
-        <h1 class="m-0 text-heading text-[var(--color-grid-text)]">Journal Entries</h1>
-        <p class="mt-1 text-body-sm text-[var(--color-grid-text-muted)]">
-          View and manage double-entry accounting records.
-        </p>
+    <div
+      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+    >
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <BookOpen class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
+            Journal Entries
+          </h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
+            View and manage double-entry accounting records.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <AppButton
+          v-if="hasPermission('ledger:create_entry')"
+          variant="primary"
+          :disabled="!hasAccounts"
+          @click="isCreateOpen = true"
+        >
+          <Plus :size="14" class="mr-2" />
+          New Entry
+        </AppButton>
       </div>
     </div>
 
     <!-- DataGrid Orchestration -->
-    <div class="min-h-0 flex-1">
+    <div class="min-h-0 flex-1 p-8">
       <DataGrid
         v-model:sorting="sorting"
         v-model:row-selection="rowSelection"
@@ -68,39 +89,28 @@ function handleRowClick(row: JournalEntry) {
         @row-click="handleRowClick"
       >
         <template #toolbar>
-          <Button variant="outline" size="sm" class="h-[26px] px-2.5 text-xs" @click="refresh()">
-            <RefreshCcw :class="['mr-1 h-3 w-3', isLoading && 'animate-spin']" />
+          <AppButton variant="stealth" @click="refresh()">
+            <RefreshCcw :class="['mr-1 h-3.5 w-3.5', isLoading && 'animate-spin']" />
             Refresh
-          </Button>
-          <Button
-            v-if="hasPermission('ledger:create_entry')"
-            size="sm"
-            class="h-[26px] px-2.5 text-xs"
-            :disabled="!hasAccounts"
-            @click="isCreateOpen = true"
-          >
-            <Plus :size="13" class="mr-1" />
-            New Entry
-          </Button>
+          </AppButton>
         </template>
 
         <!-- Empty State Operational Action -->
         <template #empty-action>
           <template v-if="!isAccountsLoading">
             <template v-if="hasAccounts">
-              <Button
+              <AppButton
                 v-if="hasPermission('ledger:create_entry')"
-                variant="default"
-                class="mt-4 shadow-sm"
+                variant="primary"
                 @click="isCreateOpen = true"
               >
                 <Plus :size="16" class="mr-2" />
                 Book Journal Entry
-              </Button>
+              </AppButton>
             </template>
             <template v-else>
               <router-link :to="{ name: 'LedgerCoa' }">
-                <Button variant="default" class="mt-4 shadow-sm"> Setup Chart of Accounts </Button>
+                <AppButton variant="primary"> Setup Chart of Accounts </AppButton>
               </router-link>
             </template>
           </template>

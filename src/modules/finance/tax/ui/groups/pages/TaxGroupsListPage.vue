@@ -24,27 +24,42 @@ function openCreateDrawer() {
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
-    <header class="flex items-center justify-between">
-      <div>
-        <div class="flex items-center gap-2">
-          <LayoutGrid class="h-6 w-6 text-primary" />
-          <h1 class="text-2xl font-bold tracking-tight">Tax Groups</h1>
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
+    <!-- Page Header -->
+    <div
+      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+    >
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <LayoutGrid class="h-6 w-6 text-[var(--color-primary-600)]" />
         </div>
-        <p class="text-muted-foreground">Combine multiple tax rules into compound calculations.</p>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
+            Tax Groups
+          </h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
+            Combine multiple tax rules into compound calculations.
+          </p>
+        </div>
       </div>
-      <AppButton @click="openCreateDrawer">
-        <Plus class="mr-2 h-4 w-4" />
-        New Tax Group
-      </AppButton>
-    </header>
 
-    <DataGrid
-      :data="groups || []"
-      :columns="taxGroupColumns"
-      :loading="isPending"
-      :state="gridState"
-    />
+      <div class="flex items-center gap-2">
+        <AppButton variant="primary" @click="openCreateDrawer">
+          <Plus class="mr-2 h-4 w-4" />
+          New Tax Group
+        </AppButton>
+      </div>
+    </div>
+
+    <!-- DataGrid Orchestration -->
+    <div class="min-h-0 flex-1 p-8">
+      <DataGrid
+        :data="groups || []"
+        :columns="taxGroupColumns"
+        :loading="isPending"
+        :state="gridState"
+      />
+    </div>
 
     <TaxGroupCreateDrawer v-model:open="isCreateDrawerOpen" />
   </div>
