@@ -17,9 +17,7 @@ export class TaxMapper {
       name: dto.name,
       rate: Number(dto.rate),
       taxType: dto.tax_type as TaxType,
-      // Default to NON_DIRECTIONAL if backend doesn't provide direction
-      direction: ((dto as unknown as Record<string, unknown>)['direction'] ||
-        'NON_DIRECTIONAL') as TaxDirection,
+      direction: dto.direction as TaxDirection,
       glAccountId: CommonMapper.toBrandedId<AccountId>(dto.gl_account_id),
       isActive: dto.is_active,
     }
@@ -41,16 +39,15 @@ export class TaxMapper {
 
   static toCalculationResult(dto: TaxCalculationResponse): TaxCalculationResult {
     const result: TaxCalculationResult = {
-      net: CommonMapper.toMoney(dto.net, dto.currency),
+      net: CommonMapper.toMoney(dto.amount, dto.currency),
       tax: CommonMapper.toMoney(dto.tax, dto.currency),
-      gross: CommonMapper.toMoney(dto.gross, dto.currency),
+      gross: CommonMapper.toMoney(dto.total, dto.currency),
     }
 
-    const rawDto = dto as unknown as Record<string, unknown>
-    if (rawDto['breakdown']) {
+    if (dto.breakdown) {
       result.breakdown = {}
-      for (const [key, value] of Object.entries(rawDto['breakdown'] as Record<string, unknown>)) {
-        result.breakdown[key] = CommonMapper.toMoney(value as string | number, dto.currency)
+      for (const [key, value] of Object.entries(dto.breakdown)) {
+        result.breakdown[key] = CommonMapper.toMoney(value, dto.currency)
       }
     }
 

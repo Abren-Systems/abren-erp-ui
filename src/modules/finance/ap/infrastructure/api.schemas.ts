@@ -71,7 +71,7 @@ export const VendorBillSchema = z.object({
   due_date: z.string().nullable().optional(), // ISO Date string
   currency: z.string().length(3),
   justification: z.string(), // Mandatory in DTO
-  status: z.string(),
+  status: z.enum(['DRAFT', 'VALIDATED', 'PAID']),
   net_amount: z.coerce.string(),
   tax_total: z.coerce.string(),
   total_amount: z.coerce.string(),

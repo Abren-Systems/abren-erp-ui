@@ -1,14 +1,16 @@
 import type { TaxRuleId, TaxGroupId, AccountId } from '@/shared/types/brand.types'
 import type { Money } from '@/shared/domain/money'
 
-export type TaxType = 'VAT' | 'WHT'
+import type { components } from '@/shared/api/generated.types'
+
+export type TaxType = components['schemas']['TaxType']
 
 export const TaxType = {
   isIndirect: (type: TaxType): boolean => type === 'VAT',
   isWithholding: (type: TaxType): boolean => type === 'WHT',
 } as const
 
-export type TaxDirection = 'INPUT' | 'OUTPUT' | 'NON_DIRECTIONAL'
+export type TaxDirection = components['schemas']['TaxDirection']
 
 export const TaxDirection = {
   isDeductible: (direction: TaxDirection): boolean => direction === 'INPUT',

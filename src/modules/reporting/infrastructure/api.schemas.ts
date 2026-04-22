@@ -8,10 +8,8 @@ import { z } from 'zod'
  */
 export const DailyCashflowSchema = z.object({
   date: z.string(),
-  total_inflow: z.string(),
-  total_outflow: z.string(),
-  projected_inflow: z.string(),
-  projected_outflow: z.string(),
-  net_cashflow: z.string(),
-  currency_code: z.string(),
+  inflow: z.string(),
+  outflow: z.string(),
+  net_change: z.string(),
+  running_balance: z.string(),
 })

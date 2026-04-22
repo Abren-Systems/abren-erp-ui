@@ -13,9 +13,11 @@ import type {
   JournalLineId,
 } from '@/shared/types/brand.types'
 
+import type { components } from '@/shared/api/generated.types'
+
 // --- Payment Request Types ---
 
-export type PaymentRequestStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PAID'
+export type PaymentRequestStatus = components['schemas']['PaymentRequestStatus']
 
 export const PaymentRequestStatus = {
   isFinal: (status: PaymentRequestStatus): boolean => status === 'PAID' || status === 'REJECTED',
@@ -70,7 +72,7 @@ export interface PaymentRequest {
 
 // --- Vendor Bill Types ---
 
-export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID'
+export type VendorBillStatus = components['schemas']['VendorBillStatus']
 
 export const VendorBillStatus = {
   isPaid: (status: VendorBillStatus): boolean => status === 'PAID',
