@@ -1,5 +1,10 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
-import type { CalculateTaxRequest, TaxRuleDTO, TaxCalculationResponse } from './api.types'
+import type {
+  CalculateTaxRequest,
+  TaxRuleDTO,
+  TaxCalculationResponse,
+  TaxRuleCreateDTO,
+} from './api.types'
 import { TaxRuleSchema, TaxCalculationResponseSchema } from './api.schemas'
 import { TaxMapper } from './mappers'
 import type { TaxRule, TaxCalculationResult } from '../domain/tax.types'
@@ -33,5 +38,14 @@ export const TaxAdapter = {
     const response = await apiPost<TaxCalculationResponse>('/finance/tax/calculate', payload)
     const dto = TaxCalculationResponseSchema.parse(response) as TaxCalculationResponse
     return TaxMapper.toCalculationResult(dto)
+  },
+
+  /**
+   * Registers a new tax rule via the backend.
+   */
+  async createTaxRule(dto: TaxRuleCreateDTO): Promise<TaxRule> {
+    const response = await apiPost<TaxRuleDTO>('/finance/tax/rules', dto)
+    const parsedDto = TaxRuleSchema.parse(response) as TaxRuleDTO
+    return TaxMapper.toTaxRule(parsedDto)
   },
 }

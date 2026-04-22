@@ -1,7 +1,5 @@
-/**
- * @module finance/tax
- * Tax management and compliance module.
- */
+import type { BusinessDomain } from '@/shared/types/module.types'
+import { taxRoutes } from './routes'
 
 // Domain exports
 // export * from './domain/tax.types';
@@ -10,6 +8,19 @@
 // export * from './application/useTaxRules';
 
 // UI exports
-// export { default as TaxSettingsView } from './ui/TaxSettingsView.vue';
+export * from './routes'
 
-export const taxModulePlaceholder = {}
+export const taxModule: BusinessDomain = {
+  id: 'tax',
+  name: 'Taxation',
+  category: 'business',
+  routes: taxRoutes,
+  permissions: ['finance:tax:view'],
+  menuItems: [
+    {
+      label: 'Tax Rules',
+      route: 'finance.tax.rules',
+      icon: 'percent',
+    },
+  ],
+}

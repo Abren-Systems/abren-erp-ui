@@ -2,6 +2,7 @@ import { coreModule } from './core'
 import { ledgerModule } from './finance/ledger'
 import { bankModule } from './finance/bank'
 import { apModule } from './finance/ap'
+import { taxModule } from './finance/tax'
 import { reportingModule } from './reporting'
 import { workflowsModule } from './workflows'
 import { inventoryModule } from './inventory'
@@ -16,6 +17,7 @@ export const businessModules: BusinessDomain[] = [
   ledgerModule,
   bankModule,
   apModule,
+  taxModule,
   reportingModule,
   inventoryModule,
 ]
