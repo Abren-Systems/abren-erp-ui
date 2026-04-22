@@ -2,7 +2,18 @@ import type { TaxRuleId, TaxGroupId, AccountId } from '@/shared/types/brand.type
 import type { Money } from '@/shared/domain/money'
 
 export type TaxType = 'VAT' | 'WHT'
+
+export namespace TaxType {
+  export const isIndirect = (type: TaxType): boolean => type === 'VAT'
+  export const isWithholding = (type: TaxType): boolean => type === 'WHT'
+}
+
 export type TaxDirection = 'INPUT' | 'OUTPUT' | 'NON_DIRECTIONAL'
+
+export namespace TaxDirection {
+  export const isDeductible = (direction: TaxDirection): boolean => direction === 'INPUT'
+  export const isLiability = (direction: TaxDirection): boolean => direction === 'OUTPUT'
+}
 export type CalculationMethod = 'SIMPLE' | 'COMPOUND'
 
 export interface TaxRule {
