@@ -46,11 +46,14 @@ function handleCancel() {
   <Dialog :open="open" @update:open="emit('update:open', $event)">
     <DialogContent class="sm:max-w-[425px] rounded-sm p-0 overflow-hidden border-0 shadow-2xl">
       <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
-        <DialogTitle class="text-[var(--color-danger-600)] font-bold uppercase tracking-widest text-xs">Void Journal Entry</DialogTitle>
+        <DialogTitle
+          class="text-[var(--color-danger-600)] font-bold uppercase tracking-widest text-xs"
+          >Void Journal Entry</DialogTitle
+        >
         <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
           You are about to void
-          <span class="font-bold text-[var(--color-neutral-900)]">{{ entryNumber }}</span>.
-          This action is irreversible and will be recorded in the audit trail.
+          <span class="font-bold text-[var(--color-neutral-900)]">{{ entryNumber }}</span
+          >. This action is irreversible and will be recorded in the audit trail.
         </DialogDescription>
       </DialogHeader>
 

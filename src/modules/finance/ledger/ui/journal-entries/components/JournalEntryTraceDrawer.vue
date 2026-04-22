@@ -38,12 +38,16 @@ const emit = defineEmits<{
     <div class="space-y-8">
       <!-- ── Workflow History ─────────────────────────────── -->
       <section>
-        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2">
+        <h3
+          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2"
+        >
           <Clock :size="12" />
           Workflow History
         </h3>
         <div class="space-y-3">
-          <div class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
+          <div
+            class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+          >
             <div class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-success-500)]" />
             <div class="flex-1">
               <p class="text-xs font-bold text-[var(--color-neutral-900)]">Created</p>
@@ -87,14 +91,20 @@ const emit = defineEmits<{
 
       <!-- ── FX Rate Audit ───────────────────────────────── -->
       <section v-if="entry.lines.some((l) => l.exchangeRate && l.exchangeRate !== 1)">
-        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2">
+        <h3
+          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2"
+        >
           <Globe :size="12" />
           FX Rates Applied
         </h3>
-        <div class="overflow-hidden rounded-sm border border-[var(--color-neutral-200)] bg-white shadow-sm">
+        <div
+          class="overflow-hidden rounded-sm border border-[var(--color-neutral-200)] bg-white shadow-sm"
+        >
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-[var(--color-neutral-50)] text-[var(--color-neutral-400)] text-[9px] font-bold uppercase tracking-widest border-b border-[var(--color-neutral-100)]">
+              <tr
+                class="bg-[var(--color-neutral-50)] text-[var(--color-neutral-400)] text-[9px] font-bold uppercase tracking-widest border-b border-[var(--color-neutral-100)]"
+              >
                 <th class="px-4 py-2">Line</th>
                 <th class="px-4 py-2 text-right">Original</th>
                 <th class="px-4 py-2 text-right">Rate</th>
@@ -114,10 +124,14 @@ const emit = defineEmits<{
                   {{ line.originalAmount?.formatted ?? '—' }}
                   {{ line.originalCurrency ?? '' }}
                 </td>
-                <td class="px-4 py-2 text-right tabular-nums text-[10px] font-bold text-[var(--color-primary-600)]">
+                <td
+                  class="px-4 py-2 text-right tabular-nums text-[10px] font-bold text-[var(--color-primary-600)]"
+                >
                   {{ line.exchangeRate?.toFixed(6) }}
                 </td>
-                <td class="px-4 py-2 text-right tabular-nums text-[10px] font-bold text-[var(--color-neutral-900)]">
+                <td
+                  class="px-4 py-2 text-right tabular-nums text-[10px] font-bold text-[var(--color-neutral-900)]"
+                >
                   {{ line.baseAmount?.formatted ?? '—' }}
                 </td>
               </tr>
@@ -128,14 +142,22 @@ const emit = defineEmits<{
 
       <!-- ── Source Documents ─────────────────────────────── -->
       <section>
-        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2">
+        <h3
+          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2"
+        >
           <FileText :size="12" />
           Source Documents
         </h3>
-        <div class="p-8 border border-dashed border-[var(--color-neutral-300)] rounded-sm flex flex-col items-center justify-center text-center">
+        <div
+          class="p-8 border border-dashed border-[var(--color-neutral-300)] rounded-sm flex flex-col items-center justify-center text-center"
+        >
           <Search :size="24" class="text-[var(--color-neutral-200)] mb-3" />
-          <p class="text-[11px] text-[var(--color-neutral-500)] font-medium">No linked source documents detected.</p>
-          <p class="text-[10px] text-[var(--color-neutral-400)] mt-1">Manual journal entries are standalone records.</p>
+          <p class="text-[11px] text-[var(--color-neutral-500)] font-medium">
+            No linked source documents detected.
+          </p>
+          <p class="text-[10px] text-[var(--color-neutral-400)] mt-1">
+            Manual journal entries are standalone records.
+          </p>
         </div>
       </section>
     </div>

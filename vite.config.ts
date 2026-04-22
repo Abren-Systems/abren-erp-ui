@@ -1,6 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-import { defineConfig, type UserConfig } from 'vite-plus'
-import type { PluginOption } from 'vite-plus'
+import { defineConfig, type UserConfig, type PluginOption } from 'vite-plus'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -8,17 +7,10 @@ import { lintConfig } from './build/vite/lint.ts'
 import { serverConfig } from './build/vite/server.ts'
 import { buildConfig } from './build/vite/build.ts'
 
-const plugins: PluginOption[] = [
-  vue({
-    template: {
-      compilerOptions: {
-        isCustomElement: (tag) => tag.startsWith('fluent-'),
-      },
-    },
-  }),
-  tailwindcss() as unknown as PluginOption,
-]
-
+/**
+ * Vite Configuration for Abren ERP
+ * Optimized for vite-plus toolchain with oxlint and vitest.
+ */
 export default defineConfig({
   lint: lintConfig as unknown as UserConfig['lint'],
   test: {
@@ -42,12 +34,21 @@ export default defineConfig({
     sortPackageJson: false,
     ignorePatterns: [],
   },
-  plugins,
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith('fluent-'),
+        },
+      },
+    }),
+    tailwindcss() as unknown as PluginOption,
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  server: serverConfig,
-  build: buildConfig,
+  server: serverConfig as unknown as UserConfig['server'],
+  build: buildConfig as unknown as UserConfig['build'],
 })

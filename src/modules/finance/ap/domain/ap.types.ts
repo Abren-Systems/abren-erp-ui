@@ -50,7 +50,7 @@ export interface PaymentRequest {
 export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID'
 
 export interface VendorBillLine {
-  id?: VendorBillLineId
+  id?: VendorBillLineId | undefined
   description: string
   amount: Money
   accountId: AccountId | null

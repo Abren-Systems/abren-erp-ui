@@ -36,12 +36,16 @@ const emit = defineEmits<{
     <div class="space-y-8">
       <!-- Workflow Timeline -->
       <section>
-        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2">
+        <h3
+          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2"
+        >
           <Clock :size="12" />
           Workflow History
         </h3>
         <div class="space-y-3">
-          <div class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
+          <div
+            class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+          >
             <div class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-neutral-400)]" />
             <div class="flex-1">
               <p class="text-xs font-bold text-[var(--color-neutral-900)]">Draft Registered</p>

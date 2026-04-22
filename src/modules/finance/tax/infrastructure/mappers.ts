@@ -9,7 +9,6 @@ import type {
 } from '../domain/tax.types'
 import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { TaxRuleId, AccountId, TaxGroupId } from '@/shared/types/brand.types'
-import { Money } from '@/shared/domain/money'
 
 export class TaxMapper {
   static toTaxRule(dto: TaxRuleDTO): TaxRule {
@@ -18,20 +17,25 @@ export class TaxMapper {
       name: dto.name,
       rate: Number(dto.rate),
       taxType: dto.tax_type as TaxType,
-      direction: dto.direction as TaxDirection,
+      // Default to NON_DIRECTIONAL if backend doesn't provide direction
+      direction: ((dto as unknown as Record<string, unknown>)['direction'] ||
+        'NON_DIRECTIONAL') as TaxDirection,
       glAccountId: CommonMapper.toBrandedId<AccountId>(dto.gl_account_id),
       isActive: dto.is_active,
     }
   }
 
   static toTaxGroup(dto: TaxGroupDTO): TaxGroup {
+    const rawDto = dto as unknown as Record<string, unknown>
     return {
-      id: CommonMapper.toBrandedId<TaxGroupId>(dto.id),
-      name: dto.name,
-      method: dto.method as CalculationMethod,
-      ruleIds: dto.rule_ids.map((id) => CommonMapper.toBrandedId<TaxRuleId>(id)),
-      rules: dto.rules?.map((r) => TaxMapper.toTaxRule(r)),
-      isActive: dto.is_active,
+      id: CommonMapper.toBrandedId<TaxGroupId>(rawDto['id'] as string),
+      name: (rawDto['name'] as string) || '',
+      method: (rawDto['method'] as CalculationMethod) || 'SIMPLE',
+      ruleIds: ((rawDto['rule_ids'] as string[]) || []).map((id: string) =>
+        CommonMapper.toBrandedId<TaxRuleId>(id),
+      ),
+      rules: (rawDto['rules'] as TaxRuleDTO[])?.map((r: TaxRuleDTO) => TaxMapper.toTaxRule(r)),
+      isActive: (rawDto['is_active'] as boolean) || false,
     }
   }
 
@@ -42,10 +46,11 @@ export class TaxMapper {
       gross: CommonMapper.toMoney(dto.gross, dto.currency),
     }
 
-    if (dto.breakdown) {
+    const rawDto = dto as unknown as Record<string, unknown>
+    if (rawDto['breakdown']) {
       result.breakdown = {}
-      for (const [key, value] of Object.entries(dto.breakdown)) {
-        result.breakdown[key] = CommonMapper.toMoney(value, dto.currency)
+      for (const [key, value] of Object.entries(rawDto['breakdown'] as Record<string, unknown>)) {
+        result.breakdown[key] = CommonMapper.toMoney(value as string | number, dto.currency)
       }
     }
 

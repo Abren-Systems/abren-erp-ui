@@ -15,10 +15,10 @@ export interface JournalEntryLine {
   debit: Money
   credit: Money
   // FX Awareness & Traceability
-  originalAmount?: Money
-  originalCurrency?: CurrencyCode
-  baseAmount?: Money
-  exchangeRate?: number
+  originalAmount?: Money | undefined
+  originalCurrency?: CurrencyCode | undefined
+  baseAmount?: Money | undefined
+  exchangeRate?: number | undefined
 }
 
 export interface JournalEntry {

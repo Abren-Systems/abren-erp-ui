@@ -54,10 +54,14 @@ function handleCancel() {
             <WalletCards class="h-5 w-5 text-[var(--color-primary-600)]" />
           </div>
           <div>
-            <DialogTitle class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs">Execute Payment</DialogTitle>
+            <DialogTitle
+              class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs"
+              >Execute Payment</DialogTitle
+            >
             <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
               Record disbursement details for
-              <span class="font-bold text-[var(--color-neutral-900)]">{{ totalAmount }}</span>.
+              <span class="font-bold text-[var(--color-neutral-900)]">{{ totalAmount }}</span
+              >.
             </DialogDescription>
           </div>
         </div>

@@ -53,9 +53,13 @@ async function handleAssign() {
             <UserCog class="h-5 w-5 text-[var(--color-primary-600)]" />
           </div>
           <div>
-            <DialogTitle class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs">Assign Access</DialogTitle>
+            <DialogTitle
+              class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs"
+              >Assign Access</DialogTitle
+            >
             <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
-              Grant additional access boundaries to <strong>{{ user?.email }}</strong>.
+              Grant additional access boundaries to <strong>{{ user?.email }}</strong
+              >.
             </DialogDescription>
           </div>
         </div>

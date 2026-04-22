@@ -175,7 +175,10 @@ const handleFocus = () => {
         class="absolute right-0 top-[1.5rem] flex h-[32px] w-8 items-center justify-center text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] disabled:opacity-50"
         @click="isOpen ? close() : open()"
       >
-        <Loader2 v-if="isLoading" class="h-3.5 w-3.5 animate-spin text-[var(--color-neutral-500)]" />
+        <Loader2
+          v-if="isLoading"
+          class="h-3.5 w-3.5 animate-spin text-[var(--color-neutral-500)]"
+        />
         <ChevronDown v-else class="h-3.5 w-3.5" />
       </button>
     </div>
@@ -193,7 +196,10 @@ const handleFocus = () => {
         Searching...
       </div>
 
-      <div v-else-if="options.length === 0" class="py-6 text-center text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">
+      <div
+        v-else-if="options.length === 0"
+        class="py-6 text-center text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+      >
         No results found.
       </div>
 
@@ -207,7 +213,9 @@ const handleFocus = () => {
           focusedIndex === index
             ? 'bg-[var(--color-neutral-50)] text-[var(--color-neutral-900)] border-[var(--color-primary-500)]'
             : 'text-[var(--color-neutral-700)] border-transparent',
-          selectedOption?.value === option.value ? 'bg-[var(--color-primary-50)]/50 text-[var(--color-primary-600)] font-bold' : '',
+          selectedOption?.value === option.value
+            ? 'bg-[var(--color-primary-50)]/50 text-[var(--color-primary-600)] font-bold'
+            : '',
         ]"
         @mouseenter="focusedIndex = index"
         @click="handleSelect(option)"

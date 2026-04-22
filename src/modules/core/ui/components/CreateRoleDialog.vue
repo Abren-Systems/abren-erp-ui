@@ -56,14 +56,19 @@ function togglePermission(code: string) {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[600px] max-h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-2xl rounded-sm">
+    <DialogContent
+      class="sm:max-w-[600px] max-h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-2xl rounded-sm"
+    >
       <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
         <div class="flex items-center gap-4">
           <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
             <ShieldCheck class="h-5 w-5 text-[var(--color-primary-600)]" />
           </div>
           <div>
-            <DialogTitle class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs">Define Boundary</DialogTitle>
+            <DialogTitle
+              class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs"
+              >Define Boundary</DialogTitle
+            >
             <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
               Construct a new identity boundary by aggregating granular system permissions.
             </DialogDescription>
@@ -87,8 +92,13 @@ function togglePermission(code: string) {
         />
 
         <div class="space-y-3">
-          <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">System Permissions</label>
-          <div class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto border border-[var(--color-neutral-200)] rounded-sm p-4 bg-[var(--color-neutral-50)]/50">
+          <label
+            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+            >System Permissions</label
+          >
+          <div
+            class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto border border-[var(--color-neutral-200)] rounded-sm p-4 bg-[var(--color-neutral-50)]/50"
+          >
             <div
               v-for="perm in permissions"
               :key="perm.code"

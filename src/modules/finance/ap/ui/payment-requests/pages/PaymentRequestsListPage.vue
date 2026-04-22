@@ -71,7 +71,11 @@ function handleCreate() {
             <Clock :size="20" />
           </div>
           <div>
-            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Submitted</p>
+            <p
+              class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+            >
+              Submitted
+            </p>
             <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
               {{ isStatsLoading ? '—' : (stats?.submittedCount ?? 0) }}
             </h3>
@@ -85,7 +89,11 @@ function handleCreate() {
             <CheckCircle2 :size="20" />
           </div>
           <div>
-            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Approved</p>
+            <p
+              class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+            >
+              Approved
+            </p>
             <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
               {{ isStatsLoading ? '—' : (stats?.approvedCount ?? 0) }}
             </h3>
@@ -99,7 +107,11 @@ function handleCreate() {
             <AlertCircle :size="20" />
           </div>
           <div>
-            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Rejected</p>
+            <p
+              class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+            >
+              Rejected
+            </p>
             <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
               {{ isStatsLoading ? '—' : (stats?.rejectedCount ?? 0) }}
             </h3>
@@ -113,7 +125,11 @@ function handleCreate() {
             <Wallet :size="20" />
           </div>
           <div>
-            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Resolved</p>
+            <p
+              class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+            >
+              Resolved
+            </p>
             <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
               {{ isStatsLoading ? '—' : (stats?.paidCount ?? 0) }}
             </h3>

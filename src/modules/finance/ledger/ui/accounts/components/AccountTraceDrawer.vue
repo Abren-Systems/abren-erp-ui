@@ -37,36 +37,63 @@ const emit = defineEmits<{
     <div class="space-y-8">
       <!-- Account details summary -->
       <section>
-        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">
+        <h3
+          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+        >
           Account Profile
         </h3>
-        <div class="space-y-3 rounded-sm border border-[var(--color-neutral-200)] bg-white p-4 shadow-sm text-xs">
+        <div
+          class="space-y-3 rounded-sm border border-[var(--color-neutral-200)] bg-white p-4 shadow-sm text-xs"
+        >
           <div class="flex justify-between items-center">
-            <span class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]">Type</span>
+            <span
+              class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]"
+              >Type</span
+            >
             <span class="font-bold text-[var(--color-neutral-900)]">{{ account.type }}</span>
           </div>
-          <div class="flex justify-between items-center border-t border-[var(--color-neutral-100)] pt-3">
-            <span class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]">Status</span>
+          <div
+            class="flex justify-between items-center border-t border-[var(--color-neutral-100)] pt-3"
+          >
             <span
-              :class="account.isActive ? 'text-[var(--color-success-600)] bg-[var(--color-success-50)]' : 'text-[var(--color-neutral-400)] bg-[var(--color-neutral-50)]'"
+              class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]"
+              >Status</span
+            >
+            <span
+              :class="
+                account.isActive
+                  ? 'text-[var(--color-success-600)] bg-[var(--color-success-50)]'
+                  : 'text-[var(--color-neutral-400)] bg-[var(--color-neutral-50)]'
+              "
               class="font-bold px-2 py-0.5 rounded-full"
             >
               {{ account.isActive ? 'Active' : 'Inactive' }}
             </span>
           </div>
-          <div class="flex justify-between items-center border-t border-[var(--color-neutral-100)] pt-3">
-            <span class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]">Currency</span>
-            <span class="font-mono font-bold text-[var(--color-neutral-900)]">{{ account.currency ?? 'Multi-currency' }}</span>
+          <div
+            class="flex justify-between items-center border-t border-[var(--color-neutral-100)] pt-3"
+          >
+            <span
+              class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]"
+              >Currency</span
+            >
+            <span class="font-mono font-bold text-[var(--color-neutral-900)]">{{
+              account.currency ?? 'Multi-currency'
+            }}</span>
           </div>
         </div>
       </section>
 
       <!-- Recent postings placeholder -->
       <section>
-        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">
+        <h3
+          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
+        >
           Recent Postings
         </h3>
-        <div class="p-8 border border-dashed border-[var(--color-neutral-300)] rounded-sm flex flex-col items-center justify-center text-center">
+        <div
+          class="p-8 border border-dashed border-[var(--color-neutral-300)] rounded-sm flex flex-col items-center justify-center text-center"
+        >
           <p class="text-[11px] text-[var(--color-neutral-500)] font-medium">
             Transaction history for this account will be displayed here.
           </p>

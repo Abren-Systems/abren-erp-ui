@@ -43,7 +43,10 @@ function handleCancel() {
   <Dialog :open="open" @update:open="emit('update:open', $event)">
     <DialogContent class="sm:max-w-[425px] rounded-sm p-0 overflow-hidden border-0 shadow-2xl">
       <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
-        <DialogTitle class="text-[var(--color-danger-600)] font-bold uppercase tracking-widest text-xs">Reject Vendor Bill</DialogTitle>
+        <DialogTitle
+          class="text-[var(--color-danger-600)] font-bold uppercase tracking-widest text-xs"
+          >Reject Vendor Bill</DialogTitle
+        >
         <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
           This action will void the draft bill. It cannot be undone and will be logged.
         </DialogDescription>
@@ -51,7 +54,10 @@ function handleCancel() {
 
       <div class="p-6 space-y-4">
         <div class="space-y-1.5">
-          <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Rejection Reason *</label>
+          <label
+            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+            >Rejection Reason *</label
+          >
           <textarea
             id="reject-reason"
             v-model="reason"

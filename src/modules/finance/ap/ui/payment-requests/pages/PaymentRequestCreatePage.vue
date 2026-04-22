@@ -29,7 +29,9 @@ function goBack() {
 <template>
   <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Header -->
-    <div class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]">
+    <div
+      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+    >
       <div class="flex items-center gap-4">
         <AppButton variant="stealth" @click="goBack">
           <ArrowLeft :size="18" />
@@ -38,14 +40,22 @@ function goBack() {
           <CreditCard class="h-6 w-6 text-[var(--color-primary-600)]" />
         </div>
         <div>
-          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">New Payment Request</h1>
-          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Standalone request — accrual entry generated automatically on approval.</p>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
+            New Payment Request
+          </h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
+            Standalone request — accrual entry generated automatically on approval.
+          </p>
         </div>
       </div>
-      
+
       <div class="flex items-center gap-2">
         <form.Subscribe v-slot="state">
-          <AppButton variant="primary" :disabled="!state.canSubmit || state.isSubmitting" @click="form.handleSubmit">
+          <AppButton
+            variant="primary"
+            :disabled="!state.canSubmit || state.isSubmitting"
+            @click="form.handleSubmit"
+          >
             {{ state.isSubmitting ? 'Creating...' : 'Create Request' }}
           </AppButton>
         </form.Subscribe>
@@ -54,12 +64,16 @@ function goBack() {
 
     <div class="flex-1 overflow-y-auto p-8">
       <div class="max-w-4xl mx-auto space-y-8">
-
         <!-- Submission Error -->
-        <div v-if="submissionError" class="bg-[var(--color-danger-50)] border border-[var(--color-danger-200)] p-4 rounded-sm flex items-start gap-3 shadow-sm mb-6">
+        <div
+          v-if="submissionError"
+          class="bg-[var(--color-danger-50)] border border-[var(--color-danger-200)] p-4 rounded-sm flex items-start gap-3 shadow-sm mb-6"
+        >
           <AlertCircle class="h-5 w-5 text-[var(--color-danger-600)] shrink-0" />
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-danger-700)]">Error creating request</h3>
+            <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-danger-700)]">
+              Error creating request
+            </h3>
             <p class="text-xs text-[var(--color-danger-600)] mt-1">
               {{ submissionError.detail ?? 'An unexpected error occurred.' }}
             </p>
@@ -76,9 +90,15 @@ function goBack() {
           "
         >
           <!-- Request Metadata -->
-          <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)] border-b pb-4 -mx-6 px-6">Request Metadata</h2>
-            
+          <div
+            class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6"
+          >
+            <h2
+              class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)] border-b pb-4 -mx-6 px-6"
+            >
+              Request Metadata
+            </h2>
+
             <form.Field name="beneficiaryId">
               <template #default="{ field, state }">
                 <AppSelect
@@ -87,7 +107,7 @@ function goBack() {
                   required
                   :disabled="isLoadingUsers"
                   :error="state.meta.errors[0]"
-                  :options="users?.map(u => ({ label: u.email, value: u.id })) || []"
+                  :options="users?.map((u) => ({ label: u.email, value: u.id })) || []"
                   @update:model-value="(val) => field.handleChange(val as string)"
                 />
               </template>
@@ -101,7 +121,7 @@ function goBack() {
                     :model-value="field.state.value"
                     :options="[
                       { label: 'ETB - Ethiopian Birr', value: 'ETB' },
-                      { label: 'USD - US Dollar', value: 'USD' }
+                      { label: 'USD - US Dollar', value: 'USD' },
                     ]"
                     :error="state.meta.errors[0]"
                     @update:model-value="(val) => field.handleChange(val as string)"
@@ -138,9 +158,17 @@ function goBack() {
           </div>
 
           <!-- Line Items -->
-          <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6 overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b bg-[var(--color-neutral-50)]/30">
-              <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)]">Line Items</h3>
+          <div
+            class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6 overflow-hidden"
+          >
+            <div
+              class="flex items-center justify-between px-6 py-4 border-b bg-[var(--color-neutral-50)]/30"
+            >
+              <h3
+                class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)]"
+              >
+                Line Items
+              </h3>
               <form.Field name="lines">
                 <template #default="{ field }">
                   <AppButton
@@ -171,7 +199,9 @@ function goBack() {
                     class="space-y-6 relative border-b border-[var(--color-neutral-100)] pb-6 last:border-0 last:pb-0 pt-6"
                   >
                     <div class="flex items-center justify-between">
-                      <span class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] bg-[var(--color-neutral-50)] px-2 py-0.5 rounded-sm">
+                      <span
+                        class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] bg-[var(--color-neutral-50)] px-2 py-0.5 rounded-sm"
+                      >
                         Line #{{ (idx as number) + 1 }}
                       </span>
                       <AppButton
@@ -204,12 +234,18 @@ function goBack() {
                       <form.Field :name="`lines[${idx}].accountId`" :index="idx">
                         <template #default="{ field: lf, state: ls }">
                           <div class="col-span-12 md:col-span-4 space-y-1.5">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">GL Account *</label>
+                            <label
+                              class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+                              >GL Account *</label
+                            >
                             <SelectLedgerAccount
                               :model-value="lf.state.value"
                               @update:model-value="(val) => lf.handleChange(val)"
                             />
-                            <p v-if="ls.meta.errors.length" class="text-[10px] text-[var(--color-danger-600)]">
+                            <p
+                              v-if="ls.meta.errors.length"
+                              class="text-[10px] text-[var(--color-danger-600)]"
+                            >
                               {{ ls.meta.errors[0] }}
                             </p>
                           </div>

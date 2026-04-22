@@ -48,26 +48,11 @@ async function handleSubmit() {
     @update:open="emit('update:open', $event)"
   >
     <form class="space-y-6" @submit.prevent="handleSubmit">
-      <AppInput
-        label="Period Name"
-        v-model="form.name"
-        placeholder="e.g. FY 2026 Q1"
-        required
-      />
+      <AppInput label="Period Name" v-model="form.name" placeholder="e.g. FY 2026 Q1" required />
 
       <div class="grid grid-cols-2 gap-4">
-        <AppInput
-          label="Start Date"
-          type="date"
-          v-model="form.start_date"
-          required
-        />
-        <AppInput
-          label="End Date"
-          type="date"
-          v-model="form.end_date"
-          required
-        />
+        <AppInput label="Start Date" type="date" v-model="form.start_date" required />
+        <AppInput label="End Date" type="date" v-model="form.end_date" required />
       </div>
 
       <div class="flex justify-end gap-3 pt-6 border-t">

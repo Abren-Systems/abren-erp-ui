@@ -74,7 +74,9 @@ function goBack() {
 
   <div v-else-if="bill" class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- ── Header / Action Surface ──────────────────────────── -->
-    <div class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]">
+    <div
+      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+    >
       <div class="flex items-center gap-4">
         <AppButton variant="stealth" @click="goBack">
           <ArrowLeft :size="18" />
@@ -84,7 +86,9 @@ function goBack() {
         </div>
         <div>
           <div class="flex items-center gap-3">
-            <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">Vendor Bill</h1>
+            <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
+              Vendor Bill
+            </h1>
             <AppBadge :variant="STATUS_VARIANT[bill.status] || 'neutral'">
               {{ bill.status }}
             </AppBadge>
@@ -146,20 +150,44 @@ function goBack() {
         <!-- Metadata summary -->
         <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
           <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Total Amount</p>
-            <p class="mt-2 text-2xl font-bold tabular-nums text-[var(--color-neutral-900)]">{{ bill.totalAmount.format() }}</p>
+            <p
+              class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+            >
+              Total Amount
+            </p>
+            <p class="mt-2 text-2xl font-bold tabular-nums text-[var(--color-neutral-900)]">
+              {{ bill.totalAmount.format() }}
+            </p>
           </div>
           <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Bill Number</p>
-            <p class="mt-2 font-mono text-xl font-bold text-[var(--color-primary-700)]">{{ bill.billNumber }}</p>
+            <p
+              class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+            >
+              Bill Number
+            </p>
+            <p class="mt-2 font-mono text-xl font-bold text-[var(--color-primary-700)]">
+              {{ bill.billNumber }}
+            </p>
           </div>
           <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Date Issued</p>
-            <p class="mt-2 text-lg font-bold text-[var(--color-neutral-900)]">{{ bill.issueDate.toLocaleDateString() }}</p>
+            <p
+              class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+            >
+              Date Issued
+            </p>
+            <p class="mt-2 text-lg font-bold text-[var(--color-neutral-900)]">
+              {{ bill.issueDate.toLocaleDateString() }}
+            </p>
           </div>
           <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Vendor ID</p>
-            <code class="mt-2 block text-xs font-mono text-[var(--color-neutral-700)] bg-[var(--color-neutral-50)] px-2 py-1 rounded-sm border border-[var(--color-neutral-100)] truncate">
+            <p
+              class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+            >
+              Vendor ID
+            </p>
+            <code
+              class="mt-2 block text-xs font-mono text-[var(--color-neutral-700)] bg-[var(--color-neutral-50)] px-2 py-1 rounded-sm border border-[var(--color-neutral-100)] truncate"
+            >
               {{ bill.vendorId }}
             </code>
           </div>
@@ -167,21 +195,47 @@ function goBack() {
 
         <!-- Justification -->
         <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
-          <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)] mb-2">Justification</p>
-          <p class="text-sm leading-relaxed text-[var(--color-neutral-800)]">{{ bill.justification }}</p>
+          <p
+            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)] mb-2"
+          >
+            Justification
+          </p>
+          <p class="text-sm leading-relaxed text-[var(--color-neutral-800)]">
+            {{ bill.justification }}
+          </p>
         </div>
 
         <!-- Expense Lines -->
         <div class="space-y-4">
-          <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Expense Lines</h2>
-          <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm overflow-hidden">
+          <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">
+            Expense Lines
+          </h2>
+          <div
+            class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
+          >
             <table class="w-full text-xs border-collapse">
               <thead>
                 <tr class="bg-[var(--color-neutral-50)] border-b border-[var(--color-neutral-200)]">
-                  <th class="px-4 py-3 text-left font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Description</th>
-                  <th class="px-4 py-3 text-right font-bold uppercase tracking-widest text-[var(--color-neutral-500)] tabular-nums">Amount</th>
-                  <th class="px-4 py-3 text-left font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">GL Account</th>
-                  <th class="px-4 py-3 text-left font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Category</th>
+                  <th
+                    class="px-4 py-3 text-left font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+                  >
+                    Description
+                  </th>
+                  <th
+                    class="px-4 py-3 text-right font-bold uppercase tracking-widest text-[var(--color-neutral-500)] tabular-nums"
+                  >
+                    Amount
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+                  >
+                    GL Account
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+                  >
+                    Category
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[var(--color-neutral-100)]">
@@ -191,7 +245,9 @@ function goBack() {
                   class="hover:bg-[var(--color-neutral-50)]/50 transition-colors"
                 >
                   <td class="px-4 py-3 text-[var(--color-neutral-800)]">{{ line.description }}</td>
-                  <td class="px-4 py-3 text-right tabular-nums font-bold text-[var(--color-neutral-900)]">
+                  <td
+                    class="px-4 py-3 text-right tabular-nums font-bold text-[var(--color-neutral-900)]"
+                  >
                     {{ line.amount.format() }}
                   </td>
                   <td class="px-4 py-3 font-mono text-[var(--color-neutral-500)]">
@@ -203,9 +259,13 @@ function goBack() {
                 </tr>
               </tbody>
               <tfoot>
-                <tr class="bg-[var(--color-neutral-50)]/30 border-t border-[var(--color-neutral-200)] font-bold">
+                <tr
+                  class="bg-[var(--color-neutral-50)]/30 border-t border-[var(--color-neutral-200)] font-bold"
+                >
                   <td class="px-4 py-4 text-[var(--color-neutral-600)]">Total Bill Value</td>
-                  <td class="px-4 py-4 text-right tabular-nums text-lg text-[var(--color-primary-700)]">
+                  <td
+                    class="px-4 py-4 text-right tabular-nums text-lg text-[var(--color-primary-700)]"
+                  >
                     {{ bill.totalAmount.format() }}
                   </td>
                   <td colspan="2" />

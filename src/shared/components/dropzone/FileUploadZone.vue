@@ -131,7 +131,9 @@ onUnmounted(() => {
           <p class="truncate text-xs font-bold text-[var(--color-neutral-900)]">
             {{ selectedFile.name }}
           </p>
-          <p class="text-[10px] font-mono text-[var(--color-neutral-500)]">{{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
+          <p class="text-[10px] font-mono text-[var(--color-neutral-500)]">
+            {{ (selectedFile.size / 1024).toFixed(1) }} KB
+          </p>
         </div>
       </div>
       <AppButton
@@ -143,7 +145,10 @@ onUnmounted(() => {
       </AppButton>
     </div>
 
-    <p v-if="errorMsg" class="mt-2 text-[10px] font-bold uppercase text-[var(--color-danger-600)] tracking-tight">
+    <p
+      v-if="errorMsg"
+      class="mt-2 text-[10px] font-bold uppercase text-[var(--color-danger-600)] tracking-tight"
+    >
       {{ errorMsg }}
     </p>
   </div>

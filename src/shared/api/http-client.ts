@@ -28,7 +28,7 @@ export interface ApiFieldError {
 export class ApiError extends Error {
   success: false
   code: string
-  details?: ApiFieldError[]
+  details?: ApiFieldError[] | undefined
 
   constructor(message: string, code: string = 'UNKNOWN_ERROR', details?: ApiFieldError[]) {
     super(message)
