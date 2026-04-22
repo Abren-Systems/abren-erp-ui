@@ -17,21 +17,16 @@ import type {
 
 export type PaymentRequestStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PAID'
 
-export namespace PaymentRequestStatus {
-  export const isFinal = (status: PaymentRequestStatus): boolean =>
-    status === 'PAID' || status === 'REJECTED'
+export const PaymentRequestStatus = {
+  isFinal: (status: PaymentRequestStatus): boolean => status === 'PAID' || status === 'REJECTED',
 
-  export const isApproved = (status: PaymentRequestStatus): boolean =>
-    status === 'APPROVED' || status === 'PAID'
+  isApproved: (status: PaymentRequestStatus): boolean => status === 'APPROVED' || status === 'PAID',
 
-  export const isEditable = (status: PaymentRequestStatus): boolean => status === 'DRAFT'
+  isEditable: (status: PaymentRequestStatus): boolean => status === 'DRAFT',
 
-  export const canTransitionTo = (
-    current: PaymentRequestStatus,
-    target: PaymentRequestStatus,
-  ): boolean => {
+  canTransitionTo: (current: PaymentRequestStatus, target: PaymentRequestStatus): boolean => {
     if (current === target) return true
-    if (isFinal(current)) return false
+    if (PaymentRequestStatus.isFinal(current)) return false
 
     const transitions: Record<PaymentRequestStatus, PaymentRequestStatus[]> = {
       DRAFT: ['SUBMITTED'],
@@ -42,8 +37,8 @@ export namespace PaymentRequestStatus {
     }
 
     return transitions[current].includes(target)
-  }
-}
+  },
+} as const
 
 export interface PaymentRequestLine {
   id: PaymentRequestLineId // Line IDs are now branded for full type purity
@@ -77,11 +72,10 @@ export interface PaymentRequest {
 
 export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID'
 
-export namespace VendorBillStatus {
-  export const isPaid = (status: VendorBillStatus): boolean => status === 'PAID'
-  export const isValidated = (status: VendorBillStatus): boolean =>
-    status === 'VALIDATED' || status === 'PAID'
-}
+export const VendorBillStatus = {
+  isPaid: (status: VendorBillStatus): boolean => status === 'PAID',
+  isValidated: (status: VendorBillStatus): boolean => status === 'VALIDATED' || status === 'PAID',
+} as const
 
 export interface VendorBillLine {
   id?: VendorBillLineId | undefined
