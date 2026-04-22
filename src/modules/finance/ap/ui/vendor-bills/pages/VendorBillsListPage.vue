@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { Button } from '@/shared/components/button'
+import { AppButton } from '@/shared/components/primitives'
 import { Plus } from 'lucide-vue-next'
 import { vendorBillColumns } from '../grids/vendor-bill.grid'
 import { useVendorBills } from '../../../application/composables/useVendorBills'
@@ -32,19 +32,35 @@ function handleCreate() {
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-5">
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Page Header -->
-    <div class="flex shrink-0 items-start justify-between">
-      <div>
-        <h1 class="m-0 text-heading text-[var(--color-grid-text)]">Vendor Bills</h1>
-        <p class="mt-1 text-body-sm text-[var(--color-grid-text-muted)]">
-          Manage inbound supplier invoices and AP accruals.
-        </p>
+    <div class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]">
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <FileText class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">Vendor Bills</h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
+            Manage inbound supplier invoices and AP accruals.
+          </p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <AppButton 
+          v-if="hasPermission('ap:create')"
+          variant="primary"
+          @click="handleCreate"
+        >
+          <Plus :size="14" class="mr-2" />
+          New Bill
+        </AppButton>
       </div>
     </div>
 
-    <!-- DataGrid: Maximum Density Queue -->
-    <div class="min-h-0 flex-1">
+    <!-- DataGrid Orchestration -->
+    <div class="min-h-0 flex-1 p-8">
       <DataGrid
         v-model:sorting="sorting"
         v-model:row-selection="rowSelection"
@@ -53,22 +69,9 @@ function handleCreate() {
         :data="bills ?? []"
         :columns="vendorBillColumns"
         :loading="isLoading"
-        placeholder="Search vendor bills…"
-        row-clickable
+        placeholder="Search vendor bills..."
         @row-click="handleRowClick"
-      >
-        <template #toolbar>
-          <Button
-            v-if="hasPermission('ap:create')"
-            size="sm"
-            class="h-[26px] px-2.5 text-xs"
-            @click="handleCreate"
-          >
-            <Plus :size="13" class="mr-1" />
-            New Bill
-          </Button>
-        </template>
-      </DataGrid>
+      />
     </div>
   </div>
 </template>

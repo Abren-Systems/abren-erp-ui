@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { TaxRule } from '../../../domain/tax.types'
-import { Badge } from '@/shared/components/badge'
+import { AppBadge } from '@/shared/components/primitives'
 
 /**
  * Grid definition for Tax Rules.
@@ -18,7 +18,7 @@ export const taxRuleColumns: ColumnDef<TaxRule>[] = [
     header: 'Type',
     cell: ({ row }) => {
       const type = row.getValue('taxType') as string
-      return h(Badge, { variant: type === 'VAT' ? 'default' : 'secondary' }, () => type)
+      return h(AppBadge, { variant: type === 'VAT' ? 'primary' : 'neutral' }, () => type)
     },
   },
   {
@@ -26,11 +26,11 @@ export const taxRuleColumns: ColumnDef<TaxRule>[] = [
     header: 'Direction',
     cell: ({ row }) => {
       const direction = row.getValue('direction') as string
-      let variant: 'default' | 'secondary' | 'outline' = 'outline'
-      if (direction === 'INPUT') variant = 'default'
-      if (direction === 'OUTPUT') variant = 'secondary'
+      let variant: 'primary' | 'success' | 'neutral' = 'neutral'
+      if (direction === 'INPUT') variant = 'success'
+      if (direction === 'OUTPUT') variant = 'primary'
 
-      return h(Badge, { variant }, () => direction)
+      return h(AppBadge, { variant }, () => direction)
     },
   },
   {
@@ -51,7 +51,7 @@ export const taxRuleColumns: ColumnDef<TaxRule>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const isActive = row.getValue('isActive') as boolean
-      return h(Badge, { variant: isActive ? 'outline' : 'destructive' }, () =>
+      return h(AppBadge, { variant: isActive ? 'success' : 'danger' }, () =>
         isActive ? 'Active' : 'Inactive',
       )
     },

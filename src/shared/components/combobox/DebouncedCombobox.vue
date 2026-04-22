@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T">
 import { ref, watch, onMounted, computed, onBeforeUnmount } from 'vue'
-import { Input } from '@/shared/components/input'
+import { AppInput } from '@/shared/components/primitives'
 import { Check, ChevronDown, Loader2 } from 'lucide-vue-next'
 
 export interface ComboboxOption {
@@ -36,7 +36,7 @@ const selectedOption = ref<ComboboxOption | null>(null)
 const focusedIndex = ref(-1)
 
 const containerRef = ref<HTMLElement | null>(null)
-const inputRef = ref<HTMLInputElement | null>(null)
+const inputRef = ref<InstanceType<typeof AppInput> | null>(null)
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -77,8 +77,6 @@ watch(
       searchQuery.value = found.label
     } else {
       // If not found in current options (e.g. initial load), we might need an initial fetch
-      // For simplicity, we just set the query to the ID if we don't know the label yet.
-      // In a full implementation, `fetchById` might be passed as well.
       searchQuery.value = newVal
     }
   },
@@ -159,12 +157,11 @@ const handleFocus = () => {
 <template>
   <div class="relative w-full" ref="containerRef">
     <div class="relative flex items-center">
-      <Input
+      <AppInput
         ref="inputRef"
         v-model="searchQuery"
         type="text"
         :placeholder="placeholder ?? 'Search...'"
-        :aria-label="ariaLabel"
         :disabled="disabled"
         class="w-full pr-8"
         @focus="handleFocus"
@@ -175,28 +172,28 @@ const handleFocus = () => {
         type="button"
         tabindex="-1"
         :disabled="disabled"
-        class="absolute right-0 top-0 flex h-full w-8 items-center justify-center text-neutral-400 hover:text-neutral-600 disabled:opacity-50"
+        class="absolute right-0 top-[1.5rem] flex h-[32px] w-8 items-center justify-center text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] disabled:opacity-50"
         @click="isOpen ? close() : open()"
       >
-        <Loader2 v-if="isLoading" class="h-4 w-4 animate-spin text-neutral-500" />
-        <ChevronDown v-else class="h-4 w-4" />
+        <Loader2 v-if="isLoading" class="h-3.5 w-3.5 animate-spin text-[var(--color-neutral-500)]" />
+        <ChevronDown v-else class="h-3.5 w-3.5" />
       </button>
     </div>
 
     <!-- Dropdown Panel -->
     <div
       v-if="isOpen"
-      class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-neutral-200 bg-white py-1 shadow-lg shadow-black/5 dark:border-neutral-800 dark:bg-neutral-950"
+      class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-sm border border-[var(--color-neutral-200)] bg-white py-1 shadow-2xl"
       role="listbox"
     >
       <div
         v-if="isLoading && options.length === 0"
-        class="py-6 text-center text-sm text-neutral-500"
+        class="py-6 text-center text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
       >
         Searching...
       </div>
 
-      <div v-else-if="options.length === 0" class="py-6 text-center text-sm text-neutral-500">
+      <div v-else-if="options.length === 0" class="py-6 text-center text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">
         No results found.
       </div>
 
@@ -205,12 +202,12 @@ const handleFocus = () => {
         :key="option.value"
         role="option"
         :aria-selected="selectedOption?.value === option.value"
-        class="relative flex cursor-default select-none items-center py-2 px-3 text-sm outline-none transition-colors"
+        class="relative flex cursor-default select-none items-center py-2 px-3 text-xs outline-none transition-colors border-l-2"
         :class="[
           focusedIndex === index
-            ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800'
-            : 'text-neutral-700 dark:text-neutral-300',
-          selectedOption?.value === option.value ? 'bg-blue-50/50 text-blue-600 font-medium' : '',
+            ? 'bg-[var(--color-neutral-50)] text-[var(--color-neutral-900)] border-[var(--color-primary-500)]'
+            : 'text-[var(--color-neutral-700)] border-transparent',
+          selectedOption?.value === option.value ? 'bg-[var(--color-primary-50)]/50 text-[var(--color-primary-600)] font-bold' : '',
         ]"
         @mouseenter="focusedIndex = index"
         @click="handleSelect(option)"
@@ -219,20 +216,16 @@ const handleFocus = () => {
           {{ option.label }}
           <span
             v-if="option.description"
-            class="ml-2 text-xs text-neutral-400 font-mono hidden sm:inline"
+            class="ml-2 text-[10px] text-[var(--color-neutral-400)] font-mono hidden sm:inline"
           >
             {{ option.description }}
           </span>
         </div>
         <Check
           v-if="selectedOption?.value === option.value"
-          class="ml-2 h-4 w-4 shrink-0 text-blue-600"
+          class="ml-2 h-3.5 w-3.5 shrink-0 text-[var(--color-primary-600)]"
         />
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Optional styling to ensure z-index context works inside grid lines */
-</style>

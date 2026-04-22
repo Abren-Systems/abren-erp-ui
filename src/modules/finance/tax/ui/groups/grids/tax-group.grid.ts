@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { TaxGroup } from '../../../domain/tax.types'
-import { Badge } from '@/shared/components/badge'
+import { AppBadge } from '@/shared/components/primitives'
 
 /**
  * Grid definition for Tax Groups.
@@ -17,7 +17,7 @@ export const taxGroupColumns: ColumnDef<TaxGroup>[] = [
     header: 'Calculation Method',
     cell: ({ row }) => {
       const method = row.getValue('method') as string
-      return h(Badge, { variant: method === 'COMPOUND' ? 'default' : 'secondary' }, () => method)
+      return h(AppBadge, { variant: method === 'COMPOUND' ? 'primary' : 'neutral' }, () => method)
     },
   },
   {
@@ -33,7 +33,7 @@ export const taxGroupColumns: ColumnDef<TaxGroup>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const isActive = row.getValue('isActive') as boolean
-      return h(Badge, { variant: isActive ? 'outline' : 'destructive' }, () =>
+      return h(AppBadge, { variant: isActive ? 'success' : 'danger' }, () =>
         isActive ? 'Active' : 'Inactive',
       )
     },

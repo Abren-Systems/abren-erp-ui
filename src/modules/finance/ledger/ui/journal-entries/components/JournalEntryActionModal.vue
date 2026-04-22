@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button } from '@/shared/components/button'
-import { Input } from '@/shared/components/input'
-import { Label } from '@/shared/components/label'
+import { AppButton, AppInput } from '@/shared/components/primitives'
 import {
   Dialog,
   DialogContent,
@@ -46,34 +44,31 @@ function handleCancel() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle class="text-destructive">Void Journal Entry</DialogTitle>
-        <DialogDescription>
+    <DialogContent class="sm:max-w-[425px] rounded-sm p-0 overflow-hidden border-0 shadow-2xl">
+      <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
+        <DialogTitle class="text-[var(--color-danger-600)] font-bold uppercase tracking-widest text-xs">Void Journal Entry</DialogTitle>
+        <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
           You are about to void
-          <span class="font-semibold">{{ entryNumber }}</span
-          >. This action is irreversible and will be recorded in the audit trail.
+          <span class="font-bold text-[var(--color-neutral-900)]">{{ entryNumber }}</span>.
+          This action is irreversible and will be recorded in the audit trail.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="grid gap-2 py-4">
-        <Label for="void-reason"> Reason <span class="text-destructive">*</span> </Label>
-        <Input
-          id="void-reason"
+      <div class="p-6 space-y-4">
+        <AppInput
+          label="Voiding Reason"
           v-model="reason"
           placeholder="e.g. Duplicate entry, incorrect amount"
-          autocomplete="off"
+          required
+          description="This reason will be permanently attached to the audit log."
         />
-        <p class="text-xs text-neutral-500">
-          This reason will be permanently attached to the audit log.
-        </p>
       </div>
 
-      <DialogFooter>
-        <Button variant="outline" @click="handleCancel">Cancel</Button>
-        <Button variant="destructive" :disabled="!reason.trim()" @click="handleConfirm">
+      <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
+        <AppButton variant="outline" @click="handleCancel">Cancel</AppButton>
+        <AppButton variant="danger" :disabled="!reason.trim()" @click="handleConfirm">
           Void Entry
-        </Button>
+        </AppButton>
       </DialogFooter>
     </DialogContent>
   </Dialog>

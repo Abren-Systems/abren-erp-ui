@@ -2,7 +2,6 @@
 import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
-import { Card, CardContent } from '@/shared/components/card'
 import { Plus, Clock, CheckCircle2, AlertCircle, Wallet, Inbox } from 'lucide-vue-next'
 import { paymentRequestColumns } from '../grids/payment-request.grid'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
@@ -66,85 +65,61 @@ function handleCreate() {
 
     <!-- Operational Inlet (In-Queue Summary) -->
     <div class="grid grid-cols-1 gap-4 md:grid-cols-4 shrink-0 p-8 pb-4">
-      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
-        <CardContent class="p-4">
-          <div class="flex items-center gap-4">
-            <div class="rounded-sm bg-orange-50 p-2 text-orange-600 border border-orange-100">
-              <Clock :size="20" />
-            </div>
-            <div>
-              <p
-                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
-              >
-                Submitted
-              </p>
-              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
-                {{ isStatsLoading ? '—' : (stats?.submittedCount ?? 0) }}
-              </h3>
-            </div>
+      <div class="bg-white border border-[var(--color-neutral-200)] shadow-sm p-4 rounded-sm">
+        <div class="flex items-center gap-4">
+          <div class="rounded-sm bg-orange-50 p-2 text-orange-600 border border-orange-100">
+            <Clock :size="20" />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Submitted</p>
+            <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
+              {{ isStatsLoading ? '—' : (stats?.submittedCount ?? 0) }}
+            </h3>
+          </div>
+        </div>
+      </div>
 
-      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
-        <CardContent class="p-4">
-          <div class="flex items-center gap-4">
-            <div class="rounded-sm bg-blue-50 p-2 text-blue-600 border border-blue-100">
-              <CheckCircle2 :size="20" />
-            </div>
-            <div>
-              <p
-                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
-              >
-                Approved
-              </p>
-              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
-                {{ isStatsLoading ? '—' : (stats?.approvedCount ?? 0) }}
-              </h3>
-            </div>
+      <div class="bg-white border border-[var(--color-neutral-200)] shadow-sm p-4 rounded-sm">
+        <div class="flex items-center gap-4">
+          <div class="rounded-sm bg-blue-50 p-2 text-blue-600 border border-blue-100">
+            <CheckCircle2 :size="20" />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Approved</p>
+            <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
+              {{ isStatsLoading ? '—' : (stats?.approvedCount ?? 0) }}
+            </h3>
+          </div>
+        </div>
+      </div>
 
-      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
-        <CardContent class="p-4">
-          <div class="flex items-center gap-4">
-            <div class="rounded-sm bg-red-50 p-2 text-red-600 border border-red-100">
-              <AlertCircle :size="20" />
-            </div>
-            <div>
-              <p
-                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
-              >
-                Rejected
-              </p>
-              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
-                {{ isStatsLoading ? '—' : (stats?.rejectedCount ?? 0) }}
-              </h3>
-            </div>
+      <div class="bg-white border border-[var(--color-neutral-200)] shadow-sm p-4 rounded-sm">
+        <div class="flex items-center gap-4">
+          <div class="rounded-sm bg-red-50 p-2 text-red-600 border border-red-100">
+            <AlertCircle :size="20" />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Rejected</p>
+            <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
+              {{ isStatsLoading ? '—' : (stats?.rejectedCount ?? 0) }}
+            </h3>
+          </div>
+        </div>
+      </div>
 
-      <Card class="border-[var(--color-neutral-200)] shadow-sm bg-white">
-        <CardContent class="p-4">
-          <div class="flex items-center gap-4">
-            <div class="rounded-sm bg-green-50 p-2 text-green-600 border border-green-100">
-              <Wallet :size="20" />
-            </div>
-            <div>
-              <p
-                class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
-              >
-                Resolved
-              </p>
-              <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
-                {{ isStatsLoading ? '—' : (stats?.paidCount ?? 0) }}
-              </h3>
-            </div>
+      <div class="bg-white border border-[var(--color-neutral-200)] shadow-sm p-4 rounded-sm">
+        <div class="flex items-center gap-4">
+          <div class="rounded-sm bg-green-50 p-2 text-green-600 border border-green-100">
+            <Wallet :size="20" />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">Resolved</p>
+            <h3 class="text-2xl font-bold tabular-nums text-[var(--color-neutral-900)] mt-0.5">
+              {{ isStatsLoading ? '—' : (stats?.paidCount ?? 0) }}
+            </h3>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Main Operational Queue (Max Density) -->

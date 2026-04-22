@@ -2,17 +2,7 @@
 import { useLedgerSettings } from '../../../application/composables/useLedgerSettings'
 import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
 import { usePermissions } from '@/shared/auth/usePermissions'
-import { Button } from '@/shared/components/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/select'
-import { AlertCircle, ArrowRight } from 'lucide-vue-next'
-import { Label } from '@/shared/components/label'
+import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { watch } from 'vue'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
@@ -60,50 +50,47 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-5">
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Page Header -->
-    <div class="flex shrink-0 items-start justify-between">
-      <div>
-        <h1 class="m-0 text-heading text-[var(--color-grid-text)]">Ledger Settings</h1>
-        <p class="mt-1 text-body-sm text-[var(--color-grid-text-muted)]">
-          Configure global reconciliation and subledger accounts.
-        </p>
+    <div class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]">
+      <div class="flex items-center gap-4">
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <Settings2 class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">Ledger Settings</h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Configure global reconciliation and subledger accounts.</p>
+        </div>
+      </div>
+      
+      <div v-if="canEdit" class="flex items-center gap-2">
+        <AppButton variant="primary" :disabled="isLoading" @click="form.handleSubmit">
+          {{ isLoading ? 'Saving...' : 'Save Settings' }}
+        </AppButton>
       </div>
     </div>
 
     <!-- Settings Canvas -->
-    <div class="max-w-2xl">
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Mappings</CardTitle>
-          <CardDescription>
-            Configure global reconciliation and subledger accounts.
-          </CardDescription>
-        </CardHeader>
-        <CardContent class="grid gap-6">
+    <div class="flex-1 overflow-y-auto p-8">
+      <div class="max-w-2xl mx-auto space-y-8">
+        <div class="bg-white p-8 rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-8">
+          <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)] border-b pb-4 -mx-8 px-8">Account Mappings</h2>
+
           <template v-if="!isAccountsLoading && accounts && accounts.length === 0">
-            <div
-              class="bg-red-50 text-red-900 border border-red-200 rounded-md p-4 flex flex-col gap-3"
-            >
-              <div class="flex items-center gap-2 font-medium">
-                <AlertCircle class="h-4 w-4" />
+            <div class="bg-[var(--color-danger-50)] text-[var(--color-danger-900)] border border-[var(--color-danger-200)] rounded-sm p-6 space-y-4">
+              <div class="flex items-center gap-2 font-bold uppercase tracking-widest text-xs">
+                <AlertCircle :size="16" />
                 <span>Missing Prerequisites</span>
               </div>
-              <p class="text-sm text-red-800">
+              <p class="text-sm leading-relaxed">
                 Your Chart of Accounts must be established before you can configure ledger mappings.
                 Without accounts, the system cannot reconcile or accrue transactions.
               </p>
-              <div>
-                <router-link :to="{ name: 'LedgerCoa' }">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    class="mt-2 text-red-900 border-red-300 hover:bg-red-100"
-                  >
-                    Setup Chart of Accounts <ArrowRight :size="14" class="ml-2" />
-                  </Button>
-                </router-link>
-              </div>
+              <router-link :to="{ name: 'LedgerCoa' }" class="block">
+                <AppButton variant="outline" class="text-[var(--color-danger-900)] border-[var(--color-danger-300)] hover:bg-[var(--color-danger-100)]">
+                  Setup Chart of Accounts <ArrowRight :size="14" class="ml-2" />
+                </AppButton>
+              </router-link>
             </div>
           </template>
 
@@ -115,67 +102,36 @@ watch(
                 form.handleSubmit()
               }
             "
+            class="space-y-8"
           >
-            <div class="grid gap-6">
-              <form.Field name="default_bridge_account_id">
-                <template #default="{ field }">
-                  <div class="grid gap-2">
-                    <Label :for="field.name">Default Bridge Account</Label>
-                    <Select
-                      :model-value="field.state.value"
-                      :disabled="isLoading || !canEdit"
-                      @update:model-value="field.handleChange"
-                    >
-                      <SelectTrigger :id="field.name">
-                        <SelectValue placeholder="Select bridge account" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                          {{ acc.code }} - {{ acc.name }}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p class="text-sm text-neutral-500">
-                      Used for temporary holding during multi-step reconciliations.
-                    </p>
-                  </div>
-                </template>
-              </form.Field>
+            <form.Field name="default_bridge_account_id">
+              <template #default="{ field }">
+                <AppSelect
+                  label="Default Bridge Account"
+                  :model-value="field.state.value"
+                  :disabled="isLoading || !canEdit"
+                  :options="accounts?.map(acc => ({ label: `${acc.code} - ${acc.name}`, value: acc.id })) || []"
+                  description="Used for temporary holding during multi-step reconciliations."
+                  @update:model-value="field.handleChange"
+                />
+              </template>
+            </form.Field>
 
-              <form.Field name="pr_payable_account_id">
-                <template #default="{ field }">
-                  <div class="grid gap-2">
-                    <Label :for="field.name">PR Payable Account</Label>
-                    <Select
-                      :model-value="field.state.value"
-                      :disabled="isLoading || !canEdit"
-                      @update:model-value="field.handleChange"
-                    >
-                      <SelectTrigger :id="field.name">
-                        <SelectValue placeholder="Select payable account" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                          {{ acc.code }} - {{ acc.name }}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p class="text-sm text-neutral-500">
-                      Default liability account for Payment Request accruals.
-                    </p>
-                  </div>
-                </template>
-              </form.Field>
-
-              <div class="flex justify-end">
-                <Button v-if="canEdit" type="submit" :disabled="isLoading">
-                  {{ isLoading ? 'Saving…' : 'Save Settings' }}
-                </Button>
-              </div>
-            </div>
+            <form.Field name="pr_payable_account_id">
+              <template #default="{ field }">
+                <AppSelect
+                  label="PR Payable Account"
+                  :model-value="field.state.value"
+                  :disabled="isLoading || !canEdit"
+                  :options="accounts?.map(acc => ({ label: `${acc.code} - ${acc.name}`, value: acc.id })) || []"
+                  description="Default liability account for Payment Request accruals."
+                  @update:model-value="field.handleChange"
+                />
+              </template>
+            </form.Field>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   </div>
 </template>

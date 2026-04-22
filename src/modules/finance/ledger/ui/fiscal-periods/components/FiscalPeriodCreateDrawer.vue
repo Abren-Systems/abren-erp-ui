@@ -1,16 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button } from '@/shared/components/button'
-import { Input } from '@/shared/components/input'
-import { Label } from '@/shared/components/label'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-} from '@/shared/components/sheet'
+import { AppButton, AppInput, AppDrawer } from '@/shared/components/primitives'
 import { useFiscalPeriods } from '../../../application/composables/useFiscalPeriods'
 import { computed } from 'vue'
 
@@ -51,41 +41,43 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <Sheet :open="open" @update:open="emit('update:open', $event)">
-    <SheetContent class="sm:max-w-[400px]">
-      <SheetHeader>
-        <SheetTitle>New Fiscal Period</SheetTitle>
-        <SheetDescription>
-          Define a new timeframe for financial postings and ledger locking.
-        </SheetDescription>
-      </SheetHeader>
+  <AppDrawer
+    :open="open"
+    title="New Fiscal Period"
+    description="Define a new timeframe for financial postings and ledger locking."
+    @update:open="emit('update:open', $event)"
+  >
+    <form class="space-y-6" @submit.prevent="handleSubmit">
+      <AppInput
+        label="Period Name"
+        v-model="form.name"
+        placeholder="e.g. FY 2026 Q1"
+        required
+      />
 
-      <form class="py-6 space-y-5" @submit.prevent="handleSubmit">
-        <div class="grid gap-2">
-          <Label for="fp-name">Period Name <span class="text-destructive">*</span></Label>
-          <Input id="fp-name" v-model="form.name" placeholder="e.g. FY 2026 Q1" />
-        </div>
+      <div class="grid grid-cols-2 gap-4">
+        <AppInput
+          label="Start Date"
+          type="date"
+          v-model="form.start_date"
+          required
+        />
+        <AppInput
+          label="End Date"
+          type="date"
+          v-model="form.end_date"
+          required
+        />
+      </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div class="grid gap-2">
-            <Label for="fp-start">Start Date <span class="text-destructive">*</span></Label>
-            <Input id="fp-start" type="date" v-model="form.start_date" />
-          </div>
-          <div class="grid gap-2">
-            <Label for="fp-end">End Date <span class="text-destructive">*</span></Label>
-            <Input id="fp-end" type="date" v-model="form.end_date" />
-          </div>
-        </div>
-
-        <SheetFooter class="pt-6 border-t mt-6">
-          <Button variant="outline" type="button" @click="emit('update:open', false)">
-            Cancel
-          </Button>
-          <Button type="submit" :disabled="!isValid || isLoading">
-            {{ isLoading ? 'Creating…' : 'Create Period' }}
-          </Button>
-        </SheetFooter>
-      </form>
-    </SheetContent>
-  </Sheet>
+      <div class="flex justify-end gap-3 pt-6 border-t">
+        <AppButton variant="outline" type="button" @click="emit('update:open', false)">
+          Cancel
+        </AppButton>
+        <AppButton variant="primary" type="submit" :disabled="!isValid || isLoading">
+          {{ isLoading ? 'Creating...' : 'Create Period' }}
+        </AppButton>
+      </div>
+    </form>
+  </AppDrawer>
 </template>

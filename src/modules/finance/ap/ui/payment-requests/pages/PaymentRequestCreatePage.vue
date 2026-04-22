@@ -1,20 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
-import { Button } from '@/shared/components/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/select'
-import { Input } from '@/shared/components/input'
-import { Label } from '@/shared/components/label'
-import { Textarea } from '@/shared/components/textarea'
+import { AppButton, AppSelect, AppInput, AppTextarea } from '@/shared/components/primitives'
 import { useCreatePaymentRequest } from '../../../application/composables/useCreatePaymentRequest'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
-import { Trash2, Plus, AlertCircle } from 'lucide-vue-next'
+import { Trash2, Plus, AlertCircle, ArrowLeft, CreditCard } from 'lucide-vue-next'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import SelectLedgerAccount from '@/shared/components/finance/SelectLedgerAccount.vue'
 
@@ -38,253 +27,219 @@ function goBack() {
 </script>
 
 <template>
-  <div class="p-6 space-y-6 max-w-4xl mx-auto">
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Header -->
-    <div>
-      <button
-        class="mb-2 flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
-        @click="goBack"
-      >
-        ← Back to Requests
-      </button>
-      <h1 class="text-2xl font-bold tracking-tight">New Payment Request</h1>
-      <p class="text-sm text-neutral-500">
-        Standalone request — accrual entry generated automatically on approval.
-      </p>
-    </div>
-
-    <!-- Submission Error -->
-    <div
-      v-if="submissionError"
-      class="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700"
-    >
-      <AlertCircle class="mt-0.5 h-5 w-5 shrink-0" />
-      <div>
-        <h3 class="text-sm font-semibold">Error creating request</h3>
-        <p class="mt-1 text-sm">
-          {{ submissionError.detail ?? 'An unexpected error occurred.' }}
-        </p>
+    <div class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]">
+      <div class="flex items-center gap-4">
+        <AppButton variant="stealth" @click="goBack">
+          <ArrowLeft :size="18" />
+        </AppButton>
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <CreditCard class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">New Payment Request</h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Standalone request — accrual entry generated automatically on approval.</p>
+        </div>
       </div>
-    </div>
-
-    <form
-      class="space-y-6"
-      @submit.prevent="
-        (e) => {
-          ;(e as Event).stopPropagation()
-          form.handleSubmit()
-        }
-      "
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle>Request Details</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
-          <form.Field name="beneficiaryId">
-            <template #default="{ field, state }">
-              <div class="grid gap-1.5">
-                <Label :for="field.name">Beneficiary <span class="text-destructive">*</span></Label>
-                <Select
-                  :model-value="field.state.value"
-                  @update:model-value="(val) => field.handleChange(val as string)"
-                  :disabled="isLoadingUsers"
-                >
-                  <SelectTrigger :id="field.name">
-                    <SelectValue placeholder="Select payee..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem v-for="user in users" :key="user.id" :value="user.id">
-                      {{ user.email }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <p v-if="state.meta.errors.length" class="text-xs text-destructive">
-                  {{ state.meta.errors.join(', ') }}
-                </p>
-              </div>
-            </template>
-          </form.Field>
-
-          <div class="flex gap-4">
-            <form.Field name="currency">
-              <template #default="{ field }">
-                <div class="flex-1 grid gap-1.5">
-                  <Label :for="field.name">Currency</Label>
-                  <Select
-                    :model-value="field.state.value"
-                    @update:model-value="(val) => field.handleChange(val as string)"
-                  >
-                    <SelectTrigger :id="field.name">
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ETB">ETB — Ethiopian Birr</SelectItem>
-                      <SelectItem value="USD">USD — US Dollar</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </template>
-            </form.Field>
-
-            <form.Field name="bankAccountId">
-              <template #default="{ field }">
-                <div class="flex-1 grid gap-1.5">
-                  <Label :for="field.name">Bank Account (optional)</Label>
-                  <Input
-                    :id="field.name"
-                    :model-value="field.state.value ?? ''"
-                    placeholder="Leave blank for finance to assign"
-                    @update:model-value="(val) => field.handleChange((val as string) || null)"
-                  />
-                </div>
-              </template>
-            </form.Field>
-          </div>
-
-          <form.Field name="justification">
-            <template #default="{ field, state }">
-              <div class="grid gap-1.5">
-                <Label :for="field.name"
-                  >Justification <span class="text-destructive">*</span></Label
-                >
-                <Textarea
-                  :id="field.name"
-                  :model-value="field.state.value"
-                  rows="3"
-                  placeholder="Business justification reviewed by approvers…"
-                  @update:model-value="(val) => field.handleChange(val as string)"
-                />
-                <p v-if="state.meta.errors.length" class="text-xs text-destructive">
-                  {{ state.meta.errors.join(', ') }}
-                </p>
-              </div>
-            </template>
-          </form.Field>
-        </CardContent>
-      </Card>
-
-      <!-- Line Items -->
-      <Card>
-        <CardHeader>
-          <div class="flex items-center justify-between">
-            <CardTitle>Line Items</CardTitle>
-            <form.Field name="lines">
-              <template #default="{ field }">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  class="h-7 text-xs"
-                  @click="
-                    field.pushValue({
-                      description: '',
-                      amount: 0,
-                      accountId: '',
-                      categoryId: '',
-                      taxAmount: 0,
-                    })
-                  "
-                >
-                  <Plus class="mr-1 h-3 w-3" /> Add Line
-                </Button>
-              </template>
-            </form.Field>
-          </div>
-        </CardHeader>
-        <CardContent class="space-y-4">
-          <form.Field name="lines">
-            <template #default="{ field }">
-              <div
-                v-for="(_, idx) in field.state.value"
-                :key="idx"
-                class="space-y-3 rounded-lg border p-4"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">
-                    Line #{{ (idx as number) + 1 }}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    class="h-7 w-7 text-neutral-400 hover:text-destructive"
-                    :disabled="field.state.value.length === 1"
-                    @click="field.removeValue(idx)"
-                  >
-                    <Trash2 class="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-
-                <div class="grid grid-cols-12 gap-3">
-                  <form.Field
-                    :name="`lines[${idx}].description`"
-                    :index="idx"
-                    class="col-span-12 md:col-span-5"
-                  >
-                    <template #default="{ field: lf }">
-                      <div class="grid gap-1.5">
-                        <Label class="text-xs">Description *</Label>
-                        <Input
-                          size="sm"
-                          :model-value="lf.state.value"
-                          placeholder="e.g. Monthly Rent"
-                          @update:model-value="(val) => lf.handleChange(val as string)"
-                        />
-                      </div>
-                    </template>
-                  </form.Field>
-
-                  <form.Field
-                    :name="`lines[${idx}].accountId`"
-                    :index="idx"
-                    class="col-span-12 md:col-span-4"
-                  >
-                    <template #default="{ field: lf }">
-                      <div class="grid gap-1.5">
-                        <Label class="text-xs">GL Account *</Label>
-                        <SelectLedgerAccount
-                          :model-value="lf.state.value"
-                          @update:model-value="(val) => lf.handleChange(val)"
-                        />
-                      </div>
-                    </template>
-                  </form.Field>
-
-                  <form.Field
-                    :name="`lines[${idx}].amount`"
-                    :index="idx"
-                    class="col-span-12 md:col-span-3"
-                  >
-                    <template #default="{ field: lf }">
-                      <div class="grid gap-1.5">
-                        <Label class="text-xs">Amount *</Label>
-                        <Input
-                          size="sm"
-                          type="number"
-                          step="0.01"
-                          :model-value="lf.state.value"
-                          class="text-right tabular-nums"
-                          @update:model-value="(val) => lf.handleChange(Number(val))"
-                        />
-                      </div>
-                    </template>
-                  </form.Field>
-                </div>
-              </div>
-            </template>
-          </form.Field>
-        </CardContent>
-      </Card>
-
-      <div class="flex justify-end gap-3 pt-4">
-        <Button variant="outline" type="button" @click="goBack">Cancel</Button>
+      
+      <div class="flex items-center gap-2">
         <form.Subscribe v-slot="state">
-          <Button :disabled="!state.canSubmit || state.isSubmitting" type="submit">
-            {{ state.isSubmitting ? 'Creating…' : 'Create Request' }}
-          </Button>
+          <AppButton variant="primary" :disabled="!state.canSubmit || state.isSubmitting" @click="form.handleSubmit">
+            {{ state.isSubmitting ? 'Creating...' : 'Create Request' }}
+          </AppButton>
         </form.Subscribe>
       </div>
-    </form>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-8">
+      <div class="max-w-4xl mx-auto space-y-8">
+
+        <!-- Submission Error -->
+        <div v-if="submissionError" class="bg-[var(--color-danger-50)] border border-[var(--color-danger-200)] p-4 rounded-sm flex items-start gap-3 shadow-sm mb-6">
+          <AlertCircle class="h-5 w-5 text-[var(--color-danger-600)] shrink-0" />
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-danger-700)]">Error creating request</h3>
+            <p class="text-xs text-[var(--color-danger-600)] mt-1">
+              {{ submissionError.detail ?? 'An unexpected error occurred.' }}
+            </p>
+          </div>
+        </div>
+
+        <form
+          class="space-y-6"
+          @submit.prevent="
+            (e) => {
+              ;(e as Event).stopPropagation()
+              form.handleSubmit()
+            }
+          "
+        >
+          <!-- Request Metadata -->
+          <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)] border-b pb-4 -mx-6 px-6">Request Metadata</h2>
+            
+            <form.Field name="beneficiaryId">
+              <template #default="{ field, state }">
+                <AppSelect
+                  label="Beneficiary"
+                  :model-value="field.state.value"
+                  required
+                  :disabled="isLoadingUsers"
+                  :error="state.meta.errors[0]"
+                  :options="users?.map(u => ({ label: u.email, value: u.id })) || []"
+                  @update:model-value="(val) => field.handleChange(val as string)"
+                />
+              </template>
+            </form.Field>
+
+            <div class="grid grid-cols-2 gap-6">
+              <form.Field name="currency">
+                <template #default="{ field, state }">
+                  <AppSelect
+                    label="Currency"
+                    :model-value="field.state.value"
+                    :options="[
+                      { label: 'ETB - Ethiopian Birr', value: 'ETB' },
+                      { label: 'USD - US Dollar', value: 'USD' }
+                    ]"
+                    :error="state.meta.errors[0]"
+                    @update:model-value="(val) => field.handleChange(val as string)"
+                  />
+                </template>
+              </form.Field>
+
+              <form.Field name="bankAccountId">
+                <template #default="{ field, state }">
+                  <AppInput
+                    label="Bank Account (Optional)"
+                    :model-value="field.state.value ?? ''"
+                    placeholder="Leave blank for finance to assign"
+                    :error="state.meta.errors[0]"
+                    @update:model-value="(val) => field.handleChange((val as string) || null)"
+                  />
+                </template>
+              </form.Field>
+            </div>
+
+            <form.Field name="justification">
+              <template #default="{ field, state }">
+                <AppTextarea
+                  label="Justification"
+                  :model-value="field.state.value"
+                  placeholder="Business justification reviewed by approvers..."
+                  required
+                  :rows="3"
+                  :error="state.meta.errors[0]"
+                  @update:model-value="(val) => field.handleChange(val as string)"
+                />
+              </template>
+            </form.Field>
+          </div>
+
+          <!-- Line Items -->
+          <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6 overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b bg-[var(--color-neutral-50)]/30">
+              <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)]">Line Items</h3>
+              <form.Field name="lines">
+                <template #default="{ field }">
+                  <AppButton
+                    variant="outline"
+                    type="button"
+                    @click="
+                      field.pushValue({
+                        description: '',
+                        amount: 0,
+                        accountId: '',
+                        categoryId: '',
+                        taxAmount: 0,
+                      })
+                    "
+                  >
+                    <Plus :size="14" class="mr-2" /> Add Line
+                  </AppButton>
+                </template>
+              </form.Field>
+            </div>
+
+            <div class="p-6 pt-0 space-y-6">
+              <form.Field name="lines">
+                <template #default="{ field }">
+                  <div
+                    v-for="(_, idx) in field.state.value"
+                    :key="idx"
+                    class="space-y-6 relative border-b border-[var(--color-neutral-100)] pb-6 last:border-0 last:pb-0 pt-6"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] bg-[var(--color-neutral-50)] px-2 py-0.5 rounded-sm">
+                        Line #{{ (idx as number) + 1 }}
+                      </span>
+                      <AppButton
+                        variant="stealth"
+                        type="button"
+                        class="h-7 w-7 text-[var(--color-neutral-400)] hover:text-[var(--color-danger-600)]"
+                        :disabled="field.state.value.length === 1"
+                        @click="field.removeValue(idx)"
+                      >
+                        <Trash2 :size="14" />
+                      </AppButton>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-6">
+                      <form.Field :name="`lines[${idx}].description`" :index="idx">
+                        <template #default="{ field: lf, state: ls }">
+                          <div class="col-span-12 md:col-span-6">
+                            <AppInput
+                              label="Description"
+                              :model-value="lf.state.value"
+                              placeholder="e.g. Monthly Rent"
+                              required
+                              :error="ls.meta.errors[0]"
+                              @update:model-value="(val) => lf.handleChange(val as string)"
+                            />
+                          </div>
+                        </template>
+                      </form.Field>
+
+                      <form.Field :name="`lines[${idx}].accountId`" :index="idx">
+                        <template #default="{ field: lf, state: ls }">
+                          <div class="col-span-12 md:col-span-4 space-y-1.5">
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">GL Account *</label>
+                            <SelectLedgerAccount
+                              :model-value="lf.state.value"
+                              @update:model-value="(val) => lf.handleChange(val)"
+                            />
+                            <p v-if="ls.meta.errors.length" class="text-[10px] text-[var(--color-danger-600)]">
+                              {{ ls.meta.errors[0] }}
+                            </p>
+                          </div>
+                        </template>
+                      </form.Field>
+
+                      <form.Field :name="`lines[${idx}].amount`" :index="idx">
+                        <template #default="{ field: lf, state: ls }">
+                          <div class="col-span-12 md:col-span-2">
+                            <AppInput
+                              label="Amount"
+                              type="number"
+                              step="0.01"
+                              :model-value="lf.state.value"
+                              required
+                              :error="ls.meta.errors[0]"
+                              class="text-right tabular-nums"
+                              @update:model-value="(val) => lf.handleChange(Number(val))"
+                            />
+                          </div>
+                        </template>
+                      </form.Field>
+                    </div>
+                  </div>
+                </template>
+              </form.Field>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>

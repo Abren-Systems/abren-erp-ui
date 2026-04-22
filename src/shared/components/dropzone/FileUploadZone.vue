@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { UploadCloud, File, X } from 'lucide-vue-next'
-import { Button } from '@/shared/components/button'
+import { AppButton } from '@/shared/components/primitives'
 
 const props = defineProps<{
   accept?: string
@@ -16,6 +16,7 @@ const emit = defineEmits<{
 const isDragging = ref(false)
 const selectedFile = ref<File | null>(null)
 const errorMsg = ref('')
+const fileInput = ref<HTMLInputElement | null>(null)
 
 function handleDragEnter(e: DragEvent) {
   e.preventDefault()
@@ -84,17 +85,17 @@ onUnmounted(() => {
   <div class="w-full">
     <div
       v-if="!selectedFile"
-      class="relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors"
+      class="relative flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed p-8 transition-colors"
       :class="[
         isDragging
-          ? 'border-blue-500 bg-blue-50/50'
-          : 'border-neutral-300 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-900/50',
+          ? 'border-[var(--color-primary-500)] bg-[var(--color-primary-50)]/50'
+          : 'border-[var(--color-neutral-300)] bg-[var(--color-neutral-50)]/30 hover:bg-[var(--color-neutral-50)]/50 hover:border-[var(--color-neutral-400)]',
       ]"
       @dragenter="handleDragEnter"
       @dragover="handleDragEnter"
       @dragleave="handleDragLeave"
       @drop="handleDrop"
-      @click="$refs.fileInput.click()"
+      @click="fileInput?.click()"
     >
       <input
         ref="fileInput"
@@ -103,12 +104,14 @@ onUnmounted(() => {
         :accept="accept"
         @change="handleFileSelect"
       />
-      <UploadCloud class="mb-3 h-8 w-8 text-neutral-400" />
-      <p class="mb-1 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-        Click to upload or drag and drop
+      <div class="p-3 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm mb-4">
+        <UploadCloud class="h-6 w-6 text-[var(--color-primary-600)]" />
+      </div>
+      <p class="mb-1 text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-900)]">
+        Upload Document
       </p>
-      <p class="text-xs text-neutral-500">
-        {{ accept ? accept.split(',').join(', ') : 'Any file' }}
+      <p class="text-[10px] font-medium text-[var(--color-neutral-500)] uppercase tracking-tight">
+        Click or drag & drop {{ accept ? accept.split(',').join(', ') : 'files' }}
         {{ maxSizeMB ? `(up to ${maxSizeMB}MB)` : '' }}
       </p>
     </div>
@@ -116,32 +119,31 @@ onUnmounted(() => {
     <!-- Selected File Preview -->
     <div
       v-else
-      class="flex items-center justify-between rounded-lg border border-neutral-200 bg-neutral-50 p-3 pr-2 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
+      class="flex items-center justify-between rounded-sm border border-[var(--color-neutral-200)] bg-white p-3 pr-2 shadow-sm"
     >
       <div class="flex items-center space-x-3 overflow-hidden">
         <div
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-[var(--color-primary-50)] text-[var(--color-primary-600)]"
         >
           <File class="h-5 w-5" />
         </div>
         <div class="overflow-hidden">
-          <p class="truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
+          <p class="truncate text-xs font-bold text-[var(--color-neutral-900)]">
             {{ selectedFile.name }}
           </p>
-          <p class="text-xs text-neutral-500">{{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
+          <p class="text-[10px] font-mono text-[var(--color-neutral-500)]">{{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
         </div>
       </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        class="h-8 w-8 text-neutral-500 hover:text-destructive"
+      <AppButton
+        variant="stealth"
+        class="h-8 w-8 p-0 text-[var(--color-neutral-400)] hover:text-[var(--color-danger-600)]"
         @click="clearFile"
       >
         <X class="h-4 w-4" />
-      </Button>
+      </AppButton>
     </div>
 
-    <p v-if="errorMsg" class="mt-2 text-xs font-medium text-destructive">
+    <p v-if="errorMsg" class="mt-2 text-[10px] font-bold uppercase text-[var(--color-danger-600)] tracking-tight">
       {{ errorMsg }}
     </p>
   </div>

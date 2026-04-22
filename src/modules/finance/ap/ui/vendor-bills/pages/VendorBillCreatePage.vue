@@ -1,25 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/card'
-import { Button } from '@/shared/components/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/select'
-import { Input } from '@/shared/components/input'
-import { Label } from '@/shared/components/label'
-import { Textarea } from '@/shared/components/textarea'
+import { AppButton, AppSelect, AppInput, AppTextarea } from '@/shared/components/primitives'
 import DebouncedCombobox from '@/shared/components/combobox/DebouncedCombobox.vue'
 import type { ComboboxOption } from '@/shared/components/combobox/DebouncedCombobox.vue'
 import FileUploadZone from '@/shared/components/dropzone/FileUploadZone.vue'
 import { useCreateVendorBill } from '../../../application/composables/useCreateVendorBill'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
-import { Trash2, Plus, AlertCircle, Eye, EyeOff } from 'lucide-vue-next'
-import { Alert, AlertDescription, AlertTitle } from '@/shared/components/alert'
+import { Trash2, Plus, AlertCircle, Eye, EyeOff, ArrowLeft, ClipboardEdit } from 'lucide-vue-next'
 
 /**
  * VendorBillCreatePage — Dedicated creation form.
@@ -83,48 +71,49 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
 </script>
 
 <template>
-  <div class="p-6 space-y-6 min-h-screen">
+  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Header -->
-    <div
-      class="flex items-center justify-between mx-auto"
-      :class="showSourceDoc ? 'max-w-none w-full' : 'max-w-4xl'"
-    >
-      <div>
-        <button
-          class="mb-2 flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
-          @click="goBack"
-        >
-          ← Back to Bills
-        </button>
-        <h1 class="text-2xl font-bold tracking-tight">Register Vendor Bill</h1>
-        <p class="text-sm text-neutral-500">Record a supplier invoice to generate an AP accrual.</p>
+    <div class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]">
+      <div class="flex items-center gap-4">
+        <AppButton variant="stealth" @click="goBack">
+          <ArrowLeft :size="18" />
+        </AppButton>
+        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <ClipboardEdit class="h-6 w-6 text-[var(--color-primary-600)]" />
+        </div>
+        <div>
+          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">Register Vendor Bill</h1>
+          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Record a supplier invoice to generate an AP accrual.</p>
+        </div>
       </div>
-
-      <Button variant="outline" size="sm" @click="showSourceDoc = !showSourceDoc">
-        <Eye v-if="!showSourceDoc" class="mr-2 h-4 w-4" />
-        <EyeOff v-else class="mr-2 h-4 w-4" />
-        {{ showSourceDoc ? 'Hide Document' : 'View Source Document' }}
-      </Button>
+      
+      <div class="flex items-center gap-2">
+        <AppButton variant="outline" @click="showSourceDoc = !showSourceDoc">
+          <Eye v-if="!showSourceDoc" :size="14" class="mr-2" />
+          <EyeOff v-else :size="14" class="mr-2" />
+          {{ showSourceDoc ? 'Hide Doc' : 'View Source' }}
+        </AppButton>
+        <form.Subscribe v-slot="state">
+          <AppButton variant="primary" :disabled="!state.canSubmit || state.isSubmitting" @click="form.handleSubmit">
+            {{ state.isSubmitting ? 'Registering...' : 'Register Bill' }}
+          </AppButton>
+        </form.Subscribe>
+      </div>
     </div>
 
     <!-- Layout Container -->
-    <div
-      class="flex gap-6 mx-auto items-start"
-      :class="showSourceDoc ? 'max-w-none w-full' : 'max-w-4xl'"
-    >
+    <div class="flex-1 overflow-hidden flex min-h-0">
       <!-- Source Document Split View (Left) -->
       <aside
         v-if="showSourceDoc"
-        class="w-1/2 sticky top-6 bg-white border border-neutral-200 rounded-lg shadow-sm flex flex-col h-[calc(100vh-4rem)] overflow-hidden"
+        class="w-[450px] border-r border-[var(--color-neutral-200)] bg-[var(--color-neutral-50)] flex flex-col h-full overflow-hidden"
       >
-        <div class="p-4 border-b bg-neutral-50 flex items-center justify-between shrink-0">
-          <h2 class="font-semibold text-sm">Source Invoice</h2>
-          <span v-if="sourceFile" class="text-xs text-neutral-500">{{ sourceFile.name }}</span>
+        <div class="p-4 border-b bg-white flex items-center justify-between shrink-0">
+          <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)]">Source Invoice</h2>
+          <span v-if="sourceFile" class="text-[10px] font-mono text-[var(--color-neutral-500)]">{{ sourceFile.name }}</span>
         </div>
 
-        <div
-          class="flex-1 overflow-auto bg-neutral-100/50 p-4 relative flex flex-col items-center justify-center"
-        >
+        <div class="flex-1 overflow-auto p-4 relative flex flex-col items-center justify-center">
           <FileUploadZone
             v-if="!sourceFile"
             accept="application/pdf,image/*"
@@ -136,64 +125,63 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
             <iframe
               v-if="sourceFile.type === 'application/pdf'"
               :src="sourceFileUrl"
-              class="w-full h-full rounded shadow-sm border-0"
+              class="w-full h-full rounded-sm shadow-sm border border-[var(--color-neutral-200)]"
             ></iframe>
             <img
               v-else
               :src="sourceFileUrl"
-              class="max-w-full rounded shadow-sm"
+              class="max-w-full rounded-sm shadow-sm border border-[var(--color-neutral-200)]"
               alt="Source Document"
             />
           </template>
 
-          <div v-if="sourceFile" class="absolute bottom-4 flex justify-center w-full">
-            <Button variant="destructive" size="sm" class="shadow-lg" @click="handleFileCleared">
-              <Trash2 class="h-4 w-4 mr-2" /> Remove Attachment
-            </Button>
+          <div v-if="sourceFile" class="absolute bottom-6 flex justify-center w-full">
+            <AppButton variant="danger" class="shadow-lg" @click="handleFileCleared">
+              <Trash2 :size="14" class="mr-2" /> Remove Attachment
+            </AppButton>
           </div>
         </div>
       </aside>
 
       <!-- Data Entry Form (Right / Center) -->
-      <div :class="showSourceDoc ? 'w-1/2' : 'w-full'">
-        <!-- Submission Error -->
-        <Alert v-if="submissionError" variant="destructive" class="mb-6">
-          <AlertCircle class="h-4 w-4" />
-          <AlertTitle>Error registering bill</AlertTitle>
-          <AlertDescription>
-            {{ submissionError.detail ?? 'An unexpected error occurred.' }}
-          </AlertDescription>
-        </Alert>
+      <div class="flex-1 overflow-y-auto p-8 bg-[var(--app-canvas)]">
+        <div class="max-w-4xl mx-auto space-y-8">
+          <!-- Submission Error -->
+          <div v-if="submissionError" class="bg-[var(--color-danger-50)] border border-[var(--color-danger-200)] p-4 rounded-sm flex items-start gap-3 shadow-sm">
+            <AlertCircle class="h-5 w-5 text-[var(--color-danger-600)] shrink-0" />
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-danger-700)]">Error registering bill</h3>
+              <p class="text-xs text-[var(--color-danger-600)] mt-1">
+                {{ submissionError.detail ?? 'An unexpected error occurred.' }}
+              </p>
+            </div>
+          </div>
 
-        <form
-          class="space-y-6"
-          @submit.prevent="
-            (e) => {
-              ;(e as Event).stopPropagation()
-              form.handleSubmit()
-            }
-          "
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Bill Details</CardTitle>
-            </CardHeader>
-            <CardContent class="space-y-4">
-              <div class="flex gap-4">
+          <form
+            class="space-y-6"
+            @submit.prevent="
+              (e) => {
+                ;(e as Event).stopPropagation()
+                form.handleSubmit()
+              }
+            "
+          >
+            <!-- Bill Metadata -->
+            <div class="bg-white p-6 rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6">
+              <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)] border-b pb-4 -mx-6 px-6">Bill Metadata</h2>
+              <div class="grid grid-cols-2 gap-6">
                 <form.Field name="vendorId">
                   <template #default="{ field, state }">
-                    <div class="flex-1 grid gap-1.5">
-                      <Label :for="field.name"
-                        >Vendor ID <span class="text-destructive">*</span></Label
-                      >
+                    <div class="space-y-1.5">
+                      <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Vendor *</label>
                       <DebouncedCombobox
                         :model-value="field.state.value"
                         :fetch-options="searchVendors"
                         placeholder="Search vendors..."
                         @update:model-value="(val) => field.handleChange(val as string)"
                       />
-                      <p v-if="state.meta.errors.length" class="text-xs text-destructive">
-                        {{ state.meta.errors.join(', ') }}
+                      <p v-if="state.meta.errors.length" class="text-[10px] text-[var(--color-danger-600)]">
+                        {{ state.meta.errors[0] }}
                       </p>
                     </div>
                   </template>
@@ -201,108 +189,83 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
 
                 <form.Field name="billNumber">
                   <template #default="{ field, state }">
-                    <div class="flex-1 grid gap-1.5">
-                      <Label :for="field.name"
-                        >Bill Number <span class="text-destructive">*</span></Label
-                      >
-                      <Input
-                        :id="field.name"
-                        :model-value="field.state.value"
-                        placeholder="e.g. INV-2023-001"
-                        @update:model-value="(val) => field.handleChange(val as string)"
-                      />
-                      <p v-if="state.meta.errors.length" class="text-xs text-destructive">
-                        {{ state.meta.errors.join(', ') }}
-                      </p>
-                    </div>
+                    <AppInput
+                      label="Bill Number"
+                      :model-value="field.state.value"
+                      placeholder="e.g. INV-2023-001"
+                      required
+                      :error="state.meta.errors[0]"
+                      @update:model-value="(val) => field.handleChange(val as string)"
+                    />
                   </template>
                 </form.Field>
               </div>
 
-              <div class="flex gap-4">
+              <div class="grid grid-cols-3 gap-6">
                 <form.Field name="issueDate">
-                  <template #default="{ field }">
-                    <div class="flex-1 grid gap-1.5">
-                      <Label :for="field.name">Issue Date</Label>
-                      <Input
-                        :id="field.name"
-                        type="date"
-                        :model-value="field.state.value"
-                        @update:model-value="(val) => field.handleChange(val as string)"
-                      />
-                    </div>
+                  <template #default="{ field, state }">
+                    <AppInput
+                      label="Issue Date"
+                      type="date"
+                      :model-value="field.state.value"
+                      :error="state.meta.errors[0]"
+                      @update:model-value="(val) => field.handleChange(val as string)"
+                    />
                   </template>
                 </form.Field>
 
                 <form.Field name="dueDate">
-                  <template #default="{ field }">
-                    <div class="flex-1 grid gap-1.5">
-                      <Label :for="field.name">Due Date</Label>
-                      <Input
-                        :id="field.name"
-                        type="date"
-                        :model-value="field.state.value"
-                        @update:model-value="(val) => field.handleChange(val as string)"
-                      />
-                    </div>
+                  <template #default="{ field, state }">
+                    <AppInput
+                      label="Due Date"
+                      type="date"
+                      :model-value="field.state.value"
+                      :error="state.meta.errors[0]"
+                      @update:model-value="(val) => field.handleChange(val as string)"
+                    />
                   </template>
                 </form.Field>
 
                 <form.Field name="currency">
-                  <template #default="{ field }">
-                    <div class="flex-none w-32 grid gap-1.5">
-                      <Label :for="field.name">Currency</Label>
-                      <Select
-                        :model-value="field.state.value"
-                        @update:model-value="(val) => field.handleChange(val as string)"
-                      >
-                        <SelectTrigger :id="field.name">
-                          <SelectValue placeholder="Select currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ETB">ETB</SelectItem>
-                          <SelectItem value="USD">USD</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <template #default="{ field, state }">
+                    <AppSelect
+                      label="Currency"
+                      :model-value="field.state.value"
+                      :options="[
+                        { label: 'ETB - Ethiopian Birr', value: 'ETB' },
+                        { label: 'USD - US Dollar', value: 'USD' }
+                      ]"
+                      :error="state.meta.errors[0]"
+                      @update:model-value="(val) => field.handleChange(val as string)"
+                    />
                   </template>
                 </form.Field>
               </div>
 
               <form.Field name="justification">
                 <template #default="{ field, state }">
-                  <div class="grid gap-1.5">
-                    <Label :for="field.name"
-                      >Justification <span class="text-destructive">*</span></Label
-                    >
-                    <Textarea
-                      :id="field.name"
-                      :model-value="field.state.value"
-                      rows="2"
-                      placeholder="Description of the purchase…"
-                      @update:model-value="(val) => field.handleChange(val as string)"
-                    />
-                    <p v-if="state.meta.errors.length" class="text-xs text-destructive">
-                      {{ state.meta.errors.join(', ') }}
-                    </p>
-                  </div>
+                  <AppTextarea
+                    label="Justification"
+                    :model-value="field.state.value"
+                    placeholder="Description of the purchase..."
+                    required
+                    :rows="2"
+                    :error="state.meta.errors[0]"
+                    @update:model-value="(val) => field.handleChange(val as string)"
+                  />
                 </template>
               </form.Field>
-            </CardContent>
-          </Card>
+            </div>
 
-          <!-- Line Items -->
-          <Card>
-            <CardHeader>
-              <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold tracking-tight">Expense Lines</h3>
+            <!-- Line Items -->
+            <div class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm space-y-6 overflow-hidden">
+              <div class="flex items-center justify-between px-6 py-4 border-b bg-[var(--color-neutral-50)]/30">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)]">Expense Lines</h3>
                 <form.Field name="lines">
                   <template #default="{ field }">
-                    <Button
+                    <AppButton
                       variant="outline"
-                      size="sm"
                       type="button"
-                      class="h-8 text-xs"
                       @click="
                         field.pushValue({
                           description: '',
@@ -312,86 +275,89 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                         })
                       "
                     >
-                      <Plus class="mr-1 h-3 w-3" /> Add Line
-                    </Button>
+                      <Plus :size="14" class="mr-2" /> Add Line
+                    </AppButton>
                   </template>
                 </form.Field>
               </div>
-            </CardHeader>
-            <CardContent class="space-y-4">
-              <form.Field name="lines">
-                <template #default="{ field }">
-                  <div
-                    v-for="(_, idx) in field.state.value"
-                    :key="idx"
-                    class="space-y-3 rounded-lg border p-4"
-                  >
-                    <div class="flex items-center justify-between">
-                      <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">
-                        Line #{{ (idx as number) + 1 }}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        type="button"
-                        class="h-7 w-7 text-neutral-400 hover:text-destructive"
-                        :disabled="field.state.value.length === 1"
-                        @click="field.removeValue(idx)"
-                      >
-                        <Trash2 class="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+              
+              <div class="p-6 pt-0 space-y-6">
+                <form.Field name="lines">
+                  <template #default="{ field }">
+                    <div
+                      v-for="(_, idx) in field.state.value"
+                      :key="idx"
+                      class="space-y-6 relative border-b border-[var(--color-neutral-100)] pb-6 last:border-0 last:pb-0 pt-6"
+                    >
+                      <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] bg-[var(--color-neutral-50)] px-2 py-0.5 rounded-sm">
+                          Line #{{ (idx as number) + 1 }}
+                        </span>
+                        <AppButton
+                          variant="stealth"
+                          type="button"
+                          class="h-7 w-7 text-[var(--color-neutral-400)] hover:text-[var(--color-danger-600)]"
+                          :disabled="field.state.value.length === 1"
+                          @click="field.removeValue(idx)"
+                        >
+                          <Trash2 :size="14" />
+                        </AppButton>
+                      </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                      <form.Field :name="`lines[${idx}].description`" :index="idx">
-                        <template #default="{ field: lf }">
-                          <div class="grid gap-1.5 flex-1 w-full col-span-2">
-                            <Label class="text-xs">Description *</Label>
-                            <Input
-                              size="sm"
-                              :model-value="lf.state.value"
-                              placeholder="e.g. Server Hosting"
-                              @update:model-value="(val) => lf.handleChange(val as string)"
-                            />
-                          </div>
-                        </template>
-                      </form.Field>
-
-                      <form.Field :name="`lines[${idx}].amount`" :index="idx">
-                        <template #default="{ field: lf }">
-                          <div class="grid gap-1.5">
-                            <Label class="text-xs">Gross Amount *</Label>
-                            <Input
-                              size="sm"
-                              type="number"
-                              step="0.01"
-                              :model-value="lf.state.value"
-                              class="text-right tabular-nums"
-                              @update:model-value="(val) => lf.handleChange(Number(val))"
-                            />
-                          </div>
-                        </template>
-                      </form.Field>
-
-                      <div class="grid grid-cols-2 gap-3 col-span-2">
-                        <form.Field :name="`lines[${idx}].accountId`" :index="idx">
-                          <template #default="{ field: lf }">
-                            <div class="grid gap-1.5">
-                              <Label class="text-xs">GL Account</Label>
-                              <DebouncedCombobox
+                      <div class="grid grid-cols-12 gap-6">
+                        <form.Field :name="`lines[${idx}].description`" :index="idx">
+                          <template #default="{ field: lf, state: ls }">
+                            <div class="col-span-12">
+                              <AppInput
+                                label="Description"
                                 :model-value="lf.state.value"
-                                :fetch-options="searchAccounts"
-                                placeholder="Search accounts..."
+                                placeholder="e.g. Server Hosting"
+                                required
+                                :error="ls.meta.errors[0]"
                                 @update:model-value="(val) => lf.handleChange(val as string)"
                               />
                             </div>
                           </template>
                         </form.Field>
 
+                        <form.Field :name="`lines[${idx}].amount`" :index="idx">
+                          <template #default="{ field: lf, state: ls }">
+                            <div class="col-span-4">
+                              <AppInput
+                                label="Amount"
+                                type="number"
+                                step="0.01"
+                                :model-value="lf.state.value"
+                                required
+                                :error="ls.meta.errors[0]"
+                                class="text-right tabular-nums"
+                                @update:model-value="(val) => lf.handleChange(Number(val))"
+                              />
+                            </div>
+                          </template>
+                        </form.Field>
+
+                        <form.Field :name="`lines[${idx}].accountId`" :index="idx">
+                          <template #default="{ field: lf, state: ls }">
+                            <div class="col-span-4 space-y-1.5">
+                              <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">GL Account</label>
+                              <DebouncedCombobox
+                                :model-value="lf.state.value"
+                                :fetch-options="searchAccounts"
+                                placeholder="Search accounts..."
+                                @update:model-value="(val) => lf.handleChange(val as string)"
+                              />
+                              <p v-if="ls.meta.errors.length" class="text-[10px] text-[var(--color-danger-600)]">
+                                {{ ls.meta.errors[0] }}
+                              </p>
+                            </div>
+                          </template>
+                        </form.Field>
+
                         <form.Field :name="`lines[${idx}].categoryId`" :index="idx">
-                          <template #default="{ field: lf }">
-                            <div class="grid gap-1.5">
-                              <Label class="text-xs">Category</Label>
+                          <template #default="{ field: lf, state: ls }">
+                            <div class="col-span-4 space-y-1.5">
+                              <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Category</label>
                               <DebouncedCombobox
                                 :model-value="lf.state.value"
                                 :fetch-options="searchCategories"
@@ -410,29 +376,20 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                                   }
                                 "
                               />
-                              <p class="text-[10px] text-neutral-400">
-                                Press Enter to add new line
+                              <p class="text-[9px] text-[var(--color-neutral-400)] mt-1 uppercase tracking-tight">
+                                Press Enter to add line
                               </p>
                             </div>
                           </template>
                         </form.Field>
                       </div>
                     </div>
-                  </div>
-                </template>
-              </form.Field>
-            </CardContent>
-          </Card>
-
-          <div class="flex justify-end gap-3 pt-4">
-            <Button variant="outline" type="button" @click="goBack">Cancel</Button>
-            <form.Subscribe v-slot="state">
-              <Button :disabled="!state.canSubmit || state.isSubmitting" type="submit">
-                {{ state.isSubmitting ? 'Registering…' : 'Register Bill' }}
-              </Button>
-            </form.Subscribe>
-          </div>
-        </form>
+                  </template>
+                </form.Field>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>

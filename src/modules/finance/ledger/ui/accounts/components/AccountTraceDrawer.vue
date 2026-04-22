@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/shared/components/sheet'
+import { AppDrawer } from '@/shared/components/primitives'
+import { Info } from 'lucide-vue-next'
 import type { Account } from '../../../domain/account.types'
 
 /**
@@ -26,51 +21,60 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <Sheet :open="open" @update:open="emit('update:open', $event)">
-    <SheetContent class="sm:max-w-[480px] overflow-y-auto">
-      <SheetHeader>
-        <SheetTitle>Trace: {{ account.code }} — {{ account.name }}</SheetTitle>
-        <SheetDescription> Journal entries posted to this account. </SheetDescription>
-      </SheetHeader>
-
-      <div class="space-y-6 py-6">
-        <!-- Account details summary -->
-        <section>
-          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-            Account Profile
-          </h3>
-          <div class="space-y-2 rounded-lg border p-4 text-sm">
-            <div class="flex justify-between">
-              <span class="text-neutral-500">Type</span>
-              <span class="font-medium">{{ account.type }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-neutral-500">Status</span>
-              <span
-                :class="account.isActive ? 'text-green-600' : 'text-neutral-400'"
-                class="font-medium"
-              >
-                {{ account.isActive ? 'Active' : 'Inactive' }}
-              </span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-neutral-500">Currency</span>
-              <span class="font-mono font-medium">{{ account.currency ?? 'Multi-currency' }}</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Recent postings placeholder -->
-        <section>
-          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-            Recent Postings
-          </h3>
-          <p class="text-sm text-neutral-500">
-            Transaction history for this account will be displayed here. Filter journal entries by
-            account to view all postings.
-          </p>
-        </section>
+  <AppDrawer
+    :open="open"
+    :title="`Trace: ${account.code} — ${account.name}`"
+    description="Journal entries posted to this account."
+    size="md"
+    @update:open="emit('update:open', $event)"
+  >
+    <template #header-icon>
+      <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+        <Info class="h-5 w-5 text-[var(--color-primary-600)]" />
       </div>
-    </SheetContent>
-  </Sheet>
+    </template>
+
+    <div class="space-y-8">
+      <!-- Account details summary -->
+      <section>
+        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">
+          Account Profile
+        </h3>
+        <div class="space-y-3 rounded-sm border border-[var(--color-neutral-200)] bg-white p-4 shadow-sm text-xs">
+          <div class="flex justify-between items-center">
+            <span class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]">Type</span>
+            <span class="font-bold text-[var(--color-neutral-900)]">{{ account.type }}</span>
+          </div>
+          <div class="flex justify-between items-center border-t border-[var(--color-neutral-100)] pt-3">
+            <span class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]">Status</span>
+            <span
+              :class="account.isActive ? 'text-[var(--color-success-600)] bg-[var(--color-success-50)]' : 'text-[var(--color-neutral-400)] bg-[var(--color-neutral-50)]'"
+              class="font-bold px-2 py-0.5 rounded-full"
+            >
+              {{ account.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center border-t border-[var(--color-neutral-100)] pt-3">
+            <span class="text-[var(--color-neutral-500)] font-medium uppercase tracking-wider text-[10px]">Currency</span>
+            <span class="font-mono font-bold text-[var(--color-neutral-900)]">{{ account.currency ?? 'Multi-currency' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent postings placeholder -->
+      <section>
+        <h3 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]">
+          Recent Postings
+        </h3>
+        <div class="p-8 border border-dashed border-[var(--color-neutral-300)] rounded-sm flex flex-col items-center justify-center text-center">
+          <p class="text-[11px] text-[var(--color-neutral-500)] font-medium">
+            Transaction history for this account will be displayed here.
+          </p>
+          <p class="text-[10px] text-[var(--color-neutral-400)] mt-1">
+            Filter journal entries by account to view all postings.
+          </p>
+        </div>
+      </section>
+    </div>
+  </AppDrawer>
 </template>

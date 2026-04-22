@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button } from '@/shared/components/button'
-import { Label } from '@/shared/components/label'
+import { AppButton } from '@/shared/components/primitives'
 import {
   Dialog,
   DialogContent,
@@ -42,34 +41,36 @@ function handleCancel() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle class="text-destructive">Reject Vendor Bill</DialogTitle>
-        <DialogDescription>
-          This action will void the draft bill. It cannot be undone.
+    <DialogContent class="sm:max-w-[425px] rounded-sm p-0 overflow-hidden border-0 shadow-2xl">
+      <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
+        <DialogTitle class="text-[var(--color-danger-600)] font-bold uppercase tracking-widest text-xs">Reject Vendor Bill</DialogTitle>
+        <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
+          This action will void the draft bill. It cannot be undone and will be logged.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="grid gap-2 py-4">
-        <Label for="reject-reason"> Reason <span class="text-destructive">*</span> </Label>
-        <textarea
-          id="reject-reason"
-          v-model="reason"
-          class="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          rows="3"
-          placeholder="Provide a clear reason (min. 5 characters)…"
-        />
+      <div class="p-6 space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">Rejection Reason *</label>
+          <textarea
+            id="reject-reason"
+            v-model="reason"
+            class="w-full resize-none rounded-sm border border-[var(--color-neutral-200)] bg-[var(--color-neutral-50)]/50 px-3 py-2 text-sm focus:bg-white focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)] outline-none transition-colors"
+            rows="3"
+            placeholder="Provide a clear reason (min. 5 characters)..."
+          />
+        </div>
       </div>
 
-      <DialogFooter>
-        <Button variant="outline" @click="handleCancel">Cancel</Button>
-        <Button
-          variant="destructive"
+      <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
+        <AppButton variant="outline" @click="handleCancel">Cancel</AppButton>
+        <AppButton
+          variant="danger"
           :disabled="reason.trim().length < 5 || isPending"
           @click="handleConfirm"
         >
-          {{ isPending ? 'Rejecting…' : 'Confirm Rejection' }}
-        </Button>
+          {{ isPending ? 'Rejecting...' : 'Confirm Rejection' }}
+        </AppButton>
       </DialogFooter>
     </DialogContent>
   </Dialog>

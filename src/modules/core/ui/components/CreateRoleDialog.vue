@@ -9,7 +9,7 @@ import {
   DialogFooter,
 } from '@/shared/components/dialog'
 import { AppButton, AppInput } from '@/shared/components/primitives'
-import { ShieldCheck, X, Search } from 'lucide-vue-next'
+import { ShieldCheck } from 'lucide-vue-next'
 import { useRoles } from '../../application/composables/useRoles'
 
 const props = defineProps<{
@@ -56,64 +56,50 @@ function togglePermission(code: string) {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent
-      class="sm:max-w-[600px] max-h-[90vh] flex flex-col p-0 overflow-hidden border-none shadow-2xl rounded-sm"
-    >
-      <DialogHeader class="px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]">
+    <DialogContent class="sm:max-w-[600px] max-h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-2xl rounded-sm">
+      <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
         <div class="flex items-center gap-4">
           <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
             <ShieldCheck class="h-5 w-5 text-[var(--color-primary-600)]" />
           </div>
           <div>
-            <DialogTitle class="text-lg font-bold text-[var(--color-neutral-900)]"
-              >Define Boundary</DialogTitle
-            >
-            <DialogDescription class="text-xs text-[var(--color-neutral-500)]">
+            <DialogTitle class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs">Define Boundary</DialogTitle>
+            <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
               Construct a new identity boundary by aggregating granular system permissions.
             </DialogDescription>
           </div>
         </div>
       </DialogHeader>
 
-      <div class="flex-1 overflow-y-auto px-8 py-6 space-y-6 bg-[var(--color-neutral-50)]/30">
-        <div class="space-y-1.5">
-          <Label
-            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
-            >Boundary Name</Label
-          >
-          <AppInput v-model="form.name" placeholder="e.g. Senior Accountant" />
-        </div>
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <AppInput
+          label="Boundary Name"
+          v-model="form.name"
+          placeholder="e.g. Senior Accountant"
+          required
+        />
 
-        <div class="space-y-1.5">
-          <Label
-            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
-            >Purpose / Description</Label
-          >
-          <AppInput
-            v-model="form.description"
-            placeholder="Describe the scope of this boundary..."
-          />
-        </div>
+        <AppInput
+          label="Purpose / Description"
+          v-model="form.description"
+          placeholder="Describe the scope of this boundary..."
+          description="A brief explanation of why this role exists."
+        />
 
         <div class="space-y-3">
-          <Label
-            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
-            >System Permissions</Label
-          >
-          <div
-            class="grid grid-cols-2 gap-2 max-h-[250px] overflow-y-auto border border-[var(--color-neutral-200)] rounded-sm p-4 bg-white shadow-inner"
-          >
+          <label class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">System Permissions</label>
+          <div class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto border border-[var(--color-neutral-200)] rounded-sm p-4 bg-[var(--color-neutral-50)]/50">
             <div
               v-for="perm in permissions"
               :key="perm.code"
-              class="flex items-center space-x-3 p-2 rounded-sm hover:bg-[var(--color-neutral-50)] transition-colors border border-transparent hover:border-[var(--color-neutral-100)]"
+              class="flex items-center space-x-3 p-2 rounded-sm hover:bg-white transition-colors border border-transparent hover:border-[var(--color-neutral-200)] hover:shadow-sm"
             >
               <input
                 type="checkbox"
                 :id="perm.code"
                 :checked="form.permissions.includes(perm.code)"
                 @change="togglePermission(perm.code)"
-                class="w-3.5 h-3.5 rounded-sm border-[var(--color-neutral-300)] text-[var(--color-primary-600)] focus:ring-[var(--color-primary-500)]"
+                class="w-3.5 h-3.5 rounded-sm border-[var(--color-neutral-300)] text-[var(--color-primary-600)] focus:ring-[var(--color-primary-500)] cursor-pointer"
               />
               <label
                 :for="perm.code"
@@ -126,9 +112,7 @@ function togglePermission(code: string) {
         </div>
       </div>
 
-      <DialogFooter
-        class="px-8 py-4 bg-white border-t border-[var(--color-neutral-200)] flex items-center justify-end gap-3"
-      >
+      <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
         <AppButton variant="outline" @click="emit('update:open', false)" :disabled="isCreating">
           Cancel
         </AppButton>
