@@ -20,7 +20,7 @@ const plugins: PluginOption[] = [
 ]
 
 export default defineConfig({
-  lint: lintConfig as UserConfig['lint'],
+  lint: lintConfig as unknown as UserConfig['lint'],
   test: {
     environment: 'jsdom',
     root: fileURLToPath(new URL('./', import.meta.url)),

@@ -7,6 +7,12 @@
     "strict": true,
     "noEmit": true,
     "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitOverride": true,
     "composite": true,
     "types": ["node"]
   },
