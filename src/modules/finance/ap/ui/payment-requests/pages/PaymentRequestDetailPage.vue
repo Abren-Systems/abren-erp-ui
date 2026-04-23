@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { AppBadge, AppButton } from '@/shared/components/primitives'
-import { PageHeader, WorkspacePanel } from '@/shared/components/workspace'
+import { PageHeader, WorkspacePanel, MetricCard, WorkspaceTable } from '@/shared/components/workspace'
 import {
   AlertTriangle,
   ArrowLeft,
@@ -235,17 +235,13 @@ function formatMoney(money: unknown) {
     </div>
 
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <div
+      <MetricCard
         v-for="card in summaryCards"
         :key="card.label"
-        class="rounded-[24px] border border-[color:var(--color-neutral-200)] bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.05)]"
-      >
-        <p class="text-sm font-medium text-[var(--color-neutral-500)]">{{ card.label }}</p>
-        <p class="mt-4 text-2xl font-semibold tracking-tight text-[var(--color-neutral-900)]">
-          {{ card.value }}
-        </p>
-        <p class="mt-2 text-sm leading-6 text-[var(--color-neutral-600)]">{{ card.detail }}</p>
-      </div>
+        :label="card.label"
+        :value="card.value"
+        :description="card.detail"
+      />
     </section>
 
     <section class="grid gap-6 xl:grid-cols-[0.75fr_1.25fr]">
@@ -270,23 +266,23 @@ function formatMoney(money: unknown) {
           </div>
 
           <div class="grid gap-4 sm:grid-cols-2">
-            <div class="rounded-2xl bg-[var(--color-neutral-50)] p-4">
+            <div class="rounded-xl bg-[var(--color-neutral-50)] p-4">
               <p
                 class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-neutral-500)]"
               >
                 Beneficiary
               </p>
-              <p class="mt-2 font-mono text-sm text-[var(--color-neutral-700)]">
+              <p class="mt-2 font-mono text-xs text-[var(--color-neutral-700)]">
                 {{ request.beneficiaryId }}
               </p>
             </div>
-            <div class="rounded-2xl bg-[var(--color-neutral-50)] p-4">
+            <div class="rounded-xl bg-[var(--color-neutral-50)] p-4">
               <p
                 class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-neutral-500)]"
               >
                 Requester
               </p>
-              <p class="mt-2 font-mono text-sm text-[var(--color-neutral-700)]">
+              <p class="mt-2 font-mono text-xs text-[var(--color-neutral-700)]">
                 {{ request.requesterId }}
               </p>
             </div>
@@ -311,61 +307,39 @@ function formatMoney(money: unknown) {
           <FileSpreadsheet class="h-5 w-5" />
         </template>
 
-        <div class="overflow-hidden rounded-2xl border border-[color:var(--color-neutral-200)]">
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead class="bg-[var(--color-neutral-50)]">
-                <tr>
-                  <th
-                    class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-neutral-500)]"
-                  >
-                    Description
-                  </th>
-                  <th
-                    class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-neutral-500)]"
-                  >
-                    Amount
-                  </th>
-                  <th
-                    class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-neutral-500)]"
-                  >
-                    GL Account
-                  </th>
-                  <th
-                    class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-neutral-500)]"
-                  >
-                    Category
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-[var(--color-neutral-200)] bg-white">
-                <tr
-                  v-for="line in request.lines"
-                  :key="line.id"
-                  class="transition-colors hover:bg-[var(--color-neutral-50)]"
-                >
-                  <td class="px-4 py-3 text-[var(--color-neutral-700)]">{{ line.description }}</td>
-                  <td class="px-4 py-3 text-right font-semibold text-[var(--color-neutral-900)]">
-                    {{ formatMoney(line.amount) }}
-                  </td>
-                  <td class="px-4 py-3 font-mono text-xs text-[var(--color-neutral-500)]">
-                    {{ line.accountId ?? 'Not assigned' }}
-                  </td>
-                  <td class="px-4 py-3 font-mono text-xs text-[var(--color-neutral-500)]">
-                    {{ line.categoryId ?? 'Not assigned' }}
-                  </td>
-                </tr>
-                <tr class="bg-[var(--color-neutral-50)] font-semibold">
-                  <td class="px-4 py-4 text-[var(--color-neutral-700)]">Total</td>
-                  <td class="px-4 py-4 text-right text-[var(--color-primary-700)]">
-                    {{ formatMoney(request.totalAmount) }}
-                  </td>
-                  <td colspan="2" />
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <WorkspaceTable>
+          <template #header>
+            <tr>
+              <th>Description</th>
+              <th class="text-right">Amount</th>
+              <th>GL Account</th>
+              <th>Category</th>
+            </tr>
+          </template>
+          <template #body>
+            <tr v-for="line in request.lines" :key="line.id">
+              <td class="text-[var(--color-neutral-700)]">{{ line.description }}</td>
+              <td class="text-right font-semibold text-[var(--color-neutral-900)]">
+                {{ formatMoney(line.amount) }}
+              </td>
+              <td class="font-mono text-[11px] text-[var(--color-neutral-500)]">
+                {{ line.accountId ?? '—' }}
+              </td>
+              <td class="font-mono text-[11px] text-[var(--color-neutral-500)]">
+                {{ line.categoryId ?? '—' }}
+              </td>
+            </tr>
+          </template>
+          <template #footer>
+            <tr class="font-semibold">
+              <td class="text-[var(--color-neutral-600)]">Total</td>
+              <td class="text-right text-[var(--color-neutral-900)]">
+                {{ formatMoney(request.totalAmount) }}
+              </td>
+              <td colspan="2" />
+            </tr>
+          </template>
+        </WorkspaceTable>
       </WorkspacePanel>
     </section>
 

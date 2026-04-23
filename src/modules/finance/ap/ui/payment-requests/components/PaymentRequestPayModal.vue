@@ -47,21 +47,20 @@ function handleCancel() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[425px] rounded-sm p-0 overflow-hidden border-0 shadow-2xl">
-      <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
+    <DialogContent class="sm:max-w-[425px] rounded-2xl p-0 overflow-hidden border border-[color:var(--color-neutral-200)] shadow-2xl">
+      <DialogHeader class="p-6 bg-[var(--color-neutral-50)]/50 border-b border-[color:var(--color-neutral-100)]">
         <div class="flex items-center gap-4">
-          <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+          <div class="p-2 bg-[var(--color-primary-50)] rounded-xl">
             <WalletCards class="h-5 w-5 text-[var(--color-primary-600)]" />
           </div>
           <div>
             <DialogTitle
-              class="text-[var(--color-neutral-900)] font-bold uppercase tracking-widest text-xs"
+              class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-neutral-900)]"
               >Execute Payment</DialogTitle
             >
-            <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
+            <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-1.5">
               Record disbursement details for
-              <span class="font-bold text-[var(--color-neutral-900)]">{{ totalAmount }}</span
-              >.
+              <span class="font-bold text-[var(--color-neutral-900)]">{{ totalAmount }}</span>.
             </DialogDescription>
           </div>
         </div>
@@ -88,14 +87,16 @@ function handleCancel() {
         />
       </div>
 
-      <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
+      <DialogFooter class="p-6 bg-[var(--color-neutral-50)]/50 border-t border-[color:var(--color-neutral-100)]">
         <AppButton variant="outline" @click="handleCancel">Cancel</AppButton>
         <AppButton
           variant="primary"
           :disabled="!disbursementRef.trim() || isPending"
           @click="handleConfirm"
         >
-          <CheckCircle2 v-if="!isPending" :size="14" class="mr-2" />
+          <template #start>
+            <CheckCircle2 v-if="!isPending" :size="14" />
+          </template>
           {{ isPending ? 'Processing...' : 'Confirm Disbursement' }}
         </AppButton>
       </DialogFooter>

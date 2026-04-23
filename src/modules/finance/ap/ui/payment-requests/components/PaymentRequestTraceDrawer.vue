@@ -39,7 +39,7 @@ const emit = defineEmits<{
     @update:open="emit('update:open', $event)"
   >
     <template #header-icon>
-      <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
+      <div class="p-2 bg-[var(--color-primary-50)] rounded-xl">
         <History class="h-5 w-5 text-[var(--color-primary-600)]" />
       </div>
     </template>
@@ -48,78 +48,41 @@ const emit = defineEmits<{
       <!-- Workflow Timeline -->
       <section>
         <h3
-          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2"
+          class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-neutral-400)] flex items-center gap-2"
         >
           <Clock :size="12" />
           Workflow History
         </h3>
-        <div class="space-y-3">
+        <div class="space-y-2">
           <div
-            class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+            v-for="(step, index) in [
+              { status: 'DRAFT', label: 'Created', sub: `Requested by ${request.requesterId}`, variant: 'neutral' },
+              { status: 'SUBMITTED', label: 'Submitted for Approval', sub: request.submittedAt ?? 'Date unavailable', variant: 'info' },
+              { status: 'APPROVED', label: 'Approved', sub: `Approved by ${request.assignedApproverId ?? 'approver'}`, variant: 'success' },
+              { status: 'REJECTED', label: 'Rejected', sub: 'Action required', variant: 'danger' },
+              { status: 'PAID', label: 'Payment Recorded', sub: request.paidAt ?? 'Date unavailable', variant: 'success' }
+            ].filter(s => {
+              if (s.status === 'DRAFT') return true;
+              if (s.status === 'SUBMITTED') return ['SUBMITTED', 'APPROVED', 'REJECTED', 'PAID'].includes(request.status);
+              if (s.status === 'APPROVED') return ['APPROVED', 'PAID'].includes(request.status);
+              if (s.status === 'REJECTED') return request.status === 'REJECTED';
+              if (s.status === 'PAID') return request.status === 'PAID';
+              return false;
+            })"
+            :key="index"
+            class="flex items-start gap-4 p-3.5 bg-white rounded-xl border border-[var(--color-neutral-200)] shadow-sm"
           >
-            <div class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-neutral-400)]" />
+            <div class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" :class="[
+              step.variant === 'neutral' ? 'bg-[var(--color-neutral-400)]' : '',
+              step.variant === 'info' ? 'bg-[var(--color-primary-500)]' : '',
+              step.variant === 'success' ? 'bg-[var(--color-success-500)]' : '',
+              step.variant === 'danger' ? 'bg-[var(--color-danger-500)]' : '',
+            ]" />
             <div class="flex-1">
-              <p class="text-xs font-bold text-[var(--color-neutral-900)]">Created</p>
-              <p class="text-[10px] text-[var(--color-neutral-500)] mt-0.5">
-                Requested by {{ request.requesterId }}
-              </p>
+              <p class="text-xs font-bold text-[var(--color-neutral-900)]">{{ step.label }}</p>
+              <p class="text-[10px] text-[var(--color-neutral-500)] mt-0.5">{{ step.sub }}</p>
             </div>
-            <AppBadge variant="neutral">DRAFT</AppBadge>
-          </div>
-
-          <div
-            v-if="['SUBMITTED', 'APPROVED', 'REJECTED', 'PAID'].includes(request.status)"
-            class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
-          >
-            <div class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary-400)]" />
-            <div class="flex-1">
-              <p class="text-xs font-bold text-[var(--color-neutral-900)]">
-                Submitted for Approval
-              </p>
-              <p class="text-[10px] text-[var(--color-neutral-500)] mt-0.5">
-                {{ request.submittedAt ?? 'Date unavailable' }}
-              </p>
-            </div>
-            <AppBadge variant="info">SUBMITTED</AppBadge>
-          </div>
-
-          <div
-            v-if="request.status === 'APPROVED' || request.status === 'PAID'"
-            class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
-          >
-            <div class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-success-500)]" />
-            <div class="flex-1">
-              <p class="text-xs font-bold text-[var(--color-neutral-900)]">Approved</p>
-              <p class="text-[10px] text-[var(--color-neutral-500)] mt-0.5">
-                Approved by {{ request.assignedApproverId ?? 'approver' }}
-              </p>
-            </div>
-            <AppBadge variant="success">APPROVED</AppBadge>
-          </div>
-
-          <div
-            v-if="request.status === 'REJECTED'"
-            class="flex items-start gap-4 p-4 bg-[var(--color-danger-50)]/30 rounded-sm border border-[var(--color-danger-200)] shadow-sm"
-          >
-            <div class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-danger-500)]" />
-            <div class="flex-1">
-              <p class="text-xs font-bold text-[var(--color-danger-700)]">Rejected</p>
-            </div>
-            <AppBadge variant="danger">REJECTED</AppBadge>
-          </div>
-
-          <div
-            v-if="request.status === 'PAID'"
-            class="flex items-start gap-4 p-4 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
-          >
-            <div class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-success-600)]" />
-            <div class="flex-1">
-              <p class="text-xs font-bold text-[var(--color-neutral-900)]">Payment Recorded</p>
-              <p class="text-[10px] text-[var(--color-neutral-500)] mt-0.5">
-                {{ request.paidAt ?? 'Date unavailable' }}
-              </p>
-            </div>
-            <AppBadge variant="success">PAID</AppBadge>
+            <AppBadge :variant="step.variant as any">{{ step.status }}</AppBadge>
           </div>
         </div>
       </section>
@@ -127,13 +90,13 @@ const emit = defineEmits<{
       <!-- GL Journal Impact -->
       <section v-if="request.targetLiabilityAccountId">
         <h3
-          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2"
+          class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-neutral-400)] flex items-center gap-2"
         >
           <Banknote :size="12" />
           Financial Impact (GL)
         </h3>
         <div
-          class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
+          class="bg-white rounded-xl border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
         >
           <div
             class="px-4 py-3 flex justify-between items-center border-b border-[var(--color-neutral-100)]"
@@ -143,7 +106,7 @@ const emit = defineEmits<{
               >Liability Account</span
             >
             <code
-              class="text-[10px] font-bold text-[var(--color-primary-600)] bg-[var(--color-primary-50)] px-1.5 py-0.5 rounded-sm"
+              class="text-[10px] font-bold text-[var(--color-primary-600)] bg-[var(--color-primary-50)] px-1.5 py-0.5 rounded-md"
             >
               {{ request.targetLiabilityAccountId.slice(0, 8) }}…
             </code>
@@ -154,7 +117,7 @@ const emit = defineEmits<{
               >Disbursement Account</span
             >
             <code
-              class="text-[10px] font-bold text-[var(--color-neutral-600)] bg-[var(--color-neutral-50)] px-1.5 py-0.5 rounded-sm"
+              class="text-[10px] font-bold text-[var(--color-neutral-600)] bg-[var(--color-neutral-50)] px-1.5 py-0.5 rounded-md"
             >
               {{ request.bankAccountId?.slice(0, 8) ?? '—' }}
             </code>
@@ -165,13 +128,13 @@ const emit = defineEmits<{
       <!-- Source Document -->
       <section v-if="request.sourceModule">
         <h3
-          class="mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-400)] flex items-center gap-2"
+          class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-neutral-400)] flex items-center gap-2"
         >
           <FileText :size="12" />
           Source Document
         </h3>
         <div
-          class="bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
+          class="bg-white rounded-xl border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
         >
           <div
             class="px-4 py-3 flex justify-between items-center border-b border-[var(--color-neutral-100)]"
@@ -190,7 +153,7 @@ const emit = defineEmits<{
               >Internal Reference</span
             >
             <code
-              class="text-[10px] font-bold text-[var(--color-neutral-600)] bg-[var(--color-neutral-50)] px-1.5 py-0.5 rounded-sm"
+              class="text-[10px] font-bold text-[var(--color-neutral-600)] bg-[var(--color-neutral-50)] px-1.5 py-0.5 rounded-md"
               >{{ request.sourceId ?? '—' }}</code
             >
           </div>

@@ -41,37 +41,29 @@ function handleCancel() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[425px] rounded-sm p-0 overflow-hidden border-0 shadow-2xl">
-      <DialogHeader class="p-6 bg-[var(--color-neutral-50)] border-b">
+    <DialogContent class="sm:max-w-[425px] rounded-2xl p-0 overflow-hidden border border-[color:var(--color-neutral-200)] shadow-2xl">
+      <DialogHeader class="p-6 bg-[var(--color-neutral-50)]/50 border-b border-[color:var(--color-neutral-100)]">
         <DialogTitle
-          class="text-[var(--color-danger-600)] font-bold uppercase tracking-widest text-xs"
+          class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-danger-600)]"
           >Reject Payment Request</DialogTitle
         >
         <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
-          This action cannot be undone. The requester will be notified and this will be logged.
+          This action cannot be undone. The requester will be notified and this rejection will be logged in the audit trail.
         </DialogDescription>
       </DialogHeader>
 
       <div class="p-6 space-y-4">
-        <div class="space-y-1.5">
-          <label
-            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
-            >Rejection Reason *</label
-          >
-          <textarea
-            id="reject-reason"
-            v-model="reason"
-            class="w-full resize-none rounded-sm border border-[var(--color-neutral-200)] bg-[var(--color-neutral-50)]/50 px-3 py-2 text-sm focus:bg-white focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)] outline-none transition-colors"
-            rows="3"
-            placeholder="Provide a clear reason (min. 5 characters)..."
-          />
-          <p class="text-[10px] text-[var(--color-neutral-400)]">
-            This reason will be permanently attached to the audit trail.
-          </p>
-        </div>
+        <AppTextarea
+          label="Rejection Reason"
+          v-model="reason"
+          placeholder="Provide a clear reason for audit traceability..."
+          required
+          :rows="3"
+          description="This reason will be permanently attached to the audit trail."
+        />
       </div>
 
-      <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
+      <DialogFooter class="p-6 bg-[var(--color-neutral-50)]/50 border-t border-[color:var(--color-neutral-100)]">
         <AppButton variant="outline" @click="handleCancel">Cancel</AppButton>
         <AppButton
           variant="danger"
