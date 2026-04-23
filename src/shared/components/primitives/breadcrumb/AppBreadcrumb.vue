@@ -19,7 +19,7 @@ const breadcrumbs = computed(() => {
 
   // Remove redundant crumbs with identical paths (common with nested index routes)
   return crumbs.filter((crumb, index) => {
-    return index === 0 || crumb.path !== crumbs[index - 1].path
+    return index === 0 || crumb.path !== crumbs[index - 1]?.path
   })
 })
 </script>

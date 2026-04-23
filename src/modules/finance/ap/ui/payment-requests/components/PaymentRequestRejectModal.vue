@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AppButton, AppInput } from '@/shared/components/primitives'
+import { AppButton, AppTextarea } from '@/shared/components/primitives'
 import {
   Dialog,
   DialogContent,

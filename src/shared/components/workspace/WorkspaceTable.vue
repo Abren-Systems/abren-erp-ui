@@ -20,7 +20,7 @@
           <slot name="body" />
         </tbody>
         <tfoot
-          v-if="$slots.footer"
+          v-if="$slots['footer']"
           class="bg-[var(--color-neutral-50)]/50 border-t border-[color:var(--color-neutral-200)]"
         >
           <slot name="footer" />

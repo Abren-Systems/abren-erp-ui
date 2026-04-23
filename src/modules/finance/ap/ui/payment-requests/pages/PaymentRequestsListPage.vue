@@ -6,14 +6,6 @@ import type { Table, Row } from '@tanstack/vue-table'
 import { AppButton } from '@/shared/components/primitives'
 import { PageHeader } from '@/shared/components/workspace'
 import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/dropdown-menu'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import type { PaymentRequest } from '../../../domain/ap.types'

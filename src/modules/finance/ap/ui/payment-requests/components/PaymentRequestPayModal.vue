@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { AppButton, AppInput, AppSelect } from '@/shared/components/primitives'
-import { WalletCards, Hash, CheckCircle2 } from 'lucide-vue-next'
+import { WalletCards, CheckCircle2 } from 'lucide-vue-next'
 import {
   Dialog,
   DialogContent,
@@ -10,11 +10,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/shared/components/dialog'
-
-/**
- * ActionModal — Execute Payment.
- * Requires payment method and disbursement reference before confirming.
- */
 
 defineProps<{
   open: boolean

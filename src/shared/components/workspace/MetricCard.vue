@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
 interface Props {
   label: string
   value: string | number
@@ -31,7 +29,7 @@ defineProps<Props>()
           <template v-else>{{ value }}</template>
         </p>
       </div>
-      <div v-if="$slots.icon" class="ml-4 shrink-0">
+      <div v-if="$slots['icon']" class="ml-4 shrink-0">
         <slot name="icon" />
       </div>
     </div>

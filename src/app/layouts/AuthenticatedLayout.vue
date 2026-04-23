@@ -141,7 +141,7 @@ const userInitials = computed(
       .split(/[.\-_]/)
       .filter(Boolean)
       .slice(0, 2)
-      .map((segment) => segment[0]?.toUpperCase() ?? '')
+      .map((segment) => (segment && segment[0] ? segment[0].toUpperCase() : ''))
       .join('') || 'AB',
 )
 

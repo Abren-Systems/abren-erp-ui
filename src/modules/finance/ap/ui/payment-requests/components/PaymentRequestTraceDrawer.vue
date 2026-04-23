@@ -1,16 +1,6 @@
 <script setup lang="ts">
 import { AppBadge, AppDrawer } from '@/shared/components/primitives'
-import {
-  History,
-  Search,
-  FileText,
-  Globe,
-  Clock,
-  User,
-  ShieldCheck,
-  Banknote,
-  CreditCard,
-} from 'lucide-vue-next'
+import { History, FileText, Clock, Banknote } from 'lucide-vue-next'
 import type { PaymentRequest } from '../../../domain/ap.types'
 
 /**
