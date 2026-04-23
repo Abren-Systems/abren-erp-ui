@@ -27,11 +27,13 @@ const props = withDefaults(
     placeholder?: string
     showToolbar?: boolean
     emptyMessage?: string
+    rowClickable?: boolean
   }>(),
   {
     skeletonRows: 8,
     showToolbar: true,
     loading: false,
+    rowClickable: false,
   },
 )
 
@@ -98,8 +100,9 @@ const emit = defineEmits<{
 }>()
 
 const handleRowClick = (row: Row<TData>) => {
-  row.toggleSelected()
-  emit('row-click', row.original)
+  if (props.rowClickable) {
+    emit('row-click', row.original)
+  }
 }
 </script>
 
@@ -173,7 +176,7 @@ const handleRowClick = (row: Row<TData>) => {
     </div>
 
     <!-- Optional footer slot (pagination, totals) -->
-    <div v-if="$slots.footer" class="grid-footer">
+    <div v-if="$slots['footer']" class="grid-footer">
       <slot name="footer" />
     </div>
   </div>
@@ -221,7 +224,7 @@ const handleRowClick = (row: Row<TData>) => {
   padding: 0 12px;
   text-align: left;
   font-size: 11px;
-  font-bold: 800; /* Extra bold for headers */
+  font-weight: 800; /* Extra bold for headers */
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-neutral-500);
