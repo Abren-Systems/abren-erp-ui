@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
+import { cn } from '@/shared/lib'
+
+defineOptions({ inheritAttrs: false })
 
 interface Props {
-  /**
-   * The visual appearance of the button.
-   * Maps to Microsoft Fluent's appearance tokens.
-   */
   variant?: 'primary' | 'secondary' | 'stealth' | 'outline' | 'neutral' | 'danger'
-  /** Standard button behavior types */
   type?: 'button' | 'submit' | 'reset'
-  /** Disables interaction */
   disabled?: boolean
-  /** Loading state (optional ERP enhancement) */
   loading?: boolean
+  size?: 'sm' | 'md' | 'lg'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,117 +17,64 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'button',
   disabled: false,
   loading: false,
+  size: 'md',
 })
 
-/**
- * Maps our AppButton variants to native Fluent appearance types.
- */
-const fluentAppearance = computed(() => {
-  switch (props.variant) {
-    case 'primary':
-      return 'accent'
-    case 'stealth':
-      return 'stealth'
-    case 'outline':
-      return 'outline'
-    case 'danger':
-      return 'neutral' // We'll style it with custom CSS below
-    case 'neutral':
-    case 'secondary':
-    default:
-      return 'neutral'
-  }
-})
-
-// Define emits to ensure standard events are passed through
 defineEmits(['click'])
+
+const attrs = useAttrs()
+
+const buttonClass = computed(() =>
+  cn(
+    'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-sm)] border font-semibold select-none transition-colors duration-100 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-300)] focus-visible:ring-offset-2 ring-offset-white',
+    sizeClasses[props.size],
+    variantClasses[props.variant],
+    attrs.class,
+  ),
+)
+
+const forwardedAttrs = computed(() => {
+  const { class: _class, ...rest } = attrs
+  return rest
+})
+
+const sizeClasses = {
+  sm: 'h-7 px-2.5 text-[12px]',
+  md: 'h-8 px-3 text-[13px]',
+  lg: 'h-10 px-4 text-[14px]',
+} as const
+
+const variantClasses = {
+  primary:
+    'border-[var(--color-primary-700)] bg-[var(--color-primary-600)] text-white shadow-[0_8px_18px_rgba(79,70,229,0.18)] hover:bg-[var(--color-primary-700)]',
+  secondary:
+    'border-[var(--color-neutral-200)] bg-[var(--color-neutral-100)] text-[var(--color-neutral-800)] hover:bg-[var(--color-neutral-200)]',
+  stealth:
+    'border-transparent bg-transparent text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-neutral-900)]',
+  outline:
+    'border-[var(--color-neutral-300)] bg-white text-[var(--color-neutral-800)] hover:bg-[var(--color-neutral-50)]',
+  neutral:
+    'border-[var(--color-neutral-200)] bg-white text-[var(--color-neutral-800)] hover:bg-[var(--color-neutral-50)]',
+  danger:
+    'border-[var(--color-danger-700)] bg-[var(--color-danger-600)] text-white hover:bg-[var(--color-danger-700)]',
+} as const
 </script>
 
 <template>
-  <fluent-button
-    :appearance="fluentAppearance"
-    :disabled="disabled || loading"
+  <button
+    v-bind="forwardedAttrs"
     :type="type"
-    class="app-button-root"
-    :class="[`variant-${variant}`]"
+    :disabled="disabled || loading"
+    :class="buttonClass"
     @click="$emit('click', $event)"
   >
-    <!-- Start Icon Slot -->
-    <slot v-if="$slots.start" name="start" slot="start" />
-
-    <!-- Progress Ring for Loading -->
-    <fluent-progress-ring v-if="loading" slot="start" class="loading-ring" />
-
-    <!-- Main Content -->
+    <span
+      v-if="loading"
+      class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent"
+      aria-hidden="true"
+    />
+    <slot v-else-if="$slots.start" name="start" />
     <slot />
-
-    <!-- End Icon Slot -->
-    <slot v-if="$slots.end" name="end" slot="end" />
-  </fluent-button>
+    <slot v-if="$slots.end" name="end" />
+  </button>
 </template>
-
-<style scoped>
-/*
- * High-Density ERP Overrides
- * We target the custom element to ensure the spacing fits the Dynamics 365 Sales aesthetic.
- */
-.app-button-root {
-  /* Restore Dynamics 365 / Fluent high-density standard */
-  height: 32px;
-  cursor: pointer;
-  transition:
-    background-color 0.1s ease,
-    box-shadow 0.1s ease;
-  --control-corner-radius: var(--radius-sm);
-  font-family: var(--font-sans);
-  font-size: var(--text-body-sm);
-  font-weight: 600;
-
-  /* Fluent Web Component Padding/Gap Tokens */
-  --accent-fill-rest: var(--color-primary-600);
-  --accent-fill-hover: var(--color-primary-700);
-  --accent-fill-active: var(--color-primary-800);
-  --button-padding-left: 12px;
-  --button-padding-right: 12px;
-  --density-filter-size: 0;
-
-  /* Ensure the button doesn't stretch and centers its content */
-  display: inline-flex;
-  width: auto;
-  min-width: 80px; /* Dynamics 365 / Fluent standard min-width */
-}
-
-.app-button-root::part(control) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.app-button-root[appearance='accent'] {
-  box-shadow: var(--elevation-1);
-}
-
-.app-button-root[appearance='accent']:hover {
-  box-shadow: var(--elevation-2);
-}
-
-.app-button-root[appearance='accent']:active {
-  box-shadow: var(--elevation-1);
-}
-
-/* 
- * Danger Variant Styling
- * Microsoft Fluent doesn't have a built-in 'destructive' appearance that matches 
- * our theme, so we manually apply our danger tokens.
- */
-.app-button-root.variant-danger {
-  --neutral-fill-rest: var(--color-danger-600);
-  --neutral-fill-hover: var(--color-danger-700);
-  --neutral-fill-active: var(--color-danger-800);
-  --neutral-foreground-rest: #ffffff;
-  --neutral-foreground-hover: #ffffff;
-  --neutral-foreground-active: #ffffff;
-  border-color: transparent;
-}
-</style>

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-/**
- * AppTextarea.vue
- *
- * A high-density wrapper for fluent-text-area.
- * Bridges Vue's v-model to native Web Component properties.
- */
+import { computed, useAttrs } from 'vue'
+import { cn } from '@/shared/lib'
+
+defineOptions({ inheritAttrs: false })
 
 interface Props {
   modelValue?: string | number
@@ -27,94 +25,66 @@ const props = withDefaults(defineProps<Props>(), {
   required: false,
   error: '',
   rows: 3,
+  description: '',
 })
 
 const emit = defineEmits(['update:modelValue', 'blur', 'focus'])
+const attrs = useAttrs()
 
-const handleInput = (event: Event) => {
+const forwardedAttrs = computed(() => {
+  const { class: _class, ...rest } = attrs
+  return rest
+})
+
+const textareaClass = computed(() =>
+  cn(
+    'min-h-24 w-full rounded-[var(--radius-sm)] border bg-white px-3 py-2 text-[13px] leading-6 text-[var(--color-neutral-900)] shadow-sm outline-none transition-colors placeholder:text-[var(--color-neutral-400)]',
+    props.error
+      ? 'border-[var(--color-danger-500)]'
+      : 'border-[var(--color-neutral-300)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)]',
+    props.disabled ? 'bg-[var(--color-neutral-50)] opacity-70' : '',
+    attrs.class,
+  ),
+)
+
+function handleInput(event: Event) {
   const target = event.target as HTMLTextAreaElement
   emit('update:modelValue', target.value)
 }
 </script>
 
 <template>
-  <div class="app-textarea-container">
-    <label v-if="label" class="app-textarea-label">
+  <div class="flex w-full flex-col gap-1.5">
+    <label
+      v-if="label"
+      :for="typeof forwardedAttrs.id === 'string' ? forwardedAttrs.id : undefined"
+      class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-neutral-500)]"
+    >
       {{ label }}
-      <span v-if="required" class="required-mark">*</span>
+      <span v-if="required" class="ml-0.5 text-[var(--color-danger-600)]">*</span>
     </label>
 
-    <fluent-text-area
+    <textarea
+      v-bind="forwardedAttrs"
+      :id="typeof forwardedAttrs.id === 'string' ? forwardedAttrs.id : undefined"
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
       :required="required"
       :rows="rows"
-      class="app-textarea-field"
+      :class="textareaClass"
       @input="handleInput"
       @blur="$emit('blur', $event)"
       @focus="$emit('focus', $event)"
     />
 
-    <p v-if="description" class="app-textarea-description">
+    <p v-if="description" class="text-[11px] text-[var(--color-neutral-500)]">
       {{ description }}
     </p>
 
-    <span v-if="error" class="app-textarea-error">
+    <span v-if="error" class="text-[11px] font-medium text-[var(--color-danger-600)]">
       {{ error }}
     </span>
   </div>
 </template>
-
-<style scoped>
-.app-textarea-container {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-}
-
-.app-textarea-label {
-  font-size: 10px;
-  font-bold: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-neutral-500);
-}
-
-.required-mark {
-  color: var(--color-danger-600);
-  margin-left: 2px;
-}
-
-.app-textarea-field {
-  width: 100%;
-  --control-corner-radius: 2px;
-  min-height: 64px;
-}
-
-.app-textarea-field :deep(::part(control)) {
-  font-size: 13px;
-  line-height: 1.5;
-  padding: 8px;
-  background-color: var(--color-neutral-50);
-}
-
-.app-textarea-field :deep(::part(control):focus) {
-  background-color: white;
-}
-
-.app-textarea-description {
-  font-size: 10px;
-  color: var(--color-neutral-400);
-  margin-top: 2px;
-}
-
-.app-textarea-error {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--color-danger-600);
-  margin-top: 2px;
-}
-</style>

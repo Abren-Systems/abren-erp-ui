@@ -1,10 +1,8 @@
 <script setup lang="ts">
-/**
- * AppSelect.vue
- *
- * High-density wrapper for fluent-select.
- * Provides both a prop-based option interface for speed and slot support for customization.
- */
+import { computed, useAttrs } from 'vue'
+import { cn } from '@/shared/lib'
+
+defineOptions({ inheritAttrs: false })
 
 interface Option {
   label: string
@@ -33,12 +31,25 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
+const attrs = useAttrs()
 
-/**
- * Handle selection changes.
- * fluent-select emits a standard DOM change event.
- */
-const handleChange = (event: Event) => {
+const forwardedAttrs = computed(() => {
+  const { class: _class, ...rest } = attrs
+  return rest
+})
+
+const controlClass = computed(() =>
+  cn(
+    'h-8 w-full rounded-[var(--radius-sm)] border bg-white px-3 text-[13px] text-[var(--color-neutral-900)] shadow-sm outline-none transition-colors',
+    props.error
+      ? 'border-[var(--color-danger-500)]'
+      : 'border-[var(--color-neutral-300)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)]',
+    props.disabled ? 'bg-[var(--color-neutral-50)] opacity-70' : '',
+    attrs.class,
+  ),
+)
+
+function handleChange(event: Event) {
   const target = event.target as HTMLSelectElement
   emit('update:modelValue', target.value)
   emit('change', target.value)
@@ -46,88 +57,39 @@ const handleChange = (event: Event) => {
 </script>
 
 <template>
-  <div class="app-select-container">
-    <label v-if="label" class="app-select-label">
+  <div class="flex w-full flex-col gap-1.5">
+    <label
+      v-if="label"
+      :for="typeof forwardedAttrs.id === 'string' ? forwardedAttrs.id : undefined"
+      class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-neutral-500)]"
+    >
       {{ label }}
-      <span v-if="required" class="required-mark">*</span>
+      <span v-if="required" class="ml-0.5 text-[var(--color-danger-600)]">*</span>
     </label>
 
-    <fluent-select
+    <select
+      v-bind="forwardedAttrs"
+      :id="typeof forwardedAttrs.id === 'string' ? forwardedAttrs.id : undefined"
       :value="modelValue ?? ''"
       :disabled="disabled"
-      class="app-select-field"
+      :required="required"
+      :class="controlClass"
       @change="handleChange"
     >
-      <!-- Optional Placeholder / Default -->
-      <fluent-option v-if="placeholder" value="">
-        {{ placeholder }}
-      </fluent-option>
-
-      <!-- Prop-based options -->
-      <fluent-option
+      <option v-if="placeholder" value="">{{ placeholder }}</option>
+      <option
         v-for="opt in options"
         :key="String(opt.value)"
         :value="String(opt.value)"
         :disabled="opt.disabled"
       >
         {{ opt.label }}
-      </fluent-option>
-
-      <!-- Slot for custom options or additional content -->
+      </option>
       <slot />
-    </fluent-select>
+    </select>
 
-    <span v-if="error" class="app-input-error">
+    <span v-if="error" class="text-[11px] font-medium text-[var(--color-danger-600)]">
       {{ error }}
     </span>
   </div>
 </template>
-
-<style scoped>
-.app-select-container {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-
-.app-select-label {
-  font-size: var(--text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-neutral-500);
-}
-
-.required-mark {
-  color: var(--color-danger-600);
-  margin-left: 2px;
-}
-
-.app-select-field {
-  width: 100%;
-  --control-corner-radius: var(--radius-sm);
-  --height-number: 32; /* Standard Fluent High-Density */
-  --neutral-stroke-rest: var(--color-neutral-300);
-  --neutral-stroke-hover: var(--color-neutral-400);
-  --neutral-fill-rest: var(--app-surface);
-}
-
-.app-select-field :deep(::part(control)) {
-  font-size: var(--text-body-sm);
-  color: var(--color-neutral-900);
-  border-radius: var(--radius-sm);
-  transition: border-color 0.1s ease;
-}
-
-.app-select-field :deep(::part(control):focus-within) {
-  border-color: var(--color-primary-600);
-}
-
-.app-input-error {
-  font-size: var(--text-micro);
-  font-weight: 600;
-  color: var(--color-danger-600);
-  margin-top: 2px;
-}
-</style>
