@@ -13,11 +13,11 @@ Before implementing the frontend views for Horizon A modules, we are establishin
 
 > **Global Principle**: "Operations are the source of truth. Accounting is the guaranteed consequence."
 
-Our True North Star is a synthesis of best-in-class philosophies:
+Our True North Star is a synthesis of proven enterprise patterns, filtered through an Abren-owned product language:
 
 - **Structure**: Sequential Progressive Disclosure (Step-by-step Task Progression)
-- **Interaction**: **Microsoft Fluent UI Native** (Native Web Components for accessibility & performance)
-- **Aesthetic**: **Dynamics 365 Sales** (High-intensity, layered contrast, sharp 2px corners)
+- **Interaction**: **Headless accessibility + Abren-owned primitives** (behavior from infrastructure, product identity from Abren)
+- **Aesthetic**: **Calm operational density** (serious, modern, trustworthy, low-theater)
 - **Workflow**: Linear (State-driven UX clarity isolated by Routing)
 - **Financial UX**: Stripe Dashboard (Traceability via Contextual Drawers)
 - **Architecture**: **Tier 1 App Primitives** + Route-Driven Components
@@ -157,7 +157,7 @@ Guards (Enforced visually in the UI):
 - Cannot "Pay" if target Bank Account is missing or balance is insufficient.
 ```
 
-_Sensory Guidance (Fluent)_: When a state transitions, a subtle motion guides the user's eye to the updated badge. Disabled actions visually feedback exactly _why_ they are locked based on the Guards.
+_Sensory Guidance_: When a state transitions, subtle motion guides the user's eye to the updated badge. Disabled actions must communicate _why_ they are locked based on the guards.
 
 ---
 
@@ -226,6 +226,6 @@ Every transactional UI feature expresses itself through these standardized compo
 | **Primitive**    | `App[Type].vue`            | **Tier 1 Wrapper** (e.g., `AppButton`, `AppInput`, `AppSelect`) |
 
 > [!IMPORTANT]
-> **Vendor Shielding**: Business modules MUST NOT use raw `<fluent-*>` tags. All interaction must occur through our established **Tier 1 Primitives** to ensure reactivity and allow for global design updates without touching business logic.
+> **Vendor Shielding**: Business modules MUST NOT use raw vendor primitives (`<fluent-*>`, raw headless primitives, or third-party UI tags). All interaction must occur through our established **Tier 1 Primitives** so Abren owns the interface contract.
 
 > **Rule**: If a component does not fit one of these types, it must be justified architecturally before creation.

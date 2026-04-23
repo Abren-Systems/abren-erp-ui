@@ -1,42 +1,42 @@
 ---
-title: 'Abren ERP Frontend - Map of the Territory'
-description: 'A centralized reading path to navigate the Frontend documentation.'
+title: 'Abren ERP Frontend Documentation'
+description: 'Entry point for frontend architecture, development, and UX doctrine.'
 tier: frontend
 tags: [readme, index, overview]
 ---
 
-# Abren ERP Frontend - Map of the Territory
+# Abren ERP Frontend Documentation
 
-Welcome to the Abren ERP UI documentation. This frontend is built with Vue 3 (Composition API), Pinia, and TypeScript, and strictly adheres to an "Operational-First" design philosophy.
+This docs tree is the source of truth for how the Abren UI is built and how it should feel.
 
-Below are the primary paths to navigate the UI ecosystem.
+## Read First
 
-## 🧭 Reading Paths
+- [Overview](./OVERVIEW.md)
+- [Development Guide](./DEVELOPMENT.md)
+- [Frontend Architecture](./architecture/ARCHITECTURE.md)
 
-### 🎨 1. Core Architecture & Philosophy
+## UX Direction
 
-Start here to understand the structural layout of the Single Page Application.
+- [UX Architecture](./architecture/UX_ARCHITECTURE.md)
+- [UX Reset Proposal](./architecture/UX_RESET_PROPOSAL.md)
+- [Design System](./architecture/DESIGN_SYSTEM.md)
+- [UI Foundation Decision](./architecture/UI_FOUNDATION_DECISION.md)
 
-- [Architecture Overview](./ARCHITECTURE.md)
-- [State Management](./STATE_MANAGEMENT.md) (Pinia & API Query usage)
-- [Routing Strategy](./ROUTING.md)
+## Implementation Guides
 
-### 🧱 2. Multi-Pane & UI Components
+- [Module Structure](./architecture/MODULE_STRUCTURE.md)
+- [State Management](./architecture/STATE_MANAGEMENT.md)
+- [API Integration](./architecture/API_INTEGRATION.md)
+- [Form Architecture](./architecture/FORM_ARCHITECTURE.md)
+- [Error Handling](./architecture/ERROR_HANDLING.md)
+- [Testing Strategy](./architecture/TESTING_STRATEGY.md)
 
-The most crucial UI pattern in our system is the Multi-Pane Split View constraint. Read these documents to learn how to build screens correctly.
+## Planning and Status
 
-- [Multi-Pane Implementation](./components/MULTI_PANE.md)
-- [Component Library Guidelines](./components/GUIDELINES.md)
-- [Reactivity Gotchas](./components/REACTIVITY.md)
+- [Implementation Roadmap](./IMPLEMENTATION_ROADMAP.md)
+- [Repository Strategy](./REPOSITORY_STRATEGY.md)
 
-### 🛠️ 3. Integration & Networking
+## Notes
 
-For developers connecting the UI to the backend:
-
-- [API Integration](./integration/API.md)
-- [Error Handling & Envelopes](./integration/ERRORS.md)
-
----
-
-> [!NOTE]
-> For heavy architectural constraints (such as `uuid7` usage, Backend Idempotency, or Schema doctrines), please refer to the backend's `/abren-api/docs/` repository.
+- Prefer the documents above over stale assumptions in old commits or prototypes.
+- When UX doctrine and implementation disagree, use the UX reset proposal as the current correction path.

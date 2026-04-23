@@ -111,7 +111,7 @@ All environment variables are prefixed with `VITE_` for Vite exposure:
 For detailed rules on how to build and structure the application, refer to the **Architecture Manifesto**:
 
 - **[Architecture Manifesto](architecture/ARCHITECTURE.md)**: Core principles, Golden Rules, and "Symmetry Not Parity" philosophy.
-- **[UX Architecture Manifesto](architecture/UX_ARCHITECTURE.md)**: The "Composable Business Operating System" principles for Fiori/Fluent-inspired ERP design.
+- **[UX Architecture Manifesto](architecture/UX_ARCHITECTURE.md)**: The workboard-first, Abren-owned interaction model for operational finance.
 - **[Module Structure](architecture/MODULE_STRUCTURE.md)**: The 4-Layer Taxonomy, Mapper-as-Factory, and scaffolding rules.
 - **[API Integration](architecture/API_INTEGRATION.md)**: How to consume the backend's action-oriented endpoints.
 

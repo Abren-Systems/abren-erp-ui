@@ -1,72 +1,79 @@
 # Abren ERP UI
 
-> Frontend for the Abren ERP Financial Operating System.
+Frontend for Abren ERP, a workflow-centered financial operations workspace for SMEs.
+
+## Product Direction
+
+Abren is not being designed as a generic admin dashboard. The frontend is evolving toward:
+
+- a **workboard-first** home experience
+- dense but calm operational workspaces
+- route-driven focus for consequential tasks
+- drawer-based traceability and supporting context
+- truthful UI surfaces that avoid fake metrics and placeholder theater
+
+The current UX reset proposal lives in [docs/architecture/UX_RESET_PROPOSAL.md](docs/architecture/UX_RESET_PROPOSAL.md).
 
 ## Tech Stack
 
-| Layer                 | Technology                           |
-| --------------------- | ------------------------------------ |
-| Framework             | Vue 3 + TypeScript (Composition API) |
-| Build                 | Vite                                 |
-| UI System             | Custom Design System (`core/ui/`)    |
-| Accessible Primitives | Radix Vue                            |
-| DataGrid Engine       | TanStack Table + TanStack Virtual    |
-| Server State          | TanStack Query                       |
-| Form State            | TanStack Form + Zod                  |
-| Client State          | Pinia                                |
-| Styling               | Tailwind CSS v4                      |
-| HTTP                  | Axios                                |
-| Testing               | Vitest + Playwright                  |
+| Layer        | Technology                                                  |
+| ------------ | ----------------------------------------------------------- |
+| Framework    | Vue 3 + TypeScript + Composition API                        |
+| Build        | Vite                                                        |
+| Routing      | Vue Router                                                  |
+| Server State | TanStack Query                                              |
+| Tables       | TanStack Table + TanStack Virtual                           |
+| UI State     | Pinia for ephemeral client state only                       |
+| Styling      | Tailwind CSS v4 + shared design tokens                      |
+| Primitives   | Abren-owned shared components built on headless foundations |
+| HTTP         | Axios                                                       |
+| Testing      | Vitest + Playwright                                         |
 
 ## Quick Start
 
 ```bash
-# Install dependencies
 vp install
-
-# Start dev server (proxies /api to localhost:8000)
 vp dev
-
-# Run unit tests
+vp check
 vp test
-
-# Generate API types from backend
-vp run generate-types
 ```
 
 ## Project Structure
 
-```
+```text
 src/
-├── app/              # Application shell (router, layouts)
-├── core/             # Shared Kernel (NO business logic)
-│   ├── api/          # Axios client, typed helpers
-│   ├── auth/         # Auth engine (JWT, tenant scoping)
-│   ├── domain/       # Money VO, Currency, branded types
-│   ├── ui/           # Custom Design System (standard components)
-│   └── types/        # Cross-module types & registry
-├── modules/          # Bounded Contexts (Monolith Modules)
-│   ├── business/     # [Applications] High-value business domains
-│   │   └── finance/
-│   │       ├── ledger/
-│   │       └── bank/
-│   └── platform/     # [Engines] Infrastructure & Platform services
-│       ├── core/     # Identity & Management
-│       └── workflows/# State Machine & Approvals
-└── assets/           # Tailwind v4 entry + @theme tokens
+├── app/              # Router, layouts, application shell
+├── assets/           # Global styles and tokens
+├── modules/          # Bounded contexts and business/platform modules
+├── shared/           # Shared kernel: primitives, utilities, auth, api, domain helpers
+└── main.ts           # App bootstrap
+```
+
+Each module follows the 4-layer structure:
+
+```text
+modules/{area}/{module}/
+├── domain/
+├── application/
+├── infrastructure/
+├── ui/
+└── routes.ts
 ```
 
 ## Documentation
 
-| Document              | Path                                                                             |
-| --------------------- | -------------------------------------------------------------------------------- |
-| Architecture          | [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)           |
-| Module Structure      | [docs/architecture/MODULE_STRUCTURE.md](docs/architecture/MODULE_STRUCTURE.md)   |
-| State Management      | [docs/architecture/STATE_MANAGEMENT.md](docs/architecture/STATE_MANAGEMENT.md)   |
-| API Integration       | [docs/architecture/API_INTEGRATION.md](docs/architecture/API_INTEGRATION.md)     |
-| Form Architecture     | [docs/architecture/FORM_ARCHITECTURE.md](docs/architecture/FORM_ARCHITECTURE.md) |
-| Error Handling        | [docs/architecture/ERROR_HANDLING.md](docs/architecture/ERROR_HANDLING.md)       |
-| Testing Strategy      | [docs/architecture/TESTING_STRATEGY.md](docs/architecture/TESTING_STRATEGY.md)   |
-| Repository Strategy   | [docs/REPOSITORY_STRATEGY.md](docs/REPOSITORY_STRATEGY.md)                       |
-| Development Guide     | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)                                       |
-| Implementation Status | [docs/IMPLEMENTATION_ROADMAP.md](docs/IMPLEMENTATION_ROADMAP.md)                 |
+Start here:
+
+- [docs/OVERVIEW.md](docs/OVERVIEW.md)
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
+- [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)
+- [docs/architecture/UX_ARCHITECTURE.md](docs/architecture/UX_ARCHITECTURE.md)
+- [docs/architecture/UX_RESET_PROPOSAL.md](docs/architecture/UX_RESET_PROPOSAL.md)
+- [docs/architecture/DESIGN_SYSTEM.md](docs/architecture/DESIGN_SYSTEM.md)
+
+## Current Priorities
+
+- replace the generic dashboard with a real workboard
+- standardize the workspace shell and page composition
+- strengthen traceability and action hierarchy across finance flows
+- align docs, skills, and implementation so the UX stops drifting

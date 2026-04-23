@@ -1,85 +1,120 @@
 # Foundation UI Components Guide
 
-This document defines the strict engineering standards for building and utilizing User Interface components within Abren ERP. We leverage the **Fluent Design System** visually, but enforce strict abstraction boundaries programmatically.
+This document defines how UI components are built and consumed in Abren ERP.
 
-## 1. The Wrapper Mandate (Vendor Shielding)
+## 1. Ownership First
 
-Never import or mount a pristine generic UI component (like `<fluent-button>`) directly inside a business module.
+Business modules must consume **Abren-owned shared components**, not raw vendor primitives.
 
-**All fundamental interactive elements must be routed through the `App` abstraction layer.** This ensures we own the reactivity contract and can pivot styling without touching business logic.
+That means:
 
-### Correct Usage (Business Layer)
+- use `App*` primitives from `src/shared/components/primitives/`
+- use shared page-kit components from `src/shared/components/workspace/`
+- do not mount raw third-party UI primitives in module pages
 
-```vue
-<template>
-  <AppButton variant="primary" @click="submitLedger"> Post Entry </AppButton>
-</template>
+The product contract belongs to Abren, not to any vendor library.
 
-<script setup>
-import { AppButton } from '@/shared/components/primitives'
-</script>
-```
+## 2. Headless Direction
 
----
+Abren’s long-term direction is:
 
-## 2. High-Density ERP Standards
+- **headless accessibility and behavior**
+- **Abren-owned appearance and composition**
 
-Abren ERP is a dense, operational interface. We explicitly deviate from standard web "breathing room" in favor of maximum information throughput.
+The preferred behavior layer is **Reka UI / Radix-Vue lineage primitives** for things like:
 
-### 2.1. The 32px Standard
+- dialogs
+- menus
+- overlays
+- labels
+- popovers
 
-All primary interactive elements (Buttons, Inputs, Selects) must maintain a **fixed height of 32px**. This allows for high-density tabular alignment and predictable vertical scanning.
+These primitives should remain invisible at the product-language level. Users should experience Abren, not a library.
 
-### 2.2. Sharp Corners
+## 3. No Fluent Reintroduction
 
-We reject the rounded "consumer" aesthetic. All components must target a **2px corner radius** standard via CSS variables.
+The old Fluent-based wrapper layer is no longer part of the active shared primitive foundation.
 
----
+Rules:
 
-## 3. Layered Contrast Hierarchy (Canvas vs. Surface)
+- do not reintroduce raw `<fluent-*>` tags
+- do not rebuild product doctrine around Fluent tokens or appearance
+- if a new primitive is needed, build it through Abren-owned headless composition
 
-To create structural depth without heavy shadows, we use a three-tier layout pattern:
+## 4. Component Layers
 
-1.  **Level 0: The Canvas (`var(--app-canvas)`)**: The pale gray base for all pages.
-2.  **Level 1: The Nav Anchor (`var(--app-sidebar)`)**: The slightly deeper gray for stable sidebars.
-3.  **Level 2: The Action Surface (`var(--app-surface)`)**: Stark white containers. **All Data Grids and Forms must live on Level 2.**
+### 4.1 Primitive Layer
 
----
+Use primitives for atomic interactions:
 
-## 4. Engineering with Shadow DOM & Tailwind v4
+- `AppButton`
+- `AppInput`
+- `AppSelect`
+- `AppBadge`
+- `AppDrawer`
+- `AppDialog`
 
-Abren ERP uses **Tailwind v4** (`@theme`). To style Fluent Web Components, we bridge these two worlds:
+### 4.2 Page-Kit Layer
 
-### 4.1. Targeting the Shadow root
+Use composition components for repeatable page structure:
 
-Direct Tailwind classes on an `<AppButton>` only affect the custom element host. To affect the internal appearance, use **Parts** or **CSS Variables**:
+- `PageHeader`
+- `WorkspacePanel`
+- `MetricStrip`
+- `EmptyState`
+- `TraceSection`
 
-```css
-/* Precise internal radius mapping */
-.app-button-root {
-  --control-corner-radius: 2px;
-  --accent-fill-rest: var(--color-primary-600);
-}
-```
+Pages should not reinvent these layouts ad hoc.
 
-### 4.2. Layout Mapping
+## 5. ERP Density Rules
 
-Use Tailwind exclusively for **Layout & Spacing** (Flex, Grid, Margin, Padding). Use Fluent tokens exclusively for **Appearance** (Color, Borders, Interaction states).
+Abren is a dense operational interface.
 
----
+Default expectations:
 
-## 5. Supported Primitives (The `App*` suite)
+- compact controls
+- tight but readable grouping
+- low-ceremony page chrome
+- tables should claim viewport priority on list pages
+- whitespace must earn its keep by improving scan speed or reducing errors
 
-Located in `src/shared/components/primitives/`:
+## 6. Styling Rules
 
-- **`AppButton`**: Action trigger. 32px high.
-- **`AppInput`**: Bridges `<fluent-text-field>`. Fixed 32px height.
-- **`AppSelect`**: Ensures strict nullable parsing for parent-child hierarchies.
-- **`AppBadge`**: Status indicators (Draft, Posted, Voided). Uses semantic tints.
-- **`AppDrawer`**: Contextual overlays for the "Provenance" stage of UX.
+Use Abren tokens from `src/assets/main.css`.
 
----
+Prefer:
 
-## 6. The Data Grid Exception
+- semantic color roles
+- surface hierarchy
+- compact spacing
+- readable numeric alignment
 
-**TanStack Table** handles structural manipulation of our grids. **Do not use `<fluent-data-grid>`**. The `DataGrid.vue` wrapper acts as the headless host. You must implement cell definitions using `App*` primitives to maintain Vue reactivity across the table rows.
+Avoid:
+
+- hardcoded vendor colors
+- library-default sizing assumptions
+- decorative card inflation
+- page-specific visual hacks that bypass shared tokens
+
+## 7. Data Grid Exception
+
+TanStack remains the structural engine for data-heavy UI.
+
+Rules:
+
+- use the shared `DataGrid` host
+- use shared cells and shared primitives inside grid definitions
+- do not adopt vendor-owned data grid components that break Vue context or product ownership
+
+## 8. Refactor Expectation
+
+When touching a shared primitive:
+
+- improve the Abren-facing API if needed
+- preserve headless ownership and avoid vendor leakage
+- avoid unnecessary rewrites if the task is unrelated
+- leave the component more clearly aligned with the headless Abren-owned direction
+
+## 9. One Rule to Remember
+
+> Vendor libraries may provide behavior. Only Abren defines the interface.

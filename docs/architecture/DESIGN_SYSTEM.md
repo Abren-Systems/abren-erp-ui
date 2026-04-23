@@ -15,10 +15,11 @@ This document strictly reflects the design tokens implemented via **Tailwind CSS
 
 ## 1. Aesthetic Principles
 
-To ensure Abren ERP feels like a state-of-the-art financial platform, we adhere to the following premium design pillars:
+To ensure Abren ERP feels like a state-of-the-art financial platform, we adhere to the following core design pillars:
 
 - **Operational Density First**: Maximize information per viewport. Avoid wasted whitespace. Every pixel must justify itself. We natively support a **3-tier density system** (Compact by default, Comfortable, Touch).
-- **Vibrant Professionalism**: We avoid muddy grays. Our neutrals use a premium **Radix Slate** (warm blue-gray) base, and our primary actions use authoritative **Indigo** to draw the eye without creating fatigue or conflicting with financial status colors.
+- **Abren-Owned Language**: We use headless infrastructure under the hood, but the look, spacing, density, and page grammar belong to Abren.
+- **Vibrant Professionalism**: We avoid muddy grays. Our neutrals use a warm blue-gray base, and our primary actions use authoritative **Indigo** to draw the eye without creating fatigue or conflicting with financial status colors.
 - **Keyboard-First UX**: Power users must be able to operate the ERP without a mouse. Tables behave like spreadsheets, and a global Command Palette (⌘K) provides instant access to all modules and actions.
 - **Speed Over Decoration**: The UI must feel instant. We avoid heavy animations in favor of micro-interactions (< 100ms) that provide immediate tactile feedback.
 
@@ -42,9 +43,9 @@ Used for primary actions, active states, and focus rings. We use Indigo (`#4f46e
 | `--color-primary-600` | `#4f46e5` | **Base Primary Action Color**              |
 | `--color-primary-700` | `#4338ca` | Primary Action Hover State                 |
 
-### 2.2 Neutral Scale (Radix Slate)
+### 2.2 Neutral Scale
 
-Used for text hierarchy, borders, and UI skeleton backgrounds. Replacing Tailwind's cold gray, we use Radix Slate for a premium, warmer blue-gray that reduces eye strain at high information density.
+Used for text hierarchy, borders, and UI skeleton backgrounds. We use a warmer blue-gray neutral base to reduce eye strain at high information density.
 
 | Token                 | Hex Value | Usage                                 |
 | :-------------------- | :-------- | :------------------------------------ |
@@ -66,9 +67,11 @@ Used specifically for validation, state, and financial indicators. We deploy ful
 | `--color-danger-500`  | `#ef4444` | (Red) Rejected, Errors, Negative amounts     |
 | `--color-info-500`    | `#3b82f6` | (Blue) Informational callouts (Non-critical) |
 
-### 2.4 Data Visualization Palette (IBM Carbon)
+### 2.4 Data Visualization Palette
 
-ERP dashboards and charts require a distinct, colorblind-safe categorical palette. We adopt the mathematically rigorous 8-color IBM Carbon data palette.
+ERP dashboards and charts require a distinct, colorblind-safe categorical palette. We currently use an IBM Carbon-derived categorical palette for charts only.
+
+> **Important**: This palette influences data visualization only. It does **not** define the product's overall UI language.
 
 - `--chart-1`: `#6929c4` (Purple)
 - `--chart-2`: `#1192e8` (Cyan)
@@ -162,7 +165,7 @@ Instead of relying solely on heavy shadows, we use **layered surfaces**—especi
 
 ### 5.2 Drop Shadows
 
-Shadows have a dual-layer softness to match the Radix Slate tone and are applied only to elevated/floating layers.
+Shadows have a dual-layer softness and are applied only to elevated/floating layers.
 
 - `--shadow-sm`: Soft border definition for basic interactive elements (buttons).
 - `--shadow-md`: Hover states for cards.
@@ -238,10 +241,10 @@ Every major entity Context Drawer in Abren ERP must include an "Audit & Notes" t
 
 To maintain high operational density and avoid the pitfalls of generalized "consumer-friendly" SaaS design, the following UX defaults are **strictly banned** in Abren ERP:
 
-- **🚫 Consumer-Grade Size Metrics**: UI libraries (including generalized Fluent / Tailwind defaults) ship with massive `40px` tap targets. These are forbidden in Abren ERP. We strictly enforce our **Compact Mode** (30px row height).
+- **🚫 Consumer-Grade Size Metrics**: General-purpose UI defaults often ship with oversized `40px` tap targets. These are forbidden in Abren ERP. We strictly enforce our **Compact Mode** (30px row height).
 - **🚫 Hidden Contextual Commands ("..." Menus)**: Primary grid actions (Edit, Delete, Export) must not be buried inside overflow ellipses menus just to make the UI look "cleaner." Use native Right-Click context menus or expose icons on hover.
 - **🚫 "Wizard" Flows for Basic Entry**: Power users despise paginated wizards because they break flow state. Use single-view Drawers or inline grid editors. Save wizards exclusively for rare, complex configurations (e.g., Year-End Close).
-- **🚫 Blinding `#FFFFFF` Backgrounds**: Staring at pure white canvases for 8 hours causes optical fatigue. Always use the Radix Slate token (`--color-neutral-50` / `#f8fafc`) as the base application background.
+- **🚫 Blinding `#FFFFFF` Backgrounds**: Staring at pure white canvases for 8 hours causes optical fatigue. Always use the neutral canvas token (`--color-neutral-50`) as the base application background.
 
 ---
 
@@ -258,8 +261,9 @@ The UI layer must remain isolated from hardcoded currency symbols or date format
 
 All base UI components (`Button`, `Input`, `Select`, etc.) are physically owned in `src/shared/components/` and strictly utilize the tokens above.
 
-- **Base Tech:** Reka UI (accessible DOM primitives via `reka-ui`)
-- **Scaffolding:** shadcn-vue CLI
+- **Behavior Layer:** Headless primitives from the Reka UI / Radix-Vue lineage
+- **Appearance Layer:** Abren-owned wrappers and page-kit components
 - **Styling Framework:** Tailwind CSS v4 `@theme`
+- **Implementation Note:** Shared primitives are Abren-owned and should continue moving toward headless foundations rather than vendor-owned visual components.
 
 _No external vendor libraries (like PrimeVue) are permitted for these primitives, guaranteeing full long-term code ownership._
