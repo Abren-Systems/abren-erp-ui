@@ -136,8 +136,7 @@ const tenantName = computed(() => authStore.currentTenant?.name || 'Current Tena
 const userEmail = computed(() => authStore.currentUser?.email || 'operator@abren.local')
 const userInitials = computed(
   () =>
-    userEmail.value
-      .split('@')[0]
+    (userEmail.value.split('@')[0] || '')
       .split(/[.\-_]/)
       .filter(Boolean)
       .slice(0, 2)
