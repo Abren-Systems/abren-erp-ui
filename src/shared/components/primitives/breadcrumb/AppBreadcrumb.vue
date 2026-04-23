@@ -5,15 +5,23 @@ import { ChevronRight, Home } from 'lucide-vue-next'
 
 const route = useRoute()
 
-const breadcrumbs = computed(() =>
-  route.matched
+const breadcrumbs = computed(() => {
+  const crumbs = route.matched
     .filter((record) => record.meta && (record.meta['title'] || record.name))
-    .map((record) => ({
-      label: (record.meta['title'] as string) || (record.name as string),
-      path: record.path,
-      active: record.path === route.path,
-    })),
-)
+    .map((record) => {
+      const label = (record.meta['title'] as string) || (record.name as string)
+      return {
+        label: label.replace(/([A-Z])/g, ' $1').trim(),
+        path: record.path,
+        active: record.path === route.path,
+      }
+    })
+
+  // Remove redundant crumbs with identical paths (common with nested index routes)
+  return crumbs.filter((crumb, index) => {
+    return index === 0 || crumb.path !== crumbs[index - 1].path
+  })
+})
 </script>
 
 <template>

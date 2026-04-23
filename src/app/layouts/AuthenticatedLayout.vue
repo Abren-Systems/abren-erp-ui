@@ -119,18 +119,9 @@ const currentModuleName = computed(() => {
 })
 
 const currentTitle = computed(() => {
-  const titledMatch = [...route.matched]
-    .reverse()
-    .find((record) => typeof record.meta.title === 'string')
-  if (titledMatch?.meta.title) {
-    return titledMatch.meta.title as string
-  }
-
-  if (route.name === 'DashboardPage') {
-    return 'Workboard'
-  }
-
-  return typeof route.name === 'string' ? route.name : currentModuleName.value
+  return typeof route.name === 'string'
+    ? route.name.replace(/([A-Z])/g, ' $1').trim()
+    : currentModuleName.value
 })
 
 const currentDescription = computed(() => {
@@ -370,17 +361,8 @@ async function handleLogout() {
               <Menu class="h-4 w-4" />
             </button>
 
-            <div class="min-w-0">
-              <p
-                class="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]"
-              >
-                {{ currentModuleName }}
-              </p>
-              <h1
-                class="truncate text-lg font-semibold tracking-tight text-[var(--color-neutral-900)]"
-              >
-                {{ currentTitle }}
-              </h1>
+            <div class="hidden min-w-0 md:block">
+              <AppBreadcrumb />
             </div>
           </div>
 
@@ -426,9 +408,11 @@ async function handleLogout() {
           </div>
         </div>
 
-        <div class="flex items-center justify-between gap-4 px-4 py-2 sm:px-6">
+        <div class="flex items-center justify-between gap-4 px-4 py-1 sm:px-6 md:hidden">
           <AppBreadcrumb />
-          <div id="command-bar-portal" class="hidden sm:block" />
+        </div>
+        <div class="hidden px-4 py-2 sm:px-6 md:block">
+          <div id="command-bar-portal" />
         </div>
       </header>
 
