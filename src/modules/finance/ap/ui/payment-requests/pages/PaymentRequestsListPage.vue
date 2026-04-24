@@ -11,12 +11,17 @@ import { usePermissions } from '@/shared/auth/usePermissions'
 import type { PaymentRequest } from '../../../domain/ap.types'
 import { h } from 'vue'
 import { MoneyCell, DateCell, BadgeCell, SelectionCell } from '@/shared/components/data-grid'
+import { History, X } from 'lucide-vue-next'
+import PaymentRequestTimeline from '../components/PaymentRequestTimeline.vue'
 
 const router = useRouter()
 const { hasPermission } = usePermissions()
 const { requests, isLoading } = usePaymentRequests()
 const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 const statusFilter = ref('all')
+
+const isTraceOpen = ref(false)
+const traceTarget = ref<PaymentRequest | null>(null)
 
 const selectedCount = computed(() => Object.keys(rowSelection.value).length)
 
@@ -101,7 +106,42 @@ const columns = [
     cell: ({ row }: { row: Row<PaymentRequest> }) =>
       h(DateCell, { date: row.original.submittedAt }),
   },
+  {
+    id: 'actions',
+    header: '',
+    cell: ({ row }: { row: Row<PaymentRequest> }) =>
+      h(
+        'div',
+        { class: 'flex justify-end pr-2' },
+        h(
+          AppButton,
+          {
+            variant: 'stealth',
+            size: 'sm',
+            class: [
+              'trace-action-btn',
+              traceTarget.value?.id === row.original.id && isTraceOpen.value ? 'is-active' : '',
+            ],
+            onClick: (e: Event) => {
+              e.stopPropagation()
+              handleTrace(row.original)
+            },
+          },
+          () => h(History, { size: 14 }),
+        ),
+      ),
+    size: 60,
+  },
 ]
+
+function handleTrace(pr: PaymentRequest) {
+  if (traceTarget.value?.id === pr.id && isTraceOpen.value) {
+    isTraceOpen.value = false
+    return
+  }
+  traceTarget.value = pr
+  isTraceOpen.value = true
+}
 
 function goToDetail(pr: PaymentRequest) {
   void router.push({ name: 'PaymentRequestDetail', params: { id: pr.id } })
@@ -121,7 +161,7 @@ function handleBulkReject() {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="flex flex-col gap-4 h-full">
     <PageHeader title="Payment Requests" description="All pending and processed payments">
       <template #actions>
         <AppButton v-if="hasPermission('ap:create')" variant="primary" @click="handleCreate">
@@ -133,50 +173,140 @@ function handleBulkReject() {
       </template>
     </PageHeader>
 
-    <div
-      class="rounded-xl border border-[var(--color-neutral-200)] bg-white shadow-sm overflow-hidden"
-    >
-      <DataGrid
-        v-model:sorting="sorting"
-        v-model:row-selection="rowSelection"
-        v-model:column-visibility="columnVisibility"
-        v-model:global-filter="globalFilter"
-        :data="filteredRequests"
-        :columns="columns"
-        :loading="isLoading"
-        placeholder="Search requests..."
-        row-clickable
-        @row-click="goToDetail"
-      >
-        <template #toolbar>
-          <div v-if="selectedCount > 0" class="flex items-center gap-2">
-            <AppButton variant="stealth" size="sm" @click="handleBulkReject">
-              <template #start><XCircle :size="14" /></template>
-              Reject Selected
-            </AppButton>
-            <AppButton variant="primary" size="sm" @click="handleBulkApprove">
-              <template #start><CheckCircle :size="14" /></template>
-              Approve Selected
-            </AppButton>
-          </div>
+    <!-- Operational Split-Pane -->
+    <div class="flex flex-1 gap-4 overflow-hidden min-h-0">
+      <!-- Main Content Area (Grid) -->
+      <div class="flex-1 min-w-0 transition-all duration-300 ease-in-out">
+        <div
+          class="h-full rounded-xl border border-[var(--color-neutral-200)] bg-white shadow-sm overflow-hidden flex flex-col"
+        >
+          <DataGrid
+            v-model:sorting="sorting"
+            v-model:row-selection="rowSelection"
+            v-model:column-visibility="columnVisibility"
+            v-model:global-filter="globalFilter"
+            :data="filteredRequests"
+            :columns="columns"
+            :loading="isLoading"
+            placeholder="Search requests..."
+            row-clickable
+            class="flex-1"
+            @row-click="goToDetail"
+          >
+            <template #toolbar>
+              <div v-if="selectedCount > 0" class="flex items-center gap-2">
+                <AppButton
+                  v-if="selectedCount === 1"
+                  variant="stealth"
+                  size="sm"
+                  @click="handleTrace(filteredRequests.find((r) => rowSelection[r.id])!)"
+                >
+                  <template #start><History :size="14" /></template>
+                  Trace
+                </AppButton>
+                <div v-if="selectedCount === 1" class="h-4 w-px bg-neutral-200 mx-1" />
 
-          <div v-else class="flex items-center gap-1.5 ml-2">
-            <button
-              v-for="opt in statusOptions"
-              :key="opt.value"
-              class="h-7 px-3 text-[11px] font-semibold rounded-full border transition-all"
-              :class="[
-                statusFilter === opt.value
-                  ? 'bg-neutral-900 border-neutral-900 text-white'
-                  : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300',
-              ]"
-              @click="statusFilter = opt.value"
-            >
-              {{ opt.label }}
-            </button>
+                <AppButton variant="stealth" size="sm" @click="handleBulkReject">
+                  <template #start><XCircle :size="14" /></template>
+                  Reject Selected
+                </AppButton>
+                <AppButton variant="primary" size="sm" @click="handleBulkApprove">
+                  <template #start><CheckCircle :size="14" /></template>
+                  Approve Selected
+                </AppButton>
+              </div>
+
+              <div v-else class="flex items-center gap-1.5 ml-2">
+                <button
+                  v-for="opt in statusOptions"
+                  :key="opt.value"
+                  class="h-7 px-3 text-[11px] font-semibold rounded-full border transition-all"
+                  :class="[
+                    statusFilter === opt.value
+                      ? 'bg-neutral-900 border-neutral-900 text-white'
+                      : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300',
+                  ]"
+                  @click="statusFilter = opt.value"
+                >
+                  {{ opt.label }}
+                </button>
+              </div>
+            </template>
+          </DataGrid>
+        </div>
+      </div>
+
+      <!-- Contextual Sidebar (Audit Trail) -->
+      <aside
+        v-if="isTraceOpen && traceTarget"
+        class="w-[320px] shrink-0 bg-white border border-neutral-200 rounded-xl shadow-lg flex flex-col transition-all animate-in slide-in-from-right duration-300"
+      >
+        <div
+          class="p-3 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50"
+        >
+          <div class="flex items-center gap-2">
+            <div class="h-6 w-6 rounded-md bg-primary-50 flex items-center justify-center">
+              <History class="h-3.5 w-3.5 text-primary-600" />
+            </div>
+            <div>
+              <h3 class="text-[10px] font-bold uppercase tracking-wider text-neutral-900">
+                Trace: {{ traceTarget.id.slice(0, 8) }}
+              </h3>
+            </div>
           </div>
-        </template>
-      </DataGrid>
+          <AppButton variant="stealth" size="sm" class="h-7 w-7 p-0" @click="isTraceOpen = false">
+            <X :size="14" />
+          </AppButton>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 scrollbar-thin">
+          <PaymentRequestTimeline :request="traceTarget" density="compact" />
+
+          <!-- Mini Stats -->
+          <div class="mt-6 pt-5 border-t border-neutral-100 space-y-3">
+            <div class="flex justify-between items-center text-[10px]">
+              <span class="text-neutral-500 font-medium uppercase tracking-tight">Step</span>
+              <span class="font-bold text-neutral-900"
+                >{{ traceTarget.currentApprovalStep }} / 3</span
+              >
+            </div>
+            <div class="flex justify-between items-center text-[10px]">
+              <span class="text-neutral-500 font-medium uppercase tracking-tight">Status</span>
+              <BadgeCell :status="traceTarget.status" class="scale-90 origin-right" />
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-neutral-50 border-t border-neutral-100">
+          <AppButton
+            variant="outline"
+            size="sm"
+            class="w-full h-8 text-[11px]"
+            @click="goToDetail(traceTarget)"
+          >
+            View Full Detail
+          </AppButton>
+        </div>
+      </aside>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Trace Action Visibility Logic */
+:deep(.grid-row) .trace-action-btn {
+  opacity: 0;
+  transition: all 0.2s ease;
+  color: var(--color-neutral-400);
+}
+
+:deep(.grid-row:hover) .trace-action-btn {
+  opacity: 1;
+}
+
+:deep(.grid-row) .trace-action-btn.is-active {
+  opacity: 1 !important;
+  color: var(--color-primary-600);
+  background: var(--color-primary-50);
+}
+</style>
