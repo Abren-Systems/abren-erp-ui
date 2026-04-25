@@ -145,13 +145,37 @@ function formatMoney(money: unknown) {
       <!-- Main Content (Left Column) -->
       <div class="lg:col-span-9 space-y-8">
         <!-- Section 1: Core Fields (Flat Grid) -->
-        <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+        <div class="grid grid-cols-2 gap-x-12 gap-y-8">
           <div class="space-y-6">
-            <AppInput label="Vendor" :modelValue="request.beneficiaryId" readonly />
-            <AppInput label="Invoice Number" :modelValue="request.sourceId || 'N/A'" readonly />
+            <div class="space-y-1.5">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                >Vendor</label
+              >
+              <div class="text-sm font-medium text-neutral-900">{{ request.beneficiaryId }}</div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                >Invoice Number</label
+              >
+              <div class="text-sm font-medium text-neutral-900 font-mono">
+                {{ request.sourceId || 'N/A' }}
+              </div>
+            </div>
             <div class="grid grid-cols-2 gap-4">
-              <AppInput label="Amount" :modelValue="formatMoney(request.totalAmount)" readonly />
-              <AppInput label="Currency" :modelValue="request.currency" readonly />
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                  >Amount</label
+                >
+                <div class="text-sm font-medium text-neutral-900 tabular-nums">
+                  {{ formatMoney(request.totalAmount) }}
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                  >Currency</label
+                >
+                <div class="text-sm font-medium text-neutral-900">{{ request.currency }}</div>
+              </div>
             </div>
           </div>
 
@@ -175,24 +199,49 @@ function formatMoney(money: unknown) {
               </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
-              <AppInput label="Request Date" :modelValue="request.submittedAt || '—'" readonly />
-              <AppInput label="Due Date" modelValue="2023-11-23" readonly />
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                  >Request Date</label
+                >
+                <div class="text-sm font-medium text-neutral-900">
+                  {{ request.submittedAt || '—' }}
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                  >Due Date</label
+                >
+                <div class="text-sm font-medium text-neutral-900">2023-11-23</div>
+              </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
-              <AppInput label="Department" modelValue="Engineering" readonly />
-              <AppInput label="Cost Center" modelValue="CC-882-ENG" readonly />
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                  >Department</label
+                >
+                <div class="text-sm font-medium text-neutral-900">Engineering</div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                  >Cost Center</label
+                >
+                <div class="text-sm font-medium text-neutral-900 font-mono">CC-882-ENG</div>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="h-px bg-neutral-200" />
 
-        <div class="space-y-4">
-          <AppInput
-            label="Description / Memo"
-            :modelValue="request.justification || 'No justification provided.'"
-            readonly
-          />
+        <div class="space-y-2">
+          <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+            >Description / Memo</label
+          >
+          <p
+            class="text-sm text-neutral-900 leading-relaxed bg-neutral-50/50 p-4 rounded-lg border border-neutral-100"
+          >
+            {{ request.justification || 'No justification provided.' }}
+          </p>
         </div>
 
         <!-- Section 2: Supporting Detail (Conditional) -->
@@ -286,34 +335,6 @@ function formatMoney(money: unknown) {
       <aside class="lg:col-span-3 space-y-6 sticky top-24">
         <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <PaymentRequestTimeline :request="request" density="compact" />
-
-          <div class="mt-8 pt-6 border-t border-neutral-100">
-            <AppButton
-              variant="stealth"
-              size="sm"
-              class="w-full justify-start text-xs text-neutral-400 italic"
-            >
-              View full audit history...
-            </AppButton>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-6">
-          <h4 class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-3">
-            System Context
-          </h4>
-          <div class="space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-[11px] text-neutral-500">Approval Step</span>
-              <span class="text-[11px] font-bold text-neutral-900"
-                >Step {{ request.currentApprovalStep }} of 3</span
-              >
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-[11px] text-neutral-500">Owner Module</span>
-              <span class="text-[11px] font-bold text-neutral-900">Accounts Payable</span>
-            </div>
-          </div>
         </div>
       </aside>
     </div>

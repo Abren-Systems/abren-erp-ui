@@ -13,6 +13,7 @@ import { h } from 'vue'
 import { MoneyCell, DateCell, BadgeCell, SelectionCell } from '@/shared/components/data-grid'
 import { History, X } from 'lucide-vue-next'
 import PaymentRequestTimeline from '../components/PaymentRequestTimeline.vue'
+import { paymentRequestColumns } from '../grids/payment-request.grid'
 
 const router = useRouter()
 const { hasPermission } = usePermissions()
@@ -58,54 +59,7 @@ const columns = [
       }),
     size: 40,
   },
-  {
-    accessorKey: 'requestNumber',
-    header: 'Request #',
-    cell: ({ row }: { row: Row<PaymentRequest> }) =>
-      h(
-        'code',
-        { class: 'text-xs font-bold font-mono uppercase text-neutral-900' },
-        row.original.requestNumber,
-      ),
-  },
-  {
-    accessorKey: 'beneficiaryId',
-    header: 'Vendor',
-    cell: ({ row }: { row: Row<PaymentRequest> }) =>
-      h('span', { class: 'font-medium' }, row.original.beneficiaryId.slice(0, 8)),
-  },
-  {
-    accessorKey: 'totalAmount',
-    header: () => h('div', { class: 'text-right' }, 'Amount'),
-    cell: ({ row }: { row: Row<PaymentRequest> }) =>
-      h(MoneyCell, { amount: row.original.totalAmount, class: 'justify-end' }),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }: { row: Row<PaymentRequest> }) =>
-      h(BadgeCell, {
-        status: row.original.status,
-        variant:
-          row.original.status === 'PAID'
-            ? 'success'
-            : row.original.status === 'REJECTED'
-              ? 'danger'
-              : 'warning',
-      }),
-  },
-  {
-    accessorKey: 'requesterId',
-    header: 'Requested By',
-    cell: ({ row }: { row: Row<PaymentRequest> }) =>
-      h('span', { class: 'text-neutral-500 text-xs' }, row.original.requesterId.slice(0, 8)),
-  },
-  {
-    accessorKey: 'submittedAt',
-    header: 'Date',
-    cell: ({ row }: { row: Row<PaymentRequest> }) =>
-      h(DateCell, { date: row.original.submittedAt }),
-  },
+  ...paymentRequestColumns,
   {
     id: 'actions',
     header: '',
@@ -220,15 +174,29 @@ function handleBulkReject() {
                 <button
                   v-for="opt in statusOptions"
                   :key="opt.value"
-                  class="h-7 px-3 text-[11px] font-semibold rounded-full border transition-all"
+                  class="h-7 pl-3 pr-2 flex items-center gap-1.5 text-[11px] font-semibold rounded-full border transition-all"
                   :class="[
                     statusFilter === opt.value
                       ? 'bg-neutral-900 border-neutral-900 text-white'
-                      : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300',
+                      : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50',
                   ]"
                   @click="statusFilter = opt.value"
                 >
-                  {{ opt.label }}
+                  <span>{{ opt.label }}</span>
+                  <span
+                    class="flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-[10px] px-1 font-mono transition-colors"
+                    :class="[
+                      statusFilter === opt.value
+                        ? 'bg-neutral-800 text-neutral-300'
+                        : 'bg-neutral-100 text-neutral-500 group-hover:bg-neutral-200',
+                    ]"
+                  >
+                    {{
+                      opt.value === 'all'
+                        ? requests?.length || 0
+                        : requests?.filter((r) => r.status === opt.value).length || 0
+                    }}
+                  </span>
                 </button>
               </div>
             </template>
