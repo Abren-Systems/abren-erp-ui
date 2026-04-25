@@ -97,7 +97,7 @@ function clear() {
 }
 
 .search-wrap {
-  width: 240px;
+  width: 320px;
 }
 
 .search-icon {

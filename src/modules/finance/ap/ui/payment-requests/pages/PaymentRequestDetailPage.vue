@@ -11,6 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Edit3,
+  Send,
 } from 'lucide-vue-next'
 import { usePaymentRequest } from '../../../application/composables/usePaymentRequest'
 import { useApprovePaymentRequest } from '../../../application/composables/useApprovePaymentRequest'
@@ -23,25 +25,37 @@ import type { PaymentRequestId } from '@/shared/types/brand.types'
 import PaymentRequestTimeline from '../components/PaymentRequestTimeline.vue'
 import BadgeCell from '@/shared/components/data-grid/cells/BadgeCell.vue'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
+import { useMoney } from '@/shared/composables/useMoney'
+import { BusinessDate } from '@/shared/domain/business-date'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
 const { hasPermission } = usePermissions()
 const { users } = useUsers()
+const { formatMoney } = useMoney()
 
 const { request, isLoading } = usePaymentRequest(props.id as PaymentRequestId)
+
+const requesterName = computed(() => {
+  if (!request.value) return '…'
+  const user = users.value?.find((u) => u.id === request.value?.requesterId)
+  if (!user) return request.value.requesterId.slice(0, 8)
+  return user.email || request.value.requesterId.slice(0, 8)
+})
+
+const beneficiaryName = computed(() => {
+  if (!request.value) return '…'
+  const user = users.value?.find((u) => u.id === request.value?.beneficiaryId)
+  if (!user) return request.value.beneficiaryId.slice(0, 8)
+  return user.email || request.value.beneficiaryId.slice(0, 8)
+})
+
 const { approve, isPending: isApproving } = useApprovePaymentRequest(props.id as PaymentRequestId)
 const { reject, isPending: isRejecting } = useRejectPaymentRequest(props.id as PaymentRequestId)
 const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(
   props.id as PaymentRequestId,
 )
 const { cancel, isPending: isCancelling } = useCancelPaymentRequest(props.id as PaymentRequestId)
-
-const requesterName = computed(() => {
-  if (!request.value || !users.value) return '—'
-  const user = users.value.find((u) => u.id === request.value?.requesterId)
-  return user ? `${user.firstName} ${user.lastName}` : request.value.requesterId.slice(0, 8)
-})
 
 const approveOpen = ref(false)
 const rejectOpen = ref(false)
@@ -72,11 +86,6 @@ async function confirmCancel() {
 
 function goBack() {
   void router.push({ name: 'PaymentRequestsList' })
-}
-
-function formatMoney(money: unknown) {
-  if (!money || !(money instanceof Money)) return '—'
-  return money.format('en-ET')
 }
 </script>
 
@@ -133,6 +142,27 @@ function formatMoney(money: unknown) {
             Reject
           </AppButton>
 
+          <!-- Action: Edit (for DRAFT or REJECTED) -->
+          <AppButton
+            v-if="request.status === 'DRAFT' || request.status === 'REJECTED'"
+            variant="outline"
+            size="sm"
+            @click="router.push({ name: 'PaymentRequestEdit', params: { id: request.id } })"
+          >
+            <template #start><Edit3 :size="14" /></template>
+            Edit Request
+          </AppButton>
+
+          <AppButton
+            v-if="request.status === 'DRAFT' || request.status === 'REJECTED'"
+            variant="primary"
+            size="sm"
+            @click="approveOpen = true"
+          >
+            <template #start><Send :size="14" /></template>
+            Submit for Approval
+          </AppButton>
+
           <AppButton
             v-if="request.status === 'SUBMITTED' && hasPermission('ap:approve')"
             variant="primary"
@@ -164,9 +194,18 @@ function formatMoney(money: unknown) {
         <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400"
           >Total Amount</span
         >
-        <span class="text-sm font-semibold text-neutral-900"
-          >{{ formatMoney(request.totalAmount) }} {{ request.currency }}</span
+        <span class="text-sm font-semibold text-neutral-900">{{
+          formatMoney(request.totalAmount)
+        }}</span>
+      </div>
+      <div class="h-8 w-px bg-neutral-200" />
+      <div class="flex flex-col gap-1">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400"
+          >Request Date</span
         >
+        <span class="text-sm font-semibold text-neutral-900">{{
+          request.submittedAt ? BusinessDate.format(request.submittedAt) : 'Pending'
+        }}</span>
       </div>
       <div class="h-8 w-px bg-neutral-200" />
       <div class="flex flex-col gap-1">
@@ -175,7 +214,12 @@ function formatMoney(money: unknown) {
           <div
             :class="[
               'h-1.5 w-1.5 rounded-full',
-              request.status === 'SUBMITTED' ? 'bg-warning-500' : 'bg-success-500',
+              request.status === 'SUBMITTED' ? 'bg-warning-500' : '',
+              request.status === 'APPROVED' ? 'bg-info-500' : '',
+              request.status === 'AUTHORIZED' ? 'bg-success-500' : '',
+              request.status === 'REJECTED' ? 'bg-danger-500' : '',
+              request.status === 'CANCELLED' ? 'bg-neutral-600' : '',
+              request.status === 'DRAFT' ? 'bg-neutral-400' : '',
             ]"
           />
           <span class="text-sm font-semibold text-neutral-900">{{ request.status }}</span>
@@ -184,11 +228,9 @@ function formatMoney(money: unknown) {
       <div class="h-8 w-px bg-neutral-200" />
       <div class="flex flex-col gap-1">
         <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400"
-          >Vendor ID</span
+          >Beneficiary</span
         >
-        <span class="text-sm font-semibold text-neutral-900 font-mono">{{
-          request.beneficiaryId.slice(0, 12)
-        }}</span>
+        <span class="text-sm font-semibold text-neutral-900">{{ beneficiaryName }}</span>
       </div>
     </div>
 
@@ -200,34 +242,43 @@ function formatMoney(money: unknown) {
           <div class="space-y-6">
             <div class="space-y-1.5">
               <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                >Vendor ID</label
+                >Requester</label
               >
-              <div class="text-sm font-medium text-neutral-900 font-mono">
-                {{ request.beneficiaryId }}
+              <div class="text-sm font-medium text-neutral-900">
+                {{ requesterName }}
               </div>
             </div>
             <div class="space-y-1.5">
               <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                >Invoice Number</label
+                >Justification</label
+              >
+              <p class="text-sm text-neutral-600 leading-relaxed">
+                {{ request.justification }}
+              </p>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                >Currency</label
+              >
+              <div class="text-sm font-medium text-neutral-900">{{ request.currency }}</div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div class="space-y-1.5">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                >Origin Document</label
+              >
+              <div class="text-sm font-medium text-neutral-900">
+                {{ request.sourceModule || 'Manual Entry' }}
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
+                >Source Reference</label
               >
               <div class="text-sm font-medium text-neutral-900 font-mono">
                 {{ request.sourceId || 'N/A' }}
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                  >Amount</label
-                >
-                <div class="text-sm font-medium text-neutral-900 tabular-nums">
-                  {{ formatMoney(request.totalAmount) }}
-                </div>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                  >Currency</label
-                >
-                <div class="text-sm font-medium text-neutral-900">{{ request.currency }}</div>
               </div>
             </div>
           </div>

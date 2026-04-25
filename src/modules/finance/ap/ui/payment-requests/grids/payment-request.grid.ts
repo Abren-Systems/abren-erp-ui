@@ -19,44 +19,58 @@ import type { PaymentRequest } from '../../../domain/ap.types'
 const STATUS_DOT: Record<string, string> = {
   DRAFT: 'bg-neutral-400',
   SUBMITTED: 'bg-warning-500',
-  APPROVED: 'bg-primary-500',
+  APPROVED: 'bg-info-500',
+  AUTHORIZED: 'bg-success-500',
   REJECTED: 'bg-danger-500',
-  PAID: 'bg-success-500',
+  CANCELLED: 'bg-neutral-600',
 }
 
 export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   {
     accessorKey: 'requestNumber',
     header: 'Ref',
-    size: 90,
+    size: 100,
     cell: ({ row }) =>
       h(
         'code',
-        { class: 'text-xs text-neutral-500 font-mono' },
+        {
+          class:
+            'px-2 py-0.5 rounded bg-neutral-100 text-[10px] text-neutral-600 font-bold font-mono tracking-tight border border-neutral-200',
+        },
         row.original.requestNumber.toUpperCase(),
       ),
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    size: 40,
-    cell: ({ row }) =>
-      h('div', { class: 'flex items-center gap-1.5' }, [
+    size: 110,
+    cell: ({ row }) => {
+      const status = row.original.status
+      const label = status.charAt(0) + status.slice(1).toLowerCase()
+      return h('div', { class: 'flex items-center gap-1.5' }, [
         h('span', {
-          class: `h-2 w-2 rounded-full ${STATUS_DOT[row.original.status] ?? 'bg-neutral-300'}`,
+          class: `h-1.5 w-1.5 rounded-full ${STATUS_DOT[status] ?? 'bg-neutral-300'}`,
         }),
-        h('span', { class: 'text-xs font-medium text-neutral-600' }, row.original.status),
-      ]),
+        h('span', { class: 'text-xs font-semibold text-neutral-700' }, label),
+      ])
+    },
   },
   {
     accessorKey: 'beneficiaryId',
-    header: 'Beneficiary ID',
-    cell: ({ row }) =>
-      h(
+    header: 'Beneficiary',
+    cell: ({ row }) => {
+      const name =
+        (row.original as PaymentRequest & { beneficiaryName?: string }).beneficiaryName ??
+        row.original.beneficiaryId.slice(0, 8)
+      return h(
         'span',
-        { class: 'text-sm text-neutral-700 font-medium' },
-        row.original.beneficiaryId.slice(0, 8) + '…',
-      ),
+        {
+          class: 'text-sm text-neutral-700 font-medium truncate block max-w-[180px]',
+          title: name,
+        },
+        name,
+      )
+    },
   },
   {
     accessorKey: 'totalAmount',
@@ -66,29 +80,22 @@ export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   },
   {
     accessorKey: 'submittedAt',
-    header: 'Submitted',
-    cell: ({ row }) => h(DateCell, { date: row.original.submittedAt }),
-  },
-  {
-    accessorKey: 'currentApprovalStep',
-    header: 'Step',
-    size: 60,
-    cell: ({ row }) =>
-      h(
-        'span',
-        { class: 'text-neutral-400 text-xs font-mono' },
-        `${row.original.currentApprovalStep}`,
-      ),
+    header: () => h('span', { class: 'w-full text-center block' }, 'Submitted'),
+    size: 100,
+    cell: ({ row }) => h(DateCell, { date: row.original.submittedAt, class: 'text-center block' }),
   },
   {
     accessorKey: 'requesterId',
     header: 'Requested By',
     cell: ({ row }) => {
-      // Access requesterName if it was hydrated by the page, otherwise fallback to sliced ID
       const name =
         (row.original as PaymentRequest & { requesterName?: string }).requesterName ??
         row.original.requesterId.slice(0, 8)
-      return h('span', { class: 'text-neutral-500 text-xs' }, name)
+      return h(
+        'span',
+        { class: 'text-neutral-500 text-xs truncate block max-w-[150px]', title: name },
+        name,
+      )
     },
   },
 ]

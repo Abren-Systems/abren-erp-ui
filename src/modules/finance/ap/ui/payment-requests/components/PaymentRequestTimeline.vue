@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Clock } from 'lucide-vue-next'
 import { AppBadge } from '@/shared/components/primitives'
+import { BusinessDate } from '@/shared/domain/business-date'
 import type { PaymentRequest } from '../../../domain/ap.types'
 
 /**
@@ -24,38 +25,46 @@ const steps: TimelineStep[] = [
   {
     status: 'DRAFT',
     label: 'Created',
-    sub: `Requested by ${props.request.requesterId.slice(0, 8)}`,
+    sub: props.request.submittedAt
+      ? `Initiated by ${props.request.requesterId.slice(0, 8)}`
+      : 'Drafting in progress...',
     variant: 'neutral',
   },
   {
     status: 'SUBMITTED',
-    label: 'Submitted for Approval',
-    sub: props.request.submittedAt ?? 'Date unavailable',
+    label: 'Submitted',
+    sub: props.request.submittedAt
+      ? BusinessDate.format(props.request.submittedAt)
+      : 'Waiting for submission',
     variant: 'info',
   },
   {
     status: 'APPROVED',
     label: 'Approved',
-    sub: `Approved by ${props.request.assignedApproverId?.slice(0, 8) ?? 'approver'}`,
+    sub:
+      props.request.status === 'APPROVED' || props.request.status === 'AUTHORIZED'
+        ? `Governance cleared`
+        : 'Pending approval',
     variant: 'success',
   },
   { status: 'REJECTED', label: 'Rejected', sub: 'Action required', variant: 'danger' },
   {
     status: 'AUTHORIZED',
     label: 'Authorized',
-    sub: `Authorized by ${props.request.authorizedBy?.slice(0, 8) ?? 'authorizer'} on ${props.request.authorizedAt ?? 'unavailable'}`,
+    sub: props.request.authorizedAt ? `Ready for settlement` : 'Awaiting finance clearance',
     variant: 'success',
   },
   { status: 'CANCELLED', label: 'Cancelled', sub: 'Request abandoned', variant: 'danger' },
 ].filter((s) => {
   const status = props.request.status
-  if (s.status === 'DRAFT') return true
-  if (s.status === 'SUBMITTED')
-    return ['SUBMITTED', 'APPROVED', 'REJECTED', 'AUTHORIZED', 'CANCELLED'].includes(status)
-  if (s.status === 'APPROVED') return ['APPROVED', 'AUTHORIZED'].includes(status)
+  // Always show these milestones
+  if (['DRAFT', 'SUBMITTED'].includes(s.status)) return true
+
+  if (s.status === 'APPROVED')
+    return ['APPROVED', 'AUTHORIZED'].includes(status) || status === 'SUBMITTED'
   if (s.status === 'REJECTED') return status === 'REJECTED'
   if (s.status === 'CANCELLED') return status === 'CANCELLED'
-  if (s.status === 'AUTHORIZED') return status === 'AUTHORIZED'
+  if (s.status === 'AUTHORIZED') return status === 'AUTHORIZED' || status === 'APPROVED'
   return false
 }) as TimelineStep[]
 </script>

@@ -15,6 +15,7 @@ import { History, X } from 'lucide-vue-next'
 import PaymentRequestTimeline from '../components/PaymentRequestTimeline.vue'
 import { paymentRequestColumns } from '../grids/payment-request.grid'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
+import type { User } from '@/modules/core/domain/user.types'
 
 const router = useRouter()
 const { hasPermission } = usePermissions()
@@ -36,18 +37,27 @@ const filteredRequests = computed(() => {
     data = data.filter((r) => r.status === statusFilter.value)
   }
 
-  // Hydrate requester names
+  // Hydrate names
   return data.map((r) => {
-    const user = users.value?.find((u) => u.id === r.requesterId)
+    const requester = users.value?.find((u) => u.id === r.requesterId)
+    const beneficiary = users.value?.find((u) => u.id === r.beneficiaryId)
+
+    const formatName = (user?: User, id?: string) => {
+      if (!user) return id?.slice(0, 8) || 'Unknown'
+      return user.email || id?.slice(0, 8)
+    }
+
     return {
       ...r,
-      requesterName: user ? `${user.firstName} ${user.lastName}` : r.requesterId.slice(0, 8),
+      requesterName: formatName(requester, r.requesterId),
+      beneficiaryName: formatName(beneficiary, r.beneficiaryId),
     }
   })
 })
 
 const statusOptions = [
-  { label: 'All Statuses', value: 'all' },
+  { label: 'All', value: 'all' },
+  { label: 'Draft', value: 'DRAFT' },
   { label: 'Submitted', value: 'SUBMITTED' },
   { label: 'Approved', value: 'APPROVED' },
   { label: 'Authorized', value: 'AUTHORIZED' },
@@ -235,12 +245,6 @@ function handleBulkReject() {
 
           <!-- Mini Stats -->
           <div class="pt-5 border-t border-neutral-100 space-y-3">
-            <div class="flex justify-between items-center text-[10px]">
-              <span class="text-neutral-500 font-medium uppercase tracking-tight">Step</span>
-              <span class="font-bold text-neutral-900"
-                >{{ traceTarget.currentApprovalStep }} / 3</span
-              >
-            </div>
             <div class="flex justify-between items-center text-[10px]">
               <span class="text-neutral-500 font-medium uppercase tracking-tight">Status</span>
               <BadgeCell :status="traceTarget.status" class="scale-90 origin-right" />
