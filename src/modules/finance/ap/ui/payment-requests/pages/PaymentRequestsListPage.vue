@@ -14,10 +14,12 @@ import { MoneyCell, DateCell, BadgeCell, SelectionCell } from '@/shared/componen
 import { History, X } from 'lucide-vue-next'
 import PaymentRequestTimeline from '../components/PaymentRequestTimeline.vue'
 import { paymentRequestColumns } from '../grids/payment-request.grid'
+import { useUsers } from '@/modules/core/application/composables/useUsers'
 
 const router = useRouter()
 const { hasPermission } = usePermissions()
 const { requests, isLoading } = usePaymentRequests()
+const { users } = useUsers()
 const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 const statusFilter = ref('all')
 
@@ -29,10 +31,19 @@ const selectedCount = computed(() => Object.keys(rowSelection.value).length)
 const filteredRequests = computed(() => {
   if (!requests.value) return []
   let data = requests.value
+
   if (statusFilter.value !== 'all') {
     data = data.filter((r) => r.status === statusFilter.value)
   }
-  return data
+
+  // Hydrate requester names
+  return data.map((r) => {
+    const user = users.value?.find((u) => u.id === r.requesterId)
+    return {
+      ...r,
+      requesterName: user ? `${user.firstName} ${user.lastName}` : r.requesterId.slice(0, 8),
+    }
+  })
 })
 
 const statusOptions = [

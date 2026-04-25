@@ -20,14 +20,22 @@ import { Money } from '@/shared/domain/money'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import PaymentRequestTimeline from '../components/PaymentRequestTimeline.vue'
 import BadgeCell from '@/shared/components/data-grid/cells/BadgeCell.vue'
+import { useUsers } from '@/modules/core/application/composables/useUsers'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
 const { hasPermission } = usePermissions()
+const { users } = useUsers()
 
 const { request, isLoading } = usePaymentRequest(props.id as PaymentRequestId)
 const { approve, isPending: isApproving } = useApprovePaymentRequest(props.id as PaymentRequestId)
 const { reject, isPending: isRejecting } = useRejectPaymentRequest(props.id as PaymentRequestId)
+
+const requesterName = computed(() => {
+  if (!request.value || !users.value) return '—'
+  const user = users.value.find((u) => u.id === request.value?.requesterId)
+  return user ? `${user.firstName} ${user.lastName}` : request.value.requesterId.slice(0, 8)
+})
 
 const approveOpen = ref(false)
 const rejectOpen = ref(false)
@@ -149,9 +157,11 @@ function formatMoney(money: unknown) {
           <div class="space-y-6">
             <div class="space-y-1.5">
               <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                >Vendor</label
+                >Vendor ID</label
               >
-              <div class="text-sm font-medium text-neutral-900">{{ request.beneficiaryId }}</div>
+              <div class="text-sm font-medium text-neutral-900 font-mono">
+                {{ request.beneficiaryId }}
+              </div>
             </div>
             <div class="space-y-1.5">
               <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
@@ -190,14 +200,12 @@ function formatMoney(money: unknown) {
                 <div
                   class="h-6 w-6 rounded-full bg-neutral-900 flex items-center justify-center text-[10px] text-white font-bold"
                 >
-                  {{ request.requesterId.slice(0, 2).toUpperCase() }}
+                  {{ requesterName.slice(0, 2).toUpperCase() }}
                 </div>
-                <span class="text-sm font-medium text-neutral-900">{{
-                  request.requesterId.slice(0, 8)
-                }}</span>
-                <span class="text-xs text-neutral-500">(IT Operations)</span>
+                <span class="text-sm font-medium text-neutral-900">{{ requesterName }}</span>
               </div>
             </div>
+
             <div class="grid grid-cols-2 gap-4">
               <div class="space-y-1.5">
                 <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
@@ -206,26 +214,6 @@ function formatMoney(money: unknown) {
                 <div class="text-sm font-medium text-neutral-900">
                   {{ request.submittedAt || '—' }}
                 </div>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                  >Due Date</label
-                >
-                <div class="text-sm font-medium text-neutral-900">2023-11-23</div>
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                  >Department</label
-                >
-                <div class="text-sm font-medium text-neutral-900">Engineering</div>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-bold uppercase tracking-wider text-neutral-400"
-                  >Cost Center</label
-                >
-                <div class="text-sm font-medium text-neutral-900 font-mono">CC-882-ENG</div>
               </div>
             </div>
           </div>

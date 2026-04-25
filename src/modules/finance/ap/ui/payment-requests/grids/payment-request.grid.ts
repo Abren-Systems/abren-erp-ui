@@ -50,7 +50,7 @@ export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   },
   {
     accessorKey: 'beneficiaryId',
-    header: 'Beneficiary',
+    header: 'Beneficiary ID',
     cell: ({ row }) =>
       h(
         'span',
@@ -79,5 +79,16 @@ export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
         { class: 'text-neutral-400 text-xs font-mono' },
         `${row.original.currentApprovalStep}`,
       ),
+  },
+  {
+    accessorKey: 'requesterId',
+    header: 'Requested By',
+    cell: ({ row }) => {
+      // Access requesterName if it was hydrated by the page, otherwise fallback to sliced ID
+      const name =
+        (row.original as PaymentRequest & { requesterName?: string }).requesterName ??
+        row.original.requesterId.slice(0, 8)
+      return h('span', { class: 'text-neutral-500 text-xs' }, name)
+    },
   },
 ]
