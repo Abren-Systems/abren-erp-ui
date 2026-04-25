@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import type { Table, Row } from '@tanstack/vue-table'
-import { AppButton } from '@/shared/components/primitives'
+import { AppButton, AppSidePane } from '@/shared/components/primitives'
 import { PageHeader } from '@/shared/components/workspace'
 import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
@@ -237,33 +237,24 @@ function handleBulkReject() {
       </div>
 
       <!-- Contextual Sidebar (Audit Trail) -->
-      <aside
-        v-if="isTraceOpen && traceTarget"
-        class="w-[320px] shrink-0 bg-white border border-neutral-200 rounded-xl shadow-lg flex flex-col transition-all animate-in slide-in-from-right duration-300"
+      <!-- Contextual Sidebar (Audit Trail) -->
+      <AppSidePane
+        v-model:open="isTraceOpen"
+        :title="`Trace: ${traceTarget?.id.slice(0, 8)}`"
+        mode="docked"
+        width="320px"
       >
-        <div
-          class="p-3 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50"
-        >
-          <div class="flex items-center gap-2">
-            <div class="h-6 w-6 rounded-md bg-primary-50 flex items-center justify-center">
-              <History class="h-3.5 w-3.5 text-primary-600" />
-            </div>
-            <div>
-              <h3 class="text-[10px] font-bold uppercase tracking-wider text-neutral-900">
-                Trace: {{ traceTarget.id.slice(0, 8) }}
-              </h3>
-            </div>
+        <template #icon>
+          <div class="h-6 w-6 rounded-md bg-primary-50 flex items-center justify-center">
+            <History class="h-3.5 w-3.5 text-primary-600" />
           </div>
-          <AppButton variant="stealth" size="sm" class="h-7 w-7 p-0" @click="isTraceOpen = false">
-            <X :size="14" />
-          </AppButton>
-        </div>
+        </template>
 
-        <div class="flex-1 overflow-y-auto p-5 scrollbar-thin">
+        <div v-if="traceTarget" class="space-y-6">
           <PaymentRequestTimeline :request="traceTarget" density="compact" />
 
           <!-- Mini Stats -->
-          <div class="mt-6 pt-5 border-t border-neutral-100 space-y-3">
+          <div class="pt-5 border-t border-neutral-100 space-y-3">
             <div class="flex justify-between items-center text-[10px]">
               <span class="text-neutral-500 font-medium uppercase tracking-tight">Step</span>
               <span class="font-bold text-neutral-900"
@@ -277,8 +268,9 @@ function handleBulkReject() {
           </div>
         </div>
 
-        <div class="p-3 bg-neutral-50 border-t border-neutral-100">
+        <template #footer>
           <AppButton
+            v-if="traceTarget"
             variant="outline"
             size="sm"
             class="w-full h-8 text-[11px]"
@@ -286,8 +278,8 @@ function handleBulkReject() {
           >
             View Full Detail
           </AppButton>
-        </div>
-      </aside>
+        </template>
+      </AppSidePane>
     </div>
   </div>
 </template>
