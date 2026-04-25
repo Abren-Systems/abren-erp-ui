@@ -26,14 +26,14 @@ const STATUS_DOT: Record<string, string> = {
 
 export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
   {
-    accessorKey: 'id',
+    accessorKey: 'requestNumber',
     header: 'Ref',
     size: 90,
     cell: ({ row }) =>
       h(
         'code',
         { class: 'text-xs text-neutral-500 font-mono' },
-        row.original.id.slice(0, 8).toUpperCase(),
+        row.original.requestNumber.toUpperCase(),
       ),
   },
   {

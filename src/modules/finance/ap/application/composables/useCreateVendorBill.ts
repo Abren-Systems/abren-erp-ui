@@ -14,7 +14,7 @@ import type { VendorBill } from '../../domain/ap.types'
  */
 const vendorBillSchema = z.object({
   vendorId: z.string().min(1, 'Vendor ID is required'),
-  billNumber: z.string().min(1, 'Bill number is required'),
+  vendorInvoiceNumber: z.string().min(1, 'Vendor invoice number is required'),
   issueDate: z.string().min(1, 'Issue date is required'),
   dueDate: z.string().min(1, 'Due date is required'),
   currency: z.string().length(3, 'Invalid currency code'),
@@ -57,7 +57,7 @@ export function useCreateVendorBill() {
     async (values: VendorBillFormValues) => {
       const dto: VendorBillCreateDTO = {
         vendor_id: values.vendorId,
-        bill_number: values.billNumber,
+        vendor_invoice_number: values.vendorInvoiceNumber,
         issue_date: values.issueDate,
         due_date: values.dueDate,
         currency_code: values.currency,
@@ -85,7 +85,7 @@ export function useCreateVendorBill() {
   const form = useForm({
     defaultValues: {
       vendorId: '',
-      billNumber: '',
+      vendorInvoiceNumber: '',
       issueDate: new Date().toISOString().split('T')[0] || '',
       dueDate: new Date().toISOString().split('T')[0] || '',
       currency: 'ETB',

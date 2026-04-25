@@ -50,7 +50,8 @@ describe('APMapper', () => {
       const dto: VendorBillDTO = {
         id: 'bill-1',
         vendor_id: 'vendor-1',
-        bill_number: 'INV-001',
+        vendor_invoice_number: 'INV-001',
+        document_number: 'VB-2018-08-001',
         issue_date: '2026-04-01',
         due_date: '2026-04-15',
         currency: 'USD',
@@ -76,7 +77,8 @@ describe('APMapper', () => {
       const model = APMapper.toVendorBill(dto)
 
       expect(model.id).toBe('bill-1')
-      expect(model.billNumber).toBe('INV-001')
+      expect(model.vendorInvoiceNumber).toBe('INV-001')
+      expect(model.billNumber).toBe('VB-2018-08-001')
       expect(model.totalAmount.amount).toBe(200)
       expect(model.totalAmount.currency).toBe(Currency.USD)
       expect(model.issueDate).toEqual('2026-04-01')

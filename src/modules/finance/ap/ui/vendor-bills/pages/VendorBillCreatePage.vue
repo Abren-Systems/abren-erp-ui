@@ -206,10 +206,10 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                   </template>
                 </form.Field>
 
-                <form.Field name="billNumber">
+                <form.Field name="vendorInvoiceNumber">
                   <template #default="{ field, state }">
                     <AppInput
-                      label="Bill Number"
+                      label="Vendor Invoice #"
                       :model-value="field.state.value"
                       placeholder="e.g. INV-2023-001"
                       required

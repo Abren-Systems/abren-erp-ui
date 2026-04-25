@@ -85,7 +85,7 @@ export class APMapper {
       assignedApproverId: null,
       sourceModule: null,
       sourceId: null,
-      requestNumber: `PR-${dto.id.slice(0, 4).toUpperCase()}`,
+      requestNumber: dto.request_number ?? `PR-${dto.id.slice(0, 4).toUpperCase()}`,
     }
   }
 
@@ -120,7 +120,8 @@ export class APMapper {
     return {
       id: CommonMapper.toBrandedId<VendorBillId>(dto.id),
       vendorId: CommonMapper.toBrandedId<VendorId>(dto.vendor_id),
-      billNumber: dto.bill_number,
+      billNumber: dto.document_number!,
+      vendorInvoiceNumber: dto.vendor_invoice_number,
       issueDate: CommonMapper.toDate(dto.issue_date)!,
       dueDate: CommonMapper.toDate(dto.due_date)!,
       currency: currency,

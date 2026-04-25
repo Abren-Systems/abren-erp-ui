@@ -93,6 +93,7 @@ export interface VendorBill {
   id: VendorBillId
   vendorId: VendorId
   billNumber: string
+  vendorInvoiceNumber: string
   issueDate: IsoDate
   dueDate: IsoDate
   currency: Currency
@@ -105,6 +106,7 @@ export interface VendorBill {
 export interface VendorBillCreate {
   vendorId: VendorId
   billNumber: string
+  vendorInvoiceNumber: string
   issueDate: IsoDate
   dueDate: IsoDate
   currency: Currency

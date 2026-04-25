@@ -66,7 +66,8 @@ export const VendorBillLineSchema = z.object({
 export const VendorBillSchema = z.object({
   id: z.string().uuid(),
   vendor_id: z.string().uuid(),
-  bill_number: z.string(),
+  document_number: z.string().nullable().optional(), // Internal system number
+  vendor_invoice_number: z.string(), // External vendor invoice number
   issue_date: z.string(), // ISO Date string
   due_date: z.string().nullable().optional(), // ISO Date string
   currency: z.string().length(3),
