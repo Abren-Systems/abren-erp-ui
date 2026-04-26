@@ -165,6 +165,11 @@ const hasWarnings = computed(() => props.warnings.length > 0)
           </div>
         </div>
       </div>
+
+      <!-- Contextual Action Mirroring -->
+      <div v-if="$slots.actions" class="pt-6 mt-2 border-t border-neutral-100">
+        <slot name="actions"></slot>
+      </div>
     </div>
   </div>
 </template>

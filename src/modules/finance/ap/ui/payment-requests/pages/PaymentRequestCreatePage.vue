@@ -355,7 +355,19 @@ function goBack() {
             :validation-state="validationState"
             :warnings="warnings"
             :breakdown="breakdown"
-          />
+          >
+            <template #actions>
+              <AppButton
+                class="w-full"
+                variant="primary"
+                :loading="isSubmitting"
+                :disabled="!validationState.isValid || runningTotal <= 0"
+                @click="form.handleSubmit"
+              >
+                Submit Request
+              </AppButton>
+            </template>
+          </FormSummaryPanel>
         </aside>
       </div>
     </div>
