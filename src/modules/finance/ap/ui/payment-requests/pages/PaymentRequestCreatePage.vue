@@ -23,8 +23,16 @@ const {
   isSubmitting,
   runningTotal,
   validationState,
+  warnings,
+  breakdown,
   saveDraft,
 } = useCreatePaymentRequest()
+
+const isSaved = ref(true) // Mock local persistence state for feedback
+// Listen for form changes to clear the saved state
+form.store.subscribe(() => {
+  if (isSaved.value) isSaved.value = false
+})
 const { users, isPending: isLoadingUsers } = useUsers()
 
 // UX Context Mocks (Not yet in API Schema)
@@ -52,6 +60,36 @@ function goBack() {
         </AppButton>
       </template>
     </PageHeader>
+
+    <!-- Mobile Sticky Summary (visible < xl) -->
+    <div
+      class="xl:hidden sticky top-0 z-40 bg-white border-b border-neutral-200 shadow-sm p-4 flex justify-between items-center"
+    >
+      <div class="flex flex-col">
+        <span class="text-[10px] uppercase text-neutral-500 font-bold tracking-wider"
+          >Total Amount</span
+        >
+        <span class="text-lg font-bold tabular-nums tracking-tight"
+          >ETB {{ runningTotal.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span
+        >
+      </div>
+      <AppBadge
+        v-if="!validationState.isValid && validationState.errorCount > 0"
+        variant="destructive"
+        class="text-[10px]"
+      >
+        {{ validationState.errorCount }} Errors
+      </AppBadge>
+      <AppBadge
+        v-else-if="warnings?.length"
+        class="bg-amber-100 text-amber-700 hover:bg-amber-100 text-[10px]"
+      >
+        {{ warnings.length }} Warnings
+      </AppBadge>
+      <AppBadge v-else class="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px]">
+        Valid
+      </AppBadge>
+    </div>
 
     <div class="flex-1 overflow-y-auto p-6 scrollbar-thin pb-24">
       <div class="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6 items-start">
@@ -315,6 +353,8 @@ function goBack() {
             :line-count="form.state.values.lines?.length || 0"
             status="DRAFT"
             :validation-state="validationState"
+            :warnings="warnings"
+            :breakdown="breakdown"
           />
         </aside>
       </div>
@@ -324,13 +364,40 @@ function goBack() {
     <div
       class="fixed bottom-0 left-0 right-0 border-t border-neutral-200 bg-white p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between"
     >
-      <div class="text-xs text-neutral-500 flex items-center gap-2 px-4 max-w-7xl mx-auto w-full">
-        <div class="flex items-center gap-2 flex-1">
-          <span class="inline-block w-2 h-2 rounded-full bg-neutral-300"></span>
-          Draft saved locally
+      <div class="text-xs flex items-center gap-2 px-4 max-w-7xl mx-auto w-full">
+        <!-- State Feedback -->
+        <div class="flex items-center gap-2 flex-1 font-medium">
+          <template v-if="isSubmitting">
+            <span class="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+            <span class="text-blue-600">Submitting for Approval...</span>
+          </template>
+          <template v-else-if="!validationState.isValid && validationState.errorCount > 0">
+            <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+            <span class="text-red-600">Cannot submit. Please resolve errors.</span>
+          </template>
+          <template v-else-if="isSaved">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-emerald-600">Draft saved locally ✓</span>
+          </template>
+          <template v-else>
+            <span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
+            <span class="text-amber-600">Unsaved changes</span>
+          </template>
         </div>
+
+        <!-- Actions -->
         <div class="flex items-center gap-3">
-          <AppButton variant="outline" @click="saveDraft"> Save as Draft </AppButton>
+          <AppButton
+            variant="outline"
+            @click="
+              () => {
+                saveDraft()
+                isSaved = true
+              }
+            "
+          >
+            Save as Draft
+          </AppButton>
           <AppButton
             variant="primary"
             :loading="isSubmitting"

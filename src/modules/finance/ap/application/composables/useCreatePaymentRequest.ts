@@ -147,11 +147,55 @@ export function useCreatePaymentRequest() {
     }
   })
 
+  const warnings = form.useStore((state) => {
+    const warns: string[] = []
+    const total =
+      state.values.lines?.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0) || 0
+    if (total > 500000) {
+      warns.push('Total amount is unusually large and requires secondary CFO approval.')
+    }
+    const emptyDescriptions = state.values.lines?.some(
+      (l: { description?: string }) => !l.description || l.description.length < 5,
+    )
+    if (emptyDescriptions) {
+      warns.push('Some line items have very brief descriptions. This may delay approval.')
+    }
+    return warns
+  })
+
+  const breakdown = form.useStore((state) => {
+    if (!state.values.lines) return []
+    const groups = state.values.lines.reduce(
+      (acc: Record<string, number>, line: { accountId?: string; amount?: number | string }) => {
+        if (!line.accountId) return acc
+        // Mocking GL Account lookup for the UX
+        const accountLabel = `GL Account (${line.accountId.substring(0, 8) || 'Unknown'})`
+        acc[accountLabel] = (acc[accountLabel] || 0) + (Number(line.amount) || 0)
+        return acc
+      },
+      {},
+    )
+
+    return Object.entries(groups).map(([label, amount]) => ({
+      label,
+      amountFormatted: `${state.values.currency || 'ETB'} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+    }))
+  })
+
   const saveDraft = async () => {
     // In a full implementation, this would call a specific draft endpoint
     // For now, we rely on the local persistence and simulate a successful save
     console.log('Draft saved:', form.state.values)
   }
 
-  return { form, isSubmitting, error, runningTotal, validationState, saveDraft }
+  return {
+    form,
+    isSubmitting,
+    error,
+    runningTotal,
+    validationState,
+    warnings,
+    breakdown,
+    saveDraft,
+  }
 }
