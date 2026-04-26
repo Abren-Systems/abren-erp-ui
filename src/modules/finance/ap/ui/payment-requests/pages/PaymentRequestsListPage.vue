@@ -340,7 +340,12 @@ function handleBulkReject() {
       </div>
 
       <!-- Filter Drawer -->
-      <AppSidePane v-model:open="isFilterOpen" title="Filter Requests" width="320px">
+      <AppSidePane
+        v-model:open="isFilterOpen"
+        title="Filter Requests"
+        description="Refine your workspace"
+        show-backdrop
+      >
         <template #icon>
           <div class="h-6 w-6 rounded-md bg-neutral-100 flex items-center justify-center">
             <ListFilter class="h-3.5 w-3.5 text-neutral-600" />

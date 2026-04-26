@@ -22,6 +22,7 @@ interface Props {
    * - 'overlay': Floats over content with a shadow (non-modal)
    */
   mode?: 'docked' | 'overlay'
+  showBackdrop?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -29,6 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
   description: '',
   size: 'md',
   mode: 'overlay',
+  showBackdrop: false,
 })
 
 const sizeWidths = {
@@ -47,52 +49,83 @@ function handleClose() {
 </script>
 
 <template>
-  <Transition :name="mode === 'docked' ? 'pane-dock' : 'pane-overlay'">
-    <aside
-      v-if="open"
-      class="app-side-pane"
-      :class="[`is-${mode}`]"
-      :style="{ width: width || sizeWidths[size] }"
-    >
-      <!-- Header Area -->
-      <header class="pane-header">
-        <div class="pane-header-content">
-          <div class="flex items-center gap-3 overflow-hidden">
-            <div v-if="$slots.icon" class="pane-icon">
-              <slot name="icon" />
+  <div class="app-side-pane-container" :class="{ 'is-open': open && mode === 'overlay' }">
+    <Transition name="pane-fade">
+      <div
+        v-if="open && mode === 'overlay' && showBackdrop"
+        class="pane-backdrop"
+        @click="handleClose"
+      />
+    </Transition>
+
+    <Transition :name="mode === 'docked' ? 'pane-dock' : 'pane-overlay'">
+      <aside
+        v-if="open"
+        class="app-side-pane"
+        :class="[`is-${mode}`]"
+        :style="{ width: width || sizeWidths[size] }"
+      >
+        <!-- Header Area -->
+        <header class="pane-header">
+          <div class="pane-header-content">
+            <div class="flex items-center gap-3 overflow-hidden">
+              <div v-if="$slots.icon" class="pane-icon">
+                <slot name="icon" />
+              </div>
+              <div class="min-w-0">
+                <h3 class="pane-title truncate">{{ title }}</h3>
+                <p v-if="description" class="pane-description truncate">{{ description }}</p>
+              </div>
             </div>
-            <div class="min-w-0">
-              <h3 class="pane-title truncate">{{ title }}</h3>
-              <p v-if="description" class="pane-description truncate">{{ description }}</p>
-            </div>
+            <AppButton
+              variant="stealth"
+              size="sm"
+              class="h-7 w-7 p-0 -mr-1 text-neutral-400 hover:text-neutral-900"
+              @click="handleClose"
+            >
+              <X :size="14" />
+            </AppButton>
           </div>
-          <AppButton
-            variant="stealth"
-            size="sm"
-            class="h-7 w-7 p-0 -mr-1 text-neutral-400 hover:text-neutral-900"
-            @click="handleClose"
-          >
-            <X :size="14" />
-          </AppButton>
-        </div>
-      </header>
+        </header>
 
-      <!-- Content Area -->
-      <div class="pane-body scrollbar-thin">
-        <slot />
-      </div>
-
-      <!-- Footer Area -->
-      <footer v-if="$slots.footer" class="pane-footer">
-        <div class="flex items-center justify-end gap-2">
-          <slot name="footer" />
+        <!-- Content Area -->
+        <div class="pane-body scrollbar-thin">
+          <slot />
         </div>
-      </footer>
-    </aside>
-  </Transition>
+
+        <!-- Footer Area -->
+        <footer v-if="$slots.footer" class="pane-footer">
+          <div class="flex items-center justify-end gap-2">
+            <slot name="footer" />
+          </div>
+        </footer>
+      </aside>
+    </Transition>
+  </div>
 </template>
 
 <style scoped>
+.app-side-pane-container {
+  display: contents;
+}
+
+.app-side-pane-container.is-open {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.pane-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 40;
+  pointer-events: auto;
+}
+
 .app-side-pane {
   display: flex;
   flex-direction: column;
@@ -100,6 +133,7 @@ function handleClose() {
   background: #ffffff;
   border-left: 1px solid var(--color-neutral-200);
   overflow: hidden;
+  pointer-events: auto;
 }
 
 /* Docked Mode — Part of the layout flow */
@@ -196,5 +230,15 @@ function handleClose() {
 .pane-overlay-enter-from,
 .pane-overlay-leave-to {
   transform: translateX(100%);
+}
+
+.pane-fade-enter-active,
+.pane-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.pane-fade-enter-from,
+.pane-fade-leave-to {
+  opacity: 0;
 }
 </style>
