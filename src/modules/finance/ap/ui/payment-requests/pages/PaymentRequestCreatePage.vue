@@ -30,16 +30,12 @@ const {
   runningTotal,
   totalFormatted,
   validationState,
+  actionBarState,
   warnings,
   breakdown,
   saveDraft,
 } = useCreatePaymentRequest()
 
-const isSaved = ref(true) // Mock local persistence state for feedback
-// Listen for form changes to clear the saved state
-form.store.subscribe(() => {
-  if (isSaved.value) isSaved.value = false
-})
 const { users, isPending: isLoadingUsers } = useUsers()
 
 // UX Context Mocks (Not yet in API Schema)
@@ -377,15 +373,15 @@ function goBack() {
     <template #actions>
       <!-- State Feedback -->
       <div class="flex items-center gap-2 flex-1 font-medium">
-        <template v-if="isSubmitting">
+        <template v-if="actionBarState === 'SUBMITTING'">
           <span class="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
           <span class="text-blue-600">Submitting for Approval...</span>
         </template>
-        <template v-else-if="!validationState.isValid && validationState.errorCount > 0">
+        <template v-else-if="actionBarState === 'ERROR'">
           <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
           <span class="text-red-600">Cannot submit. Please resolve errors.</span>
         </template>
-        <template v-else-if="isSaved">
+        <template v-else-if="actionBarState === 'SAVED'">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
           <span class="text-emerald-600">Draft saved locally ✓</span>
         </template>
@@ -397,17 +393,7 @@ function goBack() {
 
       <!-- Actions -->
       <div class="flex items-center gap-3">
-        <AppButton
-          variant="outline"
-          @click="
-            () => {
-              saveDraft()
-              isSaved = true
-            }
-          "
-        >
-          Save as Draft
-        </AppButton>
+        <AppButton variant="outline" @click="saveDraft"> Save as Draft </AppButton>
         <AppButton
           variant="primary"
           :loading="isSubmitting"

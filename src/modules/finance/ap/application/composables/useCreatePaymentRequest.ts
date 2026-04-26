@@ -7,7 +7,7 @@ import type {
   PaymentRequestCreateDTO,
   PaymentRequestLineCreateDTO,
 } from '../../infrastructure/api.types'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
 import { apKeys } from '../keys'
@@ -139,9 +139,12 @@ export function useCreatePaymentRequest() {
     const fieldErrors = Object.values(state.fieldMeta)
       .flatMap((m) => m?.errors || [])
       .filter(Boolean)
-      .map((e) =>
-        typeof e === 'string' ? e : (e as { message?: string })?.message || 'Validation error',
-      )
+      .map((e) => {
+        if (typeof e === 'string') return e
+        if (e && typeof e === 'object' && 'message' in e)
+          return String((e as { message: string }).message)
+        return 'Validation error'
+      })
 
     const allErrors = [...formErrors, ...fieldErrors]
 
@@ -150,6 +153,18 @@ export function useCreatePaymentRequest() {
       errors: allErrors,
       errorCount: allErrors.length,
     }
+  })
+
+  const isSaved = ref(true)
+  form.store.subscribe(() => {
+    if (isSaved.value) isSaved.value = false
+  })
+
+  const actionBarState = computed(() => {
+    if (isSubmitting.value) return 'SUBMITTING'
+    if (!validationState.value.isValid && validationState.value.errorCount > 0) return 'ERROR'
+    if (isSaved.value) return 'SAVED'
+    return 'MODIFIED'
   })
 
   const totalFormatted = computed(() => {
@@ -192,9 +207,10 @@ export function useCreatePaymentRequest() {
   })
 
   const saveDraft = async () => {
-    // In a full implementation, this would call a specific draft endpoint
-    // For now, we rely on the local persistence and simulate a successful save
-    console.log('Draft saved:', form.state.values)
+    const values = form.state.values
+    localStorage.setItem('abren_draft_payment_request', JSON.stringify(values))
+    console.log('Draft saved:', values)
+    isSaved.value = true
   }
 
   return {
@@ -204,6 +220,8 @@ export function useCreatePaymentRequest() {
     runningTotal,
     totalFormatted,
     validationState,
+    actionBarState,
+    isSaved,
     warnings,
     breakdown,
     saveDraft,
