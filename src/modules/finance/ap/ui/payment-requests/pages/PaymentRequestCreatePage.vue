@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { AppButton, AppSelect, AppInput, AppTextarea } from '@/shared/components/primitives'
+import {
+  AppButton,
+  AppSelect,
+  AppInput,
+  AppTextarea,
+  AppBadge,
+} from '@/shared/components/primitives'
 import { PageHeader, FormSummaryPanel, ExecutionLayout } from '@/shared/components/workspace'
 import { useCreatePaymentRequest } from '../../../application/composables/useCreatePaymentRequest'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
