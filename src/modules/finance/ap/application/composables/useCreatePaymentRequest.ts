@@ -7,6 +7,7 @@ import type {
   PaymentRequestCreateDTO,
   PaymentRequestLineCreateDTO,
 } from '../../infrastructure/api.types'
+import { computed } from 'vue'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
 import { apKeys } from '../keys'
@@ -138,13 +139,21 @@ export function useCreatePaymentRequest() {
     const fieldErrors = Object.values(state.fieldMeta)
       .flatMap((m) => m?.errors || [])
       .filter(Boolean)
+      .map((e) =>
+        typeof e === 'string' ? e : (e as { message?: string })?.message || 'Validation error',
+      )
 
-    const allErrors = [...formErrors, ...fieldErrors] as string[]
+    const allErrors = [...formErrors, ...fieldErrors]
+
     return {
       isValid,
       errors: allErrors,
       errorCount: allErrors.length,
     }
+  })
+
+  const totalFormatted = computed(() => {
+    return `ETB ${runningTotal.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
   })
 
   const warnings = form.useStore((state) => {
@@ -193,6 +202,7 @@ export function useCreatePaymentRequest() {
     isSubmitting,
     error,
     runningTotal,
+    totalFormatted,
     validationState,
     warnings,
     breakdown,

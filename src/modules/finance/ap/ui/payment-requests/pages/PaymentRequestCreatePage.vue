@@ -22,6 +22,7 @@ const {
   error: submissionError,
   isSubmitting,
   runningTotal,
+  totalFormatted,
   validationState,
   warnings,
   breakdown,
@@ -69,9 +70,7 @@ function goBack() {
         <span class="text-[10px] uppercase text-neutral-500 font-bold tracking-wider"
           >Total Amount</span
         >
-        <span class="text-lg font-bold tabular-nums tracking-tight"
-          >ETB {{ runningTotal.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span
-        >
+        <span class="text-lg font-bold tabular-nums tracking-tight">{{ totalFormatted }}</span>
       </div>
       <AppBadge
         v-if="!validationState.isValid && validationState.errorCount > 0"
@@ -347,7 +346,7 @@ function goBack() {
     <!-- Right Column: Financial Overview -->
     <template #panel>
       <FormSummaryPanel
-        :total-formatted="`ETB ${runningTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`"
+        :total-formatted="totalFormatted"
         :line-count="form.state.values.lines?.length || 0"
         status="DRAFT"
         :validation-state="validationState"
