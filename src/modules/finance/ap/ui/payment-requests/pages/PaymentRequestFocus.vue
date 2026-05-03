@@ -9,8 +9,11 @@ import { useCancelPaymentRequest } from '../../../application/composables/useCan
 import { useSubmitPaymentRequest } from '../../../application/composables/useSubmitPaymentRequest'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { AppField, AppFieldset, FieldGroup, AppTabs } from '@/shared/components/field-system'
+import { AppButton } from '@/shared/components/primitives'
+import { History } from 'lucide-vue-next'
 import PaymentRequestHeader from '../components/PaymentRequestHeader.vue'
 import PaymentRequestActions, { type ScreenAction } from '../components/PaymentRequestActions.vue'
+import PaymentRequestTraceDrawer from '../components/PaymentRequestTraceDrawer.vue'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import { DataGrid, MoneyCell } from '@/shared/components/data-grid'
 import type { PaymentRequestLine } from '../../../domain/ap.types'
@@ -32,6 +35,7 @@ const { cancel, isPending: isCancelling } = useCancelPaymentRequest(props.id as 
 const { submit, isPending: isSubmitting } = useSubmitPaymentRequest(props.id as PaymentRequestId)
 
 const activeTab = ref('Line Details')
+const isTraceOpen = ref(false)
 
 const isPending = computed(
   () =>
@@ -158,6 +162,10 @@ const lineColumns = [
     <div v-else-if="request" class="flex flex-col gap-6">
       <PaymentRequestHeader :request="request">
         <template #actions>
+          <AppButton variant="secondary" @click="isTraceOpen = true">
+            <History class="mr-2 h-4 w-4" />
+            Trace
+          </AppButton>
           <PaymentRequestActions
             :actions="actions"
             :is-pending="isPending"
@@ -208,7 +216,7 @@ const lineColumns = [
         </AppFieldset>
 
         <!-- Middle Section (Tab Bar) -->
-        <AppTabs :tabs="['Line Details', 'Financials', 'Audit Trail']" v-model="activeTab" />
+        <AppTabs :tabs="['Line Details']" v-model="activeTab" />
 
         <!-- Bottom Section (Grid/Content) -->
         <div
@@ -222,25 +230,10 @@ const lineColumns = [
             empty-message="No line items found"
           />
         </div>
-
-        <div
-          v-else-if="activeTab === 'Financials'"
-          class="p-4 bg-white rounded-lg border border-neutral-200"
-        >
-          <p class="text-sm text-neutral-500">
-            Financial details and general ledger postings would appear here.
-          </p>
-        </div>
-
-        <div
-          v-else-if="activeTab === 'Audit Trail'"
-          class="p-4 bg-white rounded-lg border border-neutral-200"
-        >
-          <p class="text-sm text-neutral-500">
-            Approval history and system trace events would appear here.
-          </p>
-        </div>
       </div>
     </div>
+
+    <!-- Trace Drawer (Lazy loaded context) -->
+    <PaymentRequestTraceDrawer v-if="request" v-model:open="isTraceOpen" :request="request" />
   </div>
 </template>
