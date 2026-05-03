@@ -24,12 +24,15 @@ export function usePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
     computed(() => apKeys.paymentRequest(toValue(id))),
     async () => {
       const unwrappedId = toValue(id)
-      if (!unwrappedId) return null
+      if (!unwrappedId || unwrappedId === 'new') return null
       return await apAdapter.getRequest(unwrappedId)
     },
     {
-      // Enabled only if we have a valid ID
-      enabled: computed(() => !!toValue(id)),
+      // Enabled only if we have a valid ID that is not 'new'
+      enabled: computed(() => {
+        const unwrappedId = toValue(id)
+        return !!unwrappedId && unwrappedId !== 'new'
+      }),
       staleTime: 1000 * 30, // 30 seconds
     },
   )

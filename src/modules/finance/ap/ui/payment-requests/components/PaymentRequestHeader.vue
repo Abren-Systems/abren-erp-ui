@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import type { PaymentRequest } from '../../../domain/ap.types'
 
 const props = defineProps<{
-  request: PaymentRequest
+  request?: PaymentRequest
 }>()
 
 const router = useRouter()
@@ -18,7 +18,11 @@ function goBack() {
 
 <template>
   <PageHeader
-    :title="`${request.requestNumber} | ${request.beneficiaryId.slice(0, 8)}`"
+    :title="
+      request
+        ? `${request.requestNumber} | ${request.beneficiaryId.slice(0, 8)}`
+        : 'New Payment Request'
+    "
     description="Payment Authorization Workflow"
   >
     <template #start>
