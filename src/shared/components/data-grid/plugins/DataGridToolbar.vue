@@ -59,16 +59,10 @@ function clear() {
       <span class="selection-text">Records selected for bulk action</span>
     </div>
 
-    <!-- Normal mode: Filters left, Search right -->
+    <!-- Normal mode: Search left, Filters right -->
     <template v-else>
-      <!-- Left: Filter Selector + Quick Filters -->
+      <!-- Left: Search + Filter Selector -->
       <div class="toolbar-left">
-        <slot />
-      </div>
-
-      <!-- Right: Filter controls + Search -->
-      <div class="toolbar-right">
-        <slot name="controls" />
         <div class="search-wrap">
           <AppInput
             :model-value="localValue"
@@ -86,6 +80,12 @@ function clear() {
             </template>
           </AppInput>
         </div>
+        <slot />
+      </div>
+
+      <!-- Right: Filter controls -->
+      <div class="toolbar-right">
+        <slot name="controls" />
       </div>
     </template>
   </div>
