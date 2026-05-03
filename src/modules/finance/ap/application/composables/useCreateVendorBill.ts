@@ -60,7 +60,7 @@ export function useCreateVendorBill() {
         vendor_invoice_number: values.vendorInvoiceNumber,
         issue_date: values.issueDate,
         due_date: values.dueDate,
-        currency_code: values.currency,
+        currency: values.currency,
         justification: values.justification,
         lines: values.lines.map((l) => ({
           description: l.description,

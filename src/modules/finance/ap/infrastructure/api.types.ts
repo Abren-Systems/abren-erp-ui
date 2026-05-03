@@ -1,4 +1,3 @@
-import type { components } from '@/shared/api/generated.types'
 import type { z } from 'zod'
 import type {
   PaymentRequestLineSchema,
@@ -10,22 +9,49 @@ import type {
 
 /** Consolidated AP Domain DTOs (Strictly aligned to backend Pydantic models via Zod schemas) */
 
-export type Schemas = components['schemas']
-
 // --- Payment Request DTOs ---
 
 export type PaymentRequestStatusDTO = z.infer<typeof PaymentRequestSchema>['status']
 export type PaymentRequestLineDTO = z.infer<typeof PaymentRequestLineSchema>
 export type PaymentRequestDTO = z.infer<typeof PaymentRequestSchema>
-export type PaymentRequestLineCreateDTO = Schemas['PaymentRequestLineCreateRequest']
-export type PaymentRequestCreateDTO = Schemas['PaymentRequestCreateRequest']
+export interface PaymentRequestLineCreateDTO {
+  description: string
+  amount: string
+  account_id?: string | null
+  category_id?: string | null
+  tax_amount?: string | null
+}
+export interface PaymentRequestCreateDTO {
+  beneficiary_id: string
+  justification: string
+  lines: PaymentRequestLineCreateDTO[]
+  currency: string
+  bank_account_id?: string | null
+  target_liability_account_id?: string | null
+}
 export type PaymentRequestAuthorizeDTO = void
-export type PaymentRequestRejectDTO = Schemas['PaymentRequestRejectRequest']
+export interface PaymentRequestRejectDTO {
+  reason: string
+}
 export type PaymentRequestStatsDTO = z.infer<typeof PaymentRequestStatsSchema>
 
 // --- Vendor Bill DTOs ---
 
 export type VendorBillLineDTO = z.infer<typeof VendorBillLineSchema>
 export type VendorBillDTO = z.infer<typeof VendorBillSchema>
-export type VendorBillCreateDTO = Schemas['VendorBillCreateRequest']
-export type VendorBillLineCreateDTO = Schemas['VendorBillLineRequest']
+export interface VendorBillLineCreateDTO {
+  description: string
+  amount: number
+  account_id?: string | null
+  category_id?: string | null
+  tax_rule_id?: string | null
+}
+export interface VendorBillCreateDTO {
+  vendor_id: string
+  vendor_invoice_number: string
+  issue_date: string
+  due_date?: string | null
+  currency: string
+  justification: string
+  lines: VendorBillLineCreateDTO[]
+}

@@ -49,7 +49,7 @@ export const apAdapter = {
       approvedCount: parsed.approved_count,
       rejectedCount: parsed.rejected_count,
       authorizedCount: parsed.authorized_count,
-      cancelledCount: parsed.cancelled_count,
+      cancelledCount: parsed.cancelled_count ?? 0,
       totalAmount: Money.from(Number(parsed.total_amount), 'ETB'),
     } as PaymentRequestStats
   },

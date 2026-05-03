@@ -52,7 +52,7 @@ export const PaymentRequestStatsSchema = z.object({
   approved_count: z.number().int(),
   rejected_count: z.number().int(),
   authorized_count: z.number().int(),
-  cancelled_count: z.number().int(),
+  cancelled_count: z.number().int().optional().default(0),
   total_amount: z.coerce.string(),
 })
 
@@ -76,7 +76,7 @@ export const VendorBillSchema = z.object({
   due_date: z.string().nullable().optional(), // ISO Date string
   currency: z.string().length(3),
   justification: z.string(), // Mandatory in DTO
-  status: z.enum(['DRAFT', 'VALIDATED', 'PAID']),
+  status: z.enum(['DRAFT', 'VALIDATED', 'PAID', 'CANCELLED']),
   net_amount: z.coerce.string(),
   tax_total: z.coerce.string(),
   total_amount: z.coerce.string(),

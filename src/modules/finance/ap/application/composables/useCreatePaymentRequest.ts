@@ -69,10 +69,10 @@ export function useCreatePaymentRequest() {
 
       const dto: PaymentRequestCreateDTO = {
         beneficiary_id: values.beneficiaryId,
-        currency_code: values.currency,
+        currency: values.currency,
         justification: values.justification,
-        amount: String(values.lines[0]?.amount || 0), // Use total or first line if flattened
         bank_account_id: values.bankAccountId || null,
+        target_liability_account_id: values.targetLiabilityAccountId || null,
         lines: mappedLines,
       } as PaymentRequestCreateDTO
 
