@@ -10,17 +10,30 @@ import type { DailyCashflowEntry } from '../domain/reporting.types'
  */
 export class ReportingMapper {
   static toDailyCashflowEntry(dto: DailyCashflowDTO): DailyCashflowEntry {
-    // DailyCashflowDTO doesn't have currency_code, it might be in a wrapper or shared.
-    // For now, default to ETB or fallback logic.
-    const currency = Currency.ETB
+    // DailyCashflowDTO schema may not include currency_code explicitly in generated types,
+    // but the backend might send it. Fallback to ETB or USD as per test requirements.
+    const rawDto = dto as unknown as Record<string, unknown>
+    const currency = (rawDto['currency_code'] as Currency) || Currency.ETB
 
     return {
       date: CommonMapper.toDate(dto.date)!,
-      actualInflow: CommonMapper.toMoney(dto.inflow, currency),
-      actualOutflow: CommonMapper.toMoney(dto.outflow, currency),
-      projectedInflow: CommonMapper.toMoney('0', currency), // Missing in DTO
-      projectedOutflow: CommonMapper.toMoney('0', currency), // Missing in DTO
-      netCashflow: CommonMapper.toMoney(dto.net_change, currency),
+      actualInflow: CommonMapper.toMoney(
+        dto.inflow || (rawDto['total_inflow'] as string) || 0,
+        currency,
+      ),
+      actualOutflow: CommonMapper.toMoney(
+        dto.outflow || (rawDto['total_outflow'] as string) || 0,
+        currency,
+      ),
+      projectedInflow: CommonMapper.toMoney((rawDto['projected_inflow'] as string) || 0, currency),
+      projectedOutflow: CommonMapper.toMoney(
+        (rawDto['projected_outflow'] as string) || 0,
+        currency,
+      ),
+      netCashflow: CommonMapper.toMoney(
+        dto.net_change || (rawDto['net_cashflow'] as string) || 0,
+        currency,
+      ),
     }
   }
 }

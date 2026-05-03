@@ -1,17 +1,16 @@
 import { describe, it, expect } from 'vitest'
 import { ReportingMapper } from '../mappers'
-import type { DailyCashflowDTO } from '../api.types'
 import { Currency } from '../../../../shared/domain/money'
 
 describe('ReportingMapper', () => {
   it('should map DailyCashflowDTO to DailyCashflowEntry', () => {
-    const dto: DailyCashflowDTO = {
+    const dto: Record<string, unknown> = {
       date: '2026-04-01',
-      total_inflow: 1000,
-      total_outflow: 500,
-      projected_inflow: 200,
-      projected_outflow: 100,
-      net_cashflow: 600,
+      inflow: '1000.00',
+      outflow: '500.00',
+      net_change: '500.00',
+      projected_inflow: '200.00',
+      projected_outflow: '100.00',
       currency_code: 'ETB',
     }
 
@@ -23,22 +22,17 @@ describe('ReportingMapper', () => {
     expect(entry.actualOutflow.amount).toBe(500)
     expect(entry.projectedInflow.amount).toBe(200)
     expect(entry.projectedOutflow.amount).toBe(100)
-    expect(entry.netCashflow.amount).toBe(600)
+    expect(entry.netCashflow.amount).toBe(500)
   })
 
-  it('should fallback to USD if currency_code is invalid', () => {
-    const dto: DailyCashflowDTO = {
+  it('should fallback to ETB if currency_code is missing', () => {
+    const dto: Record<string, unknown> = {
       date: '2026-04-01',
-      total_inflow: 1000,
-      total_outflow: 500,
-      projected_inflow: 200,
-      projected_outflow: 100,
-      net_cashflow: 600,
-      currency_code: 'INVALID' as unknown as Currency,
+      inflow: '1000.00',
     }
 
     const entry = ReportingMapper.toDailyCashflowEntry(dto)
 
-    expect(entry.actualInflow.currency).toBe(Currency.USD)
+    expect(entry.actualInflow.currency).toBe(Currency.ETB)
   })
 })

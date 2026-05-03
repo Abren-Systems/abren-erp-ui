@@ -125,7 +125,7 @@ const currentTitle = computed(() => {
 })
 
 const currentDescription = computed(() => {
-  if (route.name === 'DashboardPage') {
+  if (route.name === 'Workboard') {
     return 'Prioritize approvals, exceptions, and operational changes without getting buried in dashboard noise.'
   }
 

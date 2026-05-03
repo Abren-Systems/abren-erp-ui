@@ -27,8 +27,8 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'DashboardPage',
-          component: () => import('@/modules/core/ui/pages/DashboardPage.vue'),
+          name: 'Workboard',
+          component: () => import('@/modules/core/ui/pages/WorkboardPage.vue'),
         },
         // Dynamically register module routes
         // Dynamically register module routes (synchronous mapping, components remain lazy loaded)
