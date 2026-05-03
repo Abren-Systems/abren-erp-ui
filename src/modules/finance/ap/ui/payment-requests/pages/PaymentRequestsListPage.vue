@@ -220,7 +220,7 @@ const selectedIds = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 h-full">
+  <div class="mx-auto flex h-full w-full max-w-[1600px] flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
     <PageHeader title="Payment Requests" :description="headerDescription">
       <template #actions>
         <AppButton v-if="hasPermission('ap:create')" variant="primary" @click="handleCreate">
