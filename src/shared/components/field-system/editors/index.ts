@@ -6,5 +6,6 @@
  * They must NOT be imported directly by business modules.
  */
 export { default as BaseInput } from './BaseInput.vue'
+export { default as BaseMoneyInput } from './BaseMoneyInput.vue'
 export { default as BaseSelect } from './BaseSelect.vue'
 export { default as BaseTextarea } from './BaseTextarea.vue'

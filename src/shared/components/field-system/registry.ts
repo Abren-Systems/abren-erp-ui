@@ -14,7 +14,7 @@
 
 import { Money } from '@/shared/domain/money'
 import type { Component } from 'vue'
-import { BaseInput } from './editors'
+import { BaseInput, BaseMoneyInput } from './editors'
 
 // --- Type Definitions ---
 
@@ -135,11 +135,9 @@ const definitions = new Map<FieldType, FieldDefinition>([
       emphasis: 'strong',
       empty: isNullish,
       emptyDisplay: '—',
-      editor: BaseInput,
+      editor: BaseMoneyInput,
       editorProps: () => ({
-        type: 'number',
-        inputmode: 'decimal',
-        class: 'text-right tabular-nums',
+        placeholder: '0.00',
       }),
     },
   ],
