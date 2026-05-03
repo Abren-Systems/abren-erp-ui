@@ -184,7 +184,7 @@ function goToDetail(pr: PaymentRequest) {
 }
 
 function handleCreate() {
-  void router.push({ name: 'PaymentRequestCreate' })
+  void router.push({ name: 'PaymentRequestDetail', params: { id: 'new' } })
 }
 
 const selectedIds = computed(() => {

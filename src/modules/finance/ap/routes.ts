@@ -13,12 +13,6 @@ export default [
         component: () => import('./ui/payment-requests/pages/PaymentRequestsListPage.vue'),
       },
       {
-        path: 'create',
-        name: 'PaymentRequestCreate',
-        meta: { title: 'New Request' },
-        component: () => import('./ui/payment-requests/pages/PaymentRequestCreatePage.vue'),
-      },
-      {
         path: ':id',
         name: 'PaymentRequestDetail',
         meta: { title: 'Detail' },
