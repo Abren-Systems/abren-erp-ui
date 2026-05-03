@@ -13,6 +13,8 @@
  */
 
 import { Money } from '@/shared/domain/money'
+import type { Component } from 'vue'
+import { BaseInput } from './editors'
 
 // --- Type Definitions ---
 
@@ -37,6 +39,7 @@ export interface FieldContext {
 
 /**
  * Defines how a field type renders, formats, aligns, and handles empty state.
+ * Phase 2: also declares the editor component and static behavioral defaults for edit mode.
  */
 export interface FieldDefinition {
   /** Format a raw domain value into a display string */
@@ -51,6 +54,30 @@ export interface FieldDefinition {
   emptyDisplay: string
   /** CSS variant resolver (used by 'status' type for badge coloring) */
   variant?: (value: unknown, ctx?: FieldContext) => string
+
+  /**
+   * Phase 2: Bare editor component for edit mode.
+   * Must conform to FieldEditorProps. Must NOT render .app-field shell or label.
+   * If undefined, this field type is not editable (e.g., status, id).
+   */
+  editor?: Component
+  /**
+   * Phase 2: Static behavioral defaults forwarded to the editor.
+   * SCOPE: input type, inputmode, step, alignment class.
+   * NOT for dynamic runtime data (options lists, API results).
+   */
+  editorProps?: () => Record<string, unknown>
+}
+
+/**
+ * The contract that all bare editor components must satisfy.
+ * AppField passes these props when rendering in edit mode.
+ */
+export interface FieldEditorProps {
+  modelValue: unknown
+  error?: string
+  disabled?: boolean
+  readonly?: boolean
 }
 
 // --- Status Variant Resolver ---
@@ -93,6 +120,7 @@ const definitions = new Map<FieldType, FieldDefinition>([
       emphasis: 'normal',
       empty: (v) => v === null || v === undefined || v === '',
       emptyDisplay: '—',
+      editor: BaseInput,
     },
   ],
   [
@@ -107,6 +135,12 @@ const definitions = new Map<FieldType, FieldDefinition>([
       emphasis: 'strong',
       empty: isNullish,
       emptyDisplay: '—',
+      editor: BaseInput,
+      editorProps: () => ({
+        type: 'number',
+        inputmode: 'decimal',
+        class: 'text-right tabular-nums',
+      }),
     },
   ],
   [
@@ -137,6 +171,8 @@ const definitions = new Map<FieldType, FieldDefinition>([
       emphasis: 'normal',
       empty: isNullish,
       emptyDisplay: '—',
+      editor: BaseInput,
+      editorProps: () => ({ type: 'date' }),
     },
   ],
   [
@@ -160,6 +196,8 @@ const definitions = new Map<FieldType, FieldDefinition>([
       emphasis: 'normal',
       empty: isNullish,
       emptyDisplay: '—',
+      editor: BaseInput,
+      editorProps: () => ({ type: 'number', inputmode: 'numeric' }),
     },
   ],
 ])

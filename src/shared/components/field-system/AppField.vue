@@ -2,7 +2,11 @@
 /**
  * AppField — The only way to display a data field in a business screen.
  *
- * Responsibility: receive value → ask registry → render. Nothing else.
+ * Phase 1: receive value → ask registry → render formatted text.
+ * Phase 2: in edit mode, delegate to registry-defined bare editor.
+ *
+ * AppField is a ROUTER, not a logic container. It never branches on type.
+ * Read mode uses `value`. Edit mode uses `modelValue`. Never both.
  *
  * @see docs/FIELD_SYSTEM.md
  */
@@ -15,20 +19,43 @@ const props = withDefaults(
     field: string
     /** Display label (e.g., "Total Amount"). UI concern only. */
     label: string
-    /** Raw domain value. Must NOT be pre-formatted. */
-    value: unknown
+    /** Raw domain value for read mode. Must NOT be pre-formatted. */
+    value?: unknown
     /** Registry type key. */
     type: FieldType
     /** Optional rendering hints for domain-aware display. */
     context?: FieldContext
     /** Label/value density. */
     size?: 'sm' | 'md' | 'lg'
+    /** Render mode. Read = formatted text. Edit = registry editor. */
+    mode?: 'read' | 'edit'
+    /** Bound value for edit mode (v-model). Mutually exclusive with `value`. */
+    modelValue?: unknown
+    /** Error string for edit mode. Passed through to the editor. */
+    error?: string
+    /** Disables the editor in edit mode. */
+    disabled?: boolean
+    /** Makes the editor read-only in edit mode. */
+    readonly?: boolean
+    /** Runtime props forwarded to the editor (e.g., select options). Merges with registry editorProps. */
+    editorAttrs?: Record<string, unknown>
   }>(),
   {
+    value: undefined,
     context: undefined,
     size: 'md',
+    mode: 'read',
+    modelValue: undefined,
+    error: '',
+    disabled: false,
+    readonly: false,
+    editorAttrs: undefined,
   },
 )
+
+defineEmits<{
+  (e: 'update:modelValue', value: unknown): void
+}>()
 
 const definition = computed(() => resolveField(props.type))
 
@@ -43,6 +70,12 @@ const statusVariant = computed(() => {
   if (props.type !== 'status' || isEmpty.value) return undefined
   return definition.value.variant?.(props.value, props.context)
 })
+
+/** Merge static registry defaults with runtime screen-level overrides. Screen wins on conflict. */
+const mergedEditorProps = computed(() => ({
+  ...definition.value.editorProps?.(),
+  ...props.editorAttrs,
+}))
 </script>
 
 <template>
@@ -52,13 +85,30 @@ const statusVariant = computed(() => {
     :class="[`app-field--${size}`, `app-field--align-${definition.align}`]"
   >
     <span class="app-field__label">{{ label }}</span>
+
+    <!-- EDIT: delegate to registry-defined bare editor -->
+    <div v-if="mode === 'edit' && definition.editor" class="app-field__control">
+      <component
+        :is="definition.editor"
+        :model-value="modelValue"
+        :error="error"
+        :disabled="disabled"
+        :readonly="readonly"
+        v-bind="mergedEditorProps"
+        @update:model-value="$emit('update:modelValue', $event)"
+      />
+    </div>
+
+    <!-- READ: status badge -->
     <span
-      v-if="type === 'status' && !isEmpty"
+      v-else-if="type === 'status' && !isEmpty"
       class="app-field__badge"
       :class="`app-field__badge--${statusVariant}`"
     >
       {{ displayValue }}
     </span>
+
+    <!-- READ: formatted value -->
     <span
       v-else
       class="app-field__value"
