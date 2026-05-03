@@ -14,6 +14,7 @@ import { History, Plus, Receipt, FileText, ChevronRight } from 'lucide-vue-next'
 import { useVendorBills } from '../../../application/composables/useVendorBills'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import type { VendorBill } from '../../../domain/ap.types'
+import { Money } from '@/shared/domain/money'
 import { MoneyCell, DateCell, BadgeCell } from '@/shared/components/data-grid'
 import VendorBillTimeline from '../components/VendorBillTimeline.vue'
 
@@ -39,10 +40,12 @@ const filteredBills = computed(() => {
   return bills.value.filter((b) => b.status.toLowerCase() === statusFilter.value)
 })
 
+const selectedCount = computed(() => Object.keys(rowSelection.value).length)
+
 const totalFilteredAmount = computed(() => {
   return filteredBills.value.reduce(
-    (acc, b) => acc + (b.totalAmount ? Number(b.totalAmount) : 0),
-    0,
+    (acc, b) => acc.add(b.totalAmount || Money.zero()),
+    Money.zero(),
   )
 })
 
@@ -144,7 +147,11 @@ function handleCreate() {
       </template>
 
       <template #footer>
-        <DataGridFooter :total-rows="filteredBills.length" />
+        <DataGridFooter
+          :total-rows="filteredBills.length"
+          :selected-count="selectedCount"
+          :total-amount-formatted="totalFilteredAmount.format()"
+        />
       </template>
     </DataGrid>
 
