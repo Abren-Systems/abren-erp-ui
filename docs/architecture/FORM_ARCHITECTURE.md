@@ -178,7 +178,12 @@ export const positiveAmount = z.number().positive('Must be a positive amount')
 
 Most ERP forms are single-view, rendered inside a **Context Drawer** (right-aligned, ~480px wide). This allows users to see the background data grid while editing.
 
-### 6.2 Sectioned Forms
+### 6.2 Field System Integration (Phase 2)
+
+> [!IMPORTANT]
+> When Phase 2 (Editable Forms) is implemented, form layouts **must** use the Field System primitives (`AppFieldset`, `AppInput`) instead of raw HTML divs. The `AppFieldset` layout engine's `140px` baseline CSS Grid contract applies equally to read-only fields (`AppField`) and editable inputs (`AppInput`). See [Field System Architecture](../FIELD_SYSTEM.md).
+
+### 6.3 Sectioned Forms
 
 Complex records (e.g., Journal Entries with line items) use vertical sections with clear headings:
 
@@ -198,7 +203,7 @@ Complex records (e.g., Journal Entries with line items) use vertical sections wi
 └─────────────────────────────────┘
 ```
 
-### 6.3 Multi-Step Wizards (Exceptional, Not Default)
+### 6.4 Multi-Step Wizards (Exceptional, Not Default)
 
 Wizards are reserved for rare, complex configurations (e.g., Year-End Close, Initial Setup). When used:
 

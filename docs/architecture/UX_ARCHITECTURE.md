@@ -7,20 +7,77 @@ tags: [frontend, architecture]
 
 # Abren ERP — The Composable Business Operating System (UX Architecture)
 
-> **Status:** AUTHORITATIVE — This document dictates the UX and Interaction Philosophy for the Abren ERP frontend. It acts as the companion to the technical [Architecture Manifesto](./ARCHITECTURE.md).
-
-Before implementing the frontend views for Horizon A modules, we are establishing our ultimate UX/UI philosophy. We are elevating Abren from a "nice-looking CRUD system" to a **Composable Business Operating System for SMEs**.
+> **Version:** 2.0
+> **Status:** AUTHORITATIVE — This document dictates the UX and Interaction Philosophy for the Abren ERP frontend.
+> **Last Updated:** May 2026
+> **Companions:** [Architecture Manifesto](./ARCHITECTURE.md) · [Field System](../FIELD_SYSTEM.md) · [Design System](./DESIGN_SYSTEM.md)
 
 > **Global Principle**: "Operations are the source of truth. Accounting is the guaranteed consequence."
 
-Our True North Star is a synthesis of proven enterprise patterns, filtered through an Abren-owned product language:
+Our True North Star is a synthesis of proven enterprise patterns (Acumatica, SAP Fiori, Dynamics 365), filtered through an Abren-owned product language:
 
 - **Structure**: Sequential Progressive Disclosure (Step-by-step Task Progression)
 - **Interaction**: **Headless accessibility + Abren-owned primitives** (behavior from infrastructure, product identity from Abren)
 - **Aesthetic**: **Calm operational density** (serious, modern, trustworthy, low-theater)
 - **Workflow**: Linear (State-driven UX clarity isolated by Routing)
-- **Financial UX**: Stripe Dashboard (Traceability via Contextual Drawers)
-- **Architecture**: **Tier 1 App Primitives** + Route-Driven Components
+- **Financial UX**: Traceability via Contextual Side Panels
+- **Architecture**: **Tier 1 App Primitives** + Route-Driven Components + **Field System**
+
+---
+
+## 0. The Four Foundations (App Shell)
+
+Every screen in Abren ERP exists within a rigid macro-architecture. These four structural foundations are immutable — they persist across all navigations and ensure users always know where they are.
+
+```text
+┌──────────────────────────────────────────────────────────────────┐
+│                     TOP PANE (Global Bar)                       │
+│  Search (⌘K) · Tenant Context · Notifications · User Session   │
+├──────────┬─────────────────────────────────────────────────────┤
+│          │                                                     │
+│ SIDEBAR  │              WORKING AREA                           │
+│ (Nav)    │  ┌───────────────────────────────────────────────┐  │
+│          │  │ Form Title Bar (Record ID, Status, Actions)   │  │
+│ Start    │  ├───────────────────────────────────────────────┤  │
+│ Business │  │ Form Toolbar (Save, Cancel, Submit)           │  │
+│ Platform │  ├───────────────────────────────────────────────┤  │
+│          │  │ Summary Area (AppFieldset ghost/horizontal)   │  │
+│          │  ├───────────────────────────────────────────────┤  │
+│          │  │ Tabs & Details (AppTabs + DataGrid)           │  │
+│          │  └───────────────────────────────────────────────┘  │
+│          │                                                     │
+└──────────┴─────────────────────────────────────────────────────┘
+```
+
+### 0.1 Top Pane
+
+**Component:** `AuthenticatedLayout` header section (`sticky top-0 z-20`).
+**Contents:** Global search (⌘K), Tenant/Company context, Notifications, User session.
+**Constraint:** Must never contain module-specific actions or state.
+
+### 0.2 Sidebar (Navigation)
+
+**Component:** `AuthenticatedLayout` aside section.
+**Structure:** Three strict categories: Start (Workboard), Business Domains, Platform.
+**Constraint:** Driven by `vue-router` and RBAC permissions. Collapsible to icon-only mode.
+
+### 0.3 Workspace
+
+**Purpose:** The entry point into a Business Domain. Provides module-level health metrics and list views.
+**Components:** `PageHeader`, `DataGrid`, Smart Tabs.
+**Constraint:** Workspaces are read-only aggregations. Selecting a record transitions to the Working Area.
+
+### 0.4 Working Area
+
+**Purpose:** The dedicated canvas for performing actual work on a single entity.
+**Components:** The `<RouterView />` payload (e.g., `PaymentRequestFocus.vue`).
+**Internal Anatomy:**
+
+- **Form Title Bar** — `PageHeader` with Record ID, Status Badge, global record context.
+- **Summary Area** — `AppFieldset variant="ghost" layout="horizontal"` for high-level record data.
+- **Details Area** — `AppTabs` containing `DataGrid`, `AppFieldset` sections, or audit history.
+- **Side Panel** — `AppSidePane` for contextual provenance (Trace Drawers).
+  **Constraint:** The Working Area is the **exclusive domain of the Field System** (`AppField`, `AppFieldset`, `FieldGroup`). No raw HTML layouts. See [Field System Architecture](../FIELD_SYSTEM.md).
 
 ---
 
@@ -45,12 +102,12 @@ Instead, we use a **Router-Driven Progressive Disclosure** flow. Each stage is a
 ### 2.1. State Transition Flow
 
 ```text
-[Queue/ListPage] → [DetailPage/Focus Mode] → [TraceDrawer] → [ActionModal]
+[Workspace/ListPage] → [Focus Canvas] → [Side Panel / TraceDrawer] → [ActionModal]
 ```
 
-- **Queue (Inbox)**: Dense grid for scanning/filtering work units.
-- **Detail (Desk)**: Single entity focus, wide tabular form.
-- **Trace (Filing Cabinet)**: On-demand provenance overlay.
+- **Workspace (Inbox)**: Dense grid for scanning/filtering work units.
+- **Focus (Desk)**: Single entity focus, wide tabular form governed by the Field System.
+- **Side Panel (Filing Cabinet)**: On-demand provenance overlay (Trace Drawers).
 - **ActionModal**: Explicit confirmation for destructive actions.
 
 ### 2.2. Component Interaction Contract
@@ -59,40 +116,42 @@ The primary flow for transactional operations:
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│ [Domain]ListPage.vue                                   │
+│ [Domain]ListPage.vue  (WORKSPACE)                      │
 │  - Smart Filter Bucket Tabs + DataGrid                 │
 │  - DataGrid footer: row count, total, selection count  │
 │  - Bulk Action bar (appears when selectedCount > 0)    │
 │  - Quick Triage: docked AppSidePane (mode="docked")    │
 │      Shows audit timeline for selected row             │
-│      Does NOT mutate; navigates to Detail for editing  │
+│      Does NOT mutate; navigates to Focus for editing   │
 └─────────────────────────┬──────────────────────────────┘
                           │ router.push() — explicit navigation
                           ▼
 ┌───────────────────────────┐
-│ [Domain]DetailPage.vue    │
-│  - Entity form/grid       │
-│  - Primary actions (Post) │
-│  - Opens TraceDrawer      │
+│ [Domain]Focus.vue         │
+│  (WORKING AREA)           │
+│  - AppFieldset summary    │
+│  - AppTabs + DataGrid     │
+│  - Primary actions        │
+│  - Opens Side Panel       │
 │  - Opens ActionModal      │
 └───────┬─────────┬─────────┘
         │         │
         ▼         ▼
 ┌─────────────┐   ┌────────────────┐
-│ TraceDrawer │   │ ActionModal    │
-│  - Audit    │   │  Confirm void  │
-│  - Source   │   │  Confirm delete│
-│  - Attach.  │   │                │
+│ Side Panel  │   │ ActionModal    │
+│ TraceDrawer │   │  Confirm void  │
+│  - Audit    │   │  Confirm delete│
+│  - Source   │   │                │
 └─────────────┘   └────────────────┘
 ```
 
-> **Rule:** The Quick Triage docked pane is read-only. It shows the audit trail for context. Any mutation (approve, edit, reject) must navigate the user to the Detail route. This preserves the state isolation guarantee of Sequential Progressive Disclosure.
+> **Rule:** The Quick Triage docked pane is read-only. It shows the audit trail for context. Any mutation (approve, edit, reject) must navigate the user to the Focus route. This preserves the state isolation guarantee of Sequential Progressive Disclosure.
 
 ### 2.3. The 3 Stages of Operational Focus
 
-1. **The Active Queue (The Inbox)**: A clean, full-screen DataGrid filtering for exactly what needs attention (e.g., `Status: PENDING_APPROVAL`). Clicking a row performs a `router.push()` — no inline entity mutation from the queue.
-2. **The Focus Canvas (The Desk)**: The screen transitions cleanly to the entity. The queue disappears. The user focuses purely on doing the work in a linear, step-by-step fashion. Primary state-advancing actions are prominent; destructive actions are hidden behind `ActionModal` confirmations.
-3. **Contextual Provenance (The Filing Cabinet)**: "No number without an origin" — but it is lazy-loaded. Audit histories, underlying vendor bills, and financial impact projections sit behind a slide-out `TraceDrawer`, appearing only when the user invokes it. When they are done investigating, they close the drawer and return to the focused context.
+1. **The Workspace (The Inbox)**: A clean, full-screen DataGrid filtering for exactly what needs attention (e.g., `Status: PENDING_APPROVAL`). Clicking a row performs a `router.push()` — no inline entity mutation from the workspace.
+2. **The Focus Canvas (The Desk)**: The screen transitions cleanly to the entity. The workspace disappears. The user focuses purely on doing the work. The Working Area renders using the Field System (`AppFieldset`, `AppField`, `AppTabs`). Primary state-advancing actions are prominent; destructive actions require `ActionModal` confirmation.
+3. **The Side Panel (The Filing Cabinet)**: "No number without an origin" — but it is lazy-loaded. Audit histories, underlying vendor bills, and financial impact projections sit behind a slide-out Side Panel (`TraceDrawer`), appearing only when the user invokes it. When they are done investigating, they close the panel and return to the focused context.
 
 ### 2.4. Density Management Rules
 
@@ -121,15 +180,15 @@ We utilize a three-tier contrast system to create structural depth without heavy
 
 Every transactional module in AbrenERP implements the same Progressive Disclosure grammar. This guarantees a **repeatable, learnable interaction pattern** across the entire system:
 
-| Module                    | Queue →                    | Detail →                    | Trace                                        |
-| :------------------------ | :------------------------- | :-------------------------- | :------------------------------------------- |
-| **Journal Entries**       | `JournalEntriesListPage`   | `JournalEntryDetailPage`    | Audit, FX rates, source documents            |
-| **Vendor Bills**          | `VendorBillsListPage`      | `VendorBillDetailPage`      | Linked invoices, approvals, GL impact        |
-| **Bank Transactions**     | `BankTransactionsListPage` | `BankTransactionDetailPage` | Reconciliation matches, import source        |
-| **Inventory Adjustments** | `AdjustmentsListPage`      | `AdjustmentDetailPage`      | Warehouse logs, count sheets                 |
-| **Payment Requests**      | `PaymentRequestsListPage`  | `PaymentRequestDetailPage`  | Workflow history, vendor info, budget impact |
+| Module                    | Workspace →                | Focus →                  | Side Panel                                   |
+| :------------------------ | :------------------------- | :----------------------- | :------------------------------------------- |
+| **Journal Entries**       | `JournalEntriesListPage`   | `JournalEntryFocus`      | Audit, FX rates, source documents            |
+| **Vendor Bills**          | `VendorBillsListPage`      | `VendorBillFocus`        | Linked invoices, approvals, GL impact        |
+| **Bank Transactions**     | `BankTransactionsListPage` | `BankTransactionFocus`   | Reconciliation matches, import source        |
+| **Inventory Adjustments** | `AdjustmentsListPage`      | `AdjustmentFocus`        | Warehouse logs, count sheets                 |
+| **Payment Requests**      | `PaymentRequestsListPage`  | `PaymentRequestFocus` ✅ | Workflow history, vendor info, budget impact |
 
-> **Rule**: If a new module cannot express its primary workflow through `Queue → Detail → Trace`, the module's UX design must be escalated for architectural review before implementation.
+> **Rule**: If a new module cannot express its primary workflow through `Workspace → Focus → Side Panel`, the module's UX design must be escalated for architectural review before implementation.
 
 ---
 
@@ -221,7 +280,7 @@ Traceability is not an afterthought; it lives natively in the UI via Progressive
 | **Progressive Disclosure**  | Heavy audit data only when requested via `TraceDrawer`.                                                                                            |
 | **ERP Density**             | Information richness staged per the Density Management Rules, never diluted.                                                                       |
 | **Cultural Fit**            | Linear flows mirror Ethiopian SME accountants' step-by-step processing.                                                                            |
-| **Scalability**             | Repeatable `Queue → Detail → Trace` grammar scales across every module.                                                                            |
+| **Scalability**             | Repeatable `Workspace → Focus → Side Panel` grammar scales across every module.                                                                    |
 | **Training & Localization** | Sequential flows simplify translation and onboarding. Each step can carry localized tooltips or Amharic guidance without cluttering the interface. |
 
 ---
@@ -230,18 +289,27 @@ Traceability is not an afterthought; it lives natively in the UI via Progressive
 
 Every transactional UI feature expresses itself through these standardized component types:
 
-| Component Type   | Naming Pattern             | Role in Progressive Disclosure                                  |
-| :--------------- | :------------------------- | :-------------------------------------------------------------- |
-| **Queue**        | `[Domain]ListPage.vue`     | Stage 1: Full-screen DataGrid                                   |
-| **Focus Canvas** | `[Domain]DetailPage.vue`   | Stage 2: Isolated entity work                                   |
-| **Provenance**   | `[Domain]TraceDrawer.vue`  | Stage 3: Lazy-loaded audit overlay                              |
-| **Macro-Create** | `[Domain]CreatePage.vue`   | Full page for creating complex entities (grids, line items)     |
-| **Micro-Create** | `[Domain]CreateDrawer.vue` | Slide-out for simple taxonomies (e.g., tags, fiscal periods)    |
-| **Form**         | `[Domain][Action]Form.vue` | Headless presentation layer for a form                          |
-| **Confirmation** | `[Domain]ActionModal.vue`  | Interruptive confirmation for destructive operations            |
-| **Primitive**    | `App[Type].vue`            | **Tier 1 Wrapper** (e.g., `AppButton`, `AppInput`, `AppSelect`) |
+| Component Type     | Naming Pattern             | Foundation   | Role                                                      |
+| :----------------- | :------------------------- | :----------- | :-------------------------------------------------------- |
+| **Workspace**      | `[Domain]ListPage.vue`     | Workspace    | Full-screen DataGrid with Smart Tabs                      |
+| **Focus Canvas**   | `[Domain]Focus.vue`        | Working Area | Isolated entity work (Field System governs layout)        |
+| **Side Panel**     | `[Domain]TraceDrawer.vue`  | Working Area | Lazy-loaded audit/provenance overlay                      |
+| **Macro-Create**   | `[Domain]CreatePage.vue`   | Working Area | Full page for creating complex entities                   |
+| **Micro-Create**   | `[Domain]CreateDrawer.vue` | Working Area | Slide-out for simple taxonomies                           |
+| **Form**           | `[Domain][Action]Form.vue` | Working Area | Headless presentation layer for a form                    |
+| **Confirmation**   | `[Domain]ActionModal.vue`  | Working Area | Interruptive confirmation for destructive operations      |
+| **Field Renderer** | `AppField.vue`             | Working Area | **Tier 1** — Semantic data renderer (see Field System)    |
+| **Layout Engine**  | `AppFieldset.vue`          | Working Area | **Tier 1** — Grid layout authority (see Field System)     |
+| **Primitive**      | `App[Type].vue`            | All          | **Tier 1** — (`AppButton`, `AppInput`, `AppSelect`, etc.) |
 
 > [!IMPORTANT]
-> **Vendor Shielding**: Business modules MUST NOT use raw vendor primitives (`<fluent-*>`, raw headless primitives, or third-party UI tags). All interaction must occur through our established **Tier 1 Primitives** so Abren owns the interface contract.
+> **Vendor Shielding**: Business modules MUST NOT use raw vendor primitives (raw headless primitives or third-party UI tags). All interaction must occur through our established **Tier 1 Primitives** so Abren owns the interface contract.
 
 > **Rule**: If a component does not fit one of these types, it must be justified architecturally before creation.
+
+### Golden Reference Screens
+
+To prevent layout drift, the following screens serve as the immutable reference templates:
+
+1. **Focus Canvas:** `PaymentRequestFocus.vue` — Demonstrates `layout="horizontal"`, `AppTabs`, and `DataGrid` isolation.
+2. **Side Panel:** `PaymentRequestTraceDrawer.vue` — Demonstrates `layout="vertical"` and single-column density.

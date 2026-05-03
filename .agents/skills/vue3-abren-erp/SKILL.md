@@ -78,6 +78,9 @@ Avoid the **SFC God-Component** anti-pattern. While Vue Single-File Components a
 
 Prefer shared page composition over one-off page markup. Reuse or introduce shared patterns such as:
 
+- **`<AppField>`** — the only way to display data fields in business screens (see Field System below)
+- **`<AppFieldset>`** — the only way to group fields (see Field System below)
+- **`<FieldGroup>`** — sub-grouping within fieldsets
 - page headers (use `PageHeader` with a dynamic operational subtitle, not a static description)
 - section wrappers
 - toolbars
@@ -129,6 +132,58 @@ Bucket tabs are computed from live data, not hardcoded. They drive the `statusFi
 - Forms should keep domain rules in schemas/composables and presentation in UI components.
 - Loading, empty, error, and success states are part of the UX contract, not afterthoughts.
 
+## Field System (Non-Negotiable)
+
+> Full reference: `docs/FIELD_SYSTEM.md`
+>
+> This system exists to enable a future metadata-driven UI runtime without rewriting screens.
+
+All business screens **must** use the Field System primitives. This is the foundational architectural constraint of the Abren ERP frontend.
+
+### Mandatory Primitives
+
+- `<AppField>` — the **only** way to display a data field. Takes `field` (stable key), `label` (display text), `value` (raw domain value), and `type` (registry key).
+- `<AppFieldset>` — the **only** way to group fields. Max 3 columns. Color-coded variants.
+- `<FieldGroup>` — lightweight sub-grouping within a fieldset.
+
+### Enforced Constraints (all 11)
+
+1. **No raw layout** — use `<AppFieldset>` or `<FieldGroup>`, never `<div class="grid">`
+2. **No raw data display** — use `<AppField>`, never `<span>{{ value }}</span>`
+3. **No business logic in components** — components render, servers decide
+4. **One field system** — all rendering goes through the registry
+5. **field/label separation** — stable `field` key distinct from display `label`
+6. **No conditional field rendering** — no `v-if` based on business state; null renders as `"—"`
+7. **Generic types only** — never `money_etb` or `status_pr`; use `FieldContext` for context
+8. **AppField is a renderer** — no business rules, no visibility decisions, no mutations
+9. **Value purity** — raw domain values only; no `formatMoney(x)` before passing to `<AppField>`
+10. **FieldContext is rendering-only** — no permissions, workflow state, or user roles
+11. **Empty state semantics** — `null`, `0`, `""`, `[]` are distinct; registry defines emptiness
+
+### Registry Types
+
+Valid `FieldType` values (enforced via TypeScript union):
+
+`text` | `money` | `status` | `date` | `id` | `number`
+
+To add a new type: extend the `FieldType` union in `registry.ts` and register its `FieldDefinition`. No other files need to change.
+
+### Action Contract
+
+Focus screens render actions from a `ScreenAction[]` array:
+
+```ts
+interface ScreenAction {
+  key: string
+  label: string
+  variant: 'primary' | 'danger' | 'neutral'
+  enabled: boolean
+  requiresConfirmation?: boolean
+}
+```
+
+The component renders actions. It does not decide which actions to show.
+
 ## Styling Guidance
 
 - Use the design tokens in `src/assets/main.css`.
@@ -144,6 +199,10 @@ Bucket tabs are computed from live data, not hardcoded. They drive the `statusFi
 - inconsistent action placement across modules
 - raw vendor primitives inside business pages when a shared wrapper exists
 - layout decisions that hide what needs attention now
+- **raw HTML for data display in business screens** — `<span>{{ amount }}</span>` bypasses the Field System; use `<AppField>` exclusively
+- **raw layout divs in business screens** — `<div class="grid">` bypasses the layout system; use `<AppFieldset>` or `<FieldGroup>`
+- **pre-formatted values in AppField** — `<AppField :value="formatMoney(x)" />` breaks value purity; pass raw domain values
+- **conditional field rendering based on business state** — `v-if="status === 'APPROVED'"` on fields violates constraint 6
 - **inline cell editing in financial data grids** — editing amounts, dates, or statuses directly in a grid cell bypasses domain validation, state machine checks, and audit trail recording; all mutations must flow through the Focus Canvas or a sanctioned Drawer form; this is a financial control, not a UX limitation
 - **tri-pane / master-detail layouts that render list + detail simultaneously on the same route** — this violates Sequential Progressive Disclosure and creates split-focus fatigue; the sanctioned pattern is the Quick Triage docked pane (trace only) + a separate Focus route for full editing
 - fake or placeholder metrics — if data is not real, show an honest empty state

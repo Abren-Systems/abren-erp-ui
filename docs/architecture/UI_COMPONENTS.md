@@ -1,6 +1,8 @@
 # Foundation UI Components Guide
 
-This document defines how UI components are built and consumed in Abren ERP.
+> **Last Updated:** May 2026
+
+This document defines how UI components are built and consumed in Abren ERP. All components exist within the [Four Foundations](./UX_ARCHITECTURE.md#0-the-four-foundations-app-shell) (Top Pane, Sidebar, Workspace, Working Area).
 
 ## 1. Ownership First
 
@@ -53,7 +55,7 @@ Use primitives for atomic interactions:
 - `AppBadge`
 - `AppDrawer`
 - `AppDialog`
-- `AppSidePane` — contextual overlay and docked side surfaces (`mode="overlay"` for filters, `mode="docked"` for Quick Triage trace panes)
+- `AppSidePane` — Side Panel for contextual overlays: `mode="overlay"` for filters, `mode="docked"` for Quick Triage trace panes (maps to Acumatica's "Side Panel" concept)
 
 ### 4.2 Page-Kit Layer
 
@@ -66,6 +68,19 @@ Use composition components for repeatable page structure:
 - `TraceSection` — _(PLANNED — not yet implemented)_
 
 Pages should not reinvent these layouts ad hoc.
+
+### 4.3 Field System Layer (Working Area)
+
+The Field System governs all data display and layout inside the Working Area. See [Field System Architecture](../FIELD_SYSTEM.md) for the full specification.
+
+- `AppField` — The **only** way to display a data field. Pure semantic renderer.
+- `AppFieldset` — The **only** layout engine. CSS Grid authority with `140px` baseline.
+- `FieldGroup` — Lightweight semantic sub-grouping (no layout of its own).
+- `AppTabs` — Stateless visibility toggle for data strata.
+- `DataGrid` — The **only** tabular rendering system (TanStack Table).
+
+> [!IMPORTANT]
+> **"Fields define meaning, Fieldsets define layout."** — `AppField` must never decide its own layout. `AppFieldset` must never interpret business values. This separation is the foundation for Phase 3 (Metadata-Driven Screens).
 
 ## 5. ERP Density Rules
 

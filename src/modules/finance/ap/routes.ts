@@ -22,7 +22,7 @@ export default [
         path: ':id',
         name: 'PaymentRequestDetail',
         meta: { title: 'Detail' },
-        component: () => import('./ui/payment-requests/pages/PaymentRequestDetailPage.vue'),
+        component: () => import('./ui/payment-requests/pages/PaymentRequestFocus.vue'),
         props: true,
       },
     ],

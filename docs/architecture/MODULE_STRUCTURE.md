@@ -94,22 +94,22 @@ In our **Symmetry-over-Parity** model, the frontend's **Application Composables*
 
 ### Files
 
-| Type        | Pattern                 | Example                 |
-| ----------- | ----------------------- | ----------------------- |
-| List Page   | `*ListPage.vue`         | `AccountsListPage.vue`  |
-| Detail Page | `*DetailPage.vue`       | `AccountDetailPage.vue` |
-| Editor Page | `*EditPage.vue`         | `AccountEditPage.vue`   |
-| Create Page | `*CreatePage.vue`       | `AccountCreatePage.vue` |
-| Wizard Page | `*WizardPage.vue`       | `OnboardingWizard.vue`  |
-| Form Drawer | `*FormDrawer.vue`       | `AccountFormDrawer.vue` |
-| Adapter     | `{module}_adapter.ts`   | `ledger_adapter.ts`     |
-| Mapper      | `{entity}.mapper.ts`    | `account.mapper.ts`     |
-| Composable  | `use{Action}.ts`        | `useLedgerAccounts.ts`  |
-| Types       | `{entity}.types.ts`     | `account.types.ts`      |
-| Branded ID  | `{entity}Id` type       | `UserId`, `TenantId`    |
-| Formatter   | `{entity}-formatter.ts` | `account-formatter.ts`  |
-| Routes      | `routes.ts`             | —                       |
-| Entry       | `index.ts`              | —                       |
+| Type        | Pattern                 | Example                   |
+| ----------- | ----------------------- | ------------------------- |
+| List Page   | `*ListPage.vue`         | `AccountsListPage.vue`    |
+| Focus Page  | `*Focus.vue`            | `PaymentRequestFocus.vue` |
+| Editor Page | `*EditPage.vue`         | `AccountEditPage.vue`     |
+| Create Page | `*CreatePage.vue`       | `AccountCreatePage.vue`   |
+| Wizard Page | `*WizardPage.vue`       | `OnboardingWizard.vue`    |
+| Form Drawer | `*FormDrawer.vue`       | `AccountFormDrawer.vue`   |
+| Adapter     | `{module}_adapter.ts`   | `ledger_adapter.ts`       |
+| Mapper      | `{entity}.mapper.ts`    | `account.mapper.ts`       |
+| Composable  | `use{Action}.ts`        | `useLedgerAccounts.ts`    |
+| Types       | `{entity}.types.ts`     | `account.types.ts`        |
+| Branded ID  | `{entity}Id` type       | `UserId`, `TenantId`      |
+| Formatter   | `{entity}-formatter.ts` | `account-formatter.ts`    |
+| Routes      | `routes.ts`             | —                         |
+| Entry       | `index.ts`              | —                         |
 
 ### Data Types
 

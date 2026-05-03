@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AppBadge, AppSidePane } from '@/shared/components/primitives'
-import { History, FileText, Banknote } from 'lucide-vue-next'
+import { AppFieldset, AppField } from '@/shared/components/field-system'
+import { History } from 'lucide-vue-next'
 import PaymentRequestTimeline from './PaymentRequestTimeline.vue'
 import type { PaymentRequest } from '../../../domain/ap.types'
 
@@ -40,77 +41,46 @@ const emit = defineEmits<{
       <PaymentRequestTimeline :request="request" />
 
       <!-- GL Journal Impact -->
-      <section v-if="request.targetLiabilityAccountId">
-        <h3
-          class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-neutral-400)] flex items-center gap-2"
-        >
-          <Banknote :size="12" />
-          Financial Impact (GL)
-        </h3>
-        <div
-          class="bg-white rounded-xl border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
-        >
-          <div
-            class="px-4 py-3 flex justify-between items-center border-b border-[var(--color-neutral-100)]"
-          >
-            <span
-              class="text-[10px] font-bold text-[var(--color-neutral-500)] uppercase tracking-wider"
-              >Liability Account</span
-            >
-            <code
-              class="text-[10px] font-bold text-[var(--color-primary-600)] bg-[var(--color-primary-50)] px-1.5 py-0.5 rounded-md"
-            >
-              {{ request.targetLiabilityAccountId.slice(0, 8) }}…
-            </code>
-          </div>
-          <div class="px-4 py-3 flex justify-between items-center">
-            <span
-              class="text-[10px] font-bold text-[var(--color-neutral-500)] uppercase tracking-wider"
-              >Disbursement Account</span
-            >
-            <code
-              class="text-[10px] font-bold text-[var(--color-neutral-600)] bg-[var(--color-neutral-50)] px-1.5 py-0.5 rounded-md"
-            >
-              {{ request.bankAccountId?.slice(0, 8) ?? '—' }}
-            </code>
-          </div>
-        </div>
-      </section>
+      <AppFieldset
+        v-if="request.targetLiabilityAccountId"
+        title="Financial Impact (GL)"
+        layout="vertical"
+        :columns="1"
+      >
+        <AppField
+          field="liability"
+          label="Liability Account"
+          :value="request.targetLiabilityAccountId"
+          type="id"
+        />
+        <AppField
+          field="disbursement"
+          label="Disbursement Account"
+          :value="request.bankAccountId"
+          type="id"
+        />
+      </AppFieldset>
 
       <!-- Source Document -->
-      <section v-if="request.sourceModule">
-        <h3
-          class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-neutral-400)] flex items-center gap-2"
-        >
-          <FileText :size="12" />
-          Source Document
-        </h3>
-        <div
-          class="bg-white rounded-xl border border-[var(--color-neutral-200)] shadow-sm overflow-hidden"
-        >
-          <div
-            class="px-4 py-3 flex justify-between items-center border-b border-[var(--color-neutral-100)]"
-          >
-            <span
-              class="text-[10px] font-bold text-[var(--color-neutral-500)] uppercase tracking-wider"
-              >Originating Module</span
-            >
-            <span class="text-xs font-bold text-[var(--color-neutral-900)]">{{
-              request.sourceModule
-            }}</span>
-          </div>
-          <div class="px-4 py-3 flex justify-between items-center">
-            <span
-              class="text-[10px] font-bold text-[var(--color-neutral-500)] uppercase tracking-wider"
-              >Internal Reference</span
-            >
-            <code
-              class="text-[10px] font-bold text-[var(--color-neutral-600)] bg-[var(--color-neutral-50)] px-1.5 py-0.5 rounded-md"
-              >{{ request.sourceId ?? '—' }}</code
-            >
-          </div>
-        </div>
-      </section>
+      <AppFieldset
+        v-if="request.sourceModule"
+        title="Source Document"
+        layout="vertical"
+        :columns="1"
+      >
+        <AppField
+          field="module"
+          label="Originating Module"
+          :value="request.sourceModule"
+          type="text"
+        />
+        <AppField
+          field="reference"
+          label="Internal Reference"
+          :value="request.sourceId"
+          type="id"
+        />
+      </AppFieldset>
     </div>
   </AppSidePane>
 </template>

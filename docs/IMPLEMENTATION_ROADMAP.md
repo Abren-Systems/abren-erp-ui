@@ -53,7 +53,7 @@ Before a Horizon is called "Consolidated," every backend capability must be prov
 
 ---
 
-## 3. Ordered Transition Horizons
+## 3. Ordered Transition Horizons (Functional)
 
 | Horizon                                      | Aim                                | Primary Frontend Goal                                        |
 | -------------------------------------------- | ---------------------------------- | ------------------------------------------------------------ |
@@ -64,9 +64,29 @@ Before a Horizon is called "Consolidated," every backend capability must be prov
 
 ---
 
-## 4. Current Status: Horizon A (Backbone Consolidation)
+## 4. UI Structural Horizons (Architectural)
 
-### 4.1 Core Operating System (Backend Stage 1)
+Parallel to functional delivery, the UI architecture evolves through its own structural phases. These ensure the frontend remains a robust metadata-driven runtime.
+
+| Phase         | Focus                           | Status    | Key Deliverables                                                 |
+| ------------- | ------------------------------- | --------- | ---------------------------------------------------------------- |
+| **Phase 1**   | Primitives & Value Purity       | ✅ Done   | `AppField`, `AppFieldset`, Field Registry, No pre-formatting.    |
+| **Phase 1.5** | Layout Engine & Grid Discipline | ✅ Done   | `AppFieldset` drives CSS Grid, `140px` baseline, Golden Screens. |
+| **Phase 2**   | Editable Forms & Zod Binding    | 📋 Next   | Input variants, Zod schema binding, inline validation.           |
+| **Phase 3**   | Server-Driven Metadata          | 📋 Target | `ScreenDefinition` schema, JSON-driven screen generation.        |
+
+### The Golden Reference Screens
+
+To prevent layout drift, the following screens serve as the **immutable reference templates** for all future development:
+
+1. **The Complex Focus Canvas:** `PaymentRequestFocus.vue` (Demonstrates `layout="horizontal"`, `AppTabs`, and `DataGrid` isolation).
+2. **The Vertical Drawer:** `PaymentRequestTraceDrawer.vue` (Demonstrates `layout="vertical"` and single-column density).
+
+---
+
+## 5. Current Status: Horizon A (Backbone Consolidation)
+
+### 5.1 Core Operating System (Backend Stage 1)
 
 | Capability                  | Status | Notes                                      |
 | --------------------------- | ------ | ------------------------------------------ |
@@ -75,7 +95,7 @@ Before a Horizon is called "Consolidated," every backend capability must be prov
 | Dashboard Stat Cards        | 🔨     | Currently hardcoded; needs API integration |
 | User Profile Management     | 📋     | Planned for Phase 2                        |
 
-### 4.2 Financial Engine (Backend Stage 2)
+### 5.2 Financial Engine (Backend Stage 2)
 
 | Subdomain           | Status | Notes                                            |
 | ------------------- | ------ | ------------------------------------------------ |
@@ -88,11 +108,11 @@ Before a Horizon is called "Consolidated," every backend capability must be prov
 
 ---
 
-## 5. Sequencing Rule: "No Breadth on Unstable Seams"
+## 6. Sequencing Rule: "No Breadth on Unstable Seams"
 
 The UI will not add new modules (e.g., Procurement) until the supporting seams (Ledger, Workflows, Identity) are **Consolidated** and **Verified**.
 
-### Exit Criteria for Horizon A:
+### Exit Criteria for Horizon A
 
 1. **Zero hardcoded strings** in the primary business flow.
 2. **100% DTO sync** with the runtime OpenAPI spec.
@@ -101,7 +121,7 @@ The UI will not add new modules (e.g., Procurement) until the supporting seams (
 
 ---
 
-## 6. Cleanup & Technical Debt
+## 7. Cleanup & Technical Debt
 
 | Task                              | Priority | Status               |
 | --------------------------------- | -------- | -------------------- |
