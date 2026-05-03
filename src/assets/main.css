@@ -14,16 +14,16 @@
    * Authoritative and precise for financial systems. 
    * Source: docs/architecture/DESIGN_SYSTEM.md
    */
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-200: #c7d2fe;
-  --color-primary-300: #a5b4fc;
-  --color-primary-400: #818cf8;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5; /* ← Main CTA color */
-  --color-primary-700: #4338ca; /* ← Hover state */
-  --color-primary-800: #3730a3;
-  --color-primary-900: #312e81;
+  --color-primary-50: #eff6fc;
+  --color-primary-100: #cfe4fa;
+  --color-primary-200: #abcbf5;
+  --color-primary-300: #82aef0;
+  --color-primary-400: #5c91ea;
+  --color-primary-500: #3b74e6;
+  --color-primary-600: #0f6cbd; /* ← Main CTA color (Enterprise Blue) */
+  --color-primary-700: #0c579c; /* ← Hover state */
+  --color-primary-800: #0a4379;
+  --color-primary-900: #073059;
 
   /*
    * ── Neutrals — Fluent Design Neutral Palette ──────────────────
@@ -103,8 +103,8 @@
 
   /* Raw size scale (kept for Tailwind utility classes) */
   --text-xs: 0.6875rem; /* 11px  — micro / timestamps */
-  --text-sm: 0.8125rem; /* 13px  — secondary body */
-  --text-base: 0.875rem; /* 14px  — primary body */
+  --text-sm: 0.75rem; /* 12px  — secondary body */
+  --text-base: 0.8125rem; /* 13px  — primary body */
   --text-lg: 1rem; /* 16px  — card headings */
   --text-xl: 1.125rem; /* 18px  — section headings */
   --text-2xl: 1.25rem; /* 20px  — page sub-headings */
@@ -115,8 +115,8 @@
   --text-display: 2rem; /* 32px 700 -0.02em — page hero, rare */
   --text-heading: 1.5rem; /* 24px 700 -0.01em — module headings */
   --text-title: 1.125rem; /* 18px 600 0       — section/panel headings */
-  --text-body: 0.875rem; /* 14px 400 0       — standard content */
-  --text-body-sm: 0.8125rem; /* 13px 400 0      — secondary content */
+  --text-body: 0.8125rem; /* 13px 400 0       — standard content */
+  --text-body-sm: 0.75rem; /* 12px 400 0      — secondary content */
   --text-label: 0.6875rem; /* 11px 600 +0.04em — table headers, ALL CAPS */
   --text-code: 0.78125rem; /* 12.5px 400      — IDs, codes, amounts */
   --text-micro: 0.6875rem; /* 11px 400 +0.02em — timestamps, metadata */
@@ -195,9 +195,9 @@
  */
 :root {
   /* Fluent Web Component Token Overrides */
-  --accent-fill-rest: #4f46e5;
-  --accent-fill-hover: #4338ca;
-  --accent-fill-active: #3730a3;
+  --accent-fill-rest: #0f6cbd;
+  --accent-fill-hover: #0c579c;
+  --accent-fill-active: #0a4379;
   --accent-foreground-cut-rest: #ffffff;
 }
 
