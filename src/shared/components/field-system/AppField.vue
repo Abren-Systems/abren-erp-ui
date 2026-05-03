@@ -55,6 +55,8 @@ const props = withDefaults(
 
 defineEmits<{
   (e: 'update:modelValue', value: unknown): void
+  (e: 'blur', event: FocusEvent): void
+  (e: 'focus', event: FocusEvent): void
 }>()
 
 const definition = computed(() => resolveField(props.type))
@@ -96,6 +98,8 @@ const mergedEditorProps = computed(() => ({
         :readonly="readonly"
         v-bind="mergedEditorProps"
         @update:model-value="$emit('update:modelValue', $event)"
+        @blur="$emit('blur', $event)"
+        @focus="$emit('focus', $event)"
       />
     </div>
 
