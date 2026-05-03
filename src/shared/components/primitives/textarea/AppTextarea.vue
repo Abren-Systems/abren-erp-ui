@@ -54,37 +54,39 @@ function handleInput(event: Event) {
 </script>
 
 <template>
-  <div class="flex w-full flex-col gap-1.5">
+  <div class="app-field app-field--md">
     <label
       v-if="label"
       :for="typeof forwardedAttrs.id === 'string' ? forwardedAttrs.id : undefined"
-      class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-neutral-500)]"
+      class="app-field__label"
     >
       {{ label }}
       <span v-if="required" class="ml-0.5 text-[var(--color-danger-600)]">*</span>
     </label>
 
-    <textarea
-      v-bind="forwardedAttrs"
-      :id="typeof forwardedAttrs.id === 'string' ? forwardedAttrs.id : undefined"
-      :value="modelValue"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      :readonly="readonly"
-      :required="required"
-      :rows="rows"
-      :class="textareaClass"
-      @input="handleInput"
-      @blur="$emit('blur', $event)"
-      @focus="$emit('focus', $event)"
-    />
+    <div class="app-field__control">
+      <textarea
+        v-bind="forwardedAttrs"
+        :id="typeof forwardedAttrs.id === 'string' ? forwardedAttrs.id : undefined"
+        :value="modelValue"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :readonly="readonly"
+        :required="required"
+        :rows="rows"
+        :class="textareaClass"
+        @input="handleInput"
+        @blur="$emit('blur', $event)"
+        @focus="$emit('focus', $event)"
+      />
 
-    <p v-if="description" class="text-[11px] text-[var(--color-neutral-500)]">
-      {{ description }}
-    </p>
+      <p v-if="description" class="text-[11px] text-[var(--color-neutral-500)]">
+        {{ description }}
+      </p>
 
-    <span v-if="error" class="text-[11px] font-medium text-[var(--color-danger-600)]">
-      {{ error }}
-    </span>
+      <span v-if="error" class="text-[11px] font-medium text-[var(--color-danger-600)]">
+        {{ error }}
+      </span>
+    </div>
   </div>
 </template>
