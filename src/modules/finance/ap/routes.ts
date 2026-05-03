@@ -34,16 +34,10 @@ export default [
         component: () => import('./ui/vendor-bills/pages/VendorBillsListPage.vue'),
       },
       {
-        path: 'create',
-        name: 'VendorBillCreate',
-        meta: { title: 'New Bill' },
-        component: () => import('./ui/vendor-bills/pages/VendorBillCreatePage.vue'),
-      },
-      {
         path: ':id',
         name: 'VendorBillDetail',
-        meta: { title: 'Detail' },
-        component: () => import('./ui/vendor-bills/pages/VendorBillDetailPage.vue'),
+        meta: { title: 'Vendor Bill' },
+        component: () => import('./ui/vendor-bills/pages/VendorBillFocus.vue'),
         props: true,
       },
     ],

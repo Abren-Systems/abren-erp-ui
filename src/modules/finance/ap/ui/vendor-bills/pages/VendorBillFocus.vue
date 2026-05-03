@@ -1,31 +1,132 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { AppButton, AppSelect, AppInput, AppTextarea } from '@/shared/components/primitives'
+import { AppBadge, AppButton } from '@/shared/components/primitives'
+import { AppSelect, AppInput, AppTextarea } from '@/shared/components/primitives'
+import { PageHeader, WorkspacePanel, MetricCard } from '@/shared/components/workspace'
 import DebouncedCombobox from '@/shared/components/combobox/DebouncedCombobox.vue'
 import type { ComboboxOption } from '@/shared/components/combobox/DebouncedCombobox.vue'
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle,
+  FileText,
+  History,
+  MoreHorizontal,
+  Plus,
+  Receipt,
+  Trash2,
+} from 'lucide-vue-next'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/components/dropdown-menu'
+import { useVendorBill } from '../../../application/composables/useVendorBill'
 import { useCreateVendorBill } from '../../../application/composables/useCreateVendorBill'
+import { useValidateVendorBill } from '../../../application/composables/useValidateVendorBill'
+import { useRejectVendorBill } from '../../../application/composables/useRejectVendorBill'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
-import { Trash2, Plus, AlertCircle, ArrowLeft } from 'lucide-vue-next'
-import { PageHeader } from '@/shared/components/workspace'
+import { usePermissions } from '@/shared/auth/usePermissions'
+import VendorBillTraceSidePane from '../components/VendorBillTraceSidePane.vue'
+import VendorBillRejectModal from '../components/VendorBillRejectModal.vue'
 
-/**
- * VendorBillCreatePage — Dedicated creation form.
- *
- * Uses the Macro-Create pattern (Full Page) to support complex
- * tabular line items and maximum data density.
- */
-
+const props = defineProps<{ id: string }>()
 const router = useRouter()
-const { form, error: submissionError } = useCreateVendorBill()
+const { hasPermission } = usePermissions()
 
-// Draft Persistence
+const isNew = computed(() => props.id === 'new')
+
+// ── Existing bill fetch (only when not new) ────────────────────────────────
+const { bill, isLoading } = useVendorBill(props.id)
+const { validate, isValidating } = useValidateVendorBill(props.id)
+const { reject, isPending: isRejecting } = useRejectVendorBill(props.id)
+
+// ── Creation composable (TanStack form) ───────────────────────────────────
+const { form, isSubmitting: isCreating } = useCreateVendorBill()
 useFormPersistence(form, 'abren_draft_vendor_bill')
 
-function goBack() {
-  router.push({ name: 'VendorBillsList' })
+const isTraceOpen = ref(false)
+const isRejectModalOpen = ref(false)
+
+const isActionPending = computed(() => isValidating.value || isRejecting.value || isCreating.value)
+
+// ── Derived UI state ───────────────────────────────────────────────────────
+const statusVariant = computed<'neutral' | 'success' | 'primary' | 'warning' | 'danger' | 'info'>(
+  () => {
+    switch (bill.value?.status) {
+      case 'VALIDATED':
+        return 'success'
+      case 'PAID':
+        return 'primary'
+      default:
+        return 'neutral'
+    }
+  },
+)
+
+const summaryCards = computed(() => {
+  if (!bill.value) return []
+  return [
+    {
+      label: 'Total amount',
+      value: bill.value.totalAmount.format('en-ET'),
+      detail: 'Supplier invoice value captured for accrual and payment.',
+    },
+    {
+      label: 'Bill number',
+      value: bill.value.billNumber,
+      detail: 'Supplier-facing reference used during reconciliation.',
+    },
+    {
+      label: 'Issue date',
+      value: new Date(bill.value.issueDate).toLocaleDateString('en-ET'),
+      detail: 'When the invoice was issued by the supplier.',
+    },
+    {
+      label: 'Due date',
+      value: new Date(bill.value.dueDate).toLocaleDateString('en-ET'),
+      detail: 'When the liability is expected to be settled.',
+    },
+  ]
+})
+
+const focusGuidance = computed(() => {
+  if (isNew.value)
+    return 'Fill in the supplier invoice details and expense lines to register a new vendor bill.'
+  switch (bill.value?.status) {
+    case 'DRAFT':
+      return 'Draft bills should be validated only after invoice details, accounts, and categories are trustworthy.'
+    case 'VALIDATED':
+      return 'Validated bills are ready to feed the payment-request flow without re-entering the source context.'
+    case 'PAID':
+      return 'Paid bills are resolved, but trace remains important for audit and supplier follow-up.'
+    default:
+      return 'Review the bill, validate it into the ledger, and use trace for upstream or downstream context.'
+  }
+})
+
+// ── Actions ────────────────────────────────────────────────────────────────
+async function handleValidate() {
+  await validate()
 }
 
-// Mocked search functions for rapid UI mapping
+async function handleReject(reason: string) {
+  await reject(reason)
+  isRejectModalOpen.value = false
+}
+
+function handleCreatePR() {
+  void router.push({ name: 'PaymentRequestsList' })
+}
+
+function goBack() {
+  void router.push({ name: 'VendorBillsList' })
+}
+
+// ── Mocked search options for creation form ────────────────────────────────
 const searchVendors = async (q: string): Promise<ComboboxOption[]> => {
   return [
     { value: 'vend-123', label: 'Acme Corp', description: 'vend-123' },
@@ -51,18 +152,22 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col bg-neutral-50/50">
-    <!-- Header -->
-    <PageHeader
-      title="Register Vendor Bill"
-      description="Record a supplier invoice to generate an AP accrual."
-    >
+  <!-- ── Loading skeleton ─────────────────────────────────────────────── -->
+  <div v-if="isLoading && !bill && !isNew" class="flex min-h-[50vh] items-center justify-center">
+    <p class="text-sm text-neutral-500">Loading vendor bill...</p>
+  </div>
+
+  <!-- ── Creation Mode ─────────────────────────────────────────────────── -->
+  <div v-else-if="isNew" class="flex h-full flex-col bg-neutral-50/50">
+    <PageHeader title="Register Vendor Bill" :description="focusGuidance">
+      <template #icon>
+        <Receipt class="h-6 w-6" />
+      </template>
       <template #start>
         <AppButton variant="stealth" size="sm" class="h-8 w-8 p-0 -ml-2" @click="goBack">
           <ArrowLeft :size="16" />
         </AppButton>
       </template>
-
       <template #actions>
         <form.Subscribe v-slot="state">
           <AppButton
@@ -78,22 +183,6 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
 
     <div class="flex-1 overflow-y-auto p-6">
       <div class="max-w-4xl mx-auto space-y-8">
-        <!-- Submission Error -->
-        <div
-          v-if="submissionError"
-          class="bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3 shadow-sm mb-6"
-        >
-          <AlertCircle class="h-5 w-5 text-red-600 shrink-0" />
-          <div>
-            <h3 class="text-[10px] font-bold uppercase tracking-widest text-red-700">
-              Error registering bill
-            </h3>
-            <p class="text-xs text-red-600 mt-1">
-              {{ submissionError.message ?? 'An unexpected error occurred.' }}
-            </p>
-          </div>
-        </div>
-
         <form
           class="space-y-6"
           @submit.prevent="
@@ -200,7 +289,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
             </form.Field>
           </div>
 
-          <!-- Line Items -->
+          <!-- Expense Lines -->
           <div class="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden">
             <div
               class="flex items-center justify-between px-6 py-3 border-b border-neutral-200 bg-neutral-50/50"
@@ -214,12 +303,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                     variant="outline"
                     type="button"
                     @click="
-                      field.pushValue({
-                        description: '',
-                        amount: 0,
-                        accountId: '',
-                        categoryId: '',
-                      })
+                      field.pushValue({ description: '', amount: 0, accountId: '', categoryId: '' })
                     "
                   >
                     <Plus :size="14" class="mr-2" /> Add Line
@@ -307,7 +391,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                       </form.Field>
 
                       <form.Field :name="`lines[${idx}].categoryId`" :index="idx">
-                        <template #default="{ field: lf, state: ls }">
+                        <template #default="{ field: lf }">
                           <div class="col-span-4 space-y-1.5">
                             <label
                               class="text-[10px] font-bold uppercase tracking-widest text-neutral-500"
@@ -331,9 +415,6 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                                 }
                               "
                             />
-                            <p class="text-[9px] text-neutral-400 mt-1 uppercase tracking-tight">
-                              Press Enter to add line
-                            </p>
                           </div>
                         </template>
                       </form.Field>
@@ -346,5 +427,198 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
         </form>
       </div>
     </div>
+  </div>
+
+  <!-- ── Detail / Action Mode ──────────────────────────────────────────── -->
+  <div v-else-if="bill" class="space-y-6">
+    <PageHeader
+      eyebrow="Vendor Bill Focus"
+      title="Validate supplier invoice and downstream readiness"
+      :description="focusGuidance"
+    >
+      <template #icon>
+        <Receipt class="h-6 w-6" />
+      </template>
+
+      <template #actions>
+        <AppButton variant="outline" @click="goBack">
+          <template #start>
+            <ArrowLeft class="h-4 w-4" />
+          </template>
+          Back to queue
+        </AppButton>
+
+        <AppButton variant="outline" @click="isTraceOpen = true">
+          <template #start>
+            <History class="h-4 w-4" />
+          </template>
+          Trace
+        </AppButton>
+
+        <AppButton
+          v-if="bill.status === 'DRAFT' && hasPermission('ap:post')"
+          variant="primary"
+          :disabled="isActionPending"
+          @click="handleValidate"
+        >
+          <template #start>
+            <CheckCircle class="h-4 w-4" />
+          </template>
+          Validate &amp; Accrue
+        </AppButton>
+
+        <AppButton
+          v-if="bill.status === 'VALIDATED' && hasPermission('ap:create')"
+          variant="primary"
+          :disabled="isActionPending"
+          @click="handleCreatePR"
+        >
+          Create Payment Request
+        </AppButton>
+
+        <DropdownMenu v-if="bill.status === 'DRAFT' && hasPermission('ap:post')">
+          <DropdownMenuTrigger as-child>
+            <AppButton variant="stealth">
+              <template #start>
+                <MoreHorizontal class="h-4 w-4" />
+              </template>
+            </AppButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuSeparator />
+            <DropdownMenuItem class="text-red-700" @click="isRejectModalOpen = true">
+              Void draft bill
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </template>
+    </PageHeader>
+
+    <div class="flex flex-wrap items-center gap-3 rounded-xl bg-neutral-50 px-4 py-3">
+      <AppBadge :variant="statusVariant">{{ bill.status }}</AppBadge>
+      <p class="font-mono text-sm text-neutral-500">{{ bill.id }}</p>
+      <p class="text-sm text-neutral-600">
+        Vendor bills are the source surface. Keep supplier truth clean before triggering payment
+        work.
+      </p>
+    </div>
+
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <MetricCard
+        v-for="card in summaryCards"
+        :key="card.label"
+        :title="card.label"
+        :value="card.value"
+        :subtitle="card.detail"
+      />
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-[0.75fr_1.25fr]">
+      <WorkspacePanel
+        title="Invoice context"
+        description="Read the source narrative before validating, rejecting, or sending it into payment flow."
+      >
+        <template #icon>
+          <AlertTriangle class="h-5 w-5" />
+        </template>
+
+        <div class="space-y-5">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
+              Justification
+            </p>
+            <p class="mt-3 text-sm leading-7 text-neutral-700">{{ bill.justification }}</p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-xl bg-neutral-50 p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
+                Vendor ID
+              </p>
+              <p class="mt-2 font-mono text-sm text-neutral-700">{{ bill.vendorId }}</p>
+            </div>
+            <div class="rounded-xl bg-neutral-50 p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
+                Currency
+              </p>
+              <p class="mt-2 font-mono text-sm text-neutral-700">{{ bill.currency }}</p>
+            </div>
+          </div>
+        </div>
+      </WorkspacePanel>
+
+      <WorkspacePanel
+        title="Expense lines"
+        description="Validate the accounting shape of the bill before it becomes a payment decision."
+        body-class="space-y-4"
+      >
+        <template #icon>
+          <FileText class="h-5 w-5" />
+        </template>
+
+        <div class="overflow-hidden rounded-xl border border-neutral-200">
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-neutral-50">
+                <tr>
+                  <th
+                    class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500"
+                  >
+                    Description
+                  </th>
+                  <th
+                    class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500"
+                  >
+                    Amount
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500"
+                  >
+                    GL Account
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500"
+                  >
+                    Category
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[var(--color-neutral-200)] bg-white">
+                <tr
+                  v-for="(line, index) in bill.lines"
+                  :key="line.id ?? `${bill.id}-${index}`"
+                  class="transition-colors hover:bg-neutral-50"
+                >
+                  <td class="px-4 py-3 text-neutral-700">{{ line.description }}</td>
+                  <td class="px-4 py-3 text-right font-semibold text-neutral-900">
+                    {{ line.amount.format('en-ET') }}
+                  </td>
+                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">
+                    {{ line.accountId ?? 'Not assigned' }}
+                  </td>
+                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">
+                    {{ line.categoryId ?? 'Not assigned' }}
+                  </td>
+                </tr>
+                <tr class="bg-neutral-50 font-semibold">
+                  <td class="px-4 py-4 text-neutral-700">Total</td>
+                  <td class="px-4 py-4 text-right text-primary-700">
+                    {{ bill.totalAmount.format('en-ET') }}
+                  </td>
+                  <td colspan="2" />
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </WorkspacePanel>
+    </section>
+
+    <VendorBillTraceSidePane v-model:open="isTraceOpen" :bill="bill" />
+    <VendorBillRejectModal
+      v-model:open="isRejectModalOpen"
+      :is-pending="isRejecting"
+      @confirm="handleReject"
+    />
   </div>
 </template>

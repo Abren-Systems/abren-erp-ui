@@ -133,7 +133,7 @@ function handleRowClick(bill: VendorBill) {
 }
 
 function handleCreate() {
-  void router.push({ name: 'VendorBillCreate' })
+  void router.push({ name: 'VendorBillDetail', params: { id: 'new' } })
 }
 </script>
 
