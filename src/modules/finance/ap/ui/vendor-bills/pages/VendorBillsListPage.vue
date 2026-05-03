@@ -4,7 +4,12 @@ import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import type { Row } from '@tanstack/vue-table'
 import { AppButton, AppSidePane } from '@/shared/components/primitives'
-import { PageHeader, MetricCard } from '@/shared/components/workspace'
+import {
+  WorkspaceLayout,
+  WorkspaceToolbar,
+  WorkspaceTabs,
+  WorkspaceFooter,
+} from '@/shared/components/workspace'
 import { History, Plus, Receipt, FileText, ChevronRight } from 'lucide-vue-next'
 import { useVendorBills } from '../../../application/composables/useVendorBills'
 import { usePermissions } from '@/shared/auth/usePermissions'
@@ -20,13 +25,43 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 const isTraceOpen = ref(false)
 const traceTarget = ref<VendorBill | null>(null)
 
-const stats = computed(() => {
+const statusFilter = ref('all')
+
+const smartTabs = computed(() => {
   const data = bills.value ?? []
-  return {
-    total: data.length,
-    draft: data.filter((b) => b.status === 'DRAFT').length,
-    validated: data.filter((b) => b.status === 'VALIDATED').length,
-  }
+  return [
+    {
+      id: 'all',
+      label: 'ALL',
+      subLabel: `Total: ${data.length}`,
+      count: data.length,
+    },
+    {
+      id: 'draft',
+      label: 'DRAFT',
+      subLabel: `Awaiting: ${data.filter((b) => b.status === 'DRAFT').length}`,
+      count: data.filter((b) => b.status === 'DRAFT').length,
+    },
+    {
+      id: 'validated',
+      label: 'READY',
+      subLabel: `Accrual: ${data.filter((b) => b.status === 'VALIDATED').length}`,
+      count: data.filter((b) => b.status === 'VALIDATED').length,
+    },
+  ]
+})
+
+const filteredBills = computed(() => {
+  if (!bills.value) return []
+  if (statusFilter.value === 'all') return bills.value
+  return bills.value.filter((b) => b.status.toLowerCase() === statusFilter.value)
+})
+
+const totalFilteredAmount = computed(() => {
+  return filteredBills.value.reduce(
+    (acc, b) => acc + (b.totalAmount ? Number(b.totalAmount) : 0),
+    0,
+  )
 })
 
 const columns = [
@@ -90,76 +125,45 @@ function handleCreate() {
 </script>
 
 <template>
-  <div class="flex h-full flex-col bg-neutral-50/50">
-    <PageHeader
-      title="Vendor Bills"
-      description="Supplier invoice intake, validation, and accrual workflow."
-    >
+  <WorkspaceLayout>
+    <WorkspaceToolbar title="Vendor Bills">
       <template #actions>
-        <AppButton v-if="hasPermission('ap:create')" variant="primary" @click="handleCreate">
-          <Plus :size="16" class="mr-2" />
+        <AppButton
+          v-if="hasPermission('ap:create')"
+          variant="primary"
+          size="sm"
+          @click="handleCreate"
+        >
+          <template #start>
+            <Plus :size="14" />
+          </template>
           Register Bill
         </AppButton>
       </template>
-    </PageHeader>
+      <template #tabs>
+        <WorkspaceTabs v-model="statusFilter" :tabs="smartTabs" />
+      </template>
+    </WorkspaceToolbar>
 
-    <div class="flex-1 overflow-hidden flex">
-      <div class="flex-1 flex flex-col min-w-0 p-6 space-y-6 overflow-y-auto scrollbar-thin">
-        <!-- Metrics -->
-        <div class="grid gap-4 md:grid-cols-3">
-          <MetricCard
-            label="Total Intake"
-            :value="stats.total"
-            description="Total supplier invoices in workflow"
-          >
-            <template #icon><Receipt class="h-4 w-4 text-neutral-400" /></template>
-          </MetricCard>
-          <MetricCard
-            label="Draft Registry"
-            :value="stats.draft"
-            description="Awaiting validation and review"
-          >
-            <template #icon><FileText class="h-4 w-4 text-warning-500" /></template>
-          </MetricCard>
-          <MetricCard
-            label="Ready for Accrual"
-            :value="stats.validated"
-            description="Validated and ready for downstream"
-          >
-            <template #icon><Plus class="h-4 w-4 text-success-500" /></template>
-          </MetricCard>
-        </div>
+    <DataGrid
+      v-model:sorting="sorting"
+      v-model:row-selection="rowSelection"
+      v-model:column-visibility="columnVisibility"
+      v-model:global-filter="globalFilter"
+      :data="filteredBills"
+      :columns="columns"
+      :loading="isLoading"
+      placeholder="Search bills by number or vendor..."
+      row-clickable
+      class="flex-1 border-0 border-t border-[var(--color-neutral-200)]"
+      @row-click="handleRowClick"
+    >
+      <template #footer>
+        <WorkspaceFooter :total-rows="filteredBills.length" />
+      </template>
+    </DataGrid>
 
-        <!-- Workboard Grid -->
-        <div
-          class="flex-1 bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
-        >
-          <div class="p-4 border-b border-neutral-100 flex items-center justify-between bg-white">
-            <h3 class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-              Intake Queue
-            </h3>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] text-neutral-500 font-medium">Auto-refresh active</span>
-              <div class="h-1.5 w-1.5 rounded-full bg-success-500 animate-pulse"></div>
-            </div>
-          </div>
-
-          <DataGrid
-            v-model:sorting="sorting"
-            v-model:row-selection="rowSelection"
-            v-model:column-visibility="columnVisibility"
-            v-model:global-filter="globalFilter"
-            :data="bills ?? []"
-            :columns="columns"
-            :loading="isLoading"
-            placeholder="Search bills by number or vendor..."
-            row-clickable
-            class="flex-1"
-            @row-click="handleRowClick"
-          />
-        </div>
-      </div>
-
+    <template #sidebar>
       <!-- Contextual SidePane (Audit Trace) -->
       <AppSidePane
         v-model:open="isTraceOpen"
@@ -169,7 +173,7 @@ function handleCreate() {
         width="320px"
       >
         <template #icon>
-          <History :size="16" class="text-primary-600" />
+          <History :size="16" class="text-[var(--color-primary-600)]" />
         </template>
 
         <div v-if="traceTarget" class="space-y-6">
@@ -189,8 +193,8 @@ function handleCreate() {
           </AppButton>
         </template>
       </AppSidePane>
-    </div>
-  </div>
+    </template>
+  </WorkspaceLayout>
 </template>
 
 <style scoped>

@@ -4,7 +4,12 @@ import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import type { Table, Row } from '@tanstack/vue-table'
 import { AppButton } from '@/shared/components/primitives'
-import { PageHeader } from '@/shared/components/workspace'
+import {
+  WorkspaceLayout,
+  WorkspaceToolbar,
+  WorkspaceTabs,
+  WorkspaceFooter,
+} from '@/shared/components/workspace'
 import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
 import { usePermissions } from '@/shared/auth/usePermissions'
@@ -220,119 +225,78 @@ const selectedIds = computed(() => {
 </script>
 
 <template>
-  <div class="mx-auto flex h-full w-full max-w-[1600px] flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
-    <PageHeader title="Payment Requests" :description="headerDescription">
+  <WorkspaceLayout>
+    <WorkspaceToolbar title="Payment Requests">
       <template #actions>
-        <AppButton v-if="hasPermission('ap:create')" variant="primary" @click="handleCreate">
+        <AppButton
+          v-if="hasPermission('ap:create')"
+          variant="primary"
+          size="sm"
+          @click="handleCreate"
+        >
           <template #start>
             <Plus :size="14" />
           </template>
           New Request
         </AppButton>
       </template>
-    </PageHeader>
+      <template #tabs>
+        <WorkspaceTabs v-model="statusFilter" :tabs="smartTabs" />
+      </template>
+      <template #controls>
+        <AppButton variant="outline" size="sm" @click="isFilterOpen = true">
+          <template #start><ListFilter :size="14" /></template>
+          Filter
+        </AppButton>
+      </template>
+    </WorkspaceToolbar>
 
-    <!-- Operational Split-Pane -->
-    <div class="flex flex-1 gap-4 overflow-hidden min-h-0">
-      <!-- Main Content Area (Grid) -->
-      <div class="flex-1 min-w-0 transition-all duration-300 ease-in-out">
-        <div
-          class="h-full rounded-xl border border-[var(--color-neutral-200)] bg-white shadow-sm overflow-hidden flex flex-col"
+    <DataGrid
+      v-model:sorting="sorting"
+      v-model:row-selection="rowSelection"
+      v-model:column-visibility="columnVisibility"
+      v-model:global-filter="globalFilter"
+      :data="filteredRequests"
+      :columns="columns"
+      :loading="isLoading"
+      placeholder="Search requests..."
+      row-clickable
+      class="flex-1 border-0 border-t border-[var(--color-neutral-200)]"
+      @row-click="goToDetail"
+    >
+      <template #empty-action>
+        <AppButton
+          variant="outline"
+          size="sm"
+          @click="
+            ;((statusFilter = 'all'),
+              (filterState = { statuses: [], dateFrom: '', dateTo: '' }),
+              (globalFilter = ''))
+          "
         >
-          <DataGrid
-            v-model:sorting="sorting"
-            v-model:row-selection="rowSelection"
-            v-model:column-visibility="columnVisibility"
-            v-model:global-filter="globalFilter"
-            :data="filteredRequests"
-            :columns="columns"
-            :loading="isLoading"
-            placeholder="Search requests..."
-            row-clickable
-            class="flex-1"
-            @row-click="goToDetail"
-          >
-            <template #toolbar>
-              <div class="flex items-center justify-between w-full pr-2">
-                <div class="flex items-center gap-4">
-                  <button
-                    v-for="tab in smartTabs"
-                    :key="tab.id"
-                    class="group flex flex-col items-start px-4 py-2 border-r border-neutral-100 last:border-0 transition-all"
-                    @click="statusFilter = tab.id"
-                  >
-                    <span
-                      class="text-[10px] font-bold tracking-wider uppercase transition-colors"
-                      :class="
-                        tab.isActive
-                          ? 'text-primary-600'
-                          : 'text-neutral-400 group-hover:text-neutral-600'
-                      "
-                    >
-                      {{ tab.label }}
-                    </span>
-                    <span
-                      class="text-xs font-semibold mt-0.5"
-                      :class="tab.isActive ? 'text-neutral-900' : 'text-neutral-500'"
-                    >
-                      {{ tab.subLabel }}
-                    </span>
-                    <div
-                      class="h-0.5 w-full mt-2 rounded-full transition-all"
-                      :class="tab.isActive ? 'bg-primary-600' : 'bg-transparent'"
-                    />
-                  </button>
-                </div>
+          Clear all filters
+        </AppButton>
+      </template>
 
-                <div class="flex items-center gap-2">
-                  <AppButton variant="outline" size="sm" @click="isFilterOpen = true">
-                    <template #start><ListFilter :size="14" /></template>
-                    Filter
-                  </AppButton>
-                </div>
-              </div>
-            </template>
-            <template #empty-action>
-              <AppButton
-                variant="outline"
-                size="sm"
-                @click="
-                  ;((statusFilter = 'all'),
-                    (filterState = { statuses: [], dateFrom: '', dateTo: '' }),
-                    (globalFilter = ''))
-                "
-              >
-                Clear all filters
-              </AppButton>
-            </template>
+      <!-- DataGrid Smart Footer -->
+      <template #footer>
+        <WorkspaceFooter
+          :total-rows="filteredRequests.length"
+          :selected-count="selectedCount"
+          :total-amount-formatted="totalFilteredAmount.format()"
+        />
+      </template>
+    </DataGrid>
 
-            <!-- DataGrid Smart Footer -->
-            <template #footer>
-              <div
-                class="flex justify-between items-center w-full px-4 text-[13px] font-medium text-neutral-600 bg-neutral-50 h-10 border-t border-neutral-200"
-              >
-                <div class="flex items-center gap-4">
-                  <span>Showing {{ filteredRequests.length }} rows</span>
-                  <span v-if="selectedCount > 0" class="text-primary-600 font-semibold"
-                    >Selected: {{ selectedCount }}</span
-                  >
-                </div>
-                <div class="text-neutral-900 tabular-nums">
-                  Total: {{ totalFilteredAmount.format() }}
-                </div>
-              </div>
-            </template>
-          </DataGrid>
+    <!-- Floating Bulk Action Bar & Overlay -->
+    <PaymentRequestBulkActionBar
+      :selected-ids="selectedIds"
+      :filtered-requests="filteredRequests"
+      @clear-selection="rowSelection = {}"
+    />
 
-          <!-- Floating Bulk Action Bar & Overlay -->
-          <PaymentRequestBulkActionBar
-            :selected-ids="selectedIds"
-            :filtered-requests="filteredRequests"
-            @clear-selection="rowSelection = {}"
-          />
-        </div>
-      </div>
-
+    <!-- Sidebars -->
+    <template #sidebar>
       <!-- Filter Sidebar -->
       <PaymentRequestFilterPane
         v-model:open="isFilterOpen"
@@ -347,8 +311,8 @@ const selectedIds = computed(() => {
         :request="traceTarget"
         @view-detail="goToDetail"
       />
-    </div>
-  </div>
+    </template>
+  </WorkspaceLayout>
 </template>
 
 <style scoped>
