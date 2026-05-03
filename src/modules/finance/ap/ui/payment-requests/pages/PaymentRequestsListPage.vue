@@ -9,6 +9,7 @@ import {
   WorkspaceToolbar,
   WorkspaceTabs,
   WorkspaceFooter,
+  PageHeader,
 } from '@/shared/components/workspace'
 import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
@@ -226,7 +227,11 @@ const selectedIds = computed(() => {
 
 <template>
   <WorkspaceLayout>
-    <WorkspaceToolbar title="Payment Requests">
+    <template #header>
+      <PageHeader title="Payment Requests" plain />
+    </template>
+
+    <WorkspaceToolbar>
       <template #actions>
         <AppButton
           v-if="hasPermission('ap:create')"

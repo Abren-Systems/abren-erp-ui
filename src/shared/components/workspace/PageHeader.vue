@@ -6,6 +6,7 @@ interface Props {
   description?: string
   eyebrow?: string
   dense?: boolean
+  plain?: boolean
   class?: string
 }
 
@@ -13,6 +14,7 @@ withDefaults(defineProps<Props>(), {
   description: '',
   eyebrow: '',
   dense: false,
+  plain: false,
   class: '',
 })
 </script>
@@ -21,13 +23,17 @@ withDefaults(defineProps<Props>(), {
   <header
     :class="
       cn(
-        'relative overflow-hidden border border-[color:var(--color-neutral-200)] bg-white shadow-[0_18px_40px_rgba(15,23,42,0.06)]',
-        dense ? 'rounded-[22px] px-5 py-4 sm:px-6' : 'rounded-[24px] px-6 py-5 sm:px-7',
+        plain
+          ? 'bg-transparent pb-0'
+          : 'relative overflow-hidden border border-[color:var(--color-neutral-200)] bg-white shadow-[0_18px_40px_rgba(15,23,42,0.06)]',
+        !plain && dense ? 'rounded-[22px] px-5 py-4 sm:px-6' : '',
+        !plain && !dense ? 'rounded-[24px] px-6 py-5 sm:px-7' : '',
         $props.class,
       )
     "
   >
     <div
+      v-if="!plain"
       :class="[
         'pointer-events-none absolute inset-x-0 top-0 bg-[linear-gradient(135deg,rgba(99,102,241,0.12),rgba(59,130,246,0.04),transparent)]',
         dense ? 'h-16' : 'h-20',

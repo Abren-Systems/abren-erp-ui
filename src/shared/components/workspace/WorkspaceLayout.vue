@@ -9,7 +9,9 @@
 </script>
 
 <template>
-  <div class="mx-auto flex h-full w-full max-w-[1600px] flex-col px-4 py-4 sm:px-6 lg:px-8">
+  <div class="mx-auto flex h-full w-full max-w-[1600px] flex-col px-4 py-4 sm:px-6 lg:px-8 gap-3">
+    <slot name="header" />
+
     <!-- Operational Split-Pane -->
     <div class="flex flex-1 gap-4 overflow-hidden min-h-0">
       <!-- Main Content Area (Grid + Toolbar) -->

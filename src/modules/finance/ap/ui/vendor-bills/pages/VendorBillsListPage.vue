@@ -9,6 +9,7 @@ import {
   WorkspaceToolbar,
   WorkspaceTabs,
   WorkspaceFooter,
+  PageHeader,
 } from '@/shared/components/workspace'
 import { History, Plus, Receipt, FileText, ChevronRight } from 'lucide-vue-next'
 import { useVendorBills } from '../../../application/composables/useVendorBills'
@@ -126,7 +127,11 @@ function handleCreate() {
 
 <template>
   <WorkspaceLayout>
-    <WorkspaceToolbar title="Vendor Bills">
+    <template #header>
+      <PageHeader title="Vendor Bills" plain />
+    </template>
+
+    <WorkspaceToolbar>
       <template #actions>
         <AppButton
           v-if="hasPermission('ap:create')"
