@@ -14,6 +14,7 @@ import { useFormPersistence } from '@/shared/composables/useFormPersistence'
 import { Trash2, Plus, AlertCircle, ArrowLeft, CreditCard } from 'lucide-vue-next'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import SelectLedgerAccount from '@/shared/components/finance/SelectLedgerAccount.vue'
+import { AppFieldset, FieldGroup } from '@/shared/components/field-system'
 
 /**
  * PaymentRequestCreatePage — Dedicated creation form.
@@ -120,88 +121,74 @@ function goBack() {
         "
       >
         <!-- Request Metadata -->
-        <div class="bg-white p-6 rounded-xl border border-neutral-200 shadow-sm space-y-6">
-          <h2
-            class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 border-b pb-4 -mx-6 px-6"
-          >
-            General Information
-          </h2>
+        <AppFieldset title="General Information" variant="ghost" layout="horizontal" :columns="2">
+          <FieldGroup>
+            <form.Field name="beneficiaryId">
+              <template #default="{ field, state }">
+                <AppSelect
+                  label="Beneficiary Vendor"
+                  :model-value="field.state.value"
+                  required
+                  :disabled="isLoadingUsers"
+                  :error="state.meta.errors[0]"
+                  :options="users?.map((u) => ({ label: u.email, value: u.id })) || []"
+                  @update:model-value="(val) => field.handleChange(val as string)"
+                />
+              </template>
+            </form.Field>
 
-          <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-12 md:col-span-5">
-              <form.Field name="beneficiaryId">
-                <template #default="{ field, state }">
-                  <AppSelect
-                    label="Beneficiary Vendor"
-                    :model-value="field.state.value"
-                    required
-                    :disabled="isLoadingUsers"
-                    :error="state.meta.errors[0]"
-                    :options="users?.map((u) => ({ label: u.email, value: u.id })) || []"
-                    @update:model-value="(val) => field.handleChange(val as string)"
-                  />
-                </template>
-              </form.Field>
-            </div>
+            <AppSelect
+              label="Request Type"
+              v-model="requestType"
+              :options="[
+                { label: 'Vendor Payment', value: 'VENDOR_PAYMENT' },
+                { label: 'Employee Expense', value: 'EMPLOYEE_EXPENSE' },
+                { label: 'Advance', value: 'ADVANCE' },
+              ]"
+            />
 
-            <div class="col-span-12 md:col-span-3">
-              <AppSelect
-                label="Request Type"
-                v-model="requestType"
-                :options="[
-                  { label: 'Vendor Payment', value: 'VENDOR_PAYMENT' },
-                  { label: 'Employee Expense', value: 'EMPLOYEE_EXPENSE' },
-                  { label: 'Advance', value: 'ADVANCE' },
-                ]"
-              />
-            </div>
+            <form.Field name="currency">
+              <template #default="{ field, state }">
+                <AppSelect
+                  label="Currency"
+                  :model-value="field.state.value"
+                  :options="[
+                    { label: 'ETB', value: 'ETB' },
+                    { label: 'USD', value: 'USD' },
+                  ]"
+                  :error="state.meta.errors[0]"
+                  @update:model-value="(val) => field.handleChange(val as string)"
+                />
+              </template>
+            </form.Field>
+          </FieldGroup>
 
-            <div class="col-span-12 md:col-span-2">
-              <AppSelect
-                label="Priority"
-                v-model="priority"
-                :options="[
-                  { label: 'Normal', value: 'NORMAL' },
-                  { label: 'High', value: 'HIGH' },
-                  { label: 'Urgent', value: 'URGENT' },
-                ]"
-              />
-            </div>
+          <FieldGroup>
+            <AppSelect
+              label="Priority"
+              v-model="priority"
+              :options="[
+                { label: 'Normal', value: 'NORMAL' },
+                { label: 'High', value: 'HIGH' },
+                { label: 'Urgent', value: 'URGENT' },
+              ]"
+            />
 
-            <div class="col-span-12 md:col-span-2">
-              <form.Field name="currency">
-                <template #default="{ field, state }">
-                  <AppSelect
-                    label="Currency"
-                    :model-value="field.state.value"
-                    :options="[
-                      { label: 'ETB', value: 'ETB' },
-                      { label: 'USD', value: 'USD' },
-                    ]"
-                    :error="state.meta.errors[0]"
-                    @update:model-value="(val) => field.handleChange(val as string)"
-                  />
-                </template>
-              </form.Field>
-            </div>
-
-            <div class="col-span-12">
-              <form.Field name="justification">
-                <template #default="{ field, state }">
-                  <AppTextarea
-                    label="Description / Justification"
-                    :model-value="field.state.value"
-                    placeholder="Explain the purpose of this request for approval review..."
-                    required
-                    :rows="2"
-                    :error="state.meta.errors[0]"
-                    @update:model-value="(val) => field.handleChange(val as string)"
-                  />
-                </template>
-              </form.Field>
-            </div>
-          </div>
-        </div>
+            <form.Field name="justification">
+              <template #default="{ field, state }">
+                <AppTextarea
+                  label="Description / Justification"
+                  :model-value="field.state.value"
+                  placeholder="Explain the purpose of this request for approval review..."
+                  required
+                  :rows="3"
+                  :error="state.meta.errors[0]"
+                  @update:model-value="(val) => field.handleChange(val as string)"
+                />
+              </template>
+            </form.Field>
+          </FieldGroup>
+        </AppFieldset>
 
         <!-- Line Items Section -->
         <div class="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden">
