@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, h } from 'vue'
 import { useRouter } from 'vue-router'
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import {
+  DataGrid,
+  DataGridFilterSelector,
+  DataGridFooter,
+  useDataGrid,
+} from '@/shared/components/data-grid'
 import type { Row } from '@tanstack/vue-table'
 import { AppButton, AppSidePane } from '@/shared/components/primitives'
-import {
-  WorkspaceLayout,
-  WorkspaceToolbar,
-  WorkspaceTabs,
-  WorkspaceFooter,
-  PageHeader,
-} from '@/shared/components/workspace'
+import { WorkspaceLayout, PageHeader } from '@/shared/components/workspace'
 import { History, Plus, Receipt, FileText, ChevronRight } from 'lucide-vue-next'
 import { useVendorBills } from '../../../application/composables/useVendorBills'
 import { usePermissions } from '@/shared/auth/usePermissions'
@@ -28,29 +27,11 @@ const traceTarget = ref<VendorBill | null>(null)
 
 const statusFilter = ref('all')
 
-const smartTabs = computed(() => {
-  const data = bills.value ?? []
-  return [
-    {
-      id: 'all',
-      label: 'ALL',
-      subLabel: `Total: ${data.length}`,
-      count: data.length,
-    },
-    {
-      id: 'draft',
-      label: 'DRAFT',
-      subLabel: `Awaiting: ${data.filter((b) => b.status === 'DRAFT').length}`,
-      count: data.filter((b) => b.status === 'DRAFT').length,
-    },
-    {
-      id: 'validated',
-      label: 'READY',
-      subLabel: `Accrual: ${data.filter((b) => b.status === 'VALIDATED').length}`,
-      count: data.filter((b) => b.status === 'VALIDATED').length,
-    },
-  ]
-})
+const filterPresets = [
+  { id: 'all', label: 'All Records' },
+  { id: 'draft', label: 'Draft' },
+  { id: 'validated', label: 'Ready for Accrual' },
+]
 
 const filteredBills = computed(() => {
   if (!bills.value) return []
@@ -128,27 +109,22 @@ function handleCreate() {
 <template>
   <WorkspaceLayout>
     <template #header>
-      <PageHeader title="Vendor Bills" plain />
+      <PageHeader title="Vendor Bills" plain>
+        <template #actions>
+          <AppButton
+            v-if="hasPermission('ap:create')"
+            variant="primary"
+            size="sm"
+            @click="handleCreate"
+          >
+            <template #start>
+              <Plus :size="14" />
+            </template>
+            New
+          </AppButton>
+        </template>
+      </PageHeader>
     </template>
-
-    <WorkspaceToolbar>
-      <template #actions>
-        <AppButton
-          v-if="hasPermission('ap:create')"
-          variant="primary"
-          size="sm"
-          @click="handleCreate"
-        >
-          <template #start>
-            <Plus :size="14" />
-          </template>
-          Register Bill
-        </AppButton>
-      </template>
-      <template #tabs>
-        <WorkspaceTabs v-model="statusFilter" :tabs="smartTabs" />
-      </template>
-    </WorkspaceToolbar>
 
     <DataGrid
       v-model:sorting="sorting"
@@ -160,16 +136,19 @@ function handleCreate() {
       :loading="isLoading"
       placeholder="Search bills by number or vendor..."
       row-clickable
-      class="flex-1 border-0 border-t border-[var(--color-neutral-200)]"
+      class="flex-1"
       @row-click="handleRowClick"
     >
+      <template #toolbar>
+        <DataGridFilterSelector v-model="statusFilter" :options="filterPresets" />
+      </template>
+
       <template #footer>
-        <WorkspaceFooter :total-rows="filteredBills.length" />
+        <DataGridFooter :total-rows="filteredBills.length" />
       </template>
     </DataGrid>
 
     <template #sidebar>
-      <!-- Contextual SidePane (Audit Trace) -->
       <AppSidePane
         v-model:open="isTraceOpen"
         :title="`Trace: ${traceTarget?.billNumber}`"

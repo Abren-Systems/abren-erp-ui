@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import {
+  DataGrid,
+  DataGridFilterSelector,
+  DataGridFooter,
+  useDataGrid,
+} from '@/shared/components/data-grid'
 import type { Table, Row } from '@tanstack/vue-table'
 import { AppButton } from '@/shared/components/primitives'
-import {
-  WorkspaceLayout,
-  WorkspaceToolbar,
-  WorkspaceTabs,
-  WorkspaceFooter,
-  PageHeader,
-} from '@/shared/components/workspace'
+import { WorkspaceLayout, PageHeader } from '@/shared/components/workspace'
 import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
 import { usePaymentRequests } from '../../../application/composables/usePaymentRequests'
 import { usePermissions } from '@/shared/auth/usePermissions'
@@ -40,43 +39,11 @@ const filterState = ref({
   dateTo: '',
 })
 
-const smartTabs = computed(() => [
-  {
-    id: 'all',
-    label: 'ALL',
-    subLabel: `Total: ${requests.value?.length || 0}`,
-    count: requests.value?.length || 0,
-    isActive: statusFilter.value === 'all',
-  },
-  {
-    id: 'needs_attention',
-    label: 'NEEDS ATTENTION',
-    subLabel: `Rejected: ${requests.value?.filter((r) => r.status === 'REJECTED').length || 0}`,
-    count: requests.value?.filter((r) => ['DRAFT', 'REJECTED'].includes(r.status)).length || 0,
-    isActive: statusFilter.value === 'needs_attention',
-  },
-  {
-    id: 'in_review',
-    label: 'IN REVIEW',
-    subLabel: `Pending: ${requests.value?.filter((r) => ['SUBMITTED', 'APPROVED'].includes(r.status)).length || 0}`,
-    count:
-      requests.value?.filter((r) => ['SUBMITTED', 'APPROVED', 'AUTHORIZED'].includes(r.status))
-        .length || 0,
-    isActive: statusFilter.value === 'in_review',
-  },
-])
-
-const headerDescription = computed(() => {
-  if (isLoading.value || !requests.value) return 'Loading operational metrics...'
-
-  const active = requests.value.filter((r) =>
-    ['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED', 'AUTHORIZED'].includes(r.status),
-  )
-  const count = active.length
-  const total = active.reduce((acc, r) => acc.add(r.totalAmount), Money.zero())
-
-  return `${count} Active • ${total.format()} Total`
-})
+const filterPresets = [
+  { id: 'all', label: 'All Records' },
+  { id: 'needs_attention', label: 'Needs Attention' },
+  { id: 'in_review', label: 'In Review' },
+]
 
 const isTraceOpen = ref(false)
 const traceTarget = ref<PaymentRequest | null>(null)
@@ -228,33 +195,22 @@ const selectedIds = computed(() => {
 <template>
   <WorkspaceLayout>
     <template #header>
-      <PageHeader title="Payment Requests" plain />
+      <PageHeader title="Payment Requests" plain>
+        <template #actions>
+          <AppButton
+            v-if="hasPermission('ap:create')"
+            variant="primary"
+            size="sm"
+            @click="handleCreate"
+          >
+            <template #start>
+              <Plus :size="14" />
+            </template>
+            New
+          </AppButton>
+        </template>
+      </PageHeader>
     </template>
-
-    <WorkspaceToolbar>
-      <template #actions>
-        <AppButton
-          v-if="hasPermission('ap:create')"
-          variant="primary"
-          size="sm"
-          @click="handleCreate"
-        >
-          <template #start>
-            <Plus :size="14" />
-          </template>
-          New Request
-        </AppButton>
-      </template>
-      <template #tabs>
-        <WorkspaceTabs v-model="statusFilter" :tabs="smartTabs" />
-      </template>
-      <template #controls>
-        <AppButton variant="outline" size="sm" @click="isFilterOpen = true">
-          <template #start><ListFilter :size="14" /></template>
-          Filter
-        </AppButton>
-      </template>
-    </WorkspaceToolbar>
 
     <DataGrid
       v-model:sorting="sorting"
@@ -266,9 +222,20 @@ const selectedIds = computed(() => {
       :loading="isLoading"
       placeholder="Search requests..."
       row-clickable
-      class="flex-1 border-0 border-t border-[var(--color-neutral-200)]"
+      class="flex-1"
       @row-click="goToDetail"
     >
+      <template #toolbar>
+        <DataGridFilterSelector v-model="statusFilter" :options="filterPresets" />
+      </template>
+
+      <template #toolbar-controls>
+        <AppButton variant="outline" size="sm" @click="isFilterOpen = true">
+          <template #start><ListFilter :size="14" /></template>
+          Filter
+        </AppButton>
+      </template>
+
       <template #empty-action>
         <AppButton
           variant="outline"
@@ -283,9 +250,8 @@ const selectedIds = computed(() => {
         </AppButton>
       </template>
 
-      <!-- DataGrid Smart Footer -->
       <template #footer>
-        <WorkspaceFooter
+        <DataGridFooter
           :total-rows="filteredRequests.length"
           :selected-count="selectedCount"
           :total-amount-formatted="totalFilteredAmount.format()"
@@ -302,7 +268,6 @@ const selectedIds = computed(() => {
 
     <!-- Sidebars -->
     <template #sidebar>
-      <!-- Filter Sidebar -->
       <PaymentRequestFilterPane
         v-model:open="isFilterOpen"
         :initial-filters="filterState"
@@ -310,7 +275,6 @@ const selectedIds = computed(() => {
         @apply="filterState = $event"
       />
 
-      <!-- Contextual Sidebar (Audit Trail) -->
       <PaymentRequestTracePane
         v-model:open="isTraceOpen"
         :request="traceTarget"

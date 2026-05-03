@@ -8,6 +8,8 @@ export { default as DataGridEmpty } from './core/DataGridEmpty.vue'
 // ── Generic Plugins ──────────────────────────────────────
 export { default as DataGridColumnHeader } from './plugins/DataGridColumnHeader.vue'
 export { default as DataGridToolbar } from './plugins/DataGridToolbar.vue'
+export { default as DataGridFilterSelector } from './plugins/DataGridFilterSelector.vue'
+export { default as DataGridFooter } from './plugins/DataGridFooter.vue'
 
 // ── Shared Cells ─────────────────────────────────────────
 export { default as MoneyCell } from './cells/MoneyCell.vue'

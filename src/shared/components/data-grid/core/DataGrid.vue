@@ -116,6 +116,9 @@ const handleRowClick = (row: Row<TData>) => {
       :selected-count="selectedCount"
     >
       <slot name="toolbar" />
+      <template #controls>
+        <slot name="toolbar-controls" />
+      </template>
     </DataGridToolbar>
 
     <!-- ── Table ───────────────────────────── -->

@@ -2,9 +2,13 @@
  /**
  * WorkspaceLayout.vue
  *
- * The system standard layout for "Workspaces" (dense lists for scanning and triage).
- * Hyper-dense design: Eliminates the "Big Header" pattern and pushes the
- * operational grid directly to the top edge to maximize screen real estate.
+ * The system standard layout container for "Workspaces" (dense lists for scanning and triage).
+ * The Workspace is ONLY a container. It provides:
+ * - Page-level padding and max-width
+ * - A header slot for PageHeader
+ * - A sidebar slot for docked panes
+ *
+ * All filter/toolbar/footer concerns belong to the Grid, not the Workspace.
  */
 </script>
 
@@ -14,13 +18,9 @@
 
     <!-- Operational Split-Pane -->
     <div class="flex flex-1 gap-4 overflow-hidden min-h-0">
-      <!-- Main Content Area (Grid + Toolbar) -->
-      <div class="flex-1 min-w-0 transition-all duration-300 ease-in-out">
-        <div
-          class="h-full rounded-xl border border-[var(--color-neutral-200)] bg-white shadow-sm overflow-hidden flex flex-col"
-        >
-          <slot />
-        </div>
+      <!-- Main Content Area -->
+      <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
+        <slot />
       </div>
 
       <!-- Sidebars (Filters, Trace) -->

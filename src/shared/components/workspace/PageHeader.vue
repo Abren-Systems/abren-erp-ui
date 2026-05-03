@@ -20,20 +20,36 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
+  <!-- Plain mode: compact single-row header (Acumatica-style) -->
+  <header v-if="plain" :class="cn('flex items-center justify-between', $props.class)">
+    <div class="min-w-0">
+      <p
+        v-if="eyebrow"
+        class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--color-neutral-400)] mb-1"
+      >
+        {{ eyebrow }}
+      </p>
+      <h1 class="text-lg font-semibold tracking-tight text-[var(--color-neutral-900)]">
+        {{ title }}
+      </h1>
+    </div>
+    <div v-if="$slots.actions" class="flex shrink-0 items-center gap-2">
+      <slot name="actions" />
+    </div>
+  </header>
+
+  <!-- Card mode: rich header with gradient background -->
   <header
+    v-else
     :class="
       cn(
-        plain
-          ? 'bg-transparent pb-0'
-          : 'relative overflow-hidden border border-[color:var(--color-neutral-200)] bg-white shadow-[0_18px_40px_rgba(15,23,42,0.06)]',
-        !plain && dense ? 'rounded-[22px] px-5 py-4 sm:px-6' : '',
-        !plain && !dense ? 'rounded-[24px] px-6 py-5 sm:px-7' : '',
+        'relative overflow-hidden border border-[color:var(--color-neutral-200)] bg-white shadow-[0_18px_40px_rgba(15,23,42,0.06)]',
+        dense ? 'rounded-[22px] px-5 py-4 sm:px-6' : 'rounded-[24px] px-6 py-5 sm:px-7',
         $props.class,
       )
     "
   >
     <div
-      v-if="!plain"
       :class="[
         'pointer-events-none absolute inset-x-0 top-0 bg-[linear-gradient(135deg,rgba(99,102,241,0.12),rgba(59,130,246,0.04),transparent)]',
         dense ? 'h-16' : 'h-20',

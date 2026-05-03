@@ -1,4 +1,13 @@
 <script setup lang="ts">
+/**
+ * DataGridToolbar.vue
+ *
+ * The Grid's own unified control bar.
+ * Layout: [Filter Selector / Quick Filters] ←→ [Filter Settings + Search]
+ *
+ * This matches Acumatica's Row 2: a single horizontal bar
+ * with filter controls on the left and search on the right.
+ */
 import { ref, watch } from 'vue'
 import { Search, X } from 'lucide-vue-next'
 import { AppInput } from '@/shared/components/primitives'
@@ -39,7 +48,7 @@ function clear() {
 
 <template>
   <div class="toolbar" :class="{ 'toolbar--selection-mode': selectedCount && selectedCount > 0 }">
-    <!-- Selection mode indicator and message -->
+    <!-- Selection mode indicator -->
     <div
       v-if="selectedCount && selectedCount > 0"
       class="selection-info animate-in fade-in slide-in-from-left-2 duration-200"
@@ -50,29 +59,35 @@ function clear() {
       <span class="selection-text">Records selected for bulk action</span>
     </div>
 
-    <!-- Global search (hidden in selection mode to focus on actions) -->
-    <div v-else class="search-wrap">
-      <AppInput
-        :model-value="localValue"
-        :placeholder="placeholder ?? 'Search…'"
-        class="search-input"
-        @update:model-value="onInput"
-      >
-        <template #start>
-          <Search :size="14" class="search-icon" />
-        </template>
-        <template #end>
-          <button v-if="localValue" class="clear-btn" @click="clear">
-            <X :size="14" />
-          </button>
-        </template>
-      </AppInput>
-    </div>
+    <!-- Normal mode: Filters left, Search right -->
+    <template v-else>
+      <!-- Left: Filter Selector + Quick Filters -->
+      <div class="toolbar-left">
+        <slot />
+      </div>
 
-    <!-- Action buttons from parent -->
-    <div class="toolbar-actions">
-      <slot />
-    </div>
+      <!-- Right: Filter controls + Search -->
+      <div class="toolbar-right">
+        <slot name="controls" />
+        <div class="search-wrap">
+          <AppInput
+            :model-value="localValue"
+            :placeholder="placeholder ?? 'Search…'"
+            class="search-input"
+            @update:model-value="onInput"
+          >
+            <template #start>
+              <Search :size="14" class="search-icon" />
+            </template>
+            <template #end>
+              <button v-if="localValue" class="clear-btn" @click="clear">
+                <X :size="14" />
+              </button>
+            </template>
+          </AppInput>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -96,8 +111,21 @@ function clear() {
   color: #ffffff;
 }
 
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .search-wrap {
-  width: 320px;
+  width: 240px;
 }
 
 .search-icon {
@@ -146,13 +174,6 @@ function clear() {
   font-weight: 500;
   letter-spacing: -0.01em;
   opacity: 0.9;
-}
-
-.toolbar-actions {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 /* Deep override for buttons in selection mode */
