@@ -5,30 +5,22 @@ import { AppButton, AppSelect, AppInput, AppTextarea } from '@/shared/components
 import DebouncedCombobox from '@/shared/components/combobox/DebouncedCombobox.vue'
 import type { ComboboxOption } from '@/shared/components/combobox/DebouncedCombobox.vue'
 import FileUploadZone from '@/shared/components/dropzone/FileUploadZone.vue'
-import { useCreateVendorBill } from '../../../application/composables/useCreateVendorBill'
+import { useCreatePaymentRequest } from '../../../application/composables/useCreatePaymentRequest'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
 import { Trash2, Plus, AlertCircle, Eye, EyeOff, ArrowLeft } from 'lucide-vue-next'
 import { PageHeader } from '@/shared/components/workspace'
 
-/**
- * VendorBillCreatePage — Dedicated creation form.
- *
- * Uses the Macro-Create pattern (Full Page) to support complex
- * tabular line items and maximum data density.
- */
-
 const router = useRouter()
-const { form, error: submissionError } = useCreateVendorBill()
+const { form, error: submissionError } = useCreatePaymentRequest()
 
 const showSourceDoc = ref(false)
 const sourceFile = ref<File | null>(null)
 const sourceFileUrl = ref<string | null>(null)
 
-// Draft Persistence
-useFormPersistence(form, 'abren_draft_vendor_bill')
+useFormPersistence(form, 'abren_draft_payment_request')
 
 function goBack() {
-  router.push({ name: 'VendorBillsList' })
+  router.push({ name: 'PaymentRequestsList' })
 }
 
 function handleFileSelected(file: File) {
@@ -46,12 +38,10 @@ function handleFileCleared() {
   }
 }
 
-// Mocked search functions for rapid UI mapping
-const searchVendors = async (q: string): Promise<ComboboxOption[]> => {
+const searchBeneficiaries = async (q: string): Promise<ComboboxOption[]> => {
   return [
     { value: 'vend-123', label: 'Acme Corp', description: 'vend-123' },
-    { value: 'vend-456', label: 'Global Tech', description: 'vend-456' },
-    { value: 'vend-789', label: 'Local Supply', description: 'vend-789' },
+    { value: 'emp-456', label: 'John Doe', description: 'emp-456' },
   ].filter((v) => v.label.toLowerCase().includes(q.toLowerCase()))
 }
 
@@ -59,7 +49,6 @@ const searchAccounts = async (q: string): Promise<ComboboxOption[]> => {
   return [
     { value: 'acc-6200', label: '6200 - Office Supplies', description: 'Expense' },
     { value: 'acc-6300', label: '6300 - IT Hardware', description: 'Expense' },
-    { value: 'acc-6400', label: '6400 - Travel', description: 'Expense' },
   ].filter((v) => v.label.toLowerCase().includes(q.toLowerCase()) || v.value.includes(q))
 }
 
@@ -73,10 +62,9 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
 
 <template>
   <div class="flex h-full flex-col bg-neutral-50/50">
-    <!-- Header -->
     <PageHeader
-      title="Register Vendor Bill"
-      description="Record a supplier invoice to generate an AP accrual."
+      title="Create Payment Request"
+      description="Request a disbursement or employee reimbursement."
     >
       <template #start>
         <AppButton variant="stealth" size="sm" class="h-8 w-8 p-0 -ml-2" @click="goBack">
@@ -96,15 +84,13 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
             :disabled="!state.canSubmit || state.isSubmitting"
             @click="() => form.handleSubmit()"
           >
-            {{ state.isSubmitting ? 'Registering...' : 'Register Bill' }}
+            {{ state.isSubmitting ? 'Submitting...' : 'Submit Request' }}
           </AppButton>
         </form.Subscribe>
       </template>
     </PageHeader>
 
-    <!-- Layout Container -->
     <div class="flex-1 overflow-hidden flex min-h-0">
-      <!-- Source Document Split View (Left) -->
       <aside
         v-if="showSourceDoc"
         class="w-[450px] border-r border-neutral-200 bg-neutral-50 flex flex-col h-full overflow-hidden"
@@ -113,7 +99,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
           class="p-4 border-b border-neutral-200 bg-white flex items-center justify-between shrink-0"
         >
           <h2 class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-            Source Invoice
+            Source Document
           </h2>
           <span v-if="sourceFile" class="text-[10px] font-mono text-neutral-500">{{
             sourceFile.name
@@ -150,10 +136,8 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
         </div>
       </aside>
 
-      <!-- Data Entry Form (Right / Center) -->
       <div class="flex-1 overflow-y-auto p-6 bg-neutral-50/50">
         <div class="max-w-4xl mx-auto space-y-8">
-          <!-- Submission Error -->
           <div
             v-if="submissionError"
             class="bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3 shadow-sm mb-6"
@@ -161,7 +145,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
             <AlertCircle class="h-5 w-5 text-red-600 shrink-0" />
             <div>
               <h3 class="text-[10px] font-bold uppercase tracking-widest text-red-700">
-                Error registering bill
+                Error creating request
               </h3>
               <p class="text-xs text-red-600 mt-1">
                 {{ submissionError.message ?? 'An unexpected error occurred.' }}
@@ -178,70 +162,30 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
               }
             "
           >
-            <!-- Bill Metadata -->
             <div class="bg-white p-6 rounded-xl border border-neutral-200 shadow-sm space-y-6">
               <h2
                 class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 border-b border-neutral-100 pb-4 -mx-6 px-6"
               >
-                Bill Metadata
+                Request Details
               </h2>
               <div class="grid grid-cols-2 gap-6">
-                <form.Field name="vendorId">
+                <form.Field name="beneficiaryId">
                   <template #default="{ field, state }">
                     <div class="space-y-1.5">
                       <label
                         class="text-[10px] font-bold uppercase tracking-widest text-neutral-500"
-                        >Vendor *</label
+                        >Beneficiary *</label
                       >
                       <DebouncedCombobox
                         :model-value="field.state.value"
-                        :fetch-options="searchVendors"
-                        placeholder="Search vendors..."
+                        :fetch-options="searchBeneficiaries"
+                        placeholder="Search beneficiaries..."
                         @update:model-value="(val) => field.handleChange(val as string)"
                       />
                       <p v-if="state.meta.errors.length" class="text-[10px] text-red-600">
                         {{ state.meta.errors[0] }}
                       </p>
                     </div>
-                  </template>
-                </form.Field>
-
-                <form.Field name="vendorInvoiceNumber">
-                  <template #default="{ field, state }">
-                    <AppInput
-                      label="Vendor Invoice #"
-                      :model-value="field.state.value"
-                      placeholder="e.g. INV-2023-001"
-                      required
-                      :error="state.meta.errors[0]"
-                      @update:model-value="(val) => field.handleChange(val as string)"
-                    />
-                  </template>
-                </form.Field>
-              </div>
-
-              <div class="grid grid-cols-3 gap-6">
-                <form.Field name="issueDate">
-                  <template #default="{ field, state }">
-                    <AppInput
-                      label="Issue Date"
-                      type="date"
-                      :model-value="field.state.value"
-                      :error="state.meta.errors[0]"
-                      @update:model-value="(val) => field.handleChange(val as string)"
-                    />
-                  </template>
-                </form.Field>
-
-                <form.Field name="dueDate">
-                  <template #default="{ field, state }">
-                    <AppInput
-                      label="Due Date"
-                      type="date"
-                      :model-value="field.state.value"
-                      :error="state.meta.errors[0]"
-                      @update:model-value="(val) => field.handleChange(val as string)"
-                    />
                   </template>
                 </form.Field>
 
@@ -266,7 +210,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                   <AppTextarea
                     label="Justification"
                     :model-value="field.state.value"
-                    placeholder="Description of the purchase..."
+                    placeholder="Description of the request..."
                     required
                     :rows="2"
                     :error="state.meta.errors[0]"
@@ -276,13 +220,12 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
               </form.Field>
             </div>
 
-            <!-- Line Items -->
             <div class="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden">
               <div
                 class="flex items-center justify-between px-6 py-3 border-b border-neutral-200 bg-neutral-50/50"
               >
                 <h3 class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                  Expense Lines
+                  Line Items
                 </h3>
                 <form.Field name="lines">
                   <template #default="{ field }">
@@ -295,6 +238,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                           amount: 0,
                           accountId: '',
                           categoryId: '',
+                          taxAmount: 0,
                         })
                       "
                     >
@@ -336,7 +280,7 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                               <AppInput
                                 label="Description"
                                 :model-value="lf.state.value"
-                                placeholder="e.g. Server Hosting"
+                                placeholder="e.g. Travel expenses"
                                 required
                                 :error="ls.meta.errors[0]"
                                 @update:model-value="(val) => lf.handleChange(val as string)"
@@ -402,14 +346,12 @@ const searchCategories = async (q: string): Promise<ComboboxOption[]> => {
                                         amount: 0,
                                         accountId: '',
                                         categoryId: '',
+                                        taxAmount: 0,
                                       })
                                     }
                                   }
                                 "
                               />
-                              <p class="text-[9px] text-neutral-400 mt-1 uppercase tracking-tight">
-                                Press Enter to add line
-                              </p>
                             </div>
                           </template>
                         </form.Field>
