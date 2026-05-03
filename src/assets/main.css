@@ -14,16 +14,16 @@
    * Authoritative and precise for financial systems. 
    * Source: docs/architecture/DESIGN_SYSTEM.md
    */
-  --color-primary-50: #eff6fc;
-  --color-primary-100: #cfe4fa;
-  --color-primary-200: #abcbf5;
-  --color-primary-300: #82aef0;
-  --color-primary-400: #5c91ea;
-  --color-primary-500: #3b74e6;
-  --color-primary-600: #0f6cbd; /* ← Main CTA color (Enterprise Blue) */
-  --color-primary-700: #0c579c; /* ← Hover state */
-  --color-primary-800: #0a4379;
-  --color-primary-900: #073059;
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0f766e; /* ← Main CTA color (Deep Teal) */
+  --color-primary-700: #115e59; /* ← Hover state */
+  --color-primary-800: #134e4a;
+  --color-primary-900: #042f2e;
 
   /*
    * ── Neutrals — Fluent Design Neutral Palette ──────────────────
@@ -195,9 +195,9 @@
  */
 :root {
   /* Fluent Web Component Token Overrides */
-  --accent-fill-rest: #0f6cbd;
-  --accent-fill-hover: #0c579c;
-  --accent-fill-active: #0a4379;
+  --accent-fill-rest: #0f766e;
+  --accent-fill-hover: #115e59;
+  --accent-fill-active: #134e4a;
   --accent-foreground-cut-rest: #ffffff;
 }
 
