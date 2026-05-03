@@ -37,6 +37,10 @@ const { submit, isPending: isSubmitting } = useSubmitPaymentRequest(props.id as 
 const activeTab = ref('Line Details')
 const isTraceOpen = ref(false)
 
+/** Screen-level editability: DRAFT records allow inline editing */
+const isDraft = computed(() => request.value?.status === 'DRAFT')
+const draftJustification = ref('')
+
 const isPending = computed(
   () =>
     isApproving.value ||
@@ -201,6 +205,8 @@ const lineColumns = [
               label="Justification"
               :value="request.justification"
               type="text"
+              :mode="isDraft ? 'edit' : 'read'"
+              v-model="draftJustification"
             />
           </FieldGroup>
 
