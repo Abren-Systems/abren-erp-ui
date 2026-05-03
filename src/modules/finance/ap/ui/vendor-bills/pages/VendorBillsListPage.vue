@@ -7,16 +7,20 @@ import {
   DataGridFooter,
   useDataGrid,
 } from '@/shared/components/data-grid'
-import type { Row } from '@tanstack/vue-table'
+import type { Table, Row } from '@tanstack/vue-table'
 import { AppButton, AppSidePane } from '@/shared/components/primitives'
 import { WorkspaceLayout, PageHeader } from '@/shared/components/workspace'
-import { History, Plus, Receipt, FileText, ChevronRight } from 'lucide-vue-next'
+import { History, Plus, Receipt, FileText, ChevronRight, ListFilter, X } from 'lucide-vue-next'
 import { useVendorBills } from '../../../application/composables/useVendorBills'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import type { VendorBill } from '../../../domain/ap.types'
 import { Money } from '@/shared/domain/money'
-import { MoneyCell, DateCell, BadgeCell } from '@/shared/components/data-grid'
-import VendorBillTimeline from '../components/VendorBillTimeline.vue'
+import { SelectionCell } from '@/shared/components/data-grid'
+import type { VendorBillId } from '@/shared/types/brand.types'
+import { vendorBillColumns } from '../grids/vendor-bill.grid'
+import VendorBillTraceSidePane from '../components/VendorBillTraceSidePane.vue'
+import VendorBillFilterPane from '../components/VendorBillFilterPane.vue'
+import VendorBillBulkActionBar from '../components/VendorBillBulkActionBar.vue'
 
 const router = useRouter()
 const { hasPermission } = usePermissions()
@@ -27,6 +31,19 @@ const isTraceOpen = ref(false)
 const traceTarget = ref<VendorBill | null>(null)
 
 const statusFilter = ref('all')
+const isFilterOpen = ref(false)
+const filterState = ref({
+  statuses: [] as string[],
+  dateFrom: '',
+  dateTo: '',
+})
+
+const selectedIds = computed(() => {
+  return Object.keys(rowSelection.value)
+    .filter((k) => rowSelection.value[k])
+    .map((k) => filteredBills.value[Number(k)]?.id)
+    .filter(Boolean) as VendorBillId[]
+})
 
 const filterPresets = [
   { id: 'all', label: 'All Records' },
@@ -36,8 +53,28 @@ const filterPresets = [
 
 const filteredBills = computed(() => {
   if (!bills.value) return []
-  if (statusFilter.value === 'all') return bills.value
-  return bills.value.filter((b) => b.status.toLowerCase() === statusFilter.value)
+  let data = bills.value
+
+  // 1. Bucket Filtering (Tabs)
+  if (statusFilter.value === 'draft') {
+    data = data.filter((b) => b.status === 'DRAFT')
+  } else if (statusFilter.value === 'validated') {
+    data = data.filter((b) => b.status === 'VALIDATED')
+  }
+
+  // 2. Fine-grained Filtering (Drawer)
+  if (filterState.value.statuses.length > 0) {
+    data = data.filter((b) => filterState.value.statuses.includes(b.status))
+  }
+
+  if (filterState.value.dateFrom) {
+    data = data.filter((b) => b.issueDate >= filterState.value.dateFrom)
+  }
+  if (filterState.value.dateTo) {
+    data = data.filter((b) => b.issueDate <= filterState.value.dateTo)
+  }
+
+  return data
 })
 
 const selectedCount = computed(() => Object.keys(rowSelection.value).length)
@@ -51,30 +88,21 @@ const totalFilteredAmount = computed(() => {
 
 const columns = [
   {
-    accessorKey: 'billNumber',
-    header: 'Bill #',
-    cell: ({ row }: { row: Row<VendorBill> }) =>
-      h('span', { class: 'font-mono font-bold text-neutral-900' }, row.original.billNumber),
-  },
-  {
-    accessorKey: 'issueDate',
-    header: 'Issue Date',
-    cell: ({ row }: { row: Row<VendorBill> }) => h(DateCell, { date: row.original.issueDate }),
-  },
-  {
-    accessorKey: 'totalAmount',
-    header: 'Amount',
-    cell: ({ row }: { row: Row<VendorBill> }) =>
-      h(MoneyCell, {
-        amount: row.original.totalAmount,
-        class: 'block text-right font-bold',
+    id: 'select',
+    header: ({ table }: { table: Table<VendorBill> }) =>
+      h(SelectionCell, {
+        checked: table.getIsAllPageRowsSelected(),
+        indeterminate: table.getIsSomePageRowsSelected(),
+        'onUpdate:checked': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
       }),
+    cell: ({ row }: { row: Row<VendorBill> }) =>
+      h(SelectionCell, {
+        checked: row.getIsSelected(),
+        'onUpdate:checked': (value: boolean) => row.toggleSelected(!!value),
+      }),
+    size: 40,
   },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }: { row: Row<VendorBill> }) => h(BadgeCell, { status: row.original.status }),
-  },
+  ...vendorBillColumns,
   {
     id: 'actions',
     header: '',
@@ -146,6 +174,29 @@ function handleCreate() {
         <DataGridFilterSelector v-model="statusFilter" :options="filterPresets" />
       </template>
 
+      <template #toolbar-controls>
+        <AppButton variant="outline" size="sm" @click="isFilterOpen = true">
+          <template #start><ListFilter :size="14" /></template>
+          Filter
+        </AppButton>
+      </template>
+
+      <template #empty-action>
+        <AppButton
+          v-if="statusFilter !== 'all' || filterState.statuses.length > 0"
+          variant="outline"
+          @click="
+            () => {
+              statusFilter = 'all'
+              filterState.statuses = []
+            }
+          "
+        >
+          <template #start><X :size="14" /></template>
+          Clear filters
+        </AppButton>
+      </template>
+
       <template #footer>
         <DataGridFooter
           :total-rows="filteredBills.length"
@@ -155,35 +206,25 @@ function handleCreate() {
       </template>
     </DataGrid>
 
+    <VendorBillBulkActionBar
+      :selected-ids="selectedIds"
+      :filtered-bills="filteredBills"
+      @clear-selection="rowSelection = {}"
+    />
+
     <template #sidebar>
-      <AppSidePane
-        v-model:open="isTraceOpen"
-        :title="`Trace: ${traceTarget?.billNumber}`"
-        description="Audit provenance and status history"
-        mode="docked"
-        width="320px"
-      >
-        <template #icon>
-          <History :size="16" class="text-[var(--color-primary-600)]" />
-        </template>
+      <VendorBillFilterPane
+        v-model:open="isFilterOpen"
+        :initial-filters="filterState"
+        :status-options="[
+          { label: 'Draft', value: 'DRAFT' },
+          { label: 'Validated', value: 'VALIDATED' },
+          { label: 'Paid', value: 'PAID' },
+        ]"
+        @apply="filterState = $event"
+      />
 
-        <div v-if="traceTarget" class="space-y-6">
-          <VendorBillTimeline :bill="traceTarget" />
-        </div>
-
-        <template #footer>
-          <AppButton
-            v-if="traceTarget"
-            variant="outline"
-            size="sm"
-            class="w-full h-8 text-[11px]"
-            @click="handleRowClick(traceTarget)"
-          >
-            Open Full Record
-            <ChevronRight :size="14" class="ml-1" />
-          </AppButton>
-        </template>
-      </AppSidePane>
+      <VendorBillTraceSidePane v-model:open="isTraceOpen" :bill="traceTarget!" />
     </template>
   </WorkspaceLayout>
 </template>
