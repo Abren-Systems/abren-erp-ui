@@ -1,14 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, h, ref } from 'vue'
-import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { usePaymentRequest } from '../../../application/composables/usePaymentRequest'
-import { useCreatePaymentRequest } from '../../../application/composables/useCreatePaymentRequest'
-import { useApprovePaymentRequest } from '../../../application/composables/useApprovePaymentRequest'
-import { useRejectPaymentRequest } from '../../../application/composables/useRejectPaymentRequest'
-import { useAuthorizePaymentRequest } from '../../../application/composables/useAuthorizePaymentRequest'
-import { useCancelPaymentRequest } from '../../../application/composables/useCancelPaymentRequest'
-import { useSubmitPaymentRequest } from '../../../application/composables/useSubmitPaymentRequest'
-import type { PaymentRequestId } from '@/shared/types/brand.types'
+import { h } from 'vue'
 import {
   AppField,
   AppFormField,
@@ -20,144 +11,52 @@ import { AppButton } from '@/shared/components/primitives'
 import { History } from 'lucide-vue-next'
 import PaymentRequestHeader from './header.vue'
 import PaymentRequestActions from './actions.vue'
-import type { ActionContract } from '@/platform/component-contracts'
 import PaymentRequestTraceDrawer from './sidepanels/trace.sidepane.vue'
-import { useUsers } from '@/modules/core/application/composables/useUsers'
-import { DataGrid, MoneyCell } from '@/shared/components/data-grid'
-import { getPaymentRequestActions } from './commands'
+import { DataGrid } from '@/shared/components/data-grid'
 import { paymentRequestLineColumns } from './grids/lines.grid'
-import { CURRENCY_OPTIONS } from './fields'
-import type { PaymentRequestLine } from '../../../domain/ap.types'
+import { usePaymentRequestEntry } from './controller'
 
 const props = defineProps<{ id: string }>()
-const router = useRouter()
 
-const isNew = computed(() => props.id === 'new')
-
-// Fetch if existing record
-const { request, isLoading, error } = usePaymentRequest(props.id as PaymentRequestId)
-const { users } = useUsers()
-
-// Action composables
-const { approve, isPending: isApproving } = useApprovePaymentRequest(props.id as PaymentRequestId)
-const { reject, isPending: isRejecting } = useRejectPaymentRequest(props.id as PaymentRequestId)
-const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(
-  props.id as PaymentRequestId,
-)
-const { cancel, isPending: isCancelling } = useCancelPaymentRequest(props.id as PaymentRequestId)
-const { submit, isPending: isSubmittingRequest } = useSubmitPaymentRequest(
-  props.id as PaymentRequestId,
-)
-
-// Creation composable (provides the local TanStack form)
-const { form, isSubmitting: isCreating, isSaved, saveDraft } = useCreatePaymentRequest()
-
-const activeTab = ref('Line Details')
-const isTraceOpen = ref(false)
-
-const isDraft = computed(() => isNew.value || request.value?.status === 'DRAFT')
-const displayStatus = computed(() => (isNew.value ? 'DRAFT' : request.value?.status))
-const displaySubmittedAt = computed(() => (isNew.value ? null : request.value?.submittedAt))
-
-// Navigation Guard: Acumatica Pattern Unsaved Changes Warning
-onBeforeRouteLeave((to, from, next) => {
-  if (isNew.value && !isSaved.value && !isCreating.value) {
-    const answer = window.confirm('You have unsaved work. Would you like to leave without saving?')
-    if (answer) {
-      next()
-    } else {
-      next(false)
-    }
-  } else {
-    next()
-  }
-})
-
-const isPending = computed(
-  () =>
-    isApproving.value ||
-    isRejecting.value ||
-    isAuthorizing.value ||
-    isCancelling.value ||
-    isSubmittingRequest.value ||
-    isCreating.value,
-)
-
-const actions = computed<ActionContract[]>(() => {
-  if (isNew.value) return []
-  if (!request.value) return []
-  return getPaymentRequestActions(request.value.status)
-})
-
-function handleAction(key: string) {
-  if (key === 'submit') void submit()
-  if (key === 'approve') void approve()
-  if (key === 'reject') void reject('Rejected via Focus Screen')
-  if (key === 'authorize') void authorize()
-  if (key === 'cancel') void cancel('Cancelled via Focus Screen')
-}
-
-// Ensure the form submits when clicking "Create Request"
-function handleCreate() {
-  form.handleSubmit()
-}
-
-const requesterEmail = computed(() => {
-  if (isNew.value) return 'Current User' // Or pull from auth context
-  const user = users.value?.find((u) => u.id === request.value?.requesterId)
-  return user?.email ?? request.value?.requesterId
-})
-
-const beneficiaryEmail = computed(() => {
-  const targetId = isNew.value ? form.state.values.beneficiaryId : request.value?.beneficiaryId
-  if (!targetId) return ''
-  const user = users.value?.find((u) => u.id === targetId)
-  return user?.email ?? targetId
-})
-
-const lineColumns = paymentRequestLineColumns
-
-// Fallback data for DataGrid if we are creating new
-const currentLines = computed(() => {
-  if (isNew.value) return form.state.values.lines || []
-  return request.value?.lines || []
-})
-
-// Provide options for beneficiary select
-const userOptions = computed(() => users.value?.map((u) => ({ label: u.email, value: u.id })) || [])
-const currencyOptions = computed(() => CURRENCY_OPTIONS)
+const ctrl = usePaymentRequestEntry(props.id)
 </script>
 
 <template>
   <div class="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8">
-    <div v-if="error" class="p-8">
+    <div v-if="ctrl.error.value" class="p-8">
       <AppFieldset title="Error Loading Request" variant="neutral" :columns="1">
-        <AppField field="error" label="Error" :value="String(error)" type="text" />
+        <AppField field="error" label="Error" :value="String(ctrl.error.value)" type="text" />
       </AppFieldset>
     </div>
-    <div v-else-if="isLoading && !request && !isNew" class="p-8">
+    <div v-else-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
       <AppFieldset title="Loading" variant="neutral" :columns="1">
         <AppField field="status" label="Status" value="Loading details..." type="text" />
       </AppFieldset>
     </div>
     <div v-else class="flex flex-col gap-6">
-      <PaymentRequestHeader :request="isNew ? undefined : request">
+      <PaymentRequestHeader :request="ctrl.isNew.value ? undefined : ctrl.entity.value">
         <template #actions>
-          <template v-if="isNew">
-            <AppButton variant="secondary" class="mr-2" @click="saveDraft"> Save Draft </AppButton>
-            <AppButton variant="primary" :disabled="isCreating" @click="handleCreate">
+          <template v-if="ctrl.isNew.value">
+            <AppButton variant="secondary" class="mr-2" @click="ctrl.saveDraft">
+              Save Draft
+            </AppButton>
+            <AppButton
+              variant="primary"
+              :disabled="ctrl.isCreating.value"
+              @click="ctrl.handleCreate"
+            >
               Create Request
             </AppButton>
           </template>
           <template v-else>
-            <AppButton variant="secondary" @click="isTraceOpen = true">
+            <AppButton variant="secondary" @click="ctrl.isTraceOpen.value = true">
               <History class="mr-2 h-4 w-4" />
               Trace
             </AppButton>
             <PaymentRequestActions
-              :actions="actions"
-              :is-pending="isPending"
-              @action="handleAction"
+              :actions="ctrl.actions.value"
+              :is-pending="ctrl.isPending.value"
+              @action="ctrl.handleAction"
             />
           </template>
         </template>
@@ -168,18 +67,23 @@ const currencyOptions = computed(() => CURRENCY_OPTIONS)
         @submit.prevent="
           (e) => {
             ;(e as Event).stopPropagation()
-            form.handleSubmit()
+            ctrl.form.handleSubmit()
           }
         "
       >
         <!-- Top Section (Fieldsets) -->
         <AppFieldset variant="ghost" layout="horizontal" :columns="3">
           <FieldGroup>
-            <AppField field="requester" label="Requester" :value="requesterEmail" type="id" />
+            <AppField
+              field="requester"
+              label="Requester"
+              :value="ctrl.requesterEmail.value"
+              type="id"
+            />
 
             <AppFormField
-              v-if="isNew"
-              :field="form.Field('beneficiaryId')"
+              v-if="ctrl.isNew.value"
+              :field="ctrl.form.Field('beneficiaryId')"
               label="Beneficiary"
               type="text"
               mode="edit"
@@ -188,14 +92,14 @@ const currencyOptions = computed(() => CURRENCY_OPTIONS)
               v-else
               field="beneficiary"
               label="Beneficiary"
-              :value="beneficiaryEmail"
+              :value="ctrl.beneficiaryEmail.value"
               type="id"
             />
 
             <AppField
               field="status"
               label="Status"
-              :value="displayStatus"
+              :value="ctrl.displayStatus.value"
               type="status"
               :context="{ entity: 'PaymentRequest' }"
             />
@@ -205,13 +109,13 @@ const currencyOptions = computed(() => CURRENCY_OPTIONS)
             <AppField
               field="submittedAt"
               label="Submitted On"
-              :value="displaySubmittedAt"
+              :value="ctrl.displaySubmittedAt.value"
               type="date"
             />
 
             <AppFormField
-              v-if="isNew"
-              :field="form.Field('justification')"
+              v-if="ctrl.isNew.value"
+              :field="ctrl.form.Field('justification')"
               label="Justification"
               type="text"
               mode="edit"
@@ -220,15 +124,15 @@ const currencyOptions = computed(() => CURRENCY_OPTIONS)
               v-else
               field="justification"
               label="Justification"
-              :value="request?.justification"
+              :value="ctrl.entity.value?.justification"
               type="text"
             />
           </FieldGroup>
 
           <FieldGroup>
             <AppFormField
-              v-if="isNew"
-              :field="form.Field('currency')"
+              v-if="ctrl.isNew.value"
+              :field="ctrl.form.Field('currency')"
               label="Currency"
               type="text"
               mode="edit"
@@ -237,17 +141,16 @@ const currencyOptions = computed(() => CURRENCY_OPTIONS)
               v-else
               field="currency"
               label="Currency"
-              :value="request?.currency"
+              :value="ctrl.entity.value?.currency"
               type="text"
             />
 
-            <!-- For simplicity in this proof, we will just use the standard AppField/AppFormField for totalAmount -->
             <AppField
-              v-if="isNew"
+              v-if="ctrl.isNew.value"
               field="totalAmount"
               label="Order Total"
               :value="
-                form.state.values.lines?.reduce(
+                ctrl.form.state.values.lines?.reduce(
                   (acc, curr) => acc + (Number(curr.amount) || 0),
                   0,
                 ) || 0
@@ -258,25 +161,24 @@ const currencyOptions = computed(() => CURRENCY_OPTIONS)
               v-else
               field="totalAmount"
               label="Order Total"
-              :value="request?.totalAmount"
+              :value="ctrl.entity.value?.totalAmount"
               type="money"
             />
           </FieldGroup>
         </AppFieldset>
 
         <!-- Middle Section (Tab Bar) -->
-        <AppTabs :tabs="['Line Details']" v-model="activeTab" />
+        <AppTabs :tabs="['Line Details']" v-model="ctrl.activeTab.value" />
 
         <!-- Bottom Section (Grid/Content) -->
         <div
-          v-if="activeTab === 'Line Details'"
+          v-if="ctrl.activeTab.value === 'Line Details'"
           class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-white shadow-sm"
         >
-          <!-- When creating, we would use an editable grid here. For now, read-only grid to prove the primary fields work. -->
           <DataGrid
-            :columns="lineColumns"
-            :data="currentLines"
-            :loading="isLoading && !isNew"
+            :columns="paymentRequestLineColumns"
+            :data="ctrl.currentLines.value"
+            :loading="ctrl.isLoading.value && !ctrl.isNew.value"
             empty-message="No line items found"
           />
         </div>
@@ -285,9 +187,9 @@ const currencyOptions = computed(() => CURRENCY_OPTIONS)
 
     <!-- Trace Drawer (Lazy loaded context) -->
     <PaymentRequestTraceDrawer
-      v-if="request && !isNew"
-      v-model:open="isTraceOpen"
-      :request="request"
+      v-if="ctrl.entity.value && !ctrl.isNew.value"
+      v-model:open="ctrl.isTraceOpen.value"
+      :request="ctrl.entity.value"
     />
   </div>
 </template>
