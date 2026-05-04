@@ -11,11 +11,13 @@ import type { ScreenId } from '@/platform/screen-runtime'
 // Screen definitions are lazily populated in per-aggregate screen files.
 // This file re-exports them as the module's public screen surface.
 
-export { AP3010PL } from './ui/payment-requests/screens/AP3010PL.screen'
-export { AP301000 } from './ui/payment-requests/screens/AP301000.screen'
+import { AP3010PL } from './ui/payment-requests/screens/AP3010PL.screen'
+import { AP301000 } from './ui/payment-requests/screens/AP301000.screen'
+
+export { AP3010PL, AP301000 }
 
 /** All screens registered by the AP module */
-export const apScreens: readonly ScreenDefinition[] = []
+export const apScreens: readonly ScreenDefinition[] = [AP3010PL, AP301000]
 
 // Screens will be pushed into this array as they are defined.
 // For now this is a placeholder — the actual wiring happens in Phase 2

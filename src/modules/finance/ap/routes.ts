@@ -1,28 +1,12 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { resolveScreenRoutes } from '@/platform/screen-runtime'
+import { apScreens } from './screens'
 
 export default [
-  // --- Payment Requests ---
-  {
-    path: 'requests',
-    meta: { title: 'Payment Requests' },
-    component: () => import('@/shared/components/workspace/ModuleShell.vue'),
-    children: [
-      {
-        path: '',
-        name: 'PaymentRequestsList',
-        component: () => import('./ui/payment-requests/pages/PaymentRequestsListPage.vue'),
-      },
-      {
-        path: ':id',
-        name: 'PaymentRequestDetail',
-        meta: { title: 'Detail' },
-        component: () => import('./ui/payment-requests/pages/PaymentRequestFocus.vue'),
-        props: true,
-      },
-    ],
-  },
+  // --- Payment Requests (Screen Runtime) ---
+  ...resolveScreenRoutes(apScreens),
 
-  // --- Vendor Bills ---
+  // --- Vendor Bills (Legacy SPA) ---
   {
     path: 'vendor-bills',
     meta: { title: 'Vendor Bills' },

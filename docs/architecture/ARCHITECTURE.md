@@ -9,7 +9,7 @@ tags: [frontend, architecture]
 
 > **Version:** 2.1
 > **Last Updated:** April 2026
-> **Status:** AUTHORITATIVE — This document is the single source of truth for all architectural decisions in the Abren ERP UI.
+> **Status:** AUTHORITATIVE BASELINE — This document defines the frontend baseline architecture. ERP screen-runtime, design-system, module-restructure, and migration authority is shared with `ACUMATICA_ALIGNMENT_STRATEGY.md`, `SCREEN_RUNTIME_ARCHITECTURE.md`, `ERP_DESIGN_SYSTEM_ARCHITECTURE.md`, `COMPONENT_CONTRACTS.md`, `MODULE_RESTRUCTURE_PLAN.md`, and `MIGRATION_ROADMAP.md`.
 > **Backend Companion:** [Backend Architecture](ARCHITECTURE.md)
 
 ---
@@ -18,7 +18,7 @@ tags: [frontend, architecture]
 
 ### 1.1 What We Are Building
 
-A **domain-aware frontend** for a Financial Operating System — not a collection of CRUD forms. We strictly adhere to the **Modular Monolith Mirroring** principle: the frontend is structurally aligned with the backend's bounded contexts, ensuring that business logic boundaries are preserved from the database all the way to the UI.
+A **domain-aware frontend** for a Financial Operating System — not a collection of CRUD forms. We strictly adhere to the **Modular Monolith Mirroring** principle: the frontend is structurally aligned with the backend's bounded contexts, while the ERP UI itself is governed by a **screen runtime** rather than ad hoc route pages.
 
 ### 1.2 The Alignment Principle
 
@@ -38,7 +38,7 @@ The frontend is **domain-aware and backend-aligned**, not an exact mirror. The b
 The project is designed for **zero-rewrite scaling**, following the exact same principles as the backend's **Architecture First** journey. The frontend grows along two independent axes:
 
 1. **Vertical (Architecture): Constant.** Every module is built with strict statelessness, domain-aligned boundaries, mapper isolation, and the full security model from the moment of implementation. No exceptions.
-2. **Horizontal (Product Depth): Additive.** New features plug into the existing routing, state, and API client capabilities without requiring structural rewrites of the core platform.
+2. **Horizontal (Product Depth): Additive.** New features plug into the existing screen runtime, platform services, state, and API client capabilities without requiring structural rewrites of the core platform.
 
 ### 1.4 The "Gold Standard" Principle
 
@@ -65,13 +65,13 @@ The backend's **OpenAPI Specification** is the authoritative contract for the fu
 
 ### 2.1 The Five Golden Rules
 
-| Rule                      | Enforcement                            | Prevents                     |
-| ------------------------- | -------------------------------------- | ---------------------------- |
-| **Domain is Pure**        | No UI/API/State in `domain/`           | Business rule leakage        |
-| **Infra is the Firewall** | Mandatory Mappers in `infrastructure/` | Backend DTO leakage          |
-| **App is Orchestration**  | Side effects ONLY in `application/`    | Logic scattered in UI        |
-| **UI is Presentation**    | Pages use formatters, not domain logic | Presentation coupling        |
-| **Modular Monolith**      | Flat module separation                 | Engineering/Business overlap |
+| Rule                      | Enforcement                                 | Prevents                     |
+| ------------------------- | ------------------------------------------- | ---------------------------- |
+| **Domain is Pure**        | No UI/API/State in `domain/`                | Business rule leakage        |
+| **Infra is the Firewall** | Mandatory Mappers in `infrastructure/`      | Backend DTO leakage          |
+| **App is Orchestration**  | Side effects ONLY in `application/`         | Logic scattered in UI        |
+| **UI is Presentation**    | Screens render metadata, not business logic | Presentation coupling        |
+| **Modular Monolith**      | Flat module separation                      | Engineering/Business overlap |
 
 ### 2.2 Strict Dependency Flow
 
@@ -80,7 +80,7 @@ Dependencies point **inward** only. Modules may only depend on `core/` and never
 ```mermaid
 graph TD
     subgraph Presentation
-        P[Pages / Views]
+        P[Screen Renderers / Views]
     end
 
     subgraph Composition
@@ -98,7 +98,7 @@ graph TD
 
     subgraph "Core Infrastructure"
         SK_T[Types & Interfaces]
-        SK_C[Design System - shared/components]
+        SK_C[Design System - shared/ui + platform contracts]
         SK_U[Utilities]
         SK_EB[Event Bus]
     end
@@ -118,12 +118,12 @@ graph TD
 
 ### 2.3 Layer Responsibilities
 
-| Layer              | Responsibility              | Contains                    | May Import           | Authority          |
-| ------------------ | --------------------------- | --------------------------- | -------------------- | ------------------ |
-| **Domain**         | Pure business rules & types | `*.types.ts`, `Money.ts`    | Nothing              | Business Logic     |
-| **Application**    | Orchestration & Use Cases   | `application/composables/`  | Domain, Infra        | **TanStack Query** |
-| **Infrastructure** | ACL, Mapping, Adapters      | `infrastructure/adapter.ts` | Domain, Core API     | **DTOs** (input)   |
-| **UI**             | Presentation & Formatting   | `ui/pages/`, `ui/utils/`    | Application, Core UI | Presentation       |
+| Layer              | Responsibility              | Contains                                                                | May Import           | Authority          |
+| ------------------ | --------------------------- | ----------------------------------------------------------------------- | -------------------- | ------------------ |
+| **Domain**         | Pure business rules & types | `*.types.ts`, `Money.ts`                                                | Nothing              | Business Logic     |
+| **Application**    | Orchestration & Use Cases   | `application/composables/`                                              | Domain, Infra        | **TanStack Query** |
+| **Infrastructure** | ACL, Mapping, Adapters      | `infrastructure/adapter.ts`                                             | Domain, Core API     | **DTOs** (input)   |
+| **UI**             | Presentation & Rendering    | `ui/screens/`, `ui/views/`, `ui/components/`, `ui/grids/`, `ui/fields/` | Application, Core UI | Presentation       |
 
 ### 2.4 Component Sizing and Separation of Concerns
 
@@ -143,20 +143,20 @@ Vue Single-File Components (SFCs) must not become dumping grounds for multiple l
 
 ### 3.1 Core Stack
 
-| Layer                     | Technology                                      | Rationale                                                                                                            |
-| ------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Framework**             | Vue 3 (Composition API)                         | SFC colocation, perfect mapping for backend Use Cases                                                                |
-| **Build**                 | Vite                                            | Sub-second HMR, native ESM, Tailwind v4 native support                                                               |
-| **UI System**             | **Custom Design System** (`shared/components/`) | Full ownership, zero vendor lock-in, ERP-optimized. _(See [UI_FOUNDATION_DECISION.md](./UI_FOUNDATION_DECISION.md))_ |
-| **Accessible Primitives** | **Headless primitives (Reka UI lineage)**       | Accessibility and behavior infrastructure owned through Abren wrappers, not vendor visual language                   |
-| **DataGrid Engine**       | **TanStack Table** + **TanStack Virtual**       | Sorting, filtering, pagination, virtualized scrolling                                                                |
-| **Server State**          | **TanStack Query**                              | Caching, background refetch, optimistic updates                                                                      |
-| **Form State**            | **TanStack Form** + **Zod**                     | Headless, type-safe validation                                                                                       |
-| **Client State**          | Pinia                                           | Ephemeral/UI state ONLY (sidebar collapse, local filters)                                                            |
-| **Server State**          | **TanStack Query**                              | Authority for all domain data (ledger accounts, etc.)                                                                |
-| **Styling**               | **Tailwind CSS v4**                             | `@theme` design tokens, utility-first CSS. _(See [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md))_                            |
-| **Language**              | TypeScript (strict)                             | Compile-time safety, `noUncheckedIndexedAccess`                                                                      |
-| **HTTP**                  | Axios                                           | Interceptors for auth, idempotency, error envelopes                                                                  |
+| Layer                     | Technology                                                                                                        | Rationale                                                                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Framework**             | Vue 3 (Composition API)                                                                                           | SFC colocation, perfect mapping for backend Use Cases                                                                                |
+| **Build**                 | Vite                                                                                                              | Sub-second HMR, native ESM, Tailwind v4 native support                                                                               |
+| **UI System**             | **Custom ERP Design System** (`shared/ui/` with compatibility exports from `shared/components/` during migration) | Full ownership, zero vendor lock-in, ERP-optimized. _(See [ERP_DESIGN_SYSTEM_ARCHITECTURE.md](./ERP_DESIGN_SYSTEM_ARCHITECTURE.md))_ |
+| **Accessible Primitives** | **Headless primitives (Reka UI lineage)**                                                                         | Accessibility and behavior infrastructure owned through Abren wrappers, not vendor visual language                                   |
+| **DataGrid Engine**       | **TanStack Table** + **TanStack Virtual**                                                                         | Sorting, filtering, pagination, virtualized scrolling                                                                                |
+| **Server State**          | **TanStack Query**                                                                                                | Caching, background refetch, optimistic updates                                                                                      |
+| **Form State**            | **TanStack Form** + **Zod**                                                                                       | Headless, type-safe validation                                                                                                       |
+| **Client State**          | Pinia                                                                                                             | Ephemeral/UI state ONLY (sidebar collapse, local filters)                                                                            |
+| **Server State**          | **TanStack Query**                                                                                                | Authority for all domain data (ledger accounts, etc.)                                                                                |
+| **Styling**               | **Tailwind CSS v4**                                                                                               | `@theme` design tokens, utility-first CSS. _(See [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md))_                                            |
+| **Language**              | TypeScript (strict)                                                                                               | Compile-time safety, `noUncheckedIndexedAccess`                                                                                      |
+| **HTTP**                  | Axios                                                                                                             | Interceptors for auth, idempotency, error envelopes                                                                                  |
 
 ### 3.2 Development & Quality
 
@@ -195,13 +195,14 @@ Mappers should inherit from a `BaseMapper` (where applicable) or use shared mapp
 
 A **module** is a self-contained directory under `src/modules/` that represents one backend bounded context. It owns its:
 
-- **Pages** (route-level views)
+- **Screens** (registered ERP screen definitions)
 - **Components** (reusable within the module)
 - **Store** (Pinia client state)
 - **API client** (HTTP calls to its backend counterpart)
 - **Mappers** (DTO → ViewModel transformation)
 - **Types** (TypeScript interfaces)
-- **Routes** (lazy-loaded route definitions)
+- **Workspace entries** (navigation/workspace configuration)
+- **Compatibility routes** (transitional, generated or hand-authored during migration)
 - **Registration** (`index.ts` — `ModuleDefinition` export)
 
 ### 5.2 Module Internal Structure (Mandatory)
@@ -211,16 +212,24 @@ src/modules/{module-name}/
 ├── infrastructure/  # FIREWALL: Mappers, Adapters (ACL)
 ├── domain/          # PURE: Interfaces, Value Objects, Logic
 ├── application/     # ORCHESTRATION: Use Case Composables
-├── ui/              # 4. PRESENTATION: Components, Pages, Formatters
+├── screens.ts       # Registered screen definitions for the module
+├── workspace.ts     # Workspace/menu entries for the module
+├── ui/              # 4. PRESENTATION: Screen assets and presentational components
 │   └── {aggregate}/ # (Optional) Sliced by Aggregate Root for complex modules
 │       ├── components/
-│       ├── pages/   # List, Detail, Create, Edit, Wizard variants
-│       └── utils/   # UI-specific formatters
+│       ├── screens/
+│       ├── views/
+│       ├── fields/
+│       ├── grids/
+│       ├── commands/
+│       ├── extensions/
+│       └── utils/
+├── routes.ts        # Transitional compatibility routes only
 ```
 
 ### 5.3 Module Registration Pattern
 
-Each module exports a `ModuleDefinition` in its `index.ts`. The router aggregates these dynamically:
+Each module exports a `ModuleDefinition` in its `index.ts`. The app consumes registered screens and workspace entries first; routes are transitional compatibility adapters while the screen runtime rollout is in progress.
 
 ```typescript
 // modules/finance/ledger/index.ts
@@ -228,12 +237,9 @@ export const ledgerModule: ModuleDefinition = {
   id: 'ledger',
   name: 'General Ledger',
   category: 'business',
-  routes: () => import('./routes').then((m) => m.default),
+  screens,
+  workspaceEntries,
   permissions: ['ledger.view', 'ledger.edit'],
-  menuItems: [
-    { label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' },
-    { label: 'Journal Entries', route: 'LedgerJournals', icon: 'file-text' },
-  ],
 }
 ```
 
@@ -242,7 +248,7 @@ export const ledgerModule: ModuleDefinition = {
 1. **No cross-module imports**: `finance/ledger/` must NEVER import from `finance/ap/`.
 2. **Public API**: If Module A needs data from Module B, it goes through the Event Bus or a Core type.
 3. **Query-First State**: Domain data stays in TanStack Query. Pinia is for UI-specific toggles.
-4. **Route ownership**: Each module exports a `ModuleDefinition`.
+4. **Screen ownership**: Each module exports registered screens and workspace entries. Direct route ownership is transitional only.
 5. **Composable Orchestration**: All business logic and API orchestration MUST live in Composables, keeping `.vue` files as thin view-only layers.
 6. **Unbreakable DRY**: Domain UI patterns (like specialized selects or status badges) must be extracted and reused, never duplicated.
 
@@ -375,16 +381,16 @@ eventBus.on('ledger:entry-posted', ({ id }) => {
 
 ### 8.1 What Goes in Core
 
-| Directory      | Contents                                                    | Rule                                      |
-| -------------- | ----------------------------------------------------------- | ----------------------------------------- |
-| `api/`         | HTTP client, response types, error handler                  | Infrastructure only                       |
-| `auth/`        | Auth store, route guard, token types                        | Cross-cutting identity concern            |
-| `composables/` | `useApiQuery`, `useApiMutation`, `useFeatureGate`           | Cross-cutting utilities                   |
-| `domain/`      | `Money` VO, `Currency` enum, branded types                  | Mirrors backend Shared Kernel             |
-| `event-bus/`   | Typed event bus                                             | Module communication contract             |
-| `types/`       | `ModuleDefinition`, cross-cutting types                     | Shared contracts                          |
-| `ui/`          | **Custom Design System** (components, patterns, primitives) | Module-agnostic UI                        |
-| `utils/`       | Consolidated Pure utility functions (Barrel exported)       | `import { format } from '@/shared/utils'` |
+| Directory      | Contents                                                                     | Rule                                      |
+| -------------- | ---------------------------------------------------------------------------- | ----------------------------------------- |
+| `api/`         | HTTP client, response types, error handler                                   | Infrastructure only                       |
+| `auth/`        | Auth store, route guard, token types                                         | Cross-cutting identity concern            |
+| `composables/` | `useApiQuery`, `useApiMutation`, `useFeatureGate`                            | Cross-cutting utilities                   |
+| `domain/`      | `Money` VO, `Currency` enum, branded types                                   | Mirrors backend Shared Kernel             |
+| `event-bus/`   | Typed event bus                                                              | Module communication contract             |
+| `types/`       | screen/runtime identifiers, module contracts, cross-cutting types            | Shared contracts                          |
+| `ui/`          | **Custom ERP Design System** (primitives, ERP components, screen components) | Module-agnostic UI                        |
+| `utils/`       | Consolidated Pure utility functions (Barrel exported)                        | `import { format } from '@/shared/utils'` |
 
 ### 8.2 What Does NOT Go in Core
 
@@ -527,20 +533,20 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 ## 11. Anti-Pattern Catalog (Banned List)
 
-| Anti-Pattern                         | Why It Fails                            | Alternative                                   |
-| ------------------------------------ | --------------------------------------- | --------------------------------------------- |
-| **Raw API types in components**      | Backend DTO change breaks 50 components | Mapper → ViewModel pattern                    |
-| **Cross-module store imports**       | Creates invisible dependency graphs     | Event Bus or Core types                       |
-| **Business logic in templates**      | Untestable, duplicated across views     | Composables (Use Case Hooks)                  |
-| **Global CSS classes**               | Styling conflicts across modules        | Scoped styles + design tokens                 |
-| **`any` types**                      | Defeats TypeScript's entire purpose     | Strict mode, branded types                    |
-| **Direct Axios calls in components** | Untestable, no error interception       | Module-scoped API client                      |
-| **Storing tokens in localStorage**   | XSS vulnerability                       | httpOnly cookies or in-memory                 |
-| **Inline styles for theming**        | Unmaintainable at scale                 | Tailwind v4 `@theme` design tokens            |
-| **Raw HTML tables**                  | No sorting, pagination, virtual scroll  | `shared/components` DataGrid (TanStack Table) |
-| **Bypassing design system**          | UI inconsistency                        | Always use `shared/components` components     |
-| **`console.log`**                    | Leaks debug data, litters production    | Use high-level error boundaries or logging    |
-| **SFC God-Component**                | Page files >400 lines, unmaintainable   | Extract action bars, panes, and dialogs       |
+| Anti-Pattern                         | Why It Fails                            | Alternative                                |
+| ------------------------------------ | --------------------------------------- | ------------------------------------------ |
+| **Raw API types in components**      | Backend DTO change breaks 50 components | Mapper → ViewModel pattern                 |
+| **Cross-module store imports**       | Creates invisible dependency graphs     | Event Bus or Core types                    |
+| **Business logic in templates**      | Untestable, duplicated across views     | Composables (Use Case Hooks)               |
+| **Global CSS classes**               | Styling conflicts across modules        | Scoped styles + design tokens              |
+| **`any` types**                      | Defeats TypeScript's entire purpose     | Strict mode, branded types                 |
+| **Direct Axios calls in components** | Untestable, no error interception       | Module-scoped API client                   |
+| **Storing tokens in localStorage**   | XSS vulnerability                       | httpOnly cookies or in-memory              |
+| **Inline styles for theming**        | Unmaintainable at scale                 | Tailwind v4 `@theme` design tokens         |
+| **Raw HTML tables**                  | No sorting, pagination, virtual scroll  | shared ERP `DataGrid` platform             |
+| **Bypassing design system**          | UI inconsistency                        | Always use shared ERP/screen components    |
+| **`console.log`**                    | Leaks debug data, litters production    | Use high-level error boundaries or logging |
+| **SFC God-Component**                | Page files >400 lines, unmaintainable   | Extract action bars, panes, and dialogs    |
 
 ---
 
@@ -576,7 +582,7 @@ Comments must answer questions the code cannot. The _what_ is in the code — co
 
 - **Module-Level**: Required for `core/` and non-trivial entries. State responsibility and constraints.
 - **Composable**: Required for all exported composables. Include an `@example` block. Omit raw `{type}` markers as TypeScript is the authoritative Source of Truth (SOT).
-- **Vue Component**: Required in `<script setup>` for all components outside `shared/components/`. Describe purpose and data sourcing.
+- **Vue Component**: Required in `<script setup>` for all components outside `shared/ui/` and compatibility `shared/components/`. Describe purpose and data sourcing.
 
 ### 13.3 Type Annotations
 
@@ -584,4 +590,4 @@ Mandatory everywhere. `any` is strictly banned — use `unknown` with type guard
 
 ---
 
-_This document is the authoritative reference for all frontend architectural decisions. Every pull request is reviewed against these principles._
+_This document is the authoritative baseline for frontend architecture. ERP UI runtime behavior, component contracts, module restructure, and migration sequencing are jointly governed by the Acumatica alignment document set._

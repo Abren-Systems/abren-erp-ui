@@ -8,14 +8,7 @@
 import { ref, computed } from 'vue'
 import { AppButton, AppDialog } from '@/shared/components/primitives'
 
-export interface ScreenAction {
-  key: string
-  label: string
-  variant: 'primary' | 'danger' | 'neutral'
-  enabled: boolean
-  requiresConfirmation?: boolean
-  description?: string // Description to show in the confirmation dialog
-}
+import type { ScreenAction } from '../commands/payment-request.commands'
 
 const props = defineProps<{
   actions: ScreenAction[]

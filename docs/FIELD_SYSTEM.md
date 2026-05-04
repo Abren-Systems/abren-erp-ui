@@ -20,7 +20,7 @@ These primitives are designed so that:
 
 1. **Phase 1** (now): Screens use `<AppField>` and `<AppFieldset>` with hand-written templates.
 2. **Phase 2** (next): Editable field variants are added; forms use the same system.
-3. **Phase 3** (future): A `ScreenDefinition` schema describes screens as data. An interpreter renders them using the same primitives. No screen rewrite is needed because the component contracts are already correct.
+3. **Phase 3** (future): A `ScreenDefinition` schema describes screens as data. A screen runtime interpreter renders them using the same primitives. No screen rewrite is needed because the component contracts are already correct.
 
 This is the same architectural trajectory taken by Acumatica's Modern UI, SAP Fiori, and Oracle APEX — but implemented incrementally.
 
@@ -35,7 +35,7 @@ The frontend is a **thin client**. All business logic, validation, state transit
 - **Render** — display data from the API
 - **Collect** — send user input to the API
 - **Map** — transform DTOs into UI-friendly domain models (via Mappers)
-- **Navigate** — route based on API responses
+- **Navigate** — open or focus the correct screen based on API responses
 
 Components are **renderers**, not decision-makers.
 

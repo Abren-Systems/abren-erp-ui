@@ -24,5 +24,15 @@ export const businessModules: BusinessDomain[] = [
 
 export const platformModules: PlatformEngine[] = [coreModule, workflowsModule]
 
+import { screenRegistry } from '@/platform/screen-runtime'
+
 // All modules for convenience (e.g. router)
 export const allModules = [...businessModules, ...platformModules]
+
+// ── Screen Registry Initialization ──────────────────────────
+// Register all screens provided by the modules into the global registry.
+for (const module of allModules) {
+  if (module.screens && module.screens.length > 0) {
+    screenRegistry.registerAll(module.screens)
+  }
+}

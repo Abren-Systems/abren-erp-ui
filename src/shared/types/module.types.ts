@@ -12,6 +12,7 @@
  */
 import type { RouteRecordRaw } from 'vue-router'
 import type { Component } from 'vue'
+import type { ScreenDefinition } from '@/platform/screen-runtime'
 
 export type ModuleCategory = 'business' | 'platform'
 
@@ -30,6 +31,8 @@ export interface ModuleDefinition {
   routes: RouteRecordRaw[]
   permissions: string[]
   menuItems: MenuItem[]
+  /** Registered screen definitions (Acumatica alignment) */
+  screens?: readonly ScreenDefinition[]
   /**
    * Optional providers for cross-module communication (Adapter pattern)
    */

@@ -15,7 +15,7 @@ export const AP301000: ScreenDefinition = {
   titleKey: 'ap.paymentRequests.focus.title',
   primaryView: 'paymentRequest',
   route: {
-    path: '/finance/ap/requests/:id',
+    path: 'requests/:id',
     name: 'PaymentRequestDetail',
   },
   permissions: [{ key: 'ap:view' }],

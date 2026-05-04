@@ -70,9 +70,9 @@ Our strategy strictly mirrors **Microsoft Dynamics 365's Alternate Key methodolo
 
 ## 4. Frontend Architectural Impact
 
-### 4.1 Routing & Route Resolution
+### 4.1 Screen Routing & Identifier Resolution
 
-To successfully utilize Meaningful IDs in the URL while fetching data that relies on UUIDs, components must map the URL param back to a domain object. We utilize a **Resolver Pattern**.
+To successfully utilize Meaningful IDs in the URL while fetching data that relies on UUIDs, the screen route layer must map the URL param back to a domain object. We utilize a **Resolver Pattern**.
 
 Instead of passing the UUID in the router:
 

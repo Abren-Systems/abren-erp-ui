@@ -4,14 +4,16 @@
 
 This document defines how UI components are built and consumed in Abren ERP. All components exist within the [Four Foundations](./UX_ARCHITECTURE.md#0-the-four-foundations-app-shell) (Top Pane, Sidebar, Workspace, Working Area).
 
+It should be read together with `ERP_DESIGN_SYSTEM_ARCHITECTURE.md` and `COMPONENT_CONTRACTS.md`, which define the target layer model and contract system for Acumatica-style ERP UI.
+
 ## 1. Ownership First
 
 Business modules must consume **Abren-owned shared components**, not raw vendor primitives.
 
 That means:
 
-- use `App*` primitives from `src/shared/components/primitives/`
-- use shared page-kit components from `src/shared/components/workspace/`
+- use Abren-owned primitives and ERP components from `src/shared/ui/` as the target structure
+- during migration, compatibility exports from `src/shared/components/` are acceptable
 - do not mount raw third-party UI primitives in module pages
 
 The product contract belongs to Abren, not to any vendor library.
@@ -57,17 +59,18 @@ Use primitives for atomic interactions:
 - `AppDialog`
 - `AppSidePane` — Side Panel for contextual overlays: `mode="overlay"` for filters, `mode="docked"` for Quick Triage trace panes (maps to Acumatica's "Side Panel" concept)
 
-### 4.2 Page-Kit Layer
+### 4.2 Screen Layer
 
-Use composition components for repeatable page structure:
+Use composition components for repeatable screen structure:
 
-- `PageHeader` — with dynamic operational subtitle (live record count + aggregate amount)
+- `ScreenTitleBar`
+- `ScreenToolbar`
+- `MoreMenu`
+- `RecordServicesMenu`
 - `WorkspacePanel`
-- `MetricStrip` — _(PLANNED — not yet implemented)_
 - `EmptyState`
-- `TraceSection` — _(PLANNED — not yet implemented)_
 
-Pages should not reinvent these layouts ad hoc.
+Screens should not reinvent these layouts ad hoc.
 
 ### 4.3 Field System Layer (Working Area)
 
@@ -76,8 +79,9 @@ The Field System governs all data display and layout inside the Working Area. Se
 - `AppField` — The **only** way to display a data field. Pure semantic renderer.
 - `AppFieldset` — The **only** layout engine. CSS Grid authority with `140px` baseline.
 - `FieldGroup` — Lightweight semantic sub-grouping (no layout of its own).
+- `AppTemplate` — Named screen template authority for Acumatica-style slot widths.
 - `AppTabs` — Stateless visibility toggle for data strata.
-- `DataGrid` — The **only** tabular rendering system (TanStack Table).
+- `DataGrid` — The **only** tabular rendering system, evolving into a preset-driven ERP grid platform.
 
 > [!IMPORTANT]
 > **"Fields define meaning, Fieldsets define layout."** — `AppField` must never decide its own layout. `AppFieldset` must never interpret business values. This separation is the foundation for Phase 3 (Metadata-Driven Screens).
@@ -102,7 +106,7 @@ Every financial Workspace list page must populate the `DataGrid` `#footer` slot 
 - **Financial aggregate:** `Total: ETB X,XXX.XX` (sum of the primary amount column)
 - **Selection count** (shown only when `selectedCount > 0`): `Selected: N`
 
-This is not optional chrome — it is operational data that finance users need at a glance without scrolling.
+This is not optional chrome — it is operational data that finance users need at a glance without scrolling. As the screen runtime matures, this footer content should come from grid metadata rather than page-by-page convention.
 
 ## 6. Styling Rules
 
@@ -122,7 +126,7 @@ Avoid:
 - decorative card inflation
 - page-specific visual hacks that bypass shared tokens
 
-## 7. Data Grid Exception
+## 7. Data Grid Platform
 
 TanStack remains the structural engine for data-heavy UI.
 
@@ -130,6 +134,7 @@ Rules:
 
 - use the shared `DataGrid` host
 - use shared cells and shared primitives inside grid definitions
+- add grid presets and column metadata instead of ad hoc per-screen behavior
 - do not adopt vendor-owned data grid components that break Vue context or product ownership
 
 ## 8. Refactor Expectation

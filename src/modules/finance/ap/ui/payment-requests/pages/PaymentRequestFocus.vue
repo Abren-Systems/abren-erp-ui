@@ -23,8 +23,10 @@ import PaymentRequestActions, { type ScreenAction } from '../components/PaymentR
 import PaymentRequestTraceDrawer from '../components/PaymentRequestTraceDrawer.vue'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import { DataGrid, MoneyCell } from '@/shared/components/data-grid'
+import { getPaymentRequestActions } from '../commands/payment-request.commands'
+import { paymentRequestLineColumns } from '../grids/payment-request-lines.grid'
+import { CURRENCY_OPTIONS } from '../fields/payment-request.fields'
 import type { PaymentRequestLine } from '../../../domain/ap.types'
-import type { Row } from '@tanstack/vue-table'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
@@ -83,58 +85,7 @@ const isPending = computed(
 const actions = computed<ScreenAction[]>(() => {
   if (isNew.value) return []
   if (!request.value) return []
-  const status = request.value.status
-  const list: ScreenAction[] = []
-
-  if (status === 'DRAFT' || status === 'REJECTED') {
-    list.push({
-      key: 'submit',
-      label: 'Submit',
-      variant: 'primary',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Submit this request for approval?',
-    })
-  }
-  if (status === 'SUBMITTED') {
-    list.push({
-      key: 'approve',
-      label: 'Approve',
-      variant: 'primary',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Approve this payment request?',
-    })
-    list.push({
-      key: 'reject',
-      label: 'Reject',
-      variant: 'danger',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Reject this payment request?',
-    })
-  }
-  if (status === 'APPROVED') {
-    list.push({
-      key: 'authorize',
-      label: 'Authorize',
-      variant: 'primary',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Authorize this payment?',
-    })
-  }
-  if (status === 'DRAFT' || status === 'SUBMITTED') {
-    list.push({
-      key: 'cancel',
-      label: 'Cancel',
-      variant: 'danger',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Cancel this request permanently?',
-    })
-  }
-  return list
+  return getPaymentRequestActions(request.value.status)
 })
 
 function handleAction(key: string) {
@@ -163,27 +114,7 @@ const beneficiaryEmail = computed(() => {
   return user?.email ?? targetId
 })
 
-const lineColumns = [
-  {
-    id: 'index',
-    header: 'LINE #',
-    cell: ({ row }: { row: Row<PaymentRequestLine> }) =>
-      h('span', { class: 'font-mono text-xs text-neutral-500' }, row.index + 1),
-    size: 80,
-  },
-  {
-    id: 'description',
-    header: 'DESCRIPTION',
-    accessorKey: 'description',
-  },
-  {
-    id: 'amount',
-    header: 'AMOUNT',
-    cell: ({ row }: { row: Row<PaymentRequestLine> }) =>
-      h(MoneyCell, { amount: row.original.amount, align: 'right' }),
-    size: 150,
-  },
-]
+const lineColumns = paymentRequestLineColumns
 
 // Fallback data for DataGrid if we are creating new
 const currentLines = computed(() => {
@@ -193,10 +124,7 @@ const currentLines = computed(() => {
 
 // Provide options for beneficiary select
 const userOptions = computed(() => users.value?.map((u) => ({ label: u.email, value: u.id })) || [])
-const currencyOptions = computed(() => [
-  { label: 'ETB', value: 'ETB' },
-  { label: 'USD', value: 'USD' },
-])
+const currencyOptions = computed(() => CURRENCY_OPTIONS)
 </script>
 
 <template>

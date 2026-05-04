@@ -28,19 +28,25 @@ Navigate by concern:
 
 ### Architecture
 
-| Document                                                         | Description                                                                                           |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [Frontend Architecture](architecture/ARCHITECTURE.md)            | **Authority** — Core patterns, module rules, and layer structure                                      |
-| [UX Architecture](architecture/UX_ARCHITECTURE.md)               | **UX Authority** — 4 Foundations (Top Pane, Sidebar, Workspace, Working Area), Progressive Disclosure |
-| [Field System](FIELD_SYSTEM.md)                                  | **Field Authority** — AppField, AppFieldset layout engine, registry                                   |
-| [Module Structure](architecture/MODULE_STRUCTURE.md)             | Bounded context mapping, folder conventions, and boundary rules                                       |
-| [State Management](architecture/STATE_MANAGEMENT.md)             | Pinia store patterns, module-scoped state, and cross-module reactivity                                |
-| [API Integration](architecture/API_INTEGRATION.md)               | HTTP client, Anti-Corruption Layer (Mappers), OpenAPI type generation                                 |
-| [Form Architecture](architecture/FORM_ARCHITECTURE.md)           | TanStack Form + Zod integration and form layout patterns                                              |
-| [Testing Strategy](architecture/TESTING_STRATEGY.md)             | Frontend testing pyramid, coverage targets, and tooling                                               |
-| [UI Foundation Decision](architecture/UI_FOUNDATION_DECISION.md) | **ADR** — Evaluation of Primitive libraries and library selection                                     |
-| [Design System](architecture/DESIGN_SYSTEM.md)                   | **Visual Specs** — Colors, spacing, typography, and UX principles                                     |
-| [UI Components](architecture/UI_COMPONENTS.md)                   | Component inventory, ownership rules, and component layers                                            |
+| Document                                                                         | Description                                                                          |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [Frontend Architecture](architecture/ARCHITECTURE.md)                            | **Authority Baseline** — Core patterns, module rules, and layer structure            |
+| [Acumatica Alignment Strategy](architecture/ACUMATICA_ALIGNMENT_STRATEGY.md)     | **ERP UI Authority** — Governing strategy for the screen-runtime rewrite             |
+| [Screen Runtime Architecture](architecture/SCREEN_RUNTIME_ARCHITECTURE.md)       | Registered screens, screen instances, renderer, commands, and runtime model          |
+| [UX Architecture](architecture/UX_ARCHITECTURE.md)                               | **UX Authority** — shell, workspace, progressive disclosure, and interaction grammar |
+| [Field System](FIELD_SYSTEM.md)                                                  | **Field Authority** — AppField, AppFieldset layout engine, registry                  |
+| [Module Structure](architecture/MODULE_STRUCTURE.md)                             | Bounded context mapping, folder conventions, and boundary rules                      |
+| [Module Restructure Plan](architecture/MODULE_RESTRUCTURE_PLAN.md)               | Screen-first module export and folder migration plan                                 |
+| [State Management](architecture/STATE_MANAGEMENT.md)                             | Pinia store patterns, module-scoped state, and cross-module reactivity               |
+| [API Integration](architecture/API_INTEGRATION.md)                               | HTTP client, Anti-Corruption Layer (Mappers), OpenAPI type generation                |
+| [Form Architecture](architecture/FORM_ARCHITECTURE.md)                           | TanStack Form + Zod integration and form layout patterns                             |
+| [Testing Strategy](architecture/TESTING_STRATEGY.md)                             | Frontend testing pyramid, coverage targets, and tooling                              |
+| [UI Foundation Decision](architecture/UI_FOUNDATION_DECISION.md)                 | **ADR** — Evaluation of Primitive libraries and library selection                    |
+| [Design System](architecture/DESIGN_SYSTEM.md)                                   | **Visual Specs** — Colors, spacing, typography, and UX principles                    |
+| [ERP Design System Architecture](architecture/ERP_DESIGN_SYSTEM_ARCHITECTURE.md) | ERP component layers and target shared UI structure                                  |
+| [Component Contracts](architecture/COMPONENT_CONTRACTS.md)                       | ID, label, placement, configuration, personalization, and test contracts             |
+| [UI Components](architecture/UI_COMPONENTS.md)                                   | Component ownership rules and usage expectations                                     |
+| [Migration Roadmap](architecture/MIGRATION_ROADMAP.md)                           | Phased rollout from route/page app to screen-runtime ERP UI                          |
 
 ### Development
 

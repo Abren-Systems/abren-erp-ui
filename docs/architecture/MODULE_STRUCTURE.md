@@ -8,6 +8,7 @@ tags: [frontend, architecture]
 # Module Structure & Boundary Rules
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)
+> **Runtime companions:** `SCREEN_RUNTIME_ARCHITECTURE.md`, `MODULE_RESTRUCTURE_PLAN.md`
 
 ---
 
@@ -44,8 +45,8 @@ To prevent "Sub-Module Fatigue," do **NOT** create deep layer nesting for relate
 - ❌ `finance/ap/payment-requests/infrastructure/`
 - ✅ `finance/ap/infrastructure/` (Shared adapter for all AP context)
 
-**UI Organization:** Within the `ui/` layer of complex modules, you **MUST** slice the presentation layer into **Aggregate Roots** to prevent component soup.
-For example, `ui/payment-requests/pages/` and `ui/vendor-bills/pages/`.
+**UI Organization:** Within the `ui/` layer of complex modules, you **MUST** slice the presentation layer into **Aggregate Roots** and expose screen assets instead of only pages.
+For example, `ui/payment-requests/screens/` and `ui/vendor-bills/screens/`.
 
 ---
 
@@ -70,14 +71,20 @@ src/modules/{module}/
 │       ├── use{Entity}s.ts  # Query Facade (TanStack Query)
 │       └── use{Action}.ts   # Command Facade (Mutations & Side-effects)
 │
-├── ui/                      # [Presentation] View-only layer
+├── screens.ts               # [Registration] Module screen exports
+├── workspace.ts             # [Registration] Module workspace/menu entries
+├── ui/                      # [Presentation] View-only screen assets
 │   └── {aggregate_root}/    # Slice by feature for complex modules (e.g. `ui/accounts/`)
 │       ├── components/      # Stateless molecules & module-specific atoms
-│       ├── pages/           # Route-level stateful orchestrators
-│       ├── grids/           # TanStack Table column configurations
+│       ├── screens/         # Screen definitions by screen ID
+│       ├── views/           # Single / collection / report view metadata
+│       ├── fields/          # Field and control definitions
+│       ├── grids/           # Grid and column configurations
+│       ├── commands/        # Screen command metadata
+│       ├── extensions/      # Feature / tenant extensions
 │       └── utils/           # Display formatters
 │
-├── routes.ts                # Synchronous RouteRecordRaw definitions
+├── routes.ts                # Transitional RouteRecordRaw compatibility definitions
 └── index.ts                 # ModuleDefinition export
 ```
 
@@ -94,22 +101,25 @@ In our **Symmetry-over-Parity** model, the frontend's **Application Composables*
 
 ### Files
 
-| Type        | Pattern                 | Example                   |
-| ----------- | ----------------------- | ------------------------- |
-| List Page   | `*ListPage.vue`         | `AccountsListPage.vue`    |
-| Focus Page  | `*Focus.vue`            | `PaymentRequestFocus.vue` |
-| Editor Page | `*EditPage.vue`         | `AccountEditPage.vue`     |
-| Create Page | `*CreatePage.vue`       | `AccountCreatePage.vue`   |
-| Wizard Page | `*WizardPage.vue`       | `OnboardingWizard.vue`    |
-| Form Drawer | `*FormDrawer.vue`       | `AccountFormDrawer.vue`   |
-| Adapter     | `{module}_adapter.ts`   | `ledger_adapter.ts`       |
-| Mapper      | `{entity}.mapper.ts`    | `account.mapper.ts`       |
-| Composable  | `use{Action}.ts`        | `useLedgerAccounts.ts`    |
-| Types       | `{entity}.types.ts`     | `account.types.ts`        |
-| Branded ID  | `{entity}Id` type       | `UserId`, `TenantId`      |
-| Formatter   | `{entity}-formatter.ts` | `account-formatter.ts`    |
-| Routes      | `routes.ts`             | —                         |
-| Entry       | `index.ts`              | —                         |
+| Type           | Pattern                 | Example                   |
+| -------------- | ----------------------- | ------------------------- |
+| Workspace Page | `*ListPage.vue`         | `AccountsListPage.vue`    |
+| Focus Page     | `*Focus.vue`            | `PaymentRequestFocus.vue` |
+| Editor Page    | `*EditPage.vue`         | `AccountEditPage.vue`     |
+| Create Page    | `*CreatePage.vue`       | `AccountCreatePage.vue`   |
+| Wizard Page    | `*WizardPage.vue`       | `OnboardingWizard.vue`    |
+| Form Drawer    | `*FormDrawer.vue`       | `AccountFormDrawer.vue`   |
+| Screen Def     | `*.screen.ts`           | `AP301000.screen.ts`      |
+| Screen Set     | `screens.ts`            | —                         |
+| Workspace Set  | `workspace.ts`          | —                         |
+| Adapter        | `{module}_adapter.ts`   | `ledger_adapter.ts`       |
+| Mapper         | `{entity}.mapper.ts`    | `account.mapper.ts`       |
+| Composable     | `use{Action}.ts`        | `useLedgerAccounts.ts`    |
+| Types          | `{entity}.types.ts`     | `account.types.ts`        |
+| Branded ID     | `{entity}Id` type       | `UserId`, `TenantId`      |
+| Formatter      | `{entity}-formatter.ts` | `account-formatter.ts`    |
+| Routes         | `routes.ts`             | transitional only         |
+| Entry          | `index.ts`              | —                         |
 
 ### Data Types
 
@@ -197,48 +207,31 @@ Module A (Finance/AP)               Module B (Finance/Ledger)
                             Event Bus (Shared Kernel)
 ```
 
-## 5. Route Registration Pattern
+## 5. Screen Registration Pattern
 
-Each module exports a `ModuleDefinition` that includes its routes, permissions, and menu items:
+Each module exports a `ModuleDefinition` that includes its screens, workspace entries, permissions, and providers:
 
 ```typescript
 // modules/finance/ledger/index.ts
 import type { ModuleDefinition } from '@/shared/types/module.types'
-import routes from './routes'
+import { screens } from './screens'
+import { workspaceEntries } from './workspace'
 
 export const ledgerModule: ModuleDefinition = {
   id: 'ledger',
   name: 'General Ledger',
   category: 'business',
-  routes,
+  screens,
+  workspaceEntries,
   permissions: ['ledger.view', 'ledger.edit'],
-  menuItems: [{ label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' }],
 }
 ```
 
-The central `app/router/index.ts` aggregates all module definitions dynamically:
+The central app runtime resolves routes from screen definitions:
 
 ```typescript
-// app/router/index.ts
-import { modules } from '@/modules'
-
-const router = createRouter({
-  routes: [
-    {
-      path: '/app',
-      component: AuthenticatedLayout,
-      beforeEnter: [requiresAuth],
-      children: [], // Populated dynamically from module definitions
-    },
-  ],
-})
-
-// Register module routes dynamically
-for (const mod of modules) {
-  mod.routes().then((routes) => {
-    routes.forEach((route) => router.addRoute('app', route))
-  })
-}
+// app/screens/screen-route-map.ts
+const screenRoutes = allModules.flatMap((mod) => mod.screens.map(toScreenRoute))
 ```
 
 ---
@@ -265,6 +258,6 @@ When creating a new module (e.g., `procurement`):
 - [ ] 3. **Infrastructure Adapter**: Define `infrastructure/{module}_adapter.ts` (Parses **DTOs** using Zod schemas).
 - [ ] 4. **Mapper-as-Factory**: Implement `toViewModel()` and `toDTO()` factory logic.
 - [ ] 5. **Application Facade**: Create `application/composables/use{Entity}` using TanStack Query.
-- [ ] 6. **UI Orchestration**: Build `ui/pages/` and `ui/components/` as view-only compositions.
+- [ ] 6. **UI Orchestration**: Build `ui/screens/`, `ui/views/`, `ui/fields/`, `ui/grids/`, `ui/commands/`, and `ui/components/` as view-only compositions.
 - [ ] 7. **Quality Gate**: Run `vp check` and `npm run lint` to ensure zero boundary/console violations.
-- [ ] 8. **Registration**: Export `ModuleDefinition` in `index.ts` and register in `src/modules/registry.ts`.
+- [ ] 8. **Registration**: Export `screens` and `workspaceEntries`, then register the module in `src/modules/index.ts`.

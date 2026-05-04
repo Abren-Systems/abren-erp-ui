@@ -10,7 +10,7 @@ tags: [frontend, architecture]
 > **Version:** 2.0
 > **Status:** AUTHORITATIVE — This document dictates the UX and Interaction Philosophy for the Abren ERP frontend.
 > **Last Updated:** May 2026
-> **Companions:** [Architecture Manifesto](./ARCHITECTURE.md) · [Field System](../FIELD_SYSTEM.md) · [Design System](./DESIGN_SYSTEM.md)
+> **Companions:** [Architecture Manifesto](./ARCHITECTURE.md) · [Field System](../FIELD_SYSTEM.md) · [Design System](./DESIGN_SYSTEM.md) · `ACUMATICA_ALIGNMENT_STRATEGY.md` · `SCREEN_RUNTIME_ARCHITECTURE.md`
 
 > **Global Principle**: "Operations are the source of truth. Accounting is the guaranteed consequence."
 
@@ -21,7 +21,7 @@ Our True North Star is a synthesis of proven enterprise patterns (Acumatica, SAP
 - **Aesthetic**: **Calm operational density** (serious, modern, trustworthy, low-theater)
 - **Workflow**: Linear (State-driven UX clarity isolated by Routing)
 - **Financial UX**: Traceability via Contextual Side Panels
-- **Architecture**: **Tier 1 App Primitives** + Route-Driven Components + **Field System**
+- **Architecture**: **Screen Runtime** + **ERP Design System** + **Field System**
 
 ---
 
@@ -59,21 +59,21 @@ Every screen in Abren ERP exists within a rigid macro-architecture. These four s
 
 **Component:** `AuthenticatedLayout` aside section.
 **Structure:** Three strict categories: Start (Workboard), Business Domains, Platform.
-**Constraint:** Driven by `vue-router` and RBAC permissions. Collapsible to icon-only mode.
+**Constraint:** Driven by workspace configuration, registered screens, and RBAC permissions. Collapsible to icon-only mode.
 
 ### 0.3 Workspace
 
-**Purpose:** The entry point into a Business Domain. Provides module-level health metrics and list views.
-**Components:** `PageHeader`, `DataGrid`, Smart Tabs.
-**Constraint:** Workspaces are read-only aggregations. Selecting a record transitions to the Working Area.
+**Purpose:** The entry point into a Business Domain. Provides module-level health metrics, queue/list views, filters, saved views, and sanctioned bulk commands.
+**Components:** `ScreenTitleBar`, `DataGrid`, smart tabs, filter surfaces, bulk action bar.
+**Constraint:** Workspaces optimize for scanning and triage. Full record editing transitions to a dedicated Working Area screen instance.
 
 ### 0.4 Working Area
 
 **Purpose:** The dedicated canvas for performing actual work on a single entity.
-**Components:** The `<RouterView />` payload (e.g., `PaymentRequestFocus.vue`).
+**Components:** The screen runtime payload rendered through a `ScreenRenderer` (during migration this may still resolve to an SFC such as `PaymentRequestFocus.vue`).
 **Internal Anatomy:**
 
-- **Form Title Bar** — `PageHeader` with Record ID, Status Badge, global record context.
+- **Form Title Bar** — `ScreenTitleBar` with Record ID, Status Badge, global record context, and record services.
 - **Summary Area** — `AppFieldset variant="ghost" layout="horizontal"` for high-level record data.
 - **Details Area** — `AppTabs` containing `DataGrid`, `AppFieldset` sections, or audit history.
 - **Side Panel** — `AppSidePane` for contextual provenance (Trace Drawers).
@@ -97,12 +97,12 @@ Roles are too rigid for SMEs where one person wears five hats. We will use **Rol
 
 We explicitly reject the "Hub-and-Spoke," "Tri-Pane Workspace," and monolithic dashboard patterns for transactional operations. High information density in parallel panes leads to **Dashboard Syndrome**: cognitive overload, split-focus fatigue, and catastrophic error propagation for SME users.
 
-Instead, we use a **Router-Driven Progressive Disclosure** flow. Each stage is an isolated route or overlay — never a simultaneously competing pane.
+Instead, we use a **Screen-Driven Progressive Disclosure** flow. Each stage is an isolated screen instance or overlay — never a simultaneously competing pane.
 
 ### 2.1. State Transition Flow
 
 ```text
-[Workspace/ListPage] → [Focus Canvas] → [Side Panel / TraceDrawer] → [ActionModal]
+[Workspace Screen] → [Data Entry Screen] → [Side Panel / TraceDrawer] → [Action Dialog]
 ```
 
 - **Workspace (Inbox)**: Dense grid for scanning/filtering work units.
@@ -124,7 +124,7 @@ The primary flow for transactional operations:
 │      Shows audit timeline for selected row             │
 │      Does NOT mutate; navigates to Focus for editing   │
 └─────────────────────────┬──────────────────────────────┘
-                          │ router.push() — explicit navigation
+                          │ open/focus screen instance
                           ▼
 ┌───────────────────────────┐
 │ [Domain]Focus.vue         │
@@ -145,11 +145,11 @@ The primary flow for transactional operations:
 └─────────────┘   └────────────────┘
 ```
 
-> **Rule:** The Quick Triage docked pane is read-only. It shows the audit trail for context. Any mutation (approve, edit, reject) must navigate the user to the Focus route. This preserves the state isolation guarantee of Sequential Progressive Disclosure.
+> **Rule:** The Quick Triage docked pane is read-only. It shows the audit trail for context. Any mutation (approve, edit, reject) must move the user into the Focus/data-entry screen. This preserves the state isolation guarantee of Sequential Progressive Disclosure.
 
 ### 2.3. The 3 Stages of Operational Focus
 
-1. **The Workspace (The Inbox)**: A clean, full-screen DataGrid filtering for exactly what needs attention (e.g., `Status: PENDING_APPROVAL`). Clicking a row performs a `router.push()` — no inline entity mutation from the workspace.
+1. **The Workspace (The Inbox)**: A clean, full-screen DataGrid filtering for exactly what needs attention (e.g., `Status: PENDING_APPROVAL`). Clicking a row opens or focuses a registered screen instance. No inline entity mutation from the workspace beyond sanctioned bulk commands.
 2. **The Focus Canvas (The Desk)**: The screen transitions cleanly to the entity. The workspace disappears. The user focuses purely on doing the work. The Working Area renders using the Field System (`AppFieldset`, `AppField`, `AppTabs`). Primary state-advancing actions are prominent; destructive actions require `ActionModal` confirmation.
 3. **The Side Panel (The Filing Cabinet)**: "No number without an origin" — but it is lazy-loaded. Audit histories, underlying vendor bills, and financial impact projections sit behind a slide-out Side Panel (`TraceDrawer`), appearing only when the user invokes it. When they are done investigating, they close the panel and return to the focused context.
 
@@ -239,7 +239,7 @@ To prevent button clutter and decision paralysis, actions are strictly tiered:
 
 1. **Primary Actions (State-Advancing)**: Always visible and prominent (e.g., "Approve", "Pay", "Submit"). _Mapping: `<AppButton variant="primary" />`._
 2. **Secondary Actions (Supporting)**: Visible but visually subdued (e.g., "Edit", "Attach Document", "Print"). _Mapping: `<AppButton variant="secondary" />` or `variant="outline"`._
-3. **Tertiary Actions (Rare / Destructive)**: Hidden in overflow menus (`...`) and require `ActionModal` confirmation (e.g., "Void", "Reject", "Delete"). _Mapping: `variant="stealth"` within an overflow context._
+3. **Tertiary Actions (Rare / Destructive)**: Hidden in the `MoreMenu` and require `ActionModal` confirmation (e.g., "Void", "Reject", "Delete"). They remain visible in workflow-aware surfaces when useful for comprehension, but are not promoted as primary actions.
 4. **Bulk Actions (Multi-Selection Context)**: A floating action bar anchored to the bottom of the grid surface. Appears via `<Transition>` when `selectedCount > 0`. Dismissed when selection is cleared. Contains only state-advancing and utility actions applicable to the entire selection. Never a modal — the bar must remain visible alongside the selected rows.
 
 > **Rule:** No module may expose a destructive bulk action (e.g., bulk delete) without a preceding `ActionModal` confirmation that lists the affected record count.

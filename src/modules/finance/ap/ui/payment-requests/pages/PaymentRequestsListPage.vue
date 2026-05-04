@@ -21,6 +21,10 @@ import PaymentRequestBulkActionBar from '../components/PaymentRequestBulkActionB
 import PaymentRequestFilterPane from '../components/PaymentRequestFilterPane.vue'
 import PaymentRequestTracePane from '../components/PaymentRequestTracePane.vue'
 import { paymentRequestColumns } from '../grids/payment-request.grid'
+import {
+  PAYMENT_REQUEST_STATUS_OPTIONS,
+  PAYMENT_REQUEST_FILTER_PRESETS,
+} from '../fields/payment-request.fields'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import type { User } from '@/modules/core/domain/user.types'
@@ -39,11 +43,7 @@ const filterState = ref({
   dateTo: '',
 })
 
-const filterPresets = [
-  { id: 'all', label: 'All Records' },
-  { id: 'needs_attention', label: 'Needs Attention' },
-  { id: 'in_review', label: 'In Review' },
-]
+const filterPresets = PAYMENT_REQUEST_FILTER_PRESETS
 
 const isTraceOpen = ref(false)
 const traceTarget = ref<PaymentRequest | null>(null)
@@ -103,14 +103,7 @@ const filteredRequests = computed(() => {
   })
 })
 
-const statusOptions = [
-  { label: 'Draft', value: 'DRAFT' },
-  { label: 'Submitted', value: 'SUBMITTED' },
-  { label: 'Approved', value: 'APPROVED' },
-  { label: 'Authorized', value: 'AUTHORIZED' },
-  { label: 'Rejected', value: 'REJECTED' },
-  { label: 'Cancelled', value: 'CANCELLED' },
-]
+const statusOptions = PAYMENT_REQUEST_STATUS_OPTIONS
 
 const columns = [
   {

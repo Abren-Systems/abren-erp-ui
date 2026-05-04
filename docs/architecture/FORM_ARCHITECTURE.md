@@ -8,7 +8,7 @@ tags: [frontend, architecture]
 # Form Architecture
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)
-> **Technology:** TanStack Form + Zod + Custom Design System (`shared/components/`)
+> **Technology:** TanStack Form + Zod + Custom ERP Design System (`shared/ui/`, with compatibility exports from `shared/components/` during migration)
 
 ---
 
@@ -104,7 +104,7 @@ export function usePaymentRequestForm() {
 
 ## 4. Template Integration
 
-Pages import the form composable and bind fields declaratively using the design system components:
+Screen render targets import the form composable and bind fields declaratively using the design system components:
 
 ```vue
 <script setup lang="ts">

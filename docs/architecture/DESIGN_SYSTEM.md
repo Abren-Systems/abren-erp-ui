@@ -9,7 +9,7 @@ tags: [frontend, architecture]
 
 _The definitive source of truth for visual tokens, typography, and spacing used across the Abren ERP UI._
 
-This document strictly reflects the design tokens implemented via **Tailwind CSS v4 `@theme`** in `src/assets/main.css`. All custom components built in `src/shared/components/` must adhere exclusively to these tokens.
+This document defines the visual token layer implemented via **Tailwind CSS v4 `@theme`** in `src/assets/main.css`. ERP component architecture, contracts, and screen primitives are governed together with `ERP_DESIGN_SYSTEM_ARCHITECTURE.md` and `COMPONENT_CONTRACTS.md`. During migration, shared UI may exist under both `src/shared/components/` and `src/shared/ui/`.
 
 ---
 
@@ -20,7 +20,7 @@ To ensure Abren ERP feels like a state-of-the-art financial platform, we adhere 
 - **Operational Density First**: Maximize information per viewport. Avoid wasted whitespace. Every pixel must justify itself. We natively support a **3-tier density system** (Compact by default, Comfortable, Touch).
 - **Abren-Owned Language**: We use headless infrastructure under the hood, but the look, spacing, density, and page grammar belong to Abren.
 - **Vibrant Professionalism**: We avoid muddy grays. Our neutrals use a warm blue-gray base, and our primary actions use authoritative **Indigo** to draw the eye without creating fatigue or conflicting with financial status colors.
-- **Keyboard-First UX**: Power users must be able to operate the ERP without a mouse. Tables behave like spreadsheets, and a global Command Palette (⌘K) provides instant access to all modules and actions.
+- **Keyboard-First UX**: Power users must be able to operate the ERP without a mouse. Tables behave like spreadsheets, and a global search workspace / command surface provides instant access to screens, records, and actions.
 - **Speed Over Decoration**: The UI must feel instant. We avoid heavy animations in favor of micro-interactions (< 100ms) that provide immediate tactile feedback.
 
 ---
@@ -184,14 +184,14 @@ Shadows have a dual-layer softness and are applied only to elevated/floating lay
 
 ## 6. ERP Interaction Patterns
 
-### 6.1 Command Palette & Omni-Search (⌘K)
+### 6.1 Global Search Workspace & Command Surface
 
-> **Implementation Status:** **Phase 2**. The `⌘K` trigger button exists in `AuthenticatedLayout.vue` as a visual shell. Functional search indexing, semantic intent parsing, and context-aware bulk actions are not yet implemented. Do not reference ⌘K as a working feature in module UX until Phase 2 is executed.
+> **Implementation Status:** **Phase 2**. The shell trigger exists visually, but the Acumatica-style global search workspace, search indexing, semantic intent parsing, and context-aware command surface are not yet fully implemented. Do not describe this as finished product behavior yet.
 
-A global Command Palette is required. It provides power users instant keyboard access to jump to any module or initiate global actions.
+A global search workspace is required. It provides power users instant keyboard access to jump to screens, locate records, invoke actions, and preserve current screen context while searching.
 
-- **Omni-Search Logic:** The input must parse semantic intent (e.g., typing "Status: Paid" builds a grid filter).
-- **Context-Aware Actions:** If the user has multiple rows selected in a data grid, pressing ⌘K automatically scopes the palette to bulk actions applicable to those specific rows (e.g., "Approve 3 records", "Delete selected").
+- **Omni-Search Logic:** The input must parse semantic intent (e.g., typing "Status: Paid" builds a grid filter or screen query).
+- **Context-Aware Actions:** If the user has multiple rows selected in a data grid, the command surface should scope to bulk actions applicable to those rows.
 
 ### 6.2 Overlay Taxonomy: Drawers vs Modals
 
@@ -247,7 +247,7 @@ To maintain high operational density and avoid the pitfalls of generalized "cons
 
 - **🚫 Consumer-Grade Size Metrics**: General-purpose UI defaults often ship with oversized `40px` tap targets. These are forbidden in Abren ERP. We strictly enforce our **Compact Mode** (30px row height).
 - **🚫 Hidden Contextual Commands ("..." Menus)**: Primary grid actions (Edit, Delete, Export) must not be buried inside overflow ellipses menus just to make the UI look "cleaner." Use native Right-Click context menus or expose icons on hover.
-- **🚫 "Wizard" Flows for Basic Entry**: Power users despise paginated wizards because they break flow state. Use single-view Drawers or inline grid editors. Save wizards exclusively for rare, complex configurations (e.g., Year-End Close).
+- **🚫 "Wizard" Flows for Basic Entry**: Power users despise paginated wizards because they break flow state. Use screen-based data-entry forms or sanctioned drawers. Save wizards exclusively for rare, complex configurations (e.g., Year-End Close).
 - **🚫 Blinding `#FFFFFF` Backgrounds**: Staring at pure white canvases for 8 hours causes optical fatigue. Always use the neutral canvas token (`--color-neutral-50`) as the base application background.
 - **🚫 Inline Grid Cell Editing for Financial Data**: Editing monetary amounts, dates, or status fields directly in a grid cell bypasses domain validation, state machine enforcement, and audit trail recording. All mutations must flow through the Focus Canvas (Detail Page) or a sanctioned Drawer form. This is a **financial control**, not a UX limitation. Sage Intacct, NetSuite, and SAP all enforce this. Do not implement inline grid editing for any field that affects accounting state.
 - **🚫 Tri-Pane / Simultaneous Master-Detail on the Same Route**: Rendering the list grid and the full detail form side-by-side on the same route violates Sequential Progressive Disclosure and creates split-focus fatigue. The sanctioned alternative is the **Quick Triage docked pane** (audit trail only, read-only) on the list route, combined with a separate Focus route for full record editing.
@@ -263,9 +263,9 @@ The UI layer must remain isolated from hardcoded currency symbols or date format
 
 ---
 
-## 11. Primitive Components (`shared/components/`)
+## 11. Primitive Components (`shared/ui/` during migration via `shared/components/`)
 
-All base UI components (`Button`, `Input`, `Select`, etc.) are physically owned in `src/shared/components/` and strictly utilize the tokens above.
+All base UI components (`Button`, `Input`, `Select`, etc.) are physically owned by Abren and strictly utilize the tokens above. The target home is `src/shared/ui/`, with compatibility exports from `src/shared/components/` during migration.
 
 - **Behavior Layer:** Headless primitives from the Reka UI / Radix-Vue lineage
 - **Appearance Layer:** Abren-owned wrappers and page-kit components
