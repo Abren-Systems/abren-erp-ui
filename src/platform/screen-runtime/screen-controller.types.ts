@@ -1,17 +1,14 @@
 import type { ComputedRef } from 'vue'
 import type { ScreenStateMachine } from './state-machine.types'
-import type { Command } from './command.types'
+import type { ScreenCommand } from '../commands/command.types'
 
-/**
- * A reactive wrapper around the aggregate data.
- * It enforces granular reactivity via the `select` pattern,
- * preventing re-render storms on large forms.
- */
+// ── Screen Data (Granular Reactivity) ─────────────────────
+// Enforces the memoized selector pattern to prevent re-render storms.
+
 export interface ScreenData<T = unknown> {
   /**
    * Returns a stable computed reference to a specific property of the aggregate.
-   * This guarantees that a component subscribing to 'vendorId' will not re-render
-   * when 'currency' changes.
+   * Guarantees that subscribing to 'vendorId' will not re-render when 'currency' changes.
    */
   select<K extends keyof T>(key: K): ComputedRef<T[K] | undefined>
 
@@ -21,11 +18,10 @@ export interface ScreenData<T = unknown> {
   selectGrid<K extends keyof T>(gridKey: K): ComputedRef<unknown[]>
 }
 
-/**
- * The central orchestrator for an aggregate.
- * It strictly separates state, data access, commands, and lifecycle,
- * preventing the anti-pattern of a "god object".
- */
+// ── Screen Controller ─────────────────────────────────────
+// The central orchestrator for a screen's aggregate.
+// Strictly separates state, data access, commands, and lifecycle.
+
 export interface ScreenController<T = unknown> {
   /** The dual-layered state machine (UI + Domain) */
   readonly state: ScreenStateMachine
@@ -34,18 +30,18 @@ export interface ScreenController<T = unknown> {
   readonly data: ScreenData<T>
 
   /** The registered commands available to this screen */
-  readonly commands: Record<string, Command<T>>
+  readonly commands: Record<string, ScreenCommand<T>>
 
   /**
    * Internal mutation gateway.
-   * UI components NEVER call this directly; they use specific Commands
-   * or the provided `useField/useGrid` composables which bridge to this securely.
+   * UI components NEVER call this directly; they use Commands
+   * or the useField/useGrid composables which bridge to this securely.
    */
   _mutate(fn: (draft: T) => void): void
 
-  /** Lifecycle Orchestration */
+  /** Lifecycle orchestration */
   readonly lifecycle: {
-    /** Bootstraps the controller, typically fetching data via ID or initializing a new draft */
+    /** Bootstraps the controller — fetches data or initializes a new draft */
     load(id?: string): Promise<void>
     /** Cleans up subscriptions and releases memory when the instance is closed */
     destroy(): void

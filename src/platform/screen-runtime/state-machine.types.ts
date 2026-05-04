@@ -1,21 +1,26 @@
+// ── Dual-Layered State Machine ────────────────────────────
+// UI state tracks the interaction mode of the screen surface.
+// Domain state tracks the business logic state of the aggregate.
+// Both are governed by explicit transitions, never direct assignment.
+
 /**
- * Represents the fundamental interaction mode of the screen's UI surface.
+ * The interaction mode of the screen's UI surface.
  */
 export type UIState =
-  | 'INITIALIZING' // Screen is booting up, fetching initial context
+  | 'INITIALIZING' // Screen is booting, fetching initial context
   | 'NEW' // A blank record that has never been saved
   | 'VIEW' // An existing record in read-only mode
   | 'EDIT' // An existing record with unsaved mutations
   | 'SAVING' // An active mutation is in flight
 
 /**
- * Represents the business logic state of the underlying aggregate.
- * Note: specific domains (e.g., AP) may extend or narrow these states.
+ * The business logic state of the underlying aggregate.
+ * Specific domains (e.g., AP, GL) may extend or narrow these states.
  */
 export type DomainState = 'DRAFT' | 'BALANCED' | 'HOLD' | 'RELEASED' | 'VOIDED'
 
 /**
- * The formal state machine that governs all screen interactions.
+ * The formal state machine governing all screen interactions.
  * Mutations to state MUST happen via explicit transitions, not direct assignment.
  */
 export interface ScreenStateMachine {
@@ -36,7 +41,7 @@ export interface ScreenStateMachine {
 
   /**
    * Safely attempts to transition the Domain state.
-   * This is typically triggered by a successful backend Command effect.
+   * Typically triggered by a successful backend Command effect.
    */
   transitionDomain(newState: DomainState): void
 }
