@@ -5,7 +5,9 @@
  * filter presets, and control configurations used by the screen runtime.
  */
 
-export const PAYMENT_REQUEST_STATUS_OPTIONS = [
+import type { FieldOptionContract } from '@/platform/component-contracts'
+
+export const PAYMENT_REQUEST_STATUS_OPTIONS: readonly FieldOptionContract[] = [
   { label: 'Draft', value: 'DRAFT' },
   { label: 'Submitted', value: 'SUBMITTED' },
   { label: 'Approved', value: 'APPROVED' },
@@ -20,7 +22,7 @@ export const PAYMENT_REQUEST_FILTER_PRESETS = [
   { id: 'in_review', label: 'In Review' },
 ]
 
-export const CURRENCY_OPTIONS = [
+export const CURRENCY_OPTIONS: readonly FieldOptionContract[] = [
   { label: 'ETB', value: 'ETB' },
   { label: 'USD', value: 'USD' },
 ]

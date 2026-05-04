@@ -20,11 +20,11 @@ import { History, X, ListFilter, Calendar, Download } from 'lucide-vue-next'
 import PaymentRequestBulkActionBar from '../components/PaymentRequestBulkActionBar.vue'
 import PaymentRequestFilterPane from '../components/PaymentRequestFilterPane.vue'
 import PaymentRequestTracePane from '../components/PaymentRequestTracePane.vue'
-import { paymentRequestColumns } from '../grids/payment-request.grid'
+import { paymentRequestColumns } from '../grids/AP3010PL.primary.grid'
 import {
   PAYMENT_REQUEST_STATUS_OPTIONS,
   PAYMENT_REQUEST_FILTER_PRESETS,
-} from '../fields/payment-request.fields'
+} from '../fields/AP301000.fields'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import type { User } from '@/modules/core/domain/user.types'

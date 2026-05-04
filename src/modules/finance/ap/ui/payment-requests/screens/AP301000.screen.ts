@@ -35,7 +35,7 @@ export const AP301000: ScreenDefinition = {
   },
   layout: {
     summaryTemplate: '7-10-7',
-    renderTarget: () => import('../pages/PaymentRequestFocus.vue') as never,
+    renderTarget: () => import('../pages/AP301000.vue') as never,
   },
   commands: [],
   personalization: {

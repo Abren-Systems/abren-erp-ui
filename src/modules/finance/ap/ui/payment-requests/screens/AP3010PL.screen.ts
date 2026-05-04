@@ -11,7 +11,7 @@ import { AP_MODULE_ID, apScreenId } from '../../../screens'
 export const AP3010PL: ScreenDefinition = {
   id: apScreenId('AP3010PL'),
   moduleId: AP_MODULE_ID,
-  kind: 'workspace',
+  kind: 'primaryList',
   titleKey: 'ap.paymentRequests.list.title',
   primaryView: 'paymentRequests',
   route: {
@@ -29,7 +29,7 @@ export const AP3010PL: ScreenDefinition = {
   },
   layout: {
     summaryTemplate: '1',
-    renderTarget: () => import('../pages/PaymentRequestsListPage.vue') as never,
+    renderTarget: () => import('../pages/AP3010PL.vue') as never,
   },
   commands: [],
   personalization: {

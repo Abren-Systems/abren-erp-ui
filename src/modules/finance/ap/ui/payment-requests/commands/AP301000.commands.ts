@@ -1,26 +1,19 @@
 import type { PaymentRequestStatus } from '../../../domain/ap.types'
 
-export interface ScreenAction {
-  key: string
-  label: string
-  variant: 'primary' | 'danger' | 'neutral'
-  enabled: boolean
-  requiresConfirmation?: boolean
-  description?: string // Description to show in the confirmation dialog
-}
+import type { ActionContract } from '@/platform/component-contracts'
 
 /**
  * Derives the available screen actions based on the current aggregate status.
  * This will eventually be replaced by the ScreenRuntime's command resolver.
  */
-export function getPaymentRequestActions(status?: PaymentRequestStatus): ScreenAction[] {
+export function getPaymentRequestActions(status?: PaymentRequestStatus): ActionContract[] {
   if (!status) return []
-  const list: ScreenAction[] = []
+  const list: ActionContract[] = []
 
   if (status === 'DRAFT' || status === 'REJECTED') {
     list.push({
       key: 'submit',
-      label: 'Submit',
+      labelKey: 'Submit',
       variant: 'primary',
       enabled: true,
       requiresConfirmation: true,
@@ -30,7 +23,7 @@ export function getPaymentRequestActions(status?: PaymentRequestStatus): ScreenA
   if (status === 'SUBMITTED') {
     list.push({
       key: 'approve',
-      label: 'Approve',
+      labelKey: 'Approve',
       variant: 'primary',
       enabled: true,
       requiresConfirmation: true,
@@ -38,7 +31,7 @@ export function getPaymentRequestActions(status?: PaymentRequestStatus): ScreenA
     })
     list.push({
       key: 'reject',
-      label: 'Reject',
+      labelKey: 'Reject',
       variant: 'danger',
       enabled: true,
       requiresConfirmation: true,
@@ -48,7 +41,7 @@ export function getPaymentRequestActions(status?: PaymentRequestStatus): ScreenA
   if (status === 'APPROVED') {
     list.push({
       key: 'authorize',
-      label: 'Authorize',
+      labelKey: 'Authorize',
       variant: 'primary',
       enabled: true,
       requiresConfirmation: true,
@@ -58,7 +51,7 @@ export function getPaymentRequestActions(status?: PaymentRequestStatus): ScreenA
   if (status === 'DRAFT' || status === 'SUBMITTED') {
     list.push({
       key: 'cancel',
-      label: 'Cancel',
+      labelKey: 'Cancel',
       variant: 'danger',
       enabled: true,
       requiresConfirmation: true,

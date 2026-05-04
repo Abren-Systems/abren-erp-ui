@@ -23,9 +23,9 @@ import PaymentRequestActions, { type ScreenAction } from '../components/PaymentR
 import PaymentRequestTraceDrawer from '../components/PaymentRequestTraceDrawer.vue'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import { DataGrid, MoneyCell } from '@/shared/components/data-grid'
-import { getPaymentRequestActions } from '../commands/payment-request.commands'
-import { paymentRequestLineColumns } from '../grids/payment-request-lines.grid'
-import { CURRENCY_OPTIONS } from '../fields/payment-request.fields'
+import { getPaymentRequestActions } from '../commands/AP301000.commands'
+import { paymentRequestLineColumns } from '../grids/AP301000.lines.grid'
+import { CURRENCY_OPTIONS } from '../fields/AP301000.fields'
 import type { PaymentRequestLine } from '../../../domain/ap.types'
 
 const props = defineProps<{ id: string }>()

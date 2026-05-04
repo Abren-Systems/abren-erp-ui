@@ -8,7 +8,7 @@
 import { ref, computed } from 'vue'
 import { AppButton, AppDialog } from '@/shared/components/primitives'
 
-import type { ScreenAction } from '../commands/payment-request.commands'
+import type { ScreenAction } from '../commands/AP301000.commands'
 
 const props = defineProps<{
   actions: ScreenAction[]
@@ -71,7 +71,7 @@ const confirmDescription = computed(() => {
       size="sm"
       @click="onActionClick(action)"
     >
-      {{ action.label }}
+      {{ action.labelKey }}
     </AppButton>
 
     <AppDialog v-model:open="confirmState.open" :title="confirmTitle" size="sm">

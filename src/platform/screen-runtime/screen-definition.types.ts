@@ -9,7 +9,7 @@ import type { ScreenCommand } from '../commands/command.types'
 // Each kind has distinct layout expectations and renderer behavior.
 
 export type ScreenKind =
-  | 'workspace' // Dense list scanning, saved filters, navigation to focus
+  | 'primaryList' // Dense list scanning, saved filters, navigation to dataEntry
   | 'dataEntry' // Transaction/profile creation and editing
   | 'setup' // Preferences, numbering, posting rules, governance
   | 'processing' // Select many records, execute server action, show result
