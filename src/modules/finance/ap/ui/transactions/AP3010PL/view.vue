@@ -5,7 +5,6 @@ import { WorkspaceLayout, PageHeader } from '@/shared/components/workspace'
 import { Plus, ListFilter } from 'lucide-vue-next'
 import PaymentRequestBulkActionBar from './bulk-actions.vue'
 import PaymentRequestFilterPane from './filters.panel.vue'
-import PaymentRequestTracePane from '../AP301000/sidepanels/trace.panel.vue'
 import { usePaymentRequestList } from './controller'
 
 const ctrl = usePaymentRequestList()
@@ -84,12 +83,6 @@ const ctrl = usePaymentRequestList()
         :initial-filters="ctrl.filterState.value"
         :status-options="ctrl.statusOptions"
         @apply="ctrl.filterState.value = $event"
-      />
-
-      <PaymentRequestTracePane
-        v-model:open="ctrl.isTraceOpen.value"
-        :request="ctrl.traceTarget.value"
-        @view-detail="ctrl.goToDetail"
       />
     </template>
   </WorkspaceLayout>

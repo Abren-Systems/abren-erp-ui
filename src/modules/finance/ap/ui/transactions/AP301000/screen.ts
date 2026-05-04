@@ -36,6 +36,18 @@ export const AP301000: ScreenDefinition = {
   layout: {
     summaryTemplate: '7-10-7',
     renderTarget: () => import('./view.vue') as never,
+    sidePanel: {
+      tabs: [
+        {
+          kind: 'local',
+          id: 'trace',
+          labelKey: 'Trace',
+          icon: 'History',
+          component: () => import('./sidepanels/trace.vue'),
+        },
+      ],
+      defaultCollapsed: true,
+    },
   },
   commands: [],
   personalization: {

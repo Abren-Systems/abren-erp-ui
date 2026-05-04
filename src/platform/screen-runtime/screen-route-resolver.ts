@@ -22,9 +22,7 @@ function screenToRoute(screen: ScreenDefinition): RouteRecordRaw {
       screenKind: screen.kind,
       title: screen.titleKey,
     },
-    component: screen.layout.renderTarget
-      ? (screen.layout.renderTarget as () => Promise<unknown>)
-      : () => import('./ScreenPlaceholder.vue'),
+    component: () => import('./ScreenRenderer.vue'),
     props: true,
   }
 }

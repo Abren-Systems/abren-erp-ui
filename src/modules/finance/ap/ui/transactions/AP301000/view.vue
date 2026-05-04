@@ -11,7 +11,6 @@ import { AppButton } from '@/shared/components/primitives'
 import { History } from 'lucide-vue-next'
 import PaymentRequestHeader from './header.vue'
 import PaymentRequestActions from './actions.vue'
-import PaymentRequestTraceDrawer from './sidepanels/trace.sidepane.vue'
 import { DataGrid } from '@/shared/components/data-grid'
 import { paymentRequestLineColumns } from './grids/lines.grid'
 import { usePaymentRequestEntry } from './controller'
@@ -184,12 +183,5 @@ const ctrl = usePaymentRequestEntry(props.id)
         </div>
       </form>
     </div>
-
-    <!-- Trace Drawer (Lazy loaded context) -->
-    <PaymentRequestTraceDrawer
-      v-if="ctrl.entity.value && !ctrl.isNew.value"
-      v-model:open="ctrl.isTraceOpen.value"
-      :request="ctrl.entity.value"
-    />
   </div>
 </template>

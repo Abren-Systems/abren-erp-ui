@@ -30,3 +30,4 @@ export type {
 } from './screen-definition.types'
 export { ScreenRegistry, screenRegistry } from './screen-registry'
 export { resolveScreenRoutes } from './screen-route-resolver'
+export { default as ScreenRenderer } from './ScreenRenderer.vue'

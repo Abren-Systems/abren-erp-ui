@@ -3,6 +3,7 @@ import type { ModuleId } from '@/shared/types/brand.types'
 import type { ScreenId } from './screen-id.types'
 import type { ScreenViews } from './screen-view.types'
 import type { ScreenCommand } from '../commands/command.types'
+import type { SidePanelContract } from '../component-contracts'
 
 // ── Screen Taxonomy ───────────────────────────────────────
 // Maps directly to Acumatica form types.
@@ -40,6 +41,8 @@ export interface ScreenLayoutDefinition {
   readonly summaryTemplate: LayoutTemplate
   /** The render target component — allows compatibility with existing SFCs during migration */
   readonly renderTarget?: Component
+  /** The contextual right-pane side panel contract */
+  readonly sidePanel?: SidePanelContract
 }
 
 // ── Route Binding ─────────────────────────────────────────

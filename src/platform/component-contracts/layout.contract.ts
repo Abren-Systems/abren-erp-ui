@@ -23,7 +23,7 @@ export interface SidePanelLocalTab {
   readonly id: string
   readonly labelKey: string
   readonly icon: string
-  readonly viewName: string // Must match a key in the ScreenDefinition's views
+  readonly component: () => Promise<unknown> // Explicit lazy import of the content component
 }
 
 /**
