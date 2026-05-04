@@ -11,8 +11,8 @@ import type { ScreenId } from '@/platform/screen-runtime'
 // Screen definitions are lazily populated in per-aggregate screen files.
 // This file re-exports them as the module's public screen surface.
 
-import { AP3010PL } from './ui/payment-requests/screens/AP3010PL.screen'
-import { AP301000 } from './ui/payment-requests/screens/AP301000.screen'
+import { AP3010PL } from './ui/transactions/AP3010PL/screen'
+import { AP301000 } from './ui/transactions/AP301000/screen'
 
 export { AP3010PL, AP301000 }
 

@@ -6,7 +6,7 @@ import { AP_MODULE_ID, apScreenId } from '../../../screens'
  *
  * Acumatica screen kind: dataEntry
  * Transaction creation and editing with summary area, tabs, and line grid.
- * Current render target: PaymentRequestFocus.vue
+ * Current render target: view.vue
  */
 export const AP301000: ScreenDefinition = {
   id: apScreenId('AP301000'),
@@ -35,7 +35,7 @@ export const AP301000: ScreenDefinition = {
   },
   layout: {
     summaryTemplate: '7-10-7',
-    renderTarget: () => import('../pages/AP301000.vue') as never,
+    renderTarget: () => import('./view.vue') as never,
   },
   commands: [],
   personalization: {

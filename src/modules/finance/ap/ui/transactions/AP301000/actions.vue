@@ -8,10 +8,10 @@
 import { ref, computed } from 'vue'
 import { AppButton, AppDialog } from '@/shared/components/primitives'
 
-import type { ScreenAction } from '../commands/AP301000.commands'
+import type { ActionContract } from '@/platform/component-contracts'
 
 const props = defineProps<{
-  actions: ScreenAction[]
+  actions: ActionContract[]
   isPending?: boolean
 }>()
 
@@ -19,12 +19,12 @@ const emit = defineEmits<{
   (e: 'action', key: string): void
 }>()
 
-const confirmState = ref<{ open: boolean; action: ScreenAction | null }>({
+const confirmState = ref<{ open: boolean; action: ActionContract | null }>({
   open: false,
   action: null,
 })
 
-function onActionClick(action: ScreenAction) {
+function onActionClick(action: ActionContract) {
   if (!action.enabled) return
 
   if (action.requiresConfirmation) {
@@ -42,7 +42,7 @@ function confirmAction() {
 }
 
 const confirmTitle = computed(() => {
-  return confirmState.value.action ? `Confirm ${confirmState.value.action.label}` : 'Confirm'
+  return confirmState.value.action ? `Confirm ${confirmState.value.action.labelKey}` : 'Confirm'
 })
 
 const confirmDescription = computed(() => {

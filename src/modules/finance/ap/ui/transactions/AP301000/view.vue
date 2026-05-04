@@ -18,14 +18,15 @@ import {
 } from '@/shared/components/field-system'
 import { AppButton } from '@/shared/components/primitives'
 import { History } from 'lucide-vue-next'
-import PaymentRequestHeader from '../components/PaymentRequestHeader.vue'
-import PaymentRequestActions, { type ScreenAction } from '../components/PaymentRequestActions.vue'
-import PaymentRequestTraceDrawer from '../components/PaymentRequestTraceDrawer.vue'
+import PaymentRequestHeader from './header.vue'
+import PaymentRequestActions from './actions.vue'
+import type { ActionContract } from '@/platform/component-contracts'
+import PaymentRequestTraceDrawer from './sidepanels/trace.sidepane.vue'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import { DataGrid, MoneyCell } from '@/shared/components/data-grid'
-import { getPaymentRequestActions } from '../commands/AP301000.commands'
-import { paymentRequestLineColumns } from '../grids/AP301000.lines.grid'
-import { CURRENCY_OPTIONS } from '../fields/AP301000.fields'
+import { getPaymentRequestActions } from './commands'
+import { paymentRequestLineColumns } from './grids/lines.grid'
+import { CURRENCY_OPTIONS } from './fields'
 import type { PaymentRequestLine } from '../../../domain/ap.types'
 
 const props = defineProps<{ id: string }>()
@@ -82,7 +83,7 @@ const isPending = computed(
     isCreating.value,
 )
 
-const actions = computed<ScreenAction[]>(() => {
+const actions = computed<ActionContract[]>(() => {
   if (isNew.value) return []
   if (!request.value) return []
   return getPaymentRequestActions(request.value.status)

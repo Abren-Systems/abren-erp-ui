@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { MoneyCell, DateCell } from '@/shared/components/data-grid'
-import type { PaymentRequest } from '../../../domain/ap.types'
+import type { PaymentRequest } from '../../../../domain/ap.types'
 
 /**
  * Payment Request Grid Columns.

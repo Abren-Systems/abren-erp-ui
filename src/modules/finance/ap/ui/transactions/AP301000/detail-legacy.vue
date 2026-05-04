@@ -20,7 +20,7 @@ import { useCancelPaymentRequest } from '../../../application/composables/useCan
 import { useSubmitPaymentRequest } from '../../../application/composables/useSubmitPaymentRequest'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
-import PaymentRequestTimeline from '../components/PaymentRequestTimeline.vue'
+import PaymentRequestTimeline from './timeline.vue'
 import BadgeCell from '@/shared/components/data-grid/cells/BadgeCell.vue'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import { BusinessDate } from '@/shared/domain/business-date'

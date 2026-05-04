@@ -2,8 +2,8 @@
 import { AppBadge, AppSidePane } from '@/shared/components/primitives'
 import { AppFieldset, AppField } from '@/shared/components/field-system'
 import { History } from 'lucide-vue-next'
-import PaymentRequestTimeline from './PaymentRequestTimeline.vue'
-import type { PaymentRequest } from '../../../domain/ap.types'
+import PaymentRequestTimeline from '../timeline.vue'
+import type { PaymentRequest } from '../../../../domain/ap.types'
 
 /**
  * Stage 3: TraceDrawer — Payment Request Provenance.

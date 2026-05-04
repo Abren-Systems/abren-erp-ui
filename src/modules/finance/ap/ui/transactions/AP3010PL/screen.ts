@@ -6,7 +6,7 @@ import { AP_MODULE_ID, apScreenId } from '../../../screens'
  *
  * Acumatica screen kind: workspace
  * Dense list scanning with saved filters and navigation to AP301000.
- * Current render target: PaymentRequestsListPage.vue
+ * Current render target: view.vue
  */
 export const AP3010PL: ScreenDefinition = {
   id: apScreenId('AP3010PL'),
@@ -29,7 +29,7 @@ export const AP3010PL: ScreenDefinition = {
   },
   layout: {
     summaryTemplate: '1',
-    renderTarget: () => import('../pages/AP3010PL.vue') as never,
+    renderTarget: () => import('./view.vue') as never,
   },
   commands: [],
   personalization: {

@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { Row } from '@tanstack/vue-table'
-import type { PaymentRequestLine } from '../../../domain/ap.types'
+import type { PaymentRequestLine } from '../../../../domain/ap.types'
 import { MoneyCell } from '@/shared/components/data-grid'
 
 /**

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { AppButton, AppSidePane } from '@/shared/components/primitives'
 import { History } from 'lucide-vue-next'
-import PaymentRequestTimeline from './PaymentRequestTimeline.vue'
-import type { PaymentRequest } from '../../../domain/ap.types'
+import PaymentRequestTimeline from '../timeline.vue'
+import type { PaymentRequest } from '../../../../domain/ap.types'
 
 defineProps<{
   open: boolean
