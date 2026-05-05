@@ -40,10 +40,10 @@ export const AP301000: ScreenDefinition = {
       tabs: [
         {
           kind: 'local',
-          id: 'trace',
+          id: 'audit',
           labelKey: 'Trace',
           icon: 'History',
-          component: () => import('./sidepanels/trace.vue'),
+          component: () => import('./sidepanels/audit.vue'),
         },
       ],
       defaultCollapsed: true,

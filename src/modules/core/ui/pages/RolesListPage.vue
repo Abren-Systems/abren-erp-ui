@@ -5,7 +5,7 @@ import { AppButton, AppBadge, AppSidePane } from '@/shared/components/primitives
 import { Shield, ShieldPlus, ShieldCheck } from 'lucide-vue-next'
 import { useRoles } from '../../application/useRoles'
 import type { Role } from '../../domain/user.types'
-import CreateRoleDialog from '../components/CreateRoleDialog.vue'
+import RoleCreateDialog from '../components/RoleCreateDialog.vue'
 
 const { roles, isRolesPending } = useRoles()
 const gridState = useDataGrid()
@@ -115,7 +115,7 @@ function handleRowClick(role: Role) {
       </DataGrid>
     </div>
 
-    <CreateRoleDialog v-model:open="isCreateOpen" />
+    <RoleCreateDialog v-model:open="isCreateOpen" />
 
     <!-- Read-Only Role Detail Pane -->
     <AppSidePane

@@ -6,7 +6,7 @@ import { Users as UsersIcon, UserPlus, ShieldAlert } from 'lucide-vue-next'
 import { useUsers } from '../../application/useUsers'
 import type { User } from '../../domain/user.types'
 import UserRoleAssignmentDialog from '../components/UserRoleAssignmentDialog.vue'
-import InviteUserDialog from '../components/InviteUserDialog.vue'
+import UserInviteDialog from '../components/UserInviteDialog.vue'
 
 const { users, isPending } = useUsers()
 const gridState = useDataGrid()
@@ -116,6 +116,6 @@ function handleRowClick(user: User) {
     </div>
 
     <UserRoleAssignmentDialog v-model:open="isAssignmentOpen" :user="selectedUser" />
-    <InviteUserDialog v-model:open="isInviteOpen" />
+    <UserInviteDialog v-model:open="isInviteOpen" />
   </div>
 </template>

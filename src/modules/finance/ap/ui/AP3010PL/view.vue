@@ -3,8 +3,8 @@ import { DataGrid, DataGridFilterSelector, DataGridFooter } from '@/shared/compo
 import { AppButton } from '@/shared/components/primitives'
 import { WorkspaceLayout, PageHeader } from '@/shared/components/workspace'
 import { Plus, ListFilter } from 'lucide-vue-next'
-import PaymentRequestBulkActionBar from './bulk-actions.vue'
-import PaymentRequestFilterPane from './filters.panel.vue'
+import PaymentRequestBulkActionBar from './BulkActionBar.vue'
+import PaymentRequestFilterPane from './FilterPane.vue'
 import { usePaymentRequestList } from './controller'
 
 const ctrl = usePaymentRequestList()

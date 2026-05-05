@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { Plus, LayoutGrid } from 'lucide-vue-next'
-import CreateAccountDrawer from '../components/CreateAccountDrawer.vue'
+import AccountCreateDrawer from '../components/AccountCreateDrawer.vue'
 import { useLedgerAccounts } from '../../../application/useLedgerAccounts'
 import { accountColumns } from '../grids/account.grid'
 import { usePermissions } from '@/shared/auth/usePermissions'
@@ -97,6 +97,6 @@ function handleRowClick(row: Account) {
     </div>
 
     <!-- Creation Context -->
-    <CreateAccountDrawer v-model:open="isDrawerOpen" />
+    <AccountCreateDrawer v-model:open="isDrawerOpen" />
   </div>
 </template>
