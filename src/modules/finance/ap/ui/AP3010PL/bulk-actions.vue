@@ -2,13 +2,13 @@
 import { ref, computed } from 'vue'
 import { AppButton, AppDialog, AppInput } from '@/shared/components/primitives'
 import { CheckCircle, XCircle, Download } from 'lucide-vue-next'
-import { useBulkVendorBillActions } from '../../../application/useBulkVendorBillActions'
-import type { VendorBillId } from '@/shared/types/brand.types'
-import type { VendorBill } from '../../../domain/ap.types'
+import { useBulkPaymentRequestActions } from '../../application/useBulkPaymentRequestActions'
+import type { PaymentRequestId } from '@/shared/types/brand.types'
+import type { PaymentRequest } from '../../domain/ap.types'
 
 const props = defineProps<{
-  selectedIds: VendorBillId[]
-  filteredBills: VendorBill[]
+  selectedIds: PaymentRequestId[]
+  filteredRequests: PaymentRequest[]
 }>()
 
 const emit = defineEmits<{
@@ -16,33 +16,33 @@ const emit = defineEmits<{
 }>()
 
 const {
-  validateMultiple,
+  approveMultiple,
   rejectMultiple,
   isPending: isBulkPending,
   results: bulkResults,
   computeCounts,
   successCount,
   failureCount,
-} = useBulkVendorBillActions()
+} = useBulkPaymentRequestActions()
 
 const selectedCount = computed(() => props.selectedIds.length)
 
-const bulkValidateOpen = ref(false)
+const bulkApproveOpen = ref(false)
 const bulkRejectOpen = ref(false)
 const bulkRejectReason = ref('')
 const bulkResultsOpen = ref(false)
 
-function handleBulkValidate() {
-  bulkValidateOpen.value = true
+function handleBulkApprove() {
+  bulkApproveOpen.value = true
 }
 
 function handleBulkReject() {
   bulkRejectOpen.value = true
 }
 
-async function confirmBulkValidate() {
-  bulkValidateOpen.value = false
-  const results = await validateMultiple(props.selectedIds)
+async function confirmBulkApprove() {
+  bulkApproveOpen.value = false
+  const results = await approveMultiple(props.selectedIds)
   computeCounts(results)
   bulkResultsOpen.value = true
   emit('clear-selection')
@@ -59,26 +59,17 @@ async function confirmBulkReject() {
 }
 
 function handleExport() {
-  const rows = props.filteredBills
+  const rows = props.filteredRequests
   if (rows.length === 0) return
 
-  const headers = [
-    'Bill Number',
-    'Vendor Invoice',
-    'Status',
-    'Currency',
-    'Amount',
-    'Issue Date',
-    'Due Date',
-  ]
+  const headers = ['Request Number', 'Status', 'Beneficiary', 'Currency', 'Amount', 'Submitted At']
   const csvRows = rows.map((r) => [
-    r.billNumber,
-    r.vendorInvoiceNumber,
+    r.requestNumber,
     r.status,
+    r.beneficiaryName ?? r.beneficiaryId,
     r.currency,
     r.totalAmount.toNumber(),
-    r.issueDate,
-    r.dueDate,
+    r.submittedAt ?? '',
   ])
 
   const csv = [headers, ...csvRows].map((row) => row.join(',')).join('\n')
@@ -86,7 +77,7 @@ function handleExport() {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `vendor-bills-${new Date().toISOString().slice(0, 10)}.csv`
+  link.download = `payment-requests-${new Date().toISOString().slice(0, 10)}.csv`
   link.click()
   URL.revokeObjectURL(url)
 }
@@ -113,10 +104,10 @@ function handleExport() {
           class="text-neutral-100 hover:text-white hover:bg-neutral-800"
           size="sm"
           :disabled="isBulkPending"
-          @click="handleBulkValidate"
+          @click="handleBulkApprove"
         >
           <template #start><CheckCircle :size="14" /></template>
-          Validate
+          Approve
         </AppButton>
         <AppButton
           variant="stealth"
@@ -157,23 +148,23 @@ function handleExport() {
       </div>
     </div>
 
-    <!-- Bulk Validate Confirmation -->
-    <AppDialog v-model:open="bulkValidateOpen" title="Confirm Validation" size="sm">
+    <!-- Bulk Approve Confirmation -->
+    <AppDialog v-model:open="bulkApproveOpen" title="Confirm Individual Approvals" size="sm">
       <p class="text-sm text-neutral-600">
-        You are about to validate <strong>{{ selectedCount }}</strong> individual bills. Each bill
-        will be validated separately.
+        You are about to process <strong>{{ selectedCount }}</strong> individual approval actions.
+        Each request will be approved separately — there is no combined transaction.
       </p>
       <template #footer>
-        <AppButton variant="outline" @click="bulkValidateOpen = false">Cancel</AppButton>
-        <AppButton variant="primary" @click="confirmBulkValidate">Validate All</AppButton>
+        <AppButton variant="outline" @click="bulkApproveOpen = false">Cancel</AppButton>
+        <AppButton variant="primary" @click="confirmBulkApprove">Approve All</AppButton>
       </template>
     </AppDialog>
 
     <!-- Bulk Reject Confirmation -->
-    <AppDialog v-model:open="bulkRejectOpen" title="Reject Selected Bills" size="sm">
+    <AppDialog v-model:open="bulkRejectOpen" title="Reject Selected Requests" size="sm">
       <div class="space-y-4">
         <p class="text-sm text-neutral-600">
-          You are about to reject <strong>{{ selectedCount }}</strong> bills individually. Please
+          You are about to reject <strong>{{ selectedCount }}</strong> requests individually. Please
           provide a reason.
         </p>
         <AppInput

@@ -10,7 +10,7 @@ import {
 } from '@/shared/components/dialog'
 import { AppButton, AppInput } from '@/shared/components/primitives'
 import { ShieldCheck } from 'lucide-vue-next'
-import { useRoles } from '../../application/composables/useRoles'
+import { useRoles } from '../../application/useRoles'
 
 const props = defineProps<{
   open: boolean

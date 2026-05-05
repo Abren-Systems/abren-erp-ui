@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTenantSettings } from '../../application/composables/useTenantSettings'
+import { useTenantSettings } from '../../application/useTenantSettings'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { Building2, Settings, Edit3 } from 'lucide-vue-next'

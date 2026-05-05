@@ -6,9 +6,9 @@ import { ArrowRight, LayoutDashboard } from 'lucide-vue-next'
 import { useAuditStore } from '@/shared/infrastructure/audit.store'
 import { useAuthStore } from '@/shared/auth/auth.store'
 import { PageHeader } from '@/shared/components/workspace'
-import { useUsers } from '../../application/composables/useUsers'
+import { useUsers } from '../../application/useUsers'
 import { usePendingApprovals } from '@/modules/workflows/application/composables/usePendingApprovals'
-import { usePaymentRequestStats } from '@/modules/finance/ap/application/composables/usePaymentRequestStats'
+import { usePaymentRequestStats } from '@/modules/finance/ap/application/usePaymentRequestStats'
 
 // Sub-components
 import WorkboardStats from '../workboard/components/WorkboardStats.vue'

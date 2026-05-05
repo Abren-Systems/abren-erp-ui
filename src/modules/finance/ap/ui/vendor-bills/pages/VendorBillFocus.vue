@@ -24,10 +24,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/dropdown-menu'
-import { useVendorBill } from '../../../application/composables/useVendorBill'
-import { useCreateVendorBill } from '../../../application/composables/useCreateVendorBill'
-import { useValidateVendorBill } from '../../../application/composables/useValidateVendorBill'
-import { useRejectVendorBill } from '../../../application/composables/useRejectVendorBill'
+import { useVendorBill } from '../../../application/useVendorBill'
+import { useCreateVendorBill } from '../../../application/useCreateVendorBill'
+import { useValidateVendorBill } from '../../../application/useValidateVendorBill'
+import { useRejectVendorBill } from '../../../application/useRejectVendorBill'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import VendorBillTraceSidePane from '../components/VendorBillTraceSidePane.vue'

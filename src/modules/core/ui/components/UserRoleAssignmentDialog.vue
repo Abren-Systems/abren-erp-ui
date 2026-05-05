@@ -10,8 +10,8 @@ import {
 } from '@/shared/components/dialog'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { UserCog } from 'lucide-vue-next'
-import { useRoles } from '../../application/composables/useRoles'
-import { useUsers } from '../../application/composables/useUsers'
+import { useRoles } from '../../application/useRoles'
+import { useUsers } from '../../application/useUsers'
 import type { User } from '../../domain/user.types'
 
 const props = defineProps<{
