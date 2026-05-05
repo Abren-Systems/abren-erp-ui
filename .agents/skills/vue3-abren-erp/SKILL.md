@@ -6,7 +6,7 @@ description: Patterns and guardrails for building the Abren ERP UI with Vue 3, T
 # Vue 3 Abren ERP Development Skill
 
 > **Architecture Authority:** [`docs/architecture/ARCHITECTURE.md`](../../docs/architecture/ARCHITECTURE.md) (v3.0, Locked Baseline)
-> **Key Companions:** [`docs/architecture/SCREEN_RUNTIME.md`](../../docs/architecture/SCREEN_RUNTIME.md) (Runtime) · [`docs/architecture/COMPONENT_SYSTEM.md`](../../docs/architecture/COMPONENT_SYSTEM.md) (UI & Contracts)
+> **Key Companions:** [`docs/architecture/ACUMATICA_ALIGNMENT.md`](../../docs/architecture/ACUMATICA_ALIGNMENT.md) (Rosetta Stone) · [`docs/architecture/SCREEN_RUNTIME.md`](../../docs/architecture/SCREEN_RUNTIME.md) (Runtime) · [`docs/architecture/SCREEN_MIGRATION.md`](../../docs/architecture/SCREEN_MIGRATION.md) (Migration Guide) · [`docs/architecture/COMPONENT_SYSTEM.md`](../../docs/architecture/COMPONENT_SYSTEM.md) (UI & Contracts)
 > This skill file provides AI-specific guardrails and UX doctrine. For structural decisions (module anatomy, layer rules, platform contracts), defer to the Architecture Manifesto.
 
 ## Core Rules

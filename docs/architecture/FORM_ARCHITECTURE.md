@@ -1,222 +1,393 @@
 ---
 title: 'Form Architecture'
-description: 'Forms are the **primary interaction surface** in an ERP. Every financial transaction, every configuration change, every approval — all flow through forms. Our form architecture enforces:'
+description: 'How forms work in Abren ERP — from the 6-part anatomy down to field validation, submission pipelines, and layout templates.'
 tier: frontend
-tags: [frontend, architecture]
+tags: [frontend, architecture, forms, acumatica]
 ---
 
 # Form Architecture
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)
-> **Technology:** TanStack Form + Zod + Custom ERP Design System (`shared/ui/`, with compatibility exports from `shared/components/` during migration)
+> **Companion:** [Acumatica Alignment §5](ACUMATICA_ALIGNMENT.md#5-form-anatomy-6-basic-parts) — the 6-part form anatomy
+> **Companion:** [Screen Runtime](SCREEN_RUNTIME.md) — toolbar rendering, side panel binding
+> **Technology:** TanStack Form (headless engine) + Zod (schema validation) + Field System (`AppField`, `AppFieldset`)
+> **Last Updated:** May 2026
 
 ---
 
-## 1. Philosophy
+## 1. What a Form Is
 
-Forms are the **primary interaction surface** in an ERP. Every financial transaction, every configuration change, every approval — all flow through forms. Our form architecture enforces:
+In Abren ERP, a **form** is the primary interaction surface. Every financial transaction, configuration change, and approval flows through a form. A form is NOT a standalone `<form>` tag — it is the **entire Working Area content** governed by the [6-part anatomy](ACUMATICA_ALIGNMENT.md#5-form-anatomy-6-basic-parts):
 
-1. **Headless Logic:** TanStack Form manages state, validation lifecycles, and submission — the UI is decoupled.
-2. **Schema-Driven Validation:** Zod schemas define validation rules as pure data. No imperative `if/else` in templates.
-3. **Native Standard Schema Isolation:** Zod schemas are used directly via the [Standard Schema](https://github.com/standard-schema/standard-schema) interface, removing the need for intermediary adapter packages.
-4. **Action Mirroring ("Where decisions happen, actions must exist"):** Complex macro-forms (like Payment Requests) must display an `AppSummaryPanel` containing a mirrored contextual primary action (e.g., `Submit`). This creates a zero-friction loop (evaluate total → see validation state → click submit) without forcing users to travel to the global bottom sticky bar.
-
----
-
-## 2. Data Flow
-
-```mermaid
-sequenceDiagram
-    participant T as Template (UI)
-    participant F as TanStack Form
-    participant Z as Zod Schema
-    participant C as Composable (Use Case)
-    participant A as Adapter (API)
-
-    T->>F: User input → field.handleChange()
-    F->>Z: Validate on change/blur/submit
-    Z-->>F: Errors[] or Success
-    F-->>T: Reactive error state
-    T->>F: Submit → form.handleSubmit()
-    F->>C: onSubmit(values)
-    C->>A: adapter.create(dto)
-    A-->>C: Response
-    C-->>T: Success/Error via mutation state
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. FORM TITLE BAR        (rendered by platform — FormTitleBar)  │
+├─────────────────────────────────────────────────────────────────┤
+│ 2. FORM TOOLBAR           (rendered by platform — FormToolbar)  │
+├─────────────────────────────────────────────────────────────────┤
+│ 3. SUMMARY AREA           (AppTemplate + AppFieldset groups)    │
+├─────────────────────────────────────────────────────────────────┤
+│ 4. TABS                   (AppTabs — personalizable)            │
+├─────────────────────────────────────────────────────────────────┤
+│ 5. DETAILS AREA           (DataGrid, AppFieldset, or Rich Text) │
+│    6. ROW                 (line items in grid)                   │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
+Parts 1 and 2 (Title Bar, Toolbar) are **platform chrome** — the screen's `view.vue` never renders them. Parts 3–6 are what `view.vue` provides as pure layout projection from the controller.
+
+### Form Kinds and Their Layout Contracts
+
+Each [Form Kind](ACUMATICA_ALIGNMENT.md#3-form-kinds-what-appears-in-the-working-area) enforces a different layout:
+
+| Kind | Summary Zone | Tabs | Detail Grid | Submission Model |
+|------|-------------|------|-------------|-----------------|
+| **Setup** (`10`) | Settings sections | Rarely | No | Save on change |
+| **Maintenance** (`20`) | Summary Area (collapsible) | Yes | No | Save/Cancel |
+| **Data Entry** (`30`) | Summary Area (collapsible) | Yes (multiple) | Yes (line items) | Save/Cancel + workflow commands |
+| **Inquiry** (`40`) | Selection Area (filters) | No | Yes (results) | Read-only — no submission |
+| **Processing** (`50`) | Selection Area (filters) | No | Yes (selectable) | Process / Process All |
+
 ---
 
-## 3. Form Composable Pattern (The Integrity Pipeline)
+## 2. The Authority Model
 
-Each module's form logic lives in `application/composables/`. Forms follow the same **UI Facade** pattern as queries, but with a critical **Integrity Firewall** on submission.
+Forms in Abren are governed by the **Controller Authority** principle (see [Screen Runtime §3](SCREEN_RUNTIME.md#3-controller-authority-the-pxgraph)). The `view.vue` is a pure projection — zero business logic.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Screen Controller                       │
+│                  (controller.ts)                         │
+│                                                          │
+│  ┌──────────────┐  ┌────────────┐  ┌─────────────────┐  │
+│  │ Field Defs   │  │  Commands  │  │  State Machine  │  │
+│  │ (fields.ts)  │  │(commands.ts│  │ (UI + Domain)   │  │
+│  └──────┬───────┘  └──────┬─────┘  └──────┬──────────┘  │
+│         │                 │               │              │
+│    useField()        useCommand()    evaluates           │
+│    useGrid()                        readonly/visible     │
+└────────────────────────┬────────────────────────────────┘
+                         │ binds to
+                    ┌────▼─────┐
+                    │ view.vue │  (pure layout — no logic)
+                    └──────────┘
+```
+
+### What the Controller Owns
+
+| Responsibility | Where It Lives | NOT In |
+|---------------|---------------|--------|
+| Field definitions (label, type, readonly, required) | `fields.ts` | Template |
+| Commands (submit, approve, void) | `commands.ts` | Template buttons |
+| State evaluation (which fields are editable, which commands are visible) | `controller.ts` | `v-if` in template |
+| Data fetching & mutation | `controller.ts` via composables | Component `onMounted` |
+| Validation schema | `fields.ts` or `controller.ts` | Inline template checks |
+
+### What the View Owns
+
+| Responsibility | How |
+|---------------|-----|
+| Layout structure | `AppTemplate`, `AppFieldset`, `AppTabs` |
+| Field rendering | `<AppField v-bind="controller.useField('vendor')" />` |
+| Grid rendering | `<DataGrid v-bind="controller.useGrid('lines')" />` |
+| Nothing else | — |
+
+---
+
+## 3. The Field System (Editable Fields)
+
+Fields are the atomic unit of form interaction. Every field is declared in `fields.ts` and bound via the controller — never created ad-hoc in the template.
+
+### 3.1 Field Definition
 
 ```typescript
-// modules/finance/ap/application/composables/usePaymentRequestForm.ts
-import { useForm } from '@tanstack/vue-form'
-import { z } from 'zod'
-import { useApiMutation } from '@/shared/composables/useApiMutation'
-import { paymentRequestAdapter } from '../../infrastructure/payment_request_adapter'
-import { toDTO } from '../../infrastructure/payment_request.mapper'
+// AP301000/fields.ts
+import type { FieldDefinition } from '@/platform/field-system/field-definition.types';
 
-// ── Schema (Symmetric with Domain Logic) ──────────────────
-const paymentRequestSchema = z.object({
-  beneficiaryName: z.string().min(1, 'Beneficiary is required'),
-  amount: z.number().positive('Amount must be positive'),
-  currencyCode: z.string().length(3, 'Must be a valid ISO 4217 currency code'),
-  description: z.string().max(500).optional(),
-})
-
-type PaymentRequestFormValues = z.infer<typeof paymentRequestSchema>
-
-// ── Composable ────────────────────────────────────────
-export function usePaymentRequestForm() {
-  const { mutateAsync, isPending, error } = useApiMutation(
-    async (values: PaymentRequestFormValues) => {
-      // 1. TRANSFORM: UI values → Backend DTO via Mapper Factory
-      const dto = toDTO(values)
-
-      // 2. IO: Send hardened DTO to the Adapter
-      // (Idempotency-Key is handled by useApiMutation/httpClient)
-      return paymentRequestAdapter.create(dto)
+export const paymentRequestFields: Record<string, FieldDefinition> = {
+  referenceNumber: {
+    key: 'referenceNumber',
+    labelKey: 'ap.AP301000.summary.referenceNumber',
+    controlType: 'text',
+    state: {
+      readonly: (state) => state.domainStatus !== 'DRAFT',
     },
-  )
-
-  const form = useForm({
-    defaultValues: {
-      beneficiaryName: '',
-      amount: 0,
-      currencyCode: 'ETB',
-      description: '',
-    } satisfies PaymentRequestFormValues,
-    validators: {
-      onChange: paymentRequestSchema,
+  },
+  vendor: {
+    key: 'vendor',
+    labelKey: 'ap.AP301000.summary.vendor',
+    controlType: 'selector',
+    state: {
+      required: true,
+      readonly: (state) => state.domainStatus !== 'DRAFT',
     },
-    onSubmit: async ({ value }) => {
-      await mutateAsync(value)
+  },
+  amount: {
+    key: 'amount',
+    labelKey: 'ap.AP301000.summary.amount',
+    controlType: 'currency',
+    layoutHints: { tabularNums: true },
+    state: {
+      required: true,
+      readonly: (state) => state.domainStatus !== 'DRAFT',
     },
-  })
-
-  return { form, isPending, error }
-}
+  },
+  status: {
+    key: 'status',
+    labelKey: 'ap.AP301000.summary.status',
+    controlType: 'badge',
+    state: {
+      readonly: () => true,  // Always read-only — set by workflow
+    },
+  },
+};
 ```
 
----
-
-## 4. Template Integration
-
-Screen render targets import the form composable and bind fields declaratively using the design system components:
+### 3.2 Field Binding in View
 
 ```vue
-<script setup lang="ts">
-import { usePaymentRequestForm } from '../../application/composables/usePaymentRequestForm'
-import { AppInput } from '@/shared/components/primitives'
-import { AppButton } from '@/shared/components/primitives'
+<!-- WRONG: Raw field with inline logic -->
+<div class="space-y-2">
+  <Label for="vendor">Vendor</Label>
+  <Input
+    id="vendor"
+    :model-value="data.vendor"
+    @update:model-value="(v) => data.vendor = v"
+    :disabled="data.status !== 'DRAFT'"
+  />
+</div>
 
-const { form, isPending } = usePaymentRequestForm()
-</script>
-
-<template>
-  <form @submit.prevent.stop="form.handleSubmit()">
-    <form.Field name="beneficiaryName" v-slot="{ field, state }">
-      <div class="space-y-2">
-        <Label for="beneficiary">Beneficiary</Label>
-        <Input
-          id="beneficiary"
-          :model-value="field.state.value"
-          @update:model-value="field.handleChange"
-          @blur="field.handleBlur"
-          :class="{ 'border-danger-500': state.meta.errors.length }"
-        />
-        <p v-if="state.meta.errors.length" class="text-sm text-danger-600">
-          {{ state.meta.errors[0] }}
-        </p>
-      </div>
-    </form.Field>
-
-    <Button type="submit" :disabled="isPending">
-      {{ isPending ? 'Submitting...' : 'Create Request' }}
-    </Button>
-  </form>
-</template>
+<!-- RIGHT: Field bound via controller — zero logic in template -->
+<AppField v-bind="controller.useField('vendor')" />
 ```
+
+The `useField()` binding returns everything the `AppField` component needs:
+- `value` — current reactive value
+- `onChange` — mutation handler (goes through controller's mutation guard)
+- `readonly` — evaluated from `FieldDefinition.state.readonly` against current state machine
+- `required` — evaluated from `FieldDefinition.state.required`
+- `label` — resolved from `labelKey`
+- `controlType` — determines which input primitive renders
+- `errors` — validation errors from the schema
 
 ---
 
-## 5. Validation Strategy
+## 4. Validation Architecture
 
-### 5.1 When to Validate
+### 4.1 Validation Engine
 
-| Trigger       | Use Case                                             | Configuration                      |
-| ------------- | ---------------------------------------------------- | ---------------------------------- |
-| **On Change** | Real-time feedback for simple fields (text, numbers) | `validators: { onChange: schema }` |
-| **On Blur**   | Deferred validation for expensive checks or IDs      | `validators: { onBlur: schema }`   |
-| **On Submit** | Final gate before mutation (always active)           | `validators: { onSubmit: schema }` |
+TanStack Form + Zod is the validation engine. Zod schemas define rules as pure data — no imperative `if/else` in templates.
 
-### 5.2 Error Display Rules
+### 4.2 Schema Location
 
-1. **Field-level errors** appear directly below the input, styled with `text-danger-600`.
-2. **Form-level errors** (e.g., "Insufficient funds") appear in a banner above the submit button.
-3. **Server errors** (from the mutation's `error` state) appear in a toast notification via the global error handler.
+Validation schemas live **in the screen's field system**, not in standalone files:
 
-### 5.3 Zod Schema Conventions
+| Location | What | Why |
+|----------|------|-----|
+| `fields.ts` | Field-level rules (required, min/max, format) | Co-located with field definitions |
+| `controller.ts` | Cross-field rules (total must balance, date range) | Controller has access to full form state |
+| `shared/validation/` | Reusable validators (ISO date, positive amount, currency code) | Cross-cutting concerns |
 
-- Schemas live **next to the composable** that uses them, not in `domain/`.
-- Keep schemas as close to the API's expected payload shape as possible — the form IS the write-side DTO.
-- Reuse shared validators from `core/` for cross-cutting concerns:
+### 4.3 Shared Validators
 
 ```typescript
-// core/validation/validators.ts
+// shared/validation/validators.ts
+import { z } from 'zod'
+
 export const isoDateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD')
 export const positiveAmount = z.number().positive('Must be a positive amount')
+export const currencyCode = z.string().length(3, 'Must be a valid ISO 4217 currency code')
+```
+
+### 4.4 Validation Triggers
+
+| Trigger | Use Case | Configuration |
+|---------|----------|---------------|
+| **On Change** | Real-time feedback for simple fields | Field-level schema validation |
+| **On Blur** | Deferred validation for expensive checks | Field-level onBlur handler |
+| **On Submit** | Final gate before mutation (always active) | Controller-level form schema |
+
+### 4.5 Error Display Rules
+
+1. **Field-level errors** — Rendered by `AppField` directly below the input (part of the field contract).
+2. **Form-level errors** — Displayed by the controller in the Summary Area (e.g., "Debit and Credit totals must balance").
+3. **Server errors** — Returned from the mutation and displayed via the global toast system.
+
+---
+
+## 5. Submission Pipeline
+
+Submission is a **multi-stage pipeline** managed entirely by the controller. The view never calls API endpoints.
+
+```
+User clicks Save (toolbar) or Expected Next Action (e.g., Submit)
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│ 1. VALIDATE        Controller runs Zod schema           │
+│                    against current form state            │
+├─────────────────────────────────────────────────────────┤
+│ 2. TRANSFORM       Mapper converts UI values → DTO      │
+│                    (branded IDs, Money → raw numbers)    │
+├─────────────────────────────────────────────────────────┤
+│ 3. MUTATE          TanStack Mutation via adapter         │
+│                    (Idempotency-Key attached by client)  │
+├─────────────────────────────────────────────────────────┤
+│ 4. HANDLE RESULT   Success: invalidate queries, nav     │
+│                    Failure: show server errors           │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Save vs. Workflow Commands
+
+| Action | Type | Pipeline | Who Calls It |
+|--------|------|----------|-------------|
+| **Save** | Standard toolbar button | Validate → Transform → `adapter.update()` → Invalidate | Platform toolbar |
+| **Submit** | Workflow command (Expected Next) | Validate → Transform → `adapter.submit()` → Invalidate + status change | Controller via `ScreenCommand.execute` |
+| **Approve** | Workflow command | No form validation needed → `adapter.approve()` → Invalidate | Controller via `ScreenCommand.execute` |
+| **Void** | Workflow command | Confirmation dialog → `adapter.void()` → Invalidate + nav | Controller via `ScreenCommand.execute` |
+
+### Submission in the Controller
+
+```typescript
+// AP301000/controller.ts (submission handling)
+const saveMutation = useMutation({
+  mutationFn: async () => {
+    // 1. Validate
+    const valid = await controller.validateForm();
+    if (!valid) return;
+
+    // 2. Transform
+    const dto = APMapper.toUpdateDTO(controller.getFormValues());
+
+    // 3. Mutate
+    return paymentRequestAdapter.update(currentId.value, dto);
+  },
+  onSuccess: () => {
+    // 4. Handle result
+    queryClient.invalidateQueries({ queryKey: ['ap', 'payment-requests'] });
+    controller.transitionUIState('VIEW');
+  },
+});
 ```
 
 ---
 
-## 6. Form Layout Patterns
+## 6. Form Layout
 
-### 6.1 Single-View Forms (Default)
+### 6.1 Summary Area Layout (AppTemplate)
 
-Most ERP forms are single-view, rendered inside a **Context Drawer** (right-aligned, ~480px wide). This allows users to see the background data grid while editing.
+The Summary Area uses named templates from the [Layout Template System](ACUMATICA_ALIGNMENT.md#11-layout-template-system):
 
-### 6.2 Field System Integration (Phase 2)
+```vue
+<!-- Data Entry form with 3-column summary: ID | Details | Totals -->
+<AppTemplate template="7-10-7">
+  <template #slot-1>
+    <AppFieldset title="Document">
+      <AppField v-bind="controller.useField('referenceNumber')" />
+      <AppField v-bind="controller.useField('status')" />
+      <AppField v-bind="controller.useField('date')" />
+    </AppFieldset>
+  </template>
 
-> [!IMPORTANT]
-> When Phase 2 (Editable Forms) is implemented, form layouts **must** use the Field System primitives (`AppFieldset`, `AppInput`) instead of raw HTML divs. The `AppFieldset` layout engine's `140px` baseline CSS Grid contract applies equally to read-only fields (`AppField`) and editable inputs (`AppInput`). See [Field System Architecture](../FIELD_SYSTEM.md).
+  <template #slot-2>
+    <AppFieldset title="Vendor">
+      <AppField v-bind="controller.useField('vendor')" />
+      <AppField v-bind="controller.useField('location')" />
+    </AppFieldset>
+  </template>
 
-### 6.3 Sectioned Forms
-
-Complex records (e.g., Journal Entries with line items) use vertical sections with clear headings:
-
+  <template #slot-3>
+    <AppFieldset title="Totals">
+      <AppField v-bind="controller.useField('lineTotal')" />
+      <AppField v-bind="controller.useField('taxTotal')" />
+      <AppField v-bind="controller.useField('orderTotal')" />
+    </AppFieldset>
+  </template>
+</AppTemplate>
 ```
-┌─────────────────────────────────┐
-│ Header Info                      │
-│ [Date]  [Reference]  [Memo]     │
-├─────────────────────────────────┤
-│ Line Items                       │
-│ [Account] [Debit] [Credit]      │
-│ [Account] [Debit] [Credit]      │
-│              + Add Line          │
-├─────────────────────────────────┤
-│ Totals                           │
-│ Debit: $X    Credit: $X         │
-│ [Save Draft]  [Post]            │
-└─────────────────────────────────┘
+
+### 6.2 Detail Area Layout (Tabs + Grid)
+
+```vue
+<AppTabs>
+  <AppTab label="Document Details">
+    <!-- Tab-level toolbar for grid actions -->
+    <DataGrid v-bind="controller.useGrid('lines')">
+      <!-- Grid columns defined in grid definition, not here -->
+    </DataGrid>
+  </AppTab>
+
+  <AppTab label="Financial">
+    <AppFieldset title="Payment Details">
+      <AppField v-bind="controller.useField('paymentMethod')" />
+      <AppField v-bind="controller.useField('bankAccount')" />
+    </AppFieldset>
+  </AppTab>
+
+  <AppTab label="Approvals">
+    <DataGrid v-bind="controller.useGrid('approvalHistory')" />
+  </AppTab>
+</AppTabs>
 ```
 
-### 6.4 Multi-Step Wizards (Exceptional, Not Default)
+### 6.3 Layout Per Form Kind
 
-Wizards are reserved for rare, complex configurations (e.g., Year-End Close, Initial Setup). When used:
-
-- Display a progress indicator showing current step and total steps.
-- Allow backward navigation without data loss.
-- Validate each step's schema independently before advancing.
+| Kind | Summary Template | Typical Structure |
+|------|-----------------|-------------------|
+| **Setup** | `1` (full width) | Settings sections, no tabs |
+| **Maintenance** | `1-1` (50/50) | Two-column fieldsets, tabs for details |
+| **Data Entry** | `7-10-7` (ID/details/totals) | 3-column summary + tabs with grids |
+| **Inquiry** | N/A | Selection Area (filters) + full-width grid |
 
 ---
 
-## 7. Rules
+## 7. Line Item Editing (Detail Grid Forms)
 
-1. **No `v-model` directly on API data.** Forms always work on a local copy via TanStack Form's managed state.
-2. **No validation logic in templates.** All rules live in Zod schemas.
-3. **No direct API calls from form handlers.** Form `onSubmit` calls a mutation composable.
-4. **All financial amount inputs must enforce `step="0.01"`** and display with `tabular-nums`.
-5. **Reset forms on successful submission** using `form.reset()`, not manual ref clearing.
+Data Entry forms (area code `30`) typically include editable line item grids. These follow the same controller authority model:
+
+### 7.1 Grid as Controller Projection
+
+```typescript
+// The grid is a projection of the controller's data graph
+// Lines are NOT fetched independently — they come from the controller's detail view
+controller.useGrid('lines') // → returns reactive column defs, data, toolbar config
+```
+
+### 7.2 Line Item Operations
+
+| Operation | How | Controller Method |
+|-----------|-----|------------------|
+| Add line | Grid toolbar `[+]` button | `controller.addLine()` |
+| Delete line | Grid toolbar `[×]` button | `controller.deleteLine(index)` |
+| Edit cell | Inline cell editing | `controller.updateLineField(index, field, value)` |
+| Reorder | Drag or move buttons | `controller.reorderLine(from, to)` |
+
+### 7.3 Cross-Field Validation (Header ↔ Lines)
+
+```typescript
+// Controller validates that lines total matches header
+controller.registerCrossValidation(() => {
+  const headerTotal = controller.getFieldValue('orderTotal');
+  const linesTotal = controller.getGridData('lines')
+    .reduce((sum, line) => sum + line.amount, 0);
+
+  if (Math.abs(headerTotal - linesTotal) > 0.01) {
+    return { field: 'orderTotal', error: 'Header total must match line items' };
+  }
+  return null;
+});
+```
+
+---
+
+## 8. Rules (Non-Negotiable)
+
+1. **No `v-model` directly on API data.** Forms work on controller-managed state.
+2. **No validation logic in templates.** All rules live in Zod schemas or field definitions.
+3. **No direct API calls from views.** Submission goes through the controller's mutation pipeline.
+4. **No raw `<form.Field>` in production views.** Use `<AppField v-bind="controller.useField(key)" />`.
+5. **No toolbar or command buttons in `view.vue`.** Toolbar is rendered by platform chrome from `commands.ts`.
+6. **All financial amount inputs must enforce `step="0.01"`** and display with `tabular-nums` (via `controlType: 'currency'`).
+7. **Reset forms on successful Save** via controller state transition, not manual ref clearing.
+8. **Form schemas must be symmetric with backend DTOs** — the mapper is the only translation layer.

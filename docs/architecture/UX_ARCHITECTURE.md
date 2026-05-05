@@ -25,59 +25,64 @@ Our True North Star is a synthesis of proven enterprise patterns (Acumatica, SAP
 
 ---
 
-## 0. The Four Foundations (App Shell)
+## 0. The Three Persistent Regions (App Shell)
 
-Every screen in Abren ERP exists within a rigid macro-architecture. These four structural foundations are immutable — they persist across all navigations and ensure users always know where they are.
+Every screen in Abren ERP exists within a rigid macro-architecture. The shell has **3 persistent regions** and a **center area that transitions between states** (see [Acumatica Alignment §2](ACUMATICA_ALIGNMENT.md#2-the-ui-hierarchy-3-persistent-regions--center-area-state-machine)).
 
 ```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                     TOP PANE (Global Bar)                       │
-│  Search (⌘K) · Tenant Context · Notifications · User Session   │
+│  [🏠Home] [🔍Search] [🕐Recent] [⏱Timer] [Company▾] [Date▾] [?] [👤User▾]  │
 ├──────────┬─────────────────────────────────────────────────────┤
-│          │                                                     │
-│ SIDEBAR  │              WORKING AREA                           │
-│ (Nav)    │  ┌───────────────────────────────────────────────┐  │
-│          │  │ Form Title Bar (Record ID, Status, Actions)   │  │
-│ Start    │  ├───────────────────────────────────────────────┤  │
-│ Business │  │ Form Toolbar (Save, Cancel, Submit)           │  │
-│ Platform │  ├───────────────────────────────────────────────┤  │
-│          │  │ Summary Area (AppFieldset ghost/horizontal)   │  │
-│          │  ├───────────────────────────────────────────────┤  │
-│          │  │ Tabs & Details (AppTabs + DataGrid)           │  │
-│          │  └───────────────────────────────────────────────┘  │
-│          │                                                     │
+│          │              CENTER AREA                             │
+│ MAIN     │  (transitions between states)                       │
+│ MENU     │                                                     │
+│ (left    │  State A: WORKSPACE VIEW                            │
+│  rail)   │  ┌─────────────────────────────────────────────┐    │
+│          │  │ Tiles & links to forms, reports, dashboards │    │
+│          │  └─────────────────────────┬───────────────────┘    │
+│          │                            │ click a link           │
+│          │                            ▼                        │
+│          │  State B: WORKING AREA              ┌───────────┐   │
+│          │  ┌──────────────────────────────┐   │ SIDE      │   │
+│          │  │ Form Title Bar               │   │ PANEL     │   │
+│          │  │ Form Toolbar                 │   │ (context- │   │
+│          │  │ Summary Area                 │   │  ual to   │   │
+│          │  │ Tabs & Details               │   │  record)  │   │
+│          │  └──────────────────────────────┘   └───────────┘   │
 └──────────┴─────────────────────────────────────────────────────┘
 ```
 
 ### 0.1 Top Pane
 
 **Component:** `AuthenticatedLayout` header section (`sticky top-0 z-20`).
-**Contents:** Global search (⌘K), Tenant/Company context, Notifications, User session.
+**Contents:** Home, Global Search, Recently Viewed, Timer, Company/Branch, Business Date, Help, User Menu.
 **Constraint:** Must never contain module-specific actions or state.
 
-### 0.2 Sidebar (Navigation)
+### 0.2 Main Menu (Navigation)
 
 **Component:** `AuthenticatedLayout` aside section.
-**Structure:** Three strict categories: Start (Workboard), Business Domains, Platform.
-**Constraint:** Driven by workspace configuration, registered screens, and RBAC permissions. Collapsible to icon-only mode.
+**Structure:** Module entries (Finance, Distribution, Organization, etc.).
+**Constraint:** Driven by workspace configuration, registered screens, and RBAC permissions. Three modes: expanded (full names), collapsed (icons), minimized (Menu button in Top Pane).
 
-### 0.3 Workspace
+### 0.3 Center Area — State A: Workspace View
 
-**Purpose:** The entry point into a Business Domain. Provides module-level health metrics, queue/list views, filters, saved views, and sanctioned bulk commands.
-**Components:** `ScreenTitleBar`, `DataGrid`, smart tabs, filter surfaces, bulk action bar.
-**Constraint:** Workspaces optimize for scanning and triage. Full record editing transitions to a dedicated Working Area screen instance.
+**Purpose:** A navigation surface showing categorized links/tiles to forms, reports, and dashboards of a module. Entered when a module is clicked in the Main Menu.
+**Components:** `WorkspacePanel` with categorized tiles, favorites, queue counts.
+**Constraint:** Workspace View and Working Area are **mutually exclusive states** of the center area. No Side Panel in this state.
 
-### 0.4 Working Area
+### 0.4 Center Area — State B: Working Area
 
-**Purpose:** The dedicated canvas for performing actual work on a single entity.
-**Components:** The screen runtime payload rendered through a `ScreenRenderer` (during migration this may still resolve to an SFC such as `PaymentRequestFocus.vue`).
-**Internal Anatomy:**
+**Purpose:** The dedicated canvas for performing actual work. Entered when a link/tile is clicked in the Workspace View, or via direct URL navigation.
+**Components:** The screen runtime payload rendered through a `ScreenRenderer` using the controller/view pattern (`controller.ts` → `view.vue`).
+**Internal Anatomy** (see [Acumatica Alignment §5](ACUMATICA_ALIGNMENT.md#5-form-anatomy-6-basic-parts)):
 
-- **Form Title Bar** — `ScreenTitleBar` with Record ID, Status Badge, global record context, and record services.
-- **Summary Area** — `AppFieldset variant="ghost" layout="horizontal"` for high-level record data.
+- **Form Title Bar** — `FormTitleBar` with form title, record title, and record services (Notes, Activities, Files, Settings).
+- **Form Toolbar** — `FormToolbar` with standard buttons, Expected Next Action, and More Menu.
+- **Summary Area** — `AppTemplate` + `AppFieldset` groups for high-level record data.
 - **Details Area** — `AppTabs` containing `DataGrid`, `AppFieldset` sections, or audit history.
-- **Side Panel** — `AppSidePane` for contextual provenance (Trace Drawers).
-  **Constraint:** The Working Area is the **exclusive domain of the Field System** (`AppField`, `AppFieldset`, `FieldGroup`). No raw HTML layouts. See [Field System Architecture](../FIELD_SYSTEM.md).
+- **Side Panel** — `AppSidePane` for contextual record details (icon strip with tabs).
+  **Constraint:** The Working Area is the **exclusive domain of the Field System** (`AppField`, `AppFieldset`). No raw HTML layouts. See [Field System Architecture](../FIELD_SYSTEM.md).
 
 ---
 
@@ -102,12 +107,12 @@ Instead, we use a **Screen-Driven Progressive Disclosure** flow. Each stage is a
 ### 2.1. State Transition Flow
 
 ```text
-[Workspace Screen] → [Data Entry Screen] → [Side Panel / TraceDrawer] → [Action Dialog]
+[Workspace View] → [Working Area Screen] → [Side Panel] → [Action Dialog]
 ```
 
-- **Workspace (Inbox)**: Dense grid for scanning/filtering work units.
-- **Focus (Desk)**: Single entity focus, wide tabular form governed by the Field System.
-- **Side Panel (Filing Cabinet)**: On-demand provenance overlay (Trace Drawers).
+- **Workspace View (State A)**: Categorized tiles/links for scanning and navigating to work.
+- **Working Area (State B)**: Single entity focus via Screen ID screens (e.g., `AP301000`), governed by the 6-part form anatomy.
+- **Side Panel**: On-demand contextual details (icon strip tabs).
 - **ActionModal**: Explicit confirmation for destructive actions.
 
 ### 2.2. Component Interaction Contract
@@ -116,42 +121,43 @@ The primary flow for transactional operations:
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│ [Domain]ListPage.vue  (WORKSPACE)                      │
+│ Inquiry Screen (e.g., AP3010PL)                        │
+│  - WORKSPACE VIEW → navigates here                     │
 │  - Smart Filter Bucket Tabs + DataGrid                 │
 │  - DataGrid footer: row count, total, selection count  │
 │  - Bulk Action bar (appears when selectedCount > 0)    │
-│  - Quick Triage: docked AppSidePane (mode="docked")    │
-│      Shows audit timeline for selected row             │
-│      Does NOT mutate; navigates to Focus for editing   │
+│  - Docked Side Panel shows context for selected row    │
+│      Does NOT mutate; navigates to data entry screen   │
 └─────────────────────────┬──────────────────────────────┘
-                          │ open/focus screen instance
+                          │ click row / open screen
                           ▼
 ┌───────────────────────────┐
-│ [Domain]Focus.vue         │
-│  (WORKING AREA)           │
-│  - AppFieldset summary    │
+│ Data Entry Screen         │
+│  (e.g., AP301000)         │
+│  - Form Title Bar         │
+│  - Form Toolbar           │
+│  - Summary Area           │
 │  - AppTabs + DataGrid     │
-│  - Primary actions        │
-│  - Opens Side Panel       │
-│  - Opens ActionModal      │
+│  - Side Panel (tabs)      │
+│  - ActionModal            │
 └───────┬─────────┬─────────┘
         │         │
         ▼         ▼
 ┌─────────────┐   ┌────────────────┐
 │ Side Panel  │   │ ActionModal    │
-│ TraceDrawer │   │  Confirm void  │
+│ (icon tabs) │   │  Confirm void  │
 │  - Audit    │   │  Confirm delete│
-│  - Source   │   │                │
+│  - Files    │   │                │
 └─────────────┘   └────────────────┘
 ```
 
-> **Rule:** The Quick Triage docked pane is read-only. It shows the audit trail for context. Any mutation (approve, edit, reject) must move the user into the Focus/data-entry screen. This preserves the state isolation guarantee of Sequential Progressive Disclosure.
+> **Rule:** The inquiry screen's Side Panel is read-only. It shows contextual details. Any mutation (approve, edit, reject) must navigate the user into the data entry screen. This preserves state isolation.
 
 ### 2.3. The 3 Stages of Operational Focus
 
-1. **The Workspace (The Inbox)**: A clean, full-screen DataGrid filtering for exactly what needs attention (e.g., `Status: PENDING_APPROVAL`). Clicking a row opens or focuses a registered screen instance. No inline entity mutation from the workspace beyond sanctioned bulk commands.
-2. **The Focus Canvas (The Desk)**: The screen transitions cleanly to the entity. The workspace disappears. The user focuses purely on doing the work. The Working Area renders using the Field System (`AppFieldset`, `AppField`, `AppTabs`). Primary state-advancing actions are prominent; destructive actions require `ActionModal` confirmation.
-3. **The Side Panel (The Filing Cabinet)**: "No number without an origin" — but it is lazy-loaded. Audit histories, underlying vendor bills, and financial impact projections sit behind a slide-out Side Panel (`TraceDrawer`), appearing only when the user invokes it. When they are done investigating, they close the panel and return to the focused context.
+1. **The Workspace View (State A)**: Clicking a module in the Main Menu shows categorized tiles/links. Clicking a tile navigates to an inquiry or data entry screen.
+2. **The Working Area (State B)**: The center area transitions to the screen. The Workspace View disappears. The user focuses purely on doing the work. The screen renders using the 6-part form anatomy (`FormTitleBar`, `FormToolbar`, Summary Area, Tabs, Details). Primary state-advancing actions are prominent via Expected Next Action; destructive actions require `ActionModal` confirmation.
+3. **The Side Panel**: "No number without an origin" — but it is lazy-loaded. Audit histories, underlying vendor bills, and financial impact projections sit behind icon strip tabs in the Side Panel, appearing only when the user invokes them. When they are done investigating, they collapse the panel and return to the focused context.
 
 ### 2.4. Density Management Rules
 
@@ -159,9 +165,10 @@ Each stage has an explicit density contract:
 
 | Stage              | Density                                   | Rationale                                                      |
 | :----------------- | :---------------------------------------- | :------------------------------------------------------------- |
-| **Queue (List)**   | Maximum — compact rows, minimal chrome    | Scanning speed is paramount                                    |
-| **Detail (Focus)** | Moderate — readable forms, clear sections | Accuracy over speed                                            |
-| **Trace (Drawer)** | Compact — dense timeline, minimal padding | Supporting context, not primary work                           |
+| **Workspace View** | Maximum — compact tiles, categorized links| Scanning speed is paramount                                    |
+| **Inquiry (List)** | Maximum — compact rows, minimal chrome    | Scanning and triage speed                                      |
+| **Data Entry**     | Moderate — readable forms, clear sections | Accuracy over speed                                            |
+| **Side Panel**     | Compact — dense timeline, minimal padding | Supporting context, not primary work                           |
 | **ActionModal**    | Minimal — interruptive clarity            | Destructive actions demand singular, undistracted confirmation |
 
 ### 2.5. Layered Context & Tiered Contrast (Dynamics 365 Standard)
@@ -180,15 +187,15 @@ We utilize a three-tier contrast system to create structural depth without heavy
 
 Every transactional module in AbrenERP implements the same Progressive Disclosure grammar. This guarantees a **repeatable, learnable interaction pattern** across the entire system:
 
-| Module                    | Workspace →                | Focus →                  | Side Panel                                   |
-| :------------------------ | :------------------------- | :----------------------- | :------------------------------------------- |
-| **Journal Entries**       | `JournalEntriesListPage`   | `JournalEntryFocus`      | Audit, FX rates, source documents            |
-| **Vendor Bills**          | `VendorBillsListPage`      | `VendorBillFocus`        | Linked invoices, approvals, GL impact        |
-| **Bank Transactions**     | `BankTransactionsListPage` | `BankTransactionFocus`   | Reconciliation matches, import source        |
-| **Inventory Adjustments** | `AdjustmentsListPage`      | `AdjustmentFocus`        | Warehouse logs, count sheets                 |
-| **Payment Requests**      | `PaymentRequestsListPage`  | `PaymentRequestFocus` ✅ | Workflow history, vendor info, budget impact |
+| Module                    | Inquiry Screen (PL)                | Data Entry Screen            | Side Panel                                   |
+| :------------------------ | :--------------------------------- | :--------------------------- | :------------------------------------------- |
+| **Journal Entries**       | `GL3010PL`                         | `GL301000`                   | Audit, FX rates, source documents            |
+| **Vendor Bills**          | `AP3020PL`                         | `AP302000`                   | Linked invoices, approvals, GL impact        |
+| **Bank Transactions**     | `BK3010PL`                         | `BK301000`                   | Reconciliation matches, import source        |
+| **Inventory Adjustments** | `IN3010PL`                         | `IN301000`                   | Warehouse logs, count sheets                 |
+| **Payment Requests**      | `AP3010PL` ✅                       | `AP301000` ✅                 | Workflow history, vendor info, budget impact |
 
-> **Rule**: If a new module cannot express its primary workflow through `Workspace → Focus → Side Panel`, the module's UX design must be escalated for architectural review before implementation.
+> **Rule**: If a new module cannot express its primary workflow through `Workspace View → Inquiry Screen → Data Entry Screen → Side Panel`, the module's UX design must be escalated for architectural review before implementation.
 
 ---
 
@@ -237,10 +244,10 @@ _Sensory Guidance_: When a state transitions, subtle motion guides the user's ey
 
 To prevent button clutter and decision paralysis, actions are strictly tiered:
 
-1. **Primary Actions (State-Advancing)**: Always visible and prominent (e.g., "Approve", "Pay", "Submit"). _Mapping: `<AppButton variant="primary" />`._
-2. **Secondary Actions (Supporting)**: Visible but visually subdued (e.g., "Edit", "Attach Document", "Print"). _Mapping: `<AppButton variant="secondary" />` or `variant="outline"`._
-3. **Tertiary Actions (Rare / Destructive)**: Hidden in the `MoreMenu` and require `ActionModal` confirmation (e.g., "Void", "Reject", "Delete"). They remain visible in workflow-aware surfaces when useful for comprehension, but are not promoted as primary actions.
-4. **Bulk Actions (Multi-Selection Context)**: A floating action bar anchored to the bottom of the grid surface. Appears via `<Transition>` when `selectedCount > 0`. Dismissed when selection is cleared. Contains only state-advancing and utility actions applicable to the entire selection. Never a modal — the bar must remain visible alongside the selected rows.
+1. **Primary Actions (State-Advancing)**: The **Expected Next Action** — a highlighted button on the toolbar, determined by the current record's domain status. Always visible and prominent (e.g., "Submit" when DRAFT, "Approve" when SUBMITTED). Rendered automatically by `FormToolbar` from `commands.ts`.
+2. **Secondary Actions (Supporting)**: Other available commands on the toolbar. May appear directly on the toolbar (favorites) or in the **More Menu** under categorized sections.
+3. **Tertiary Actions (Rare / Destructive)**: In the More Menu only, greyed out when unavailable. Require `ActionModal` confirmation (e.g., "Void", "Reject", "Delete").
+4. **Bulk Actions (Multi-Selection Context)**: A floating action bar anchored to the bottom of the grid in inquiry screens. Appears via `<Transition>` when `selectedCount > 0`. Contains only state-advancing and utility actions applicable to the entire selection.
 
 > **Rule:** No module may expose a destructive bulk action (e.g., bulk delete) without a preceding `ActionModal` confirmation that lists the affected record count.
 
@@ -263,11 +270,11 @@ The schema dictates:
 Traceability is not an afterthought; it lives natively in the UI via Progressive Disclosure.
 
 - Every Work Unit exposes its **Timeline**, **State Transitions**, and **Financial Impact**.
-- **UI Pattern**: A standard `<TraceDrawer />` component accessible from the Focus Canvas houses:
-  - `Trace` (Lineage to parent/child documents)
-  - `Documents` (Attached invoices, receipts)
+- **UI Pattern**: The standard Side Panel (`AppSidePane`) with icon strip tabs houses:
+  - `Audit` (Timeline of state transitions and who approved what)
+  - `Files` (Attached invoices, receipts)
   - `Financial Impact` (Projected or realized debits/credits)
-  - `Workflow History` (Audit log of who approved what and when)
+  - `Trace` (Lineage to parent/child documents)
 - **Rule**: _No number exists without a visible origin._
 
 ---
@@ -277,10 +284,10 @@ Traceability is not an afterthought; it lives natively in the UI via Progressive
 | Principle                   | Implementation                                                                                                                                     |
 | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Isolation of State**      | No accidental mutations from queue clicks. Route transitions are explicit.                                                                         |
-| **Progressive Disclosure**  | Heavy audit data only when requested via `TraceDrawer`.                                                                                            |
+| **Progressive Disclosure**  | Heavy audit data only when requested via Side Panel icon tabs.                                                                                     |
 | **ERP Density**             | Information richness staged per the Density Management Rules, never diluted.                                                                       |
 | **Cultural Fit**            | Linear flows mirror Ethiopian SME accountants' step-by-step processing.                                                                            |
-| **Scalability**             | Repeatable `Workspace → Focus → Side Panel` grammar scales across every module.                                                                    |
+| **Scalability**             | Repeatable `Workspace View → Data Entry → Side Panel` grammar scales across every module.                                                     |
 | **Training & Localization** | Sequential flows simplify translation and onboarding. Each step can carry localized tooltips or Amharic guidance without cluttering the interface. |
 
 ---
@@ -291,13 +298,10 @@ Every transactional UI feature expresses itself through these standardized compo
 
 | Component Type     | Naming Pattern             | Foundation   | Role                                                      |
 | :----------------- | :------------------------- | :----------- | :-------------------------------------------------------- |
-| **Workspace**      | `[Domain]ListPage.vue`     | Workspace    | Full-screen DataGrid with Smart Tabs                      |
-| **Focus Canvas**   | `[Domain]Focus.vue`        | Working Area | Isolated entity work (Field System governs layout)        |
-| **Side Panel**     | `[Domain]TraceDrawer.vue`  | Working Area | Lazy-loaded audit/provenance overlay                      |
-| **Macro-Create**   | `[Domain]CreatePage.vue`   | Working Area | Full page for creating complex entities                   |
-| **Micro-Create**   | `[Domain]CreateDrawer.vue` | Working Area | Slide-out for simple taxonomies                           |
-| **Form**           | `[Domain][Action]Form.vue` | Working Area | Headless presentation layer for a form                    |
-| **Confirmation**   | `[Domain]ActionModal.vue`  | Working Area | Interruptive confirmation for destructive operations      |
+| **Inquiry Screen** | `{ScreenID}PL/view.vue`   | Working Area | Full-screen DataGrid with filters (e.g., `AP3010PL`)      |
+| **Data Entry**     | `{ScreenID}/view.vue`     | Working Area | 6-part form anatomy (e.g., `AP301000`)                    |
+| **Side Panel Tab** | `sidepanels/{tab}.vue`    | Working Area | Icon strip tab content (audit, files, trace)              |
+| **Dialog**         | `{Entity}Dialog.vue`      | Working Area | Interruptive confirmation for destructive operations      |
 | **Field Renderer** | `AppField.vue`             | Working Area | **Tier 1** — Semantic data renderer (see Field System)    |
 | **Layout Engine**  | `AppFieldset.vue`          | Working Area | **Tier 1** — Grid layout authority (see Field System)     |
 | **Primitive**      | `App[Type].vue`            | All          | **Tier 1** — (`AppButton`, `AppInput`, `AppSelect`, etc.) |
@@ -311,5 +315,6 @@ Every transactional UI feature expresses itself through these standardized compo
 
 To prevent layout drift, the following screens serve as the immutable reference templates:
 
-1. **Focus Canvas:** `PaymentRequestFocus.vue` — Demonstrates `layout="horizontal"`, `AppTabs`, and `DataGrid` isolation.
-2. **Side Panel:** `PaymentRequestTraceDrawer.vue` — Demonstrates `layout="vertical"` and single-column density.
+1. **Data Entry:** `AP301000/view.vue` — Demonstrates `AppTemplate`, `AppTabs`, `DataGrid`, and controller authority.
+2. **Inquiry:** `AP3010PL/view.vue` — Demonstrates full-width DataGrid with filters and bulk actions.
+3. **Side Panel:** `AP301000/sidepanels/` — Demonstrates icon strip tabs with contextual record binding.

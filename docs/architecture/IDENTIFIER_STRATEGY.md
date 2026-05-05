@@ -240,5 +240,5 @@ To prevent regressions, the following testing protocols must be implemented for 
 ### 7.2 Session & Deep Link Tests (E2E / Cypress)
 
 - **Deep Linking**: Directly navigate to a Display ID URL (`/invoices/INV-5092`) bypassing the grid. Verify the `resolve` endpoint successfully fetches the UUID-based entity and hydrates the forms.
-- **Browser Refresh Resilience**: Assert that performing a hard refresh on `/invoices/INV-5092` does not crash due to missing UUID context mapping in transient Vuex/Pinia state.
+- **Browser Refresh Resilience**: Assert that performing a hard refresh on `/invoices/INV-5092` does not crash due to missing identifier context in the TanStack Query cache.
 - **Cache Invalidations**: Verify if switching from `INV-001` to `INV-002` appropriately triggers reactivity, overriding older UUID data in the primary detail view instead of displaying stale data.

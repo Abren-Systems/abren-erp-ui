@@ -653,16 +653,20 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 | Document                                         | Description                                           |
 | ------------------------------------------------ | ----------------------------------------------------- |
+| [Acumatica Alignment](ACUMATICA_ALIGNMENT.md)    | **Rosetta Stone** — maps all Acumatica UI concepts to Abren equivalents |
 | [UX Architecture Manifesto](UX_ARCHITECTURE.md)  | The interactive behavior and workflow OS standards    |
 | [Identifier Strategy](IDENTIFIER_STRATEGY.md)    | Mapping Human IDs to Backend UUIDs across the stack   |
-| [Screen Runtime](SCREEN_RUNTIME.md)              | Unified screen runtime and behavioral discipline      |
-| [Component System](COMPONENT_SYSTEM.md)          | Ownership, contracts, and design system alignment     |
-| [State Management](STATE_MANAGEMENT.md)          | Pinia store patterns and reactive state flows         |
-| [API Integration](API_INTEGRATION.md)            | HTTP client, mapper patterns, OpenAPI type generation |
+| [Screen Runtime](SCREEN_RUNTIME.md)              | Unified screen runtime, toolbar rendering, side panel |
+| [Screen Migration](SCREEN_MIGRATION.md)          | Step-by-step legacy → Screen ID conversion guide      |
+| [Component System](COMPONENT_SYSTEM.md)          | Ownership, contracts, and build status markers        |
+| [State Management](STATE_MANAGEMENT.md)          | TanStack Query (server) + Pinia (ephemeral UI) state  |
+| [API Integration](API_INTEGRATION.md)            | HTTP client, adapter, mapper, composable pipeline     |
 | [Form Architecture](FORM_ARCHITECTURE.md)        | TanStack Form + Zod integration and form patterns     |
 | [Field System](../FIELD_SYSTEM.md)               | Field rendering authority                             |
 | [Error Handling](ERROR_HANDLING.md)              | Error categories, toast system, loading states        |
 | [Testing Strategy](TESTING_STRATEGY.md)          | Frontend testing pyramid and coverage targets         |
+| [Naming Conventions](NAMING.md)                  | File, component, and entity naming standards          |
+| [Design System](DESIGN_SYSTEM.md)               | Visual pillars, density, and brand tokens             |
 | [Development Guide](../DEVELOPMENT.md)           | Local setup, coding standards, and conventions        |
 | [Repository Strategy](../REPOSITORY_STRATEGY.md) | How the UI repo coexists with the API repo            |
 

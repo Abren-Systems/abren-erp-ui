@@ -119,7 +119,7 @@ describe('Money (Value Object)', () => {
 Testing a Composable (UI Facade) requires asserting that the correct **Side Effects** were triggered.
 
 ```typescript
-// modules/finance/ap/application/composables/__tests__/usePayRequest.test.ts
+// modules/finance/ap/application/__tests__/usePayRequest.test.ts
 import { describe, it, expect, vi } from 'vitest'
 import { usePayRequest } from '../usePayRequest'
 

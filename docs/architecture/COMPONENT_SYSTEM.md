@@ -8,6 +8,7 @@ tags: [frontend, components, design-system, acumatica]
 # Component System & Contracts
 
 > **Parent:** [Frontend Architecture](ARCHITECTURE.md)
+> **Companion:** [Acumatica Alignment](ACUMATICA_ALIGNMENT.md) — maps components to Acumatica's form anatomy (§5)
 > **Last Updated:** May 2026
 
 This document defines how UI components are built, consumed, and governed in Abren ERP. It ensures that the product identity remains Abren-owned while leveraging headless infrastructure for behavior.
@@ -46,24 +47,40 @@ The old Fluent-based wrapper layer is historical context, not an active foundati
 
 Atomic interactions built via Abren-owned headless composition:
 
-- `AppButton`, `AppInput`, `AppSelect`, `AppBadge`, `AppDrawer`, `AppDialog`.
-- `AppSidePane` — Contextual overlays (`mode="overlay"` for filters, `mode="docked"` for trace panes).
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| `AppButton` | Clickable actions | ✅ Built |
+| `AppInput` | Text/number input | ✅ Built |
+| `AppSelect` | Dropdown selection | ✅ Built |
+| `AppBadge` | Status indicators | ✅ Built |
+| `AppDrawer` | Slide-out panels | ✅ Built |
+| `AppDialog` | Modal dialogs | ✅ Built |
+| `AppSidePane` | Contextual overlays (filter/trace) | ✅ Built |
 
-### 2.2 Screen Layer
+### 2.2 Screen Layer (Platform Chrome)
 
-Repeatable screen structure compositions:
+Repeatable screen structure compositions that implement [Acumatica Form Anatomy](ACUMATICA_ALIGNMENT.md#5-form-anatomy-6-basic-parts):
 
-- `ScreenTitleBar`, `ScreenToolbar`, `MoreMenu`, `RecordServicesMenu`, `WorkspacePanel`, `EmptyState`.
+| Component | Acumatica Part | Purpose | Status |
+|-----------|---------------|---------|--------|
+| `FormTitleBar` | Part 1: Form Title Bar | Form title, record title, record service buttons | ❌ Not built |
+| `FormToolbar` | Part 2: Form Toolbar | Standard buttons + Expected Next + More Menu | ❌ Not built |
+| `MoreMenu` | Part 2: More Menu | Categorized commands, favorites, expected next indicator | ❌ Not built |
+| `RecordServicesMenu` | Part 1: Title Bar buttons | Notes, Files, Activities, Settings | ❌ Not built |
+| `WorkspacePanel` | Workspace overlay | Categorized links to forms/reports/dashboards | ❌ Not built |
+| `EmptyState` | — | Empty record/list placeholder | ✅ Built |
 
 ### 2.3 Field System Layer (Working Area)
 
 Governs all data display and layout inside the Working Area. See [Field System Architecture](../FIELD_SYSTEM.md).
 
-- `AppField` — Semantic data renderer.
-- `AppFieldset` — CSS Grid layout authority (140px baseline).
-- `AppTemplate` — Named screen template authority for Acumatica-style slot widths.
-- `AppTabs` — Personalizable visibility toggle for data strata.
-- `DataGrid` — Tabular rendering platform with preset-driven logic.
+| Component | Acumatica Part | Purpose | Status |
+|-----------|---------------|---------|--------|
+| `AppField` | `PXField` | Semantic data renderer via Field System | ✅ Built |
+| `AppFieldset` | `qp-fieldset` | CSS Grid layout authority (140px baseline) | ✅ Built |
+| `AppTemplate` | `qp-template` | Named screen template for Acumatica-style slot widths | ❌ Not built |
+| `AppTabs` | Part 4: Tabs | Personalizable visibility toggle for data strata | ✅ Built |
+| `DataGrid` | Part 5/6: Details/Row | Tabular rendering with preset-driven logic | ✅ Built |
 
 ---
 
@@ -140,21 +157,45 @@ interface GridDefinition<TEntity> {
 
 ---
 
-## 5. Command Contract
+## 5. Command Contract (Two-Layer Hybrid)
+
+Follows [Acumatica's command model](ACUMATICA_ALIGNMENT.md#6-the-command-model-two-layer-hybrid): declarative data objects (Layer 1) resolved by a platform toolbar renderer (Layer 2).
+
+### Layer 1: Declaration (commands.ts)
 
 ```ts
 interface ScreenCommand {
+  // Identity
   key: string
-  labelKey: I18nKey
-  categoryKey?: I18nKey
-  variant: 'primary' | 'neutral' | 'danger'
-  visible: boolean
-  enabled: boolean
-  favoriteEligible?: boolean
+  labelKey: string                          // i18n key: '{module}.{screenId}.actions.{key}'
+  icon?: string
+
+  // Placement (static attributes — like PXButton)
+  categoryKey: string                       // More Menu category: 'processing', 'activities', 'other'
+  displayOnMainToolbar?: boolean            // Also show as toolbar button (default: false)
+  favoriteEligible?: boolean                // User can star this command
+
+  // Visibility & enablement (state-driven — like Workflow API)
+  isVisible: (state: ScreenState) => boolean
+  isEnabled: (state: ScreenState, data: unknown) => boolean
+  expectedNext: (state: ScreenState) => boolean    // Green dot + highlighted toolbar button
+
+  // Execution
+  execute: (controller: ScreenController) => void | Promise<void>
 }
 ```
 
-- **Rules**: Unavailable commands remain visible but disabled for workflow comprehension. Commands are grouped in `MoreMenu` by category. User-favorites can be promoted to the toolbar.
+### Layer 2: Platform Resolution (FormToolbar)
+
+The `FormToolbar` component reads commands and renders them. No hand-coding per form.
+
+### Rules:
+
+- Unavailable commands remain **visible but disabled** in the More Menu for workflow comprehension.
+- Commands are grouped by `categoryKey` in the More Menu.
+- User-favorites (★) are promoted from More Menu to the toolbar.
+- Expected Next Action (●) is highlighted as a prominent toolbar button.
+- Responsive: commands cascade off toolbar into More Menu as screen shrinks.
 
 ---
 

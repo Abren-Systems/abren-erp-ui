@@ -65,7 +65,7 @@ export const useLedgerUIStore = defineStore('ledger-ui', () => {
 ### 2.2 Key Rules
 
 - **Setup Store syntax** (function-based) over Options API for full TypeScript inference.
-- **Stores hold ViewModels**, not raw DTOs. The mapper transforms data before it enters the store.
+- **Stores hold UI state only**, not domain data or ViewModels. Domain data lives in TanStack Query cache, managed by controllers.
 - **No API calls in stores**. Stores are passive state containers. Composables orchestrate data flow.
 - **Always expose `$reset()`** for logout cleanup and testing.
 
@@ -208,27 +208,31 @@ export function useSubmitRequest() {
 
 ---
 
+## 6. Auth Store (Shared Technical Concern)
+
+The Auth store is an exception to module-level store rules — it is a **shared technical concern** that enables module isolation by providing identity context to route guards and API interceptors.
+
+```typescript
 // shared/auth/auth.store.ts
 export const useAuthStore = defineStore('auth', () => {
-const token = ref<string | null>(null)
-const currentUser = ref<CurrentUser | null>(null)
-const currentTenant = ref<TenantInfo | null>(null)
+  const token = ref<string | null>(null)
+  const currentUser = ref<CurrentUser | null>(null)
+  const currentTenant = ref<TenantInfo | null>(null)
 
-const isAuthenticated = computed(() => !!token.value)
-const tenantFeatures = computed(() => currentTenant.value?.features ?? {})
+  const isAuthenticated = computed(() => !!token.value)
+  const tenantFeatures = computed(() => currentTenant.value?.features ?? {})
 
-function hasFeature(feature: string): boolean {
-return tenantFeatures.value[feature] === true
-}
+  function hasFeature(feature: string): boolean {
+    return tenantFeatures.value[feature] === true
+  }
 
-return {
-token,
-currentUser,
-currentTenant,
-isAuthenticated,
-tenantFeatures,
-hasFeature,
-}
+  return {
+    token,
+    currentUser,
+    currentTenant,
+    isAuthenticated,
+    tenantFeatures,
+    hasFeature,
+  }
 })
-
-This store is not a bounded context — it is a **shared technical concern** that enables module isolation by providing identity context to route guards and API interceptors.
+```
