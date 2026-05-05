@@ -13,11 +13,13 @@ import type { ScreenId } from '@/platform/screen-runtime'
 
 import { AP3010PL } from './ui/AP3010PL/screen'
 import { AP301000 } from './ui/AP301000/screen'
+import { AP3020PL } from './ui/AP3020PL/screen'
+import { AP302000 } from './ui/AP302000/screen'
 
-export { AP3010PL, AP301000 }
+export { AP3010PL, AP301000, AP3020PL, AP302000 }
 
 /** All screens registered by the AP module */
-export const apScreens: readonly ScreenDefinition[] = [AP3010PL, AP301000]
+export const apScreens: readonly ScreenDefinition[] = [AP3010PL, AP301000, AP3020PL, AP302000]
 
 // Screens will be pushed into this array as they are defined.
 // For now this is a placeholder — the actual wiring happens in Phase 2
