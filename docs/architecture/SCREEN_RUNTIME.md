@@ -46,15 +46,15 @@ Vue Router
 
 The frontend is organized by Acumatica-style archetypes encoded in the **Screen ID**. Each archetype maps to a Form Kind (see [Acumatica Alignment §3](ACUMATICA_ALIGNMENT.md#3-form-kinds-what-appears-in-the-working-area)) that enforces what a form is allowed to do.
 
-| Area Code | Archetype | Form Kind | Purpose | Example |
-|-----------|-----------|-----------|---------|---------|
-| `10` | **Setup** | `setup` | Configuration and module preferences | `AP101000` |
-| `20` | **Maintenance** | `maintenance` | Master data management (Vendors, Items) | `AP201000` |
-| `30` | **Data Entry** | `dataEntry` | Transactional document entry (Bills, JEs) | `AP301000` |
-| `PL` | **Primary List** | `inquiry` | Paired list/inquiry for data entry forms | `AP3010PL` |
-| `40` | **Inquiry** | `inquiry` | Read-only analytical grids | `AP401000` |
-| `50` | **Processing** | `processing` | Bulk processing screens (deferred) | `AP501000` |
-| `60` | **Report** | `report` | Formatted printable reports | `AP601000` |
+| Area Code | Archetype        | Form Kind     | Purpose                                   | Example    |
+| --------- | ---------------- | ------------- | ----------------------------------------- | ---------- |
+| `10`      | **Setup**        | `setup`       | Configuration and module preferences      | `AP101000` |
+| `20`      | **Maintenance**  | `maintenance` | Master data management (Vendors, Items)   | `AP201000` |
+| `30`      | **Data Entry**   | `dataEntry`   | Transactional document entry (Bills, JEs) | `AP301000` |
+| `PL`      | **Primary List** | `inquiry`     | Paired list/inquiry for data entry forms  | `AP3010PL` |
+| `40`      | **Inquiry**      | `inquiry`     | Read-only analytical grids                | `AP401000` |
+| `50`      | **Processing**   | `processing`  | Bulk processing screens (deferred)        | `AP501000` |
+| `60`      | **Report**       | `report`      | Formatted printable reports               | `AP601000` |
 
 ---
 
@@ -86,14 +86,14 @@ The Form Title Bar is rendered by the `FormTitleBar` component (platform-level).
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
-| Element | Source | Behavior |
-|---------|--------|----------|
-| Form title | `screenDefinition.title` | Static — set once from screen metadata |
-| Record title | Controller's primary view current record | Reactive — updates on record navigation |
-| Note button | Platform `RecordNotes` service | Opens note attachment dialog for current record |
-| Activities button | Platform `RecordActivities` service | Opens task/event/email creation in new tab |
-| Files button | Platform `RecordAttachments` service | Opens file attachment dialog for current record |
-| Settings button | Platform `ScreenConfiguration` service | Form personalization and configuration |
+| Element           | Source                                   | Behavior                                        |
+| ----------------- | ---------------------------------------- | ----------------------------------------------- |
+| Form title        | `screenDefinition.title`                 | Static — set once from screen metadata          |
+| Record title      | Controller's primary view current record | Reactive — updates on record navigation         |
+| Note button       | Platform `RecordNotes` service           | Opens note attachment dialog for current record |
+| Activities button | Platform `RecordActivities` service      | Opens task/event/email creation in new tab      |
+| Files button      | Platform `RecordAttachments` service     | Opens file attachment dialog for current record |
+| Settings button   | Platform `ScreenConfiguration` service   | Form personalization and configuration          |
 
 > **Build status:** All title bar service buttons are ❌ not built. The `FormTitleBar` component must be created as platform chrome.
 
@@ -126,17 +126,17 @@ Input: commands[] from controller.getCommands()
 
 ### Standard Buttons (per Form Kind):
 
-| Button | Setup | Maintenance | Data Entry | Inquiry | Processing |
-|--------|-------|-------------|------------|---------|------------|
-| Save | ✅ | ✅ | ✅ | — | — |
-| Cancel | ✅ | ✅ | ✅ | — | — |
-| Add | — | ✅ | ✅ | — | — |
-| Delete | — | ✅ | ✅ | — | — |
-| Copy | — | — | ✅ | — | — |
-| Undo | — | — | ✅ | — | — |
-| First/Prev/Next/Last | — | ✅ | ✅ | — | — |
-| Refresh | — | — | — | ✅ | ✅ |
-| Process / Process All | — | — | — | — | ✅ |
+| Button                | Setup | Maintenance | Data Entry | Inquiry | Processing |
+| --------------------- | ----- | ----------- | ---------- | ------- | ---------- |
+| Save                  | ✅    | ✅          | ✅         | —       | —          |
+| Cancel                | ✅    | ✅          | ✅         | —       | —          |
+| Add                   | —     | ✅          | ✅         | —       | —          |
+| Delete                | —     | ✅          | ✅         | —       | —          |
+| Copy                  | —     | —           | ✅         | —       | —          |
+| Undo                  | —     | —           | ✅         | —       | —          |
+| First/Prev/Next/Last  | —     | ✅          | ✅         | —       | —          |
+| Refresh               | —     | —           | —          | ✅      | ✅         |
+| Process / Process All | —     | —           | —          | —       | ✅         |
 
 ### More Menu Rendering:
 
@@ -202,22 +202,22 @@ The Side Panel is rendered by the `AppSidePanel` component. It appears on the ri
 
 The Side Panel is **always bound to the current record context**:
 
-| Trigger | Behavior |
-|---------|----------|
+| Trigger                                    | Behavior                                                |
+| ------------------------------------------ | ------------------------------------------------------- |
 | Grid row selection (on list/inquiry forms) | Side panel refreshes with the selected row's record key |
-| Record navigation (on data entry forms) | Side panel refreshes with the navigated record |
-| Tab switch in panel | Active tab content reloads for current record |
+| Record navigation (on data entry forms)    | Side panel refreshes with the navigated record          |
+| Tab switch in panel                        | Active tab content reloads for current record           |
 
 ### Side Panel Contract:
 
 ```typescript
 interface SidePanelConfig {
-  tabs: SidePanelTab[];
+  tabs: SidePanelTab[]
 }
 
 type SidePanelTab =
-  | { kind: 'local'; icon: string; component: Component; label: string }   // Local content
-  | { kind: 'screen'; icon: string; screenId: ScreenId; label: string };   // Embedded form
+  | { kind: 'local'; icon: string; component: Component; label: string } // Local content
+  | { kind: 'screen'; icon: string; screenId: ScreenId; label: string } // Embedded form
 
 // Context is injected automatically by the platform:
 // provide('sidePanelContext', { recordKey: computed(() => controller.currentRecordKey) })

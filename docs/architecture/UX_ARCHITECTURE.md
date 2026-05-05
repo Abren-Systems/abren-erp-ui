@@ -163,13 +163,13 @@ The primary flow for transactional operations:
 
 Each stage has an explicit density contract:
 
-| Stage              | Density                                   | Rationale                                                      |
-| :----------------- | :---------------------------------------- | :------------------------------------------------------------- |
-| **Workspace View** | Maximum — compact tiles, categorized links| Scanning speed is paramount                                    |
-| **Inquiry (List)** | Maximum — compact rows, minimal chrome    | Scanning and triage speed                                      |
-| **Data Entry**     | Moderate — readable forms, clear sections | Accuracy over speed                                            |
-| **Side Panel**     | Compact — dense timeline, minimal padding | Supporting context, not primary work                           |
-| **ActionModal**    | Minimal — interruptive clarity            | Destructive actions demand singular, undistracted confirmation |
+| Stage              | Density                                    | Rationale                                                      |
+| :----------------- | :----------------------------------------- | :------------------------------------------------------------- |
+| **Workspace View** | Maximum — compact tiles, categorized links | Scanning speed is paramount                                    |
+| **Inquiry (List)** | Maximum — compact rows, minimal chrome     | Scanning and triage speed                                      |
+| **Data Entry**     | Moderate — readable forms, clear sections  | Accuracy over speed                                            |
+| **Side Panel**     | Compact — dense timeline, minimal padding  | Supporting context, not primary work                           |
+| **ActionModal**    | Minimal — interruptive clarity             | Destructive actions demand singular, undistracted confirmation |
 
 ### 2.5. Layered Context & Tiered Contrast (Dynamics 365 Standard)
 
@@ -187,13 +187,13 @@ We utilize a three-tier contrast system to create structural depth without heavy
 
 Every transactional module in AbrenERP implements the same Progressive Disclosure grammar. This guarantees a **repeatable, learnable interaction pattern** across the entire system:
 
-| Module                    | Inquiry Screen (PL)                | Data Entry Screen            | Side Panel                                   |
-| :------------------------ | :--------------------------------- | :--------------------------- | :------------------------------------------- |
-| **Journal Entries**       | `GL3010PL`                         | `GL301000`                   | Audit, FX rates, source documents            |
-| **Vendor Bills**          | `AP3020PL`                         | `AP302000`                   | Linked invoices, approvals, GL impact        |
-| **Bank Transactions**     | `BK3010PL`                         | `BK301000`                   | Reconciliation matches, import source        |
-| **Inventory Adjustments** | `IN3010PL`                         | `IN301000`                   | Warehouse logs, count sheets                 |
-| **Payment Requests**      | `AP3010PL` ✅                       | `AP301000` ✅                 | Workflow history, vendor info, budget impact |
+| Module                    | Inquiry Screen (PL) | Data Entry Screen | Side Panel                                   |
+| :------------------------ | :------------------ | :---------------- | :------------------------------------------- |
+| **Journal Entries**       | `GL3010PL`          | `GL301000`        | Audit, FX rates, source documents            |
+| **Vendor Bills**          | `AP3020PL`          | `AP302000`        | Linked invoices, approvals, GL impact        |
+| **Bank Transactions**     | `BK3010PL`          | `BK301000`        | Reconciliation matches, import source        |
+| **Inventory Adjustments** | `IN3010PL`          | `IN301000`        | Warehouse logs, count sheets                 |
+| **Payment Requests**      | `AP3010PL` ✅       | `AP301000` ✅     | Workflow history, vendor info, budget impact |
 
 > **Rule**: If a new module cannot express its primary workflow through `Workspace View → Inquiry Screen → Data Entry Screen → Side Panel`, the module's UX design must be escalated for architectural review before implementation.
 
@@ -287,7 +287,7 @@ Traceability is not an afterthought; it lives natively in the UI via Progressive
 | **Progressive Disclosure**  | Heavy audit data only when requested via Side Panel icon tabs.                                                                                     |
 | **ERP Density**             | Information richness staged per the Density Management Rules, never diluted.                                                                       |
 | **Cultural Fit**            | Linear flows mirror Ethiopian SME accountants' step-by-step processing.                                                                            |
-| **Scalability**             | Repeatable `Workspace View → Data Entry → Side Panel` grammar scales across every module.                                                     |
+| **Scalability**             | Repeatable `Workspace View → Data Entry → Side Panel` grammar scales across every module.                                                          |
 | **Training & Localization** | Sequential flows simplify translation and onboarding. Each step can carry localized tooltips or Amharic guidance without cluttering the interface. |
 
 ---
@@ -296,15 +296,15 @@ Traceability is not an afterthought; it lives natively in the UI via Progressive
 
 Every transactional UI feature expresses itself through these standardized component types:
 
-| Component Type     | Naming Pattern             | Foundation   | Role                                                      |
-| :----------------- | :------------------------- | :----------- | :-------------------------------------------------------- |
-| **Inquiry Screen** | `{ScreenID}PL/view.vue`   | Working Area | Full-screen DataGrid with filters (e.g., `AP3010PL`)      |
-| **Data Entry**     | `{ScreenID}/view.vue`     | Working Area | 6-part form anatomy (e.g., `AP301000`)                    |
-| **Side Panel Tab** | `sidepanels/{tab}.vue`    | Working Area | Icon strip tab content (audit, files, trace)              |
-| **Dialog**         | `{Entity}Dialog.vue`      | Working Area | Interruptive confirmation for destructive operations      |
-| **Field Renderer** | `AppField.vue`             | Working Area | **Tier 1** — Semantic data renderer (see Field System)    |
-| **Layout Engine**  | `AppFieldset.vue`          | Working Area | **Tier 1** — Grid layout authority (see Field System)     |
-| **Primitive**      | `App[Type].vue`            | All          | **Tier 1** — (`AppButton`, `AppInput`, `AppSelect`, etc.) |
+| Component Type     | Naming Pattern          | Foundation   | Role                                                      |
+| :----------------- | :---------------------- | :----------- | :-------------------------------------------------------- |
+| **Inquiry Screen** | `{ScreenID}PL/view.vue` | Working Area | Full-screen DataGrid with filters (e.g., `AP3010PL`)      |
+| **Data Entry**     | `{ScreenID}/view.vue`   | Working Area | 6-part form anatomy (e.g., `AP301000`)                    |
+| **Side Panel Tab** | `sidepanels/{tab}.vue`  | Working Area | Icon strip tab content (audit, files, trace)              |
+| **Dialog**         | `{Entity}Dialog.vue`    | Working Area | Interruptive confirmation for destructive operations      |
+| **Field Renderer** | `AppField.vue`          | Working Area | **Tier 1** — Semantic data renderer (see Field System)    |
+| **Layout Engine**  | `AppFieldset.vue`       | Working Area | **Tier 1** — Grid layout authority (see Field System)     |
+| **Primitive**      | `App[Type].vue`         | All          | **Tier 1** — (`AppButton`, `AppInput`, `AppSelect`, etc.) |
 
 > [!IMPORTANT]
 > **Vendor Shielding**: Business modules MUST NOT use raw vendor primitives (raw headless primitives or third-party UI tags). All interaction must occur through our established **Tier 1 Primitives** so Abren owns the interface contract.

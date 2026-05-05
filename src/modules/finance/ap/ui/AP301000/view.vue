@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { h } from 'vue'
+/**
+ * AP301000 — Payment Request Data Entry View
+ *
+ * Pure presentation template. All behavior comes from the controller.
+ * All chrome comes from platform components (FormTitleBar, FormToolbar).
+ *
+ * This file should remain thin — layout only, no business logic.
+ */
 import {
   AppField,
   AppFormField,
@@ -8,10 +15,8 @@ import {
   AppTabs,
 } from '@/shared/components/field-system'
 import { AppButton } from '@/shared/components/primitives'
-import { History } from 'lucide-vue-next'
-import PaymentRequestHeader from './header.vue'
-import PaymentRequestActions from './actions.vue'
 import { DataGrid } from '@/shared/components/data-grid'
+import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { paymentRequestLineColumns } from './grids/lines.grid'
 import { usePaymentRequestEntry } from './controller'
 
@@ -21,57 +26,54 @@ const ctrl = usePaymentRequestEntry(props.id)
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8">
+  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+    <!-- Error State -->
     <div v-if="ctrl.error.value" class="p-8">
       <AppFieldset title="Error Loading Request" variant="neutral" :columns="1">
         <AppField field="error" label="Error" :value="String(ctrl.error.value)" type="text" />
       </AppFieldset>
     </div>
+
+    <!-- Loading State -->
     <div v-else-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
       <AppFieldset title="Loading" variant="neutral" :columns="1">
         <AppField field="status" label="Status" value="Loading details..." type="text" />
       </AppFieldset>
     </div>
-    <div v-else class="flex flex-col gap-6">
-      <PaymentRequestHeader :request="ctrl.isNew.value ? undefined : ctrl.entity.value">
-        <template #actions>
-          <template v-if="ctrl.isNew.value">
-            <AppButton variant="secondary" class="mr-2" @click="ctrl.saveDraft">
-              Save Draft
-            </AppButton>
-            <AppButton
-              variant="primary"
-              :disabled="ctrl.isCreating.value"
-              @click="ctrl.handleCreate"
-            >
-              Create Request
-            </AppButton>
-          </template>
-          <template v-else>
-            <AppButton variant="secondary" @click="ctrl.isTraceOpen.value = true">
-              <History class="mr-2 h-4 w-4" />
-              Trace
-            </AppButton>
-            <PaymentRequestActions
-              :actions="ctrl.actions.value"
-              :is-pending="ctrl.isPending.value"
-              @action="ctrl.handleAction"
-            />
-          </template>
-        </template>
-      </PaymentRequestHeader>
 
-      <form
-        class="px-8 pb-8 flex flex-col gap-6"
-        @submit.prevent="
-          (e) => {
-            ;(e as Event).stopPropagation()
-            ctrl.form.handleSubmit()
-          }
-        "
+    <!-- Main Content -->
+    <template v-else>
+      <!-- 1. Form Title Bar -->
+      <FormTitleBar
+        :form-title="ctrl.screen.titleKey"
+        :record-title="ctrl.isNew.value ? undefined : ctrl.entity.value?.requestNumber"
+        back-route="PaymentRequestsList"
+      />
+
+      <!-- 2. Form Toolbar -->
+      <FormToolbar
+        v-if="!ctrl.isNew.value"
+        :commands="ctrl.screen.commands"
+        :domain-state="String(ctrl.state.domain)"
+        :executors="ctrl.commands.value"
+        :is-pending="ctrl.isPending.value"
+        :is-new="ctrl.isNew.value"
+      />
+
+      <!-- Create Mode Toolbar -->
+      <div
+        v-else
+        class="flex items-center gap-2 px-6 py-2 border-b border-[var(--color-neutral-200)] bg-white"
       >
-        <!-- Top Section (Fieldsets) -->
-        <AppFieldset variant="ghost" layout="horizontal" :columns="3">
+        <AppButton variant="secondary" @click="ctrl.saveDraft"> Save Draft </AppButton>
+        <AppButton variant="primary" :disabled="ctrl.isCreating.value" @click="ctrl.handleCreate">
+          Create Request
+        </AppButton>
+      </div>
+
+      <!-- 3. Summary Area -->
+      <div class="px-6 py-5">
+        <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
           <FieldGroup>
             <AppField v-bind="ctrl.fields.requesterId" />
             <AppField
@@ -102,12 +104,16 @@ const ctrl = usePaymentRequestEntry(props.id)
             />
             <AppField v-bind="ctrl.fields.totalAmount" />
           </FieldGroup>
-        </AppFieldset>
+        </AppTemplate>
+      </div>
 
-        <!-- Middle Section (Tab Bar) -->
+      <!-- 4. Tabs -->
+      <div class="px-6">
         <AppTabs :tabs="['Line Details']" v-model="ctrl.activeTab.value" />
+      </div>
 
-        <!-- Bottom Section (Grid/Content) -->
+      <!-- 5. Details Area -->
+      <div class="px-6 pb-6">
         <div
           v-if="ctrl.activeTab.value === 'Line Details'"
           class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-white shadow-sm"
@@ -119,7 +125,7 @@ const ctrl = usePaymentRequestEntry(props.id)
             empty-message="No line items found"
           />
         </div>
-      </form>
-    </div>
+      </div>
+    </template>
   </div>
 </template>

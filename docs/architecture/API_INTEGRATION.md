@@ -38,13 +38,13 @@ Screen Controller (controller.ts) → View (view.vue)
 
 ### Layer Responsibilities
 
-| Layer | File Location | Input | Output | Allowed Imports |
-|-------|--------------|-------|--------|-----------------|
-| HTTP Client | `shared/api/` | URL + config | Raw JSON (envelope unwrapped) | Axios, auth store |
-| Adapter | `modules/{m}/infrastructure/*_adapter.ts` | Method args | Validated DTOs | HTTP client, Zod schemas |
-| Schemas | `modules/{m}/infrastructure/schemas.ts` | Raw JSON | Typed DTOs | Zod only |
-| Mapper | `modules/{m}/infrastructure/mappers.ts` | DTOs | Domain types | Domain types, value objects |
-| Composable | `modules/{m}/application/use*.ts` | Record ID / filters | Reactive refs | Adapter, mapper, TanStack Query |
+| Layer       | File Location                             | Input               | Output                        | Allowed Imports                 |
+| ----------- | ----------------------------------------- | ------------------- | ----------------------------- | ------------------------------- |
+| HTTP Client | `shared/api/`                             | URL + config        | Raw JSON (envelope unwrapped) | Axios, auth store               |
+| Adapter     | `modules/{m}/infrastructure/*_adapter.ts` | Method args         | Validated DTOs                | HTTP client, Zod schemas        |
+| Schemas     | `modules/{m}/infrastructure/schemas.ts`   | Raw JSON            | Typed DTOs                    | Zod only                        |
+| Mapper      | `modules/{m}/infrastructure/mappers.ts`   | DTOs                | Domain types                  | Domain types, value objects     |
+| Composable  | `modules/{m}/application/use*.ts`         | Record ID / filters | Reactive refs                 | Adapter, mapper, TanStack Query |
 
 ---
 
@@ -95,6 +95,7 @@ httpClient.interceptors.request.use((config) => {
 The backend uses a unified response envelope. The HTTP client unwraps it before data reaches adapters.
 
 **Success Envelope:**
+
 ```json
 {
   "success": true,
@@ -104,6 +105,7 @@ The backend uses a unified response envelope. The HTTP client unwraps it before 
 ```
 
 **Error Envelope:**
+
 ```json
 {
   "success": false,
@@ -400,15 +402,15 @@ API Call → Axios Error → Interceptor → ApiError class → Composable catch
 
 ### 8.2 Global vs Local Error Handling
 
-| Error Type | Handling | Example |
-|-----------|----------|---------|
-| `401 Unauthorized` | **Global**: Auto-redirect to login | Token expired |
-| `403 Forbidden` | **Global**: Show "access denied" toast | Feature not enabled |
-| `429 Too Many Requests` | **Global**: Show rate limit warning | Rapid API calls |
-| `404 Not Found` | **Local**: Module composable handles it | Entity deleted |
-| `422 Validation` | **Local**: Show field-level errors on form | Invalid form data |
-| `409 Conflict` | **Local**: Show conflict resolution UI | Optimistic concurrency violation |
-| `5xx Server Error` | **Global**: Show generic error banner | Backend down |
+| Error Type              | Handling                                   | Example                          |
+| ----------------------- | ------------------------------------------ | -------------------------------- |
+| `401 Unauthorized`      | **Global**: Auto-redirect to login         | Token expired                    |
+| `403 Forbidden`         | **Global**: Show "access denied" toast     | Feature not enabled              |
+| `429 Too Many Requests` | **Global**: Show rate limit warning        | Rapid API calls                  |
+| `404 Not Found`         | **Local**: Module composable handles it    | Entity deleted                   |
+| `422 Validation`        | **Local**: Show field-level errors on form | Invalid form data                |
+| `409 Conflict`          | **Local**: Show conflict resolution UI     | Optimistic concurrency violation |
+| `5xx Server Error`      | **Global**: Show generic error banner      | Backend down                     |
 
 ### 8.3 Global Error Interceptor
 

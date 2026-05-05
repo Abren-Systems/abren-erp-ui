@@ -1,5 +1,6 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { AP_MODULE_ID, apScreenId } from '../../screens'
+import { AP301000_COMMANDS } from './commands'
 
 /**
  * AP301000 — Payment Request Data Entry (Focus)
@@ -12,7 +13,7 @@ export const AP301000: ScreenDefinition = {
   id: apScreenId('AP301000'),
   moduleId: AP_MODULE_ID,
   kind: 'dataEntry',
-  titleKey: 'ap.paymentRequests.focus.title',
+  titleKey: 'Payment Requests',
   primaryView: 'paymentRequest',
   route: {
     path: 'requests/:id',
@@ -49,7 +50,7 @@ export const AP301000: ScreenDefinition = {
       defaultCollapsed: true,
     },
   },
-  commands: [],
+  commands: AP301000_COMMANDS,
   personalization: {
     allowTabPersonalization: true,
     allowGridPersonalization: true,

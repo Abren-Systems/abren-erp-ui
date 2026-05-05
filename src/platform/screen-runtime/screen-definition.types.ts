@@ -124,7 +124,7 @@ export interface ScreenDefinition<
   readonly layout: ScreenLayoutDefinition
 
   /** Commands available on this screen */
-  readonly commands: readonly ScreenCommand<TEntity>[]
+  readonly commands: readonly ScreenCommand[]
 
   /** Personalization policy governing what users can customize */
   readonly personalization: ScreenPersonalizationPolicy

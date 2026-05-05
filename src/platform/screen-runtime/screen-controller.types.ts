@@ -29,8 +29,8 @@ export interface ScreenController<T = unknown> {
   /** The granular data access layer */
   readonly data: ScreenData<T>
 
-  /** The registered commands available to this screen */
-  readonly commands: Record<string, ScreenCommand<T>>
+  /** The declared commands for this screen (flat data objects) */
+  readonly commands: readonly ScreenCommand[]
 
   /**
    * Internal mutation gateway.

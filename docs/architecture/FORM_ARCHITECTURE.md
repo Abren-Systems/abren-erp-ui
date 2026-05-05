@@ -40,13 +40,13 @@ Parts 1 and 2 (Title Bar, Toolbar) are **platform chrome** — the screen's `vie
 
 Each [Form Kind](ACUMATICA_ALIGNMENT.md#3-form-kinds-what-appears-in-the-working-area) enforces a different layout:
 
-| Kind | Summary Zone | Tabs | Detail Grid | Submission Model |
-|------|-------------|------|-------------|-----------------|
-| **Setup** (`10`) | Settings sections | Rarely | No | Save on change |
-| **Maintenance** (`20`) | Summary Area (collapsible) | Yes | No | Save/Cancel |
-| **Data Entry** (`30`) | Summary Area (collapsible) | Yes (multiple) | Yes (line items) | Save/Cancel + workflow commands |
-| **Inquiry** (`40`) | Selection Area (filters) | No | Yes (results) | Read-only — no submission |
-| **Processing** (`50`) | Selection Area (filters) | No | Yes (selectable) | Process / Process All |
+| Kind                   | Summary Zone               | Tabs           | Detail Grid      | Submission Model                |
+| ---------------------- | -------------------------- | -------------- | ---------------- | ------------------------------- |
+| **Setup** (`10`)       | Settings sections          | Rarely         | No               | Save on change                  |
+| **Maintenance** (`20`) | Summary Area (collapsible) | Yes            | No               | Save/Cancel                     |
+| **Data Entry** (`30`)  | Summary Area (collapsible) | Yes (multiple) | Yes (line items) | Save/Cancel + workflow commands |
+| **Inquiry** (`40`)     | Selection Area (filters)   | No             | Yes (results)    | Read-only — no submission       |
+| **Processing** (`50`)  | Selection Area (filters)   | No             | Yes (selectable) | Process / Process All           |
 
 ---
 
@@ -75,22 +75,22 @@ Forms in Abren are governed by the **Controller Authority** principle (see [Scre
 
 ### What the Controller Owns
 
-| Responsibility | Where It Lives | NOT In |
-|---------------|---------------|--------|
-| Field definitions (label, type, readonly, required) | `fields.ts` | Template |
-| Commands (submit, approve, void) | `commands.ts` | Template buttons |
-| State evaluation (which fields are editable, which commands are visible) | `controller.ts` | `v-if` in template |
-| Data fetching & mutation | `controller.ts` via composables | Component `onMounted` |
-| Validation schema | `fields.ts` or `controller.ts` | Inline template checks |
+| Responsibility                                                           | Where It Lives                  | NOT In                 |
+| ------------------------------------------------------------------------ | ------------------------------- | ---------------------- |
+| Field definitions (label, type, readonly, required)                      | `fields.ts`                     | Template               |
+| Commands (submit, approve, void)                                         | `commands.ts`                   | Template buttons       |
+| State evaluation (which fields are editable, which commands are visible) | `controller.ts`                 | `v-if` in template     |
+| Data fetching & mutation                                                 | `controller.ts` via composables | Component `onMounted`  |
+| Validation schema                                                        | `fields.ts` or `controller.ts`  | Inline template checks |
 
 ### What the View Owns
 
-| Responsibility | How |
-|---------------|-----|
-| Layout structure | `AppTemplate`, `AppFieldset`, `AppTabs` |
-| Field rendering | `<AppField v-bind="controller.useField('vendor')" />` |
-| Grid rendering | `<DataGrid v-bind="controller.useGrid('lines')" />` |
-| Nothing else | — |
+| Responsibility   | How                                                   |
+| ---------------- | ----------------------------------------------------- |
+| Layout structure | `AppTemplate`, `AppFieldset`, `AppTabs`               |
+| Field rendering  | `<AppField v-bind="controller.useField('vendor')" />` |
+| Grid rendering   | `<DataGrid v-bind="controller.useGrid('lines')" />`   |
+| Nothing else     | —                                                     |
 
 ---
 
@@ -102,7 +102,7 @@ Fields are the atomic unit of form interaction. Every field is declared in `fiel
 
 ```typescript
 // AP301000/fields.ts
-import type { FieldDefinition } from '@/platform/field-system/field-definition.types';
+import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
 
 export const paymentRequestFields: Record<string, FieldDefinition> = {
   referenceNumber: {
@@ -137,10 +137,10 @@ export const paymentRequestFields: Record<string, FieldDefinition> = {
     labelKey: 'ap.AP301000.summary.status',
     controlType: 'badge',
     state: {
-      readonly: () => true,  // Always read-only — set by workflow
+      readonly: () => true, // Always read-only — set by workflow
     },
   },
-};
+}
 ```
 
 ### 3.2 Field Binding in View
@@ -162,6 +162,7 @@ export const paymentRequestFields: Record<string, FieldDefinition> = {
 ```
 
 The `useField()` binding returns everything the `AppField` component needs:
+
 - `value` — current reactive value
 - `onChange` — mutation handler (goes through controller's mutation guard)
 - `readonly` — evaluated from `FieldDefinition.state.readonly` against current state machine
@@ -182,11 +183,11 @@ TanStack Form + Zod is the validation engine. Zod schemas define rules as pure d
 
 Validation schemas live **in the screen's field system**, not in standalone files:
 
-| Location | What | Why |
-|----------|------|-----|
-| `fields.ts` | Field-level rules (required, min/max, format) | Co-located with field definitions |
-| `controller.ts` | Cross-field rules (total must balance, date range) | Controller has access to full form state |
-| `shared/validation/` | Reusable validators (ISO date, positive amount, currency code) | Cross-cutting concerns |
+| Location             | What                                                           | Why                                      |
+| -------------------- | -------------------------------------------------------------- | ---------------------------------------- |
+| `fields.ts`          | Field-level rules (required, min/max, format)                  | Co-located with field definitions        |
+| `controller.ts`      | Cross-field rules (total must balance, date range)             | Controller has access to full form state |
+| `shared/validation/` | Reusable validators (ISO date, positive amount, currency code) | Cross-cutting concerns                   |
 
 ### 4.3 Shared Validators
 
@@ -201,11 +202,11 @@ export const currencyCode = z.string().length(3, 'Must be a valid ISO 4217 curre
 
 ### 4.4 Validation Triggers
 
-| Trigger | Use Case | Configuration |
-|---------|----------|---------------|
-| **On Change** | Real-time feedback for simple fields | Field-level schema validation |
-| **On Blur** | Deferred validation for expensive checks | Field-level onBlur handler |
-| **On Submit** | Final gate before mutation (always active) | Controller-level form schema |
+| Trigger       | Use Case                                   | Configuration                 |
+| ------------- | ------------------------------------------ | ----------------------------- |
+| **On Change** | Real-time feedback for simple fields       | Field-level schema validation |
+| **On Blur**   | Deferred validation for expensive checks   | Field-level onBlur handler    |
+| **On Submit** | Final gate before mutation (always active) | Controller-level form schema  |
 
 ### 4.5 Error Display Rules
 
@@ -240,12 +241,12 @@ User clicks Save (toolbar) or Expected Next Action (e.g., Submit)
 
 ### Save vs. Workflow Commands
 
-| Action | Type | Pipeline | Who Calls It |
-|--------|------|----------|-------------|
-| **Save** | Standard toolbar button | Validate → Transform → `adapter.update()` → Invalidate | Platform toolbar |
-| **Submit** | Workflow command (Expected Next) | Validate → Transform → `adapter.submit()` → Invalidate + status change | Controller via `ScreenCommand.execute` |
-| **Approve** | Workflow command | No form validation needed → `adapter.approve()` → Invalidate | Controller via `ScreenCommand.execute` |
-| **Void** | Workflow command | Confirmation dialog → `adapter.void()` → Invalidate + nav | Controller via `ScreenCommand.execute` |
+| Action      | Type                             | Pipeline                                                               | Who Calls It                           |
+| ----------- | -------------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
+| **Save**    | Standard toolbar button          | Validate → Transform → `adapter.update()` → Invalidate                 | Platform toolbar                       |
+| **Submit**  | Workflow command (Expected Next) | Validate → Transform → `adapter.submit()` → Invalidate + status change | Controller via `ScreenCommand.execute` |
+| **Approve** | Workflow command                 | No form validation needed → `adapter.approve()` → Invalidate           | Controller via `ScreenCommand.execute` |
+| **Void**    | Workflow command                 | Confirmation dialog → `adapter.void()` → Invalidate + nav              | Controller via `ScreenCommand.execute` |
 
 ### Submission in the Controller
 
@@ -254,21 +255,21 @@ User clicks Save (toolbar) or Expected Next Action (e.g., Submit)
 const saveMutation = useMutation({
   mutationFn: async () => {
     // 1. Validate
-    const valid = await controller.validateForm();
-    if (!valid) return;
+    const valid = await controller.validateForm()
+    if (!valid) return
 
     // 2. Transform
-    const dto = APMapper.toUpdateDTO(controller.getFormValues());
+    const dto = APMapper.toUpdateDTO(controller.getFormValues())
 
     // 3. Mutate
-    return paymentRequestAdapter.update(currentId.value, dto);
+    return paymentRequestAdapter.update(currentId.value, dto)
   },
   onSuccess: () => {
     // 4. Handle result
-    queryClient.invalidateQueries({ queryKey: ['ap', 'payment-requests'] });
-    controller.transitionUIState('VIEW');
+    queryClient.invalidateQueries({ queryKey: ['ap', 'payment-requests'] })
+    controller.transitionUIState('VIEW')
   },
-});
+})
 ```
 
 ---
@@ -333,12 +334,12 @@ The Summary Area uses named templates from the [Layout Template System](ACUMATIC
 
 ### 6.3 Layout Per Form Kind
 
-| Kind | Summary Template | Typical Structure |
-|------|-----------------|-------------------|
-| **Setup** | `1` (full width) | Settings sections, no tabs |
-| **Maintenance** | `1-1` (50/50) | Two-column fieldsets, tabs for details |
-| **Data Entry** | `7-10-7` (ID/details/totals) | 3-column summary + tabs with grids |
-| **Inquiry** | N/A | Selection Area (filters) + full-width grid |
+| Kind            | Summary Template             | Typical Structure                          |
+| --------------- | ---------------------------- | ------------------------------------------ |
+| **Setup**       | `1` (full width)             | Settings sections, no tabs                 |
+| **Maintenance** | `1-1` (50/50)                | Two-column fieldsets, tabs for details     |
+| **Data Entry**  | `7-10-7` (ID/details/totals) | 3-column summary + tabs with grids         |
+| **Inquiry**     | N/A                          | Selection Area (filters) + full-width grid |
 
 ---
 
@@ -356,27 +357,26 @@ controller.useGrid('lines') // → returns reactive column defs, data, toolbar c
 
 ### 7.2 Line Item Operations
 
-| Operation | How | Controller Method |
-|-----------|-----|------------------|
-| Add line | Grid toolbar `[+]` button | `controller.addLine()` |
-| Delete line | Grid toolbar `[×]` button | `controller.deleteLine(index)` |
-| Edit cell | Inline cell editing | `controller.updateLineField(index, field, value)` |
-| Reorder | Drag or move buttons | `controller.reorderLine(from, to)` |
+| Operation   | How                       | Controller Method                                 |
+| ----------- | ------------------------- | ------------------------------------------------- |
+| Add line    | Grid toolbar `[+]` button | `controller.addLine()`                            |
+| Delete line | Grid toolbar `[×]` button | `controller.deleteLine(index)`                    |
+| Edit cell   | Inline cell editing       | `controller.updateLineField(index, field, value)` |
+| Reorder     | Drag or move buttons      | `controller.reorderLine(from, to)`                |
 
 ### 7.3 Cross-Field Validation (Header ↔ Lines)
 
 ```typescript
 // Controller validates that lines total matches header
 controller.registerCrossValidation(() => {
-  const headerTotal = controller.getFieldValue('orderTotal');
-  const linesTotal = controller.getGridData('lines')
-    .reduce((sum, line) => sum + line.amount, 0);
+  const headerTotal = controller.getFieldValue('orderTotal')
+  const linesTotal = controller.getGridData('lines').reduce((sum, line) => sum + line.amount, 0)
 
   if (Math.abs(headerTotal - linesTotal) > 0.01) {
-    return { field: 'orderTotal', error: 'Header total must match line items' };
+    return { field: 'orderTotal', error: 'Header total must match line items' }
   }
-  return null;
-});
+  return null
+})
 ```
 
 ---

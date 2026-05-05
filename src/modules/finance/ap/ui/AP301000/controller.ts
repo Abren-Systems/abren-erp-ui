@@ -2,7 +2,6 @@ import { computed, ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
-import type { ActionContract } from '@/platform/component-contracts'
 import { usePaymentRequest } from '../../application/usePaymentRequest'
 import { useCreatePaymentRequest } from '../../application/useCreatePaymentRequest'
 import { useApprovePaymentRequest } from '../../application/useApprovePaymentRequest'
@@ -11,11 +10,10 @@ import { useAuthorizePaymentRequest } from '../../application/useAuthorizePaymen
 import { useCancelPaymentRequest } from '../../application/useCancelPaymentRequest'
 import { useSubmitPaymentRequest } from '../../application/useSubmitPaymentRequest'
 import { useUsers } from '@/modules/core/application/useUsers'
-import { getPaymentRequestActions } from './commands'
 import { CURRENCY_OPTIONS, AP301000_FIELDS } from './fields'
 import { AP301000 } from './screen'
 import { useField } from '@/platform/field-system/bindings'
-import type { PaymentRequest, PaymentRequestStatus } from '../../domain/ap.types'
+import type { PaymentRequest } from '../../domain/ap.types'
 
 /**
  * AP301000 — Payment Request Data Entry Controller
@@ -28,6 +26,10 @@ import type { PaymentRequest, PaymentRequestStatus } from '../../domain/ap.types
  *
  * This is the single source of behavior for AP301000/view.vue.
  * The view template reads from this controller exclusively.
+ *
+ * Commands are declared in commands.ts (data objects).
+ * Execution handlers are registered here via registerCommand().
+ * The FormToolbar reads both to render and dispatch actions.
  */
 export function usePaymentRequestEntry(id: string) {
   const router = useRouter()
@@ -60,14 +62,14 @@ export function usePaymentRequestEntry(id: string) {
     isNew,
   })
 
-  // ── Workflow Actions ──
+  // ── Workflow Action Executors ──
   const { approve, isPending: isApproving } = useApprovePaymentRequest(id as PaymentRequestId)
   const { reject, isPending: isRejecting } = useRejectPaymentRequest(id as PaymentRequestId)
   const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(id as PaymentRequestId)
   const { cancel, isPending: isCancelling } = useCancelPaymentRequest(id as PaymentRequestId)
   const { submit, isPending: isSubmittingRequest } = useSubmitPaymentRequest(id as PaymentRequestId)
 
-  // Register commands on the base controller
+  // Register command executors — the FormToolbar reads these for dispatch
   base.registerCommand('submit', {
     execute: async () => void submit(),
     isPending: isSubmittingRequest,
@@ -92,14 +94,6 @@ export function usePaymentRequestEntry(id: string) {
 
   // ── Domain Derived State ──
   const isDraft = computed(() => isNew.value || activeEntity.value?.status === 'DRAFT')
-  const displayStatus = computed(() => activeEntity.value?.status)
-  const displaySubmittedAt = computed(() => (isNew.value ? null : activeEntity.value?.submittedAt))
-
-  const actions = computed<ActionContract[]>(() => {
-    if (isNew.value) return []
-    if (!activeEntity.value?.status) return []
-    return getPaymentRequestActions(activeEntity.value.status as PaymentRequestStatus)
-  })
 
   // ── Resolved Display Names ──
   const requesterEmail = computed(() => {
@@ -125,12 +119,7 @@ export function usePaymentRequestEntry(id: string) {
   )
   const currencyOptions = computed(() => CURRENCY_OPTIONS)
 
-  // ── Action Dispatch ──
-  function handleAction(key: string) {
-    const command = base.commands.value[key]
-    if (command) void command.execute()
-  }
-
+  // ── Action Dispatch (for creation-mode Save/Create) ──
   function handleCreate() {
     void form.handleSubmit()
   }
@@ -177,9 +166,6 @@ export function usePaymentRequestEntry(id: string) {
 
     // Domain derived
     isDraft,
-    displayStatus,
-    displaySubmittedAt,
-    actions,
 
     // Resolved names
     requesterEmail,
@@ -193,7 +179,6 @@ export function usePaymentRequestEntry(id: string) {
     currencyOptions,
 
     // Handlers
-    handleAction,
     handleCreate,
 
     // Navigation

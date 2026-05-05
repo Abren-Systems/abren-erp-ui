@@ -5,4 +5,5 @@
  * categories, expected-next-action, favorites, and confirmation.
  */
 
-export type { ScreenCommand, CommandEffects } from './command.types'
+export type { ScreenCommand } from './command.types'
+export { isCommandVisible, getExpectedNextAction, groupCommandsByCategory } from './command.types'

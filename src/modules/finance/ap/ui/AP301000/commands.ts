@@ -1,62 +1,64 @@
-import type { PaymentRequestStatus } from '../../domain/ap.types'
-
-import type { ActionContract } from '@/platform/component-contracts'
+import type { ScreenCommand } from '@/platform/commands'
 
 /**
- * Derives the available screen actions based on the current aggregate status.
- * This will eventually be replaced by the ScreenRuntime's command resolver.
+ * AP301000 — Payment Request Screen Commands
+ *
+ * Declarative command definitions. The platform toolbar reads these
+ * to determine Expected Next Action, More Menu grouping, and visibility.
+ * Execution is handled by the controller's registerCommand() registry.
  */
-export function getPaymentRequestActions(status?: PaymentRequestStatus): ActionContract[] {
-  if (!status) return []
-  const list: ActionContract[] = []
-
-  if (status === 'DRAFT' || status === 'REJECTED') {
-    list.push({
-      key: 'submit',
-      labelKey: 'Submit',
-      variant: 'primary',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Submit this request for approval?',
-    })
-  }
-  if (status === 'SUBMITTED') {
-    list.push({
-      key: 'approve',
-      labelKey: 'Approve',
-      variant: 'primary',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Approve this payment request?',
-    })
-    list.push({
-      key: 'reject',
-      labelKey: 'Reject',
-      variant: 'danger',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Reject this payment request?',
-    })
-  }
-  if (status === 'APPROVED') {
-    list.push({
-      key: 'authorize',
-      labelKey: 'Authorize',
-      variant: 'primary',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Authorize this payment?',
-    })
-  }
-  if (status === 'DRAFT' || status === 'SUBMITTED') {
-    list.push({
-      key: 'cancel',
-      labelKey: 'Cancel',
-      variant: 'danger',
-      enabled: true,
-      requiresConfirmation: true,
-      description: 'Cancel this request permanently?',
-    })
-  }
-  return list
-}
+export const AP301000_COMMANDS: readonly ScreenCommand[] = [
+  {
+    key: 'submit',
+    labelKey: 'Submit',
+    variant: 'primary',
+    categoryKey: 'processing',
+    displayOnMainToolbar: true,
+    from: ['DRAFT', 'REJECTED'],
+    to: 'SUBMITTED',
+    requiresConfirmation: true,
+    confirmationMessageKey: 'Submit this request for approval?',
+  },
+  {
+    key: 'approve',
+    labelKey: 'Approve',
+    variant: 'primary',
+    categoryKey: 'processing',
+    displayOnMainToolbar: true,
+    from: ['SUBMITTED'],
+    to: 'APPROVED',
+    requiresConfirmation: true,
+    confirmationMessageKey: 'Approve this payment request?',
+  },
+  {
+    key: 'reject',
+    labelKey: 'Reject',
+    variant: 'danger',
+    categoryKey: 'processing',
+    displayOnMainToolbar: true,
+    from: ['SUBMITTED'],
+    to: 'REJECTED',
+    requiresConfirmation: true,
+    confirmationMessageKey: 'Reject this payment request?',
+  },
+  {
+    key: 'authorize',
+    labelKey: 'Authorize',
+    variant: 'primary',
+    categoryKey: 'processing',
+    displayOnMainToolbar: true,
+    from: ['APPROVED'],
+    to: 'AUTHORIZED',
+    requiresConfirmation: true,
+    confirmationMessageKey: 'Authorize this payment?',
+  },
+  {
+    key: 'cancel',
+    labelKey: 'Cancel Request',
+    variant: 'danger',
+    categoryKey: 'other',
+    from: ['DRAFT', 'SUBMITTED'],
+    requiresConfirmation: true,
+    confirmationMessageKey: 'Cancel this request permanently?',
+  },
+]

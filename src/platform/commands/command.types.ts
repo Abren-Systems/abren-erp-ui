@@ -1,80 +1,100 @@
-import type { Component } from 'vue'
-import type { ScreenStateMachine } from '../screen-runtime/state-machine.types'
-import type { ScreenData, ScreenController } from '../screen-runtime/screen-controller.types'
-
-// ── Command Effects ───────────────────────────────────────
-// Isolates side effects (API calls, navigation, notifications) from
-// state mutation logic. Commands execute through this interface.
-
-export interface CommandEffects {
-  /** Executes a side effect asynchronously */
-  run<T>(effectFn: () => Promise<T>): Promise<T>
-
-  /** Notifies the user of a successful action */
-  notifySuccess(message: string): void
-
-  /** Notifies the user of a failed action */
-  notifyError(message: string, error?: unknown): void
-}
-
 // ── Screen Command ────────────────────────────────────────
-// A formal action a user can take on a screen.
-// Commands govern their own visibility, enablement, category,
-// and expected-next-action highlighting — matching Acumatica's
-// More menu, toolbar, and command favorites model.
+// A formal declarative action a user can take on a screen.
+//
+// This is a DATA OBJECT — no methods. Visibility and enablement
+// are derived by the platform toolbar from `from[]` + current
+// domain state. Execution is dispatched through the controller's
+// command registry (registerCommand).
+//
+// Maps to Acumatica's two-layer model:
+//   Layer 1: Declaration (this object)
+//   Layer 2: Platform resolver (FormToolbar reads these + controller executors)
 
-export interface ScreenCommand<TData = unknown> {
-  /** Unique identifier (e.g., 'save', 'release', 'void') */
-  readonly id: string
+export interface ScreenCommand {
+  /** Unique identifier for the command (e.g., 'submit', 'release', 'void') */
+  readonly key: string
 
-  /** Localization key for the display label */
+  /** Localization key for the display label (e.g., 'ap.AP301000.actions.submit') */
   readonly labelKey: string
 
-  /** Optional icon component */
-  readonly icon?: Component
+  /** Optional icon name from the icon library */
+  readonly icon?: string
 
-  /** Visual significance */
+  /** Visual significance of the command */
   readonly variant: 'primary' | 'neutral' | 'danger'
 
-  // ── Acumatica-style command metadata ──
+  // ── Acumatica-style Toolbar / More Menu Placement ──
 
-  /** Category key for More menu grouping */
+  /** Category key for More Menu grouping (e.g., 'processing', 'activities', 'other') */
   readonly categoryKey?: string
 
-  /**
-   * Whether this command should be highlighted as the likely next action.
-   * Maps to Acumatica's expected-next-action toolbar highlighting.
-   */
-  readonly expectedNext?: boolean
+  /** Whether this command should also appear as a button on the main toolbar */
+  readonly displayOnMainToolbar?: boolean
+
+  /** Whether users can star this command to promote it to the toolbar */
+  readonly favoriteEligible?: boolean
+
+  // ── Workflow Transitions ──
 
   /**
-   * Whether users can star this command to promote it to the toolbar.
-   * Maps to Acumatica's command favorites.
+   * The list of Domain States in which this command is visible and actionable.
+   * If undefined, the command is visible in all states.
    */
-  readonly favoriteEligible?: boolean
+  readonly from?: readonly string[]
+
+  /** The Domain State this command transitions the record into upon success */
+  readonly to?: string
+
+  // ── Confirmation ──
 
   /** Whether executing this command requires a confirmation dialog */
   readonly requiresConfirmation?: boolean
 
-  // ── Workflow Transitions ──
+  /** Localization key for the confirmation dialog message */
+  readonly confirmationMessageKey?: string
+}
 
-  /** The list of Domain States in which this command is allowed to be executed. If undefined, allowed in any state. */
-  readonly from?: string[] // using string instead of DomainState to allow module-specific extension
+// ── Command Resolution Utilities ──────────────────────────
 
-  /** The Domain State this command transitions the record into upon successful execution. */
-  readonly to?: string
+/**
+ * Determines whether a command is visible given the current domain state.
+ * A command with no `from` constraint is always visible.
+ */
+export function isCommandVisible(command: ScreenCommand, domainState: string): boolean {
+  if (!command.from || command.from.length === 0) return true
+  return command.from.includes(domainState)
+}
 
-  // ── Predicates ──
+/**
+ * Identifies the expected next action — the single primary command
+ * that matches the current domain state.
+ */
+export function getExpectedNextAction(
+  commands: readonly ScreenCommand[],
+  domainState: string,
+): ScreenCommand | undefined {
+  return commands.find(
+    (cmd) => cmd.variant === 'primary' && cmd.from !== undefined && cmd.from.includes(domainState),
+  )
+}
 
-  /** Whether the command button should be rendered at all */
-  isVisible(state: ScreenStateMachine): boolean
+/**
+ * Groups visible commands by their categoryKey for More Menu rendering.
+ * Commands without a categoryKey are grouped under 'other'.
+ */
+export function groupCommandsByCategory(
+  commands: readonly ScreenCommand[],
+  domainState: string,
+): Map<string, ScreenCommand[]> {
+  const groups = new Map<string, ScreenCommand[]>()
 
-  /**
-   * Whether the command button should be interactive vs disabled.
-   * Disabled-but-visible matches Acumatica's convention for unavailable commands.
-   */
-  isEnabled(state: ScreenStateMachine, data: ScreenData<TData>): boolean
+  for (const cmd of commands) {
+    const category = cmd.categoryKey ?? 'other'
+    if (!groups.has(category)) {
+      groups.set(category, [])
+    }
+    groups.get(category)!.push(cmd)
+  }
 
-  /** The core execution logic — receives the controller and effects interface */
-  execute(controller: ScreenController<TData>, effects: CommandEffects): Promise<void>
+  return groups
 }

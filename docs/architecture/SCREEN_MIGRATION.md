@@ -20,14 +20,14 @@ This guide codifies the exact process for converting a legacy `pages/components/
 
 Before touching code, answer these questions:
 
-| # | Question | How to Answer |
-|---|----------|---------------|
-| 1 | What **Form Kind** is this? | See [Acumatica Alignment §3](ACUMATICA_ALIGNMENT.md#3-form-kinds-what-appears-in-the-working-area) — Setup/Maintenance/Data Entry/Inquiry/Processing/Report |
-| 2 | What **Screen ID** should it get? | Module prefix + area code + sequence. See [§4](ACUMATICA_ALIGNMENT.md#4-the-screen-id-system) |
-| 3 | Does it need a **PL (Primary List)** pair? | Data Entry forms → YES, create both `XX301000` and `XX3010PL` |
-| 4 | What is the **Primary View**? | The main record/entity the form manages |
-| 5 | What **commands** does it need? | Standard buttons per kind + domain-specific actions |
-| 6 | What **Summary Area template** does it need? | `1-1-1`, `7-10-7`, etc. See [§11](ACUMATICA_ALIGNMENT.md#11-layout-template-system) |
+| #   | Question                                     | How to Answer                                                                                                                                               |
+| --- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | What **Form Kind** is this?                  | See [Acumatica Alignment §3](ACUMATICA_ALIGNMENT.md#3-form-kinds-what-appears-in-the-working-area) — Setup/Maintenance/Data Entry/Inquiry/Processing/Report |
+| 2   | What **Screen ID** should it get?            | Module prefix + area code + sequence. See [§4](ACUMATICA_ALIGNMENT.md#4-the-screen-id-system)                                                               |
+| 3   | Does it need a **PL (Primary List)** pair?   | Data Entry forms → YES, create both `XX301000` and `XX3010PL`                                                                                               |
+| 4   | What is the **Primary View**?                | The main record/entity the form manages                                                                                                                     |
+| 5   | What **commands** does it need?              | Standard buttons per kind + domain-specific actions                                                                                                         |
+| 6   | What **Summary Area template** does it need? | `1-1-1`, `7-10-7`, etc. See [§11](ACUMATICA_ALIGNMENT.md#11-layout-template-system)                                                                         |
 
 ---
 
@@ -63,26 +63,28 @@ src/modules/{area}/{module}/ui/
 This is the metadata file — the equivalent of Acumatica's screen registration.
 
 ```typescript
-import type { ScreenDefinition } from '@/platform/screen-runtime/screen-definition.types';
+import type { ScreenDefinition } from '@/platform/screen-runtime/screen-definition.types'
 
 export const AP301000: ScreenDefinition = {
   screenId: 'AP301000' as ScreenId,
   title: 'Payment Request Entry',
-  kind: 'dataEntry',                    // From pre-migration Q1
+  kind: 'dataEntry', // From pre-migration Q1
   module: 'ap',
 
   layout: {
-    summaryTemplate: '7-10-7',          // From pre-migration Q6
+    summaryTemplate: '7-10-7', // From pre-migration Q6
   },
 
   views: {
-    paymentRequest: {                   // Primary View (from Q4)
+    paymentRequest: {
+      // Primary View (from Q4)
       name: 'paymentRequest',
       kind: 'single',
       containerName: 'PaymentRequestEntry',
       queryKey: ['ap', 'payment-requests', 'detail'],
     },
-    lines: {                            // Detail View (if data entry)
+    lines: {
+      // Detail View (if data entry)
       name: 'lines',
       kind: 'collection',
       containerName: 'PaymentRequestLines',
@@ -96,7 +98,7 @@ export const AP301000: ScreenDefinition = {
     edit: 'ap:payment-requests:edit',
     delete: 'ap:payment-requests:delete',
   },
-};
+}
 ```
 
 ### Step 2: Create `fields.ts` (Field Definitions)
@@ -104,7 +106,7 @@ export const AP301000: ScreenDefinition = {
 Declare every field the form displays. Fields enforce behavioral discipline via the controller.
 
 ```typescript
-import type { FieldDefinition } from '@/platform/field-system/field-definition.types';
+import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
 
 export const paymentRequestFields: Record<string, FieldDefinition> = {
   referenceNumber: {
@@ -129,10 +131,10 @@ export const paymentRequestFields: Record<string, FieldDefinition> = {
     labelKey: 'ap.AP301000.summary.status',
     controlType: 'badge',
     state: {
-      readonly: () => true,  // Always read-only — set by workflow
+      readonly: () => true, // Always read-only — set by workflow
     },
   },
-};
+}
 ```
 
 ### Step 3: Create `commands.ts` (Command Declarations)
@@ -140,7 +142,7 @@ export const paymentRequestFields: Record<string, FieldDefinition> = {
 Declare commands as **flat data objects** following the [two-layer hybrid model](ACUMATICA_ALIGNMENT.md#6-the-command-model-two-layer-hybrid):
 
 ```typescript
-import type { ScreenCommand } from '@/platform/commands/command.types';
+import type { ScreenCommand } from '@/platform/commands/command.types'
 
 export const paymentRequestCommands: ScreenCommand[] = [
   {
@@ -172,14 +174,14 @@ export const paymentRequestCommands: ScreenCommand[] = [
     labelKey: 'ap.AP301000.actions.void',
     icon: 'x-circle',
     categoryKey: 'processing',
-    displayOnMainToolbar: false,      // Only in More Menu
+    displayOnMainToolbar: false, // Only in More Menu
     favoriteEligible: false,
     isVisible: (state) => ['APPROVED', 'AUTHORIZED'].includes(state.domainStatus),
     isEnabled: () => true,
     expectedNext: () => false,
     execute: (controller) => controller.executeAction('void'),
   },
-];
+]
 ```
 
 ### Step 4: Create `controller.ts` (The PXGraph)
@@ -187,28 +189,28 @@ export const paymentRequestCommands: ScreenCommand[] = [
 The controller is the single source of truth. It owns data, commands, and state.
 
 ```typescript
-import { useScreenController } from '@/platform/screen-runtime/useScreenController';
-import { AP301000 } from './screen';
-import { paymentRequestFields } from './fields';
-import { paymentRequestCommands } from './commands';
+import { useScreenController } from '@/platform/screen-runtime/useScreenController'
+import { AP301000 } from './screen'
+import { paymentRequestFields } from './fields'
+import { paymentRequestCommands } from './commands'
 
 export function usePaymentRequestEntry(id: string) {
-  const controller = useScreenController(AP301000);
+  const controller = useScreenController(AP301000)
 
   // Register fields
-  controller.registerFields(paymentRequestFields);
+  controller.registerFields(paymentRequestFields)
 
   // Register commands
-  paymentRequestCommands.forEach(cmd => controller.registerCommand(cmd));
+  paymentRequestCommands.forEach((cmd) => controller.registerCommand(cmd))
 
   // Data loading via module infrastructure
-  const { data, isLoading } = usePaymentRequestQuery(id);
-  controller.bindPrimaryView(data);
+  const { data, isLoading } = usePaymentRequestQuery(id)
+  controller.bindPrimaryView(data)
 
   // State machine bindings
-  controller.bindDomainStatus(() => data.value?.status);
+  controller.bindDomainStatus(() => data.value?.status)
 
-  return controller;
+  return controller
 }
 ```
 
@@ -218,11 +220,11 @@ The view is a **pure projection** of the controller. Zero business logic.
 
 ```vue
 <script setup lang="ts">
-import { usePaymentRequestEntry } from './controller';
-import { useRoute } from 'vue-router';
+import { usePaymentRequestEntry } from './controller'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
-const controller = usePaymentRequestEntry(route.params.id as string);
+const route = useRoute()
+const controller = usePaymentRequestEntry(route.params.id as string)
 </script>
 
 <template>
@@ -253,10 +255,10 @@ const controller = usePaymentRequestEntry(route.params.id as string);
 ### Step 6: Register in `screens.ts`
 
 ```typescript
-import { AP301000 } from './AP301000/screen';
-import { AP3010PL } from './AP3010PL/screen';
+import { AP301000 } from './AP301000/screen'
+import { AP3010PL } from './AP3010PL/screen'
 
-export const apScreens = [AP301000, AP3010PL];
+export const apScreens = [AP301000, AP3010PL]
 ```
 
 ### Step 7: Register routes
@@ -267,31 +269,31 @@ Add the screen's route to the module's router configuration, pointing to the `vi
 
 ## 4. Legacy Pattern → New Pattern Cheat Sheet
 
-| Legacy Pattern | New Pattern | Why |
-|---------------|-------------|-----|
+| Legacy Pattern                                   | New Pattern                                                                       | Why                                                        |
+| ------------------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `pages/VendorBillFocus.vue` (600+ line monolith) | `AP302000/view.vue` (pure layout) + `controller.ts` + `commands.ts` + `fields.ts` | Separation of concerns; controller is testable without DOM |
-| Inline toolbar buttons in template | `commands.ts` data objects | Platform renders toolbar automatically |
-| `v-if="status === 'DRAFT'"` in template | `isVisible: (state) => state.domainStatus === 'DRAFT'` in command | Logic lives in controller, not in view |
-| Direct API calls in component | Controller calls via module adapter/composable | Clean Architecture boundary |
-| `defineProps` for data passing | `controller.useField('key')` binding | State machine governs field behavior |
-| Ad-hoc CSS grid for summary | `summaryTemplate: '7-10-7'` in `screen.ts` | Consistent across all forms |
-| Hand-coded tabs | `AppTabs` + `AppTab` from screen definition | Personalizable, consistent |
+| Inline toolbar buttons in template               | `commands.ts` data objects                                                        | Platform renders toolbar automatically                     |
+| `v-if="status === 'DRAFT'"` in template          | `isVisible: (state) => state.domainStatus === 'DRAFT'` in command                 | Logic lives in controller, not in view                     |
+| Direct API calls in component                    | Controller calls via module adapter/composable                                    | Clean Architecture boundary                                |
+| `defineProps` for data passing                   | `controller.useField('key')` binding                                              | State machine governs field behavior                       |
+| Ad-hoc CSS grid for summary                      | `summaryTemplate: '7-10-7'` in `screen.ts`                                        | Consistent across all forms                                |
+| Hand-coded tabs                                  | `AppTabs` + `AppTab` from screen definition                                       | Personalizable, consistent                                 |
 
 ---
 
 ## 5. Migration Priority
 
-| Priority | Screen | Legacy Location | Target ID | Form Kind |
-|----------|--------|----------------|-----------|-----------|
-| ✅ Done | Payment Request Entry | `AP301000/` | `AP301000` | Data Entry |
-| ✅ Done | Payment Requests List | `AP3010PL/` | `AP3010PL` | Inquiry |
-| P1 | Vendor Bill Entry | `vendor-bills/pages/VendorBillFocus.vue` | `AP302000` | Data Entry |
-| P1 | Journal Entry | (ledger legacy) | `GL301000` | Data Entry |
-| P1 | Chart of Accounts | (ledger legacy) | `GL201000` | Maintenance |
-| P2 | Bank Accounts | (bank legacy) | `BK201000` | Maintenance |
-| P2 | Tax Preferences | (tax legacy) | `TX101000` | Setup |
-| P2 | Stock Items | (inventory legacy) | `IN202000` | Maintenance |
-| P2 | Inventory Adjustments | (inventory legacy) | `IN301000` | Data Entry |
+| Priority | Screen                | Legacy Location                          | Target ID  | Form Kind   |
+| -------- | --------------------- | ---------------------------------------- | ---------- | ----------- |
+| ✅ Done  | Payment Request Entry | `AP301000/`                              | `AP301000` | Data Entry  |
+| ✅ Done  | Payment Requests List | `AP3010PL/`                              | `AP3010PL` | Inquiry     |
+| P1       | Vendor Bill Entry     | `vendor-bills/pages/VendorBillFocus.vue` | `AP302000` | Data Entry  |
+| P1       | Journal Entry         | (ledger legacy)                          | `GL301000` | Data Entry  |
+| P1       | Chart of Accounts     | (ledger legacy)                          | `GL201000` | Maintenance |
+| P2       | Bank Accounts         | (bank legacy)                            | `BK201000` | Maintenance |
+| P2       | Tax Preferences       | (tax legacy)                             | `TX101000` | Setup       |
+| P2       | Stock Items           | (inventory legacy)                       | `IN202000` | Maintenance |
+| P2       | Inventory Adjustments | (inventory legacy)                       | `IN301000` | Data Entry  |
 
 ---
 
