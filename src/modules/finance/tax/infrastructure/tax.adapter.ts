@@ -2,7 +2,7 @@ import { apiGet, apiPost } from '@/shared/api/http-client'
 import type {
   CalculateTaxRequest,
   TaxRuleDTO,
-  TaxCalculationResponse,
+  TaxCalculationResultDTO,
   TaxRuleCreateDTO,
   TaxGroupDTO,
   TaxGroupCreateDTO,
@@ -35,8 +35,8 @@ export const TaxAdapter = {
    * Submits a sandbox calculation payload to preview tax amounts.
    */
   async calculatePreviewTax(payload: CalculateTaxRequest): Promise<TaxCalculationResult> {
-    const response = await apiPost<TaxCalculationResponse>('/finance/tax/calculate', payload)
-    const dto = TaxCalculationResponseSchema.parse(response) as TaxCalculationResponse
+    const response = await apiPost<TaxCalculationResultDTO>('/finance/tax/calculate', payload)
+    const dto = TaxCalculationResponseSchema.parse(response) as TaxCalculationResultDTO
     return TaxMapper.toCalculationResult(dto)
   },
 

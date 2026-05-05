@@ -13,15 +13,20 @@ import type {
   JournalLineId,
 } from '@/shared/types/brand.types'
 
-import type { components } from '@/shared/api/generated.types'
-
 // --- Payment Request Types ---
 
-export type PaymentRequestStatus = components['schemas']['PaymentRequestStatus']
+export type PaymentRequestStatus =
+  | 'DRAFT'
+  | 'SUBMITTED'
+  | 'APPROVED'
+  | 'AUTHORIZED'
+  | 'REJECTED'
+  | 'CANCELLED'
+  | 'PAID'
 
 export const PaymentRequestStatus = {
   isFinal: (status: PaymentRequestStatus): boolean =>
-    status === 'AUTHORIZED' || status === 'REJECTED' || status === 'CANCELLED',
+    status === 'REJECTED' || status === 'CANCELLED' || status === 'PAID',
 
   isApproved: (status: PaymentRequestStatus): boolean =>
     status === 'APPROVED' || status === 'AUTHORIZED',
@@ -36,9 +41,10 @@ export const PaymentRequestStatus = {
       DRAFT: ['SUBMITTED', 'CANCELLED'],
       SUBMITTED: ['APPROVED', 'REJECTED', 'CANCELLED'],
       APPROVED: ['AUTHORIZED', 'REJECTED'],
-      AUTHORIZED: [],
+      AUTHORIZED: ['PAID'],
       REJECTED: [],
       CANCELLED: [],
+      PAID: [],
     }
 
     return transitions[current].includes(target)
@@ -77,7 +83,7 @@ export interface PaymentRequest {
 
 // --- Vendor Bill Types ---
 
-export type VendorBillStatus = components['schemas']['VendorBillStatus']
+export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID' | 'VOIDED'
 
 export const VendorBillStatus = {
   isPaid: (status: VendorBillStatus): boolean => status === 'PAID',
@@ -107,7 +113,7 @@ export interface VendorBill {
   lines: VendorBillLine[]
 }
 
-export interface VendorBillCreate {
+export interface CreateVendorBillDTO {
   vendorId: VendorId
   billNumber: string
   vendorInvoiceNumber: string

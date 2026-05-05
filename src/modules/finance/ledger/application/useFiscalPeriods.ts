@@ -8,7 +8,7 @@ import type { FiscalPeriod } from '../domain/fiscal-period.types'
 import type { components } from '@/shared/api/generated.types'
 import type { ApiError } from '@/shared/api/http-client'
 
-type FiscalPeriodCreate = components['schemas']['FiscalPeriodCreate']
+type CreateFiscalPeriodDTO = components['schemas']['CreateFiscalPeriodDTO']
 
 /**
  * Use Case: Manage Fiscal Periods.
@@ -37,9 +37,9 @@ export function useFiscalPeriods() {
   const { mutateAsync: createPeriod, isPending: isCreating } = useApiMutation<
     FiscalPeriod,
     ApiError,
-    FiscalPeriodCreate
+    CreateFiscalPeriodDTO
   >(
-    async (data: FiscalPeriodCreate) => {
+    async (data: CreateFiscalPeriodDTO) => {
       const dto = await ledgerAdapter.createFiscalPeriod(data)
       return LedgerMapper.toFiscalPeriod(dto)
     },

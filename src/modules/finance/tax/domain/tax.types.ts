@@ -41,5 +41,4 @@ export interface TaxCalculationResult {
   net: Money
   tax: Money
   gross: Money
-  breakdown?: Record<string, Money>
 }

@@ -20,7 +20,9 @@ export const ItemSchema = z.object({
   product_id: z.string().uuid(),
   sku: z.string(),
   name: z.string(),
+  unit_of_measure: z.string(),
   tracking_mode: z.string(),
+  is_active: z.boolean(),
 })
 
 export const StockLevelSchema = z.object({
@@ -64,7 +66,7 @@ export const AdjustmentLineSchema = z.object({
   serial_ids: z.array(z.string().uuid()).nullable().optional(),
 })
 
-export const AdjustmentCreateSchema = z.object({
+export const CreateAdjustmentSchema = z.object({
   warehouse_id: z.string().uuid(),
   reason: z.string(),
   lines: z.array(AdjustmentLineSchema),

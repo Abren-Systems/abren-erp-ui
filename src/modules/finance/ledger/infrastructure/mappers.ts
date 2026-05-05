@@ -14,10 +14,10 @@ import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { JournalEntry, JournalEntryLine } from '../domain/journal-entry.types'
 import type { FiscalPeriod, FiscalPeriodStatus } from '../domain/fiscal-period.types'
 
-type AccountRead = components['schemas']['AccountRead']
-type JournalEntryRead = components['schemas']['JournalEntryRead']
-type JournalLineRead = components['schemas']['JournalLineRead']
-type FiscalPeriodRead = components['schemas']['FiscalPeriodRead']
+type AccountDTO = components['schemas']['AccountDTO']
+type JournalEntryDTO = components['schemas']['JournalEntryDTO']
+type JournalLineDTO = components['schemas']['JournalLineDTO']
+type FiscalPeriodDTO = components['schemas']['FiscalPeriodDTO']
 
 /**
  * Ledger Mapper-as-Factory.
@@ -32,8 +32,8 @@ export class LedgerMapper {
    * @param dto - The raw account data from the API.
    * @returns A clean Account domain model.
    */
-  static toAccount(dto: AccountRead): Account {
-    // Backend currently doesn't provide currency_code in AccountRead,
+  static toAccount(dto: AccountDTO): Account {
+    // Backend currently doesn't provide currency_code in AccountDTO,
     // defaulting to functional currency (ETB) for now.
     const currency = Currency.ETB
 
@@ -54,8 +54,8 @@ export class LedgerMapper {
    * @param dto - The raw journal entry line data from the API.
    * @returns A validated JournalEntryLine domain model.
    */
-  private static mapJournalLine(dto: JournalLineRead): JournalEntryLine {
-    const currency = (dto.currency as Currency) || Currency.ETB
+  private static mapJournalLine(dto: JournalLineDTO): JournalEntryLine {
+    const currency = (dto.currency_code as Currency) || Currency.ETB
 
     return {
       id: CommonMapper.toBrandedId<JournalLineId>(dto.id),
@@ -84,7 +84,7 @@ export class LedgerMapper {
    * @param dto - The raw journal entry data from the API.
    * @returns A clean JournalEntry domain model.
    */
-  static toJournalEntry(dto: JournalEntryRead): JournalEntry {
+  static toJournalEntry(dto: JournalEntryDTO): JournalEntry {
     return {
       id: CommonMapper.toBrandedId<JournalEntryId>(dto.id),
       entryNumber: dto.entry_number,
@@ -103,7 +103,7 @@ export class LedgerMapper {
    * @param dto - The raw fiscal period data from the API.
    * @returns A clean FiscalPeriod domain model.
    */
-  static toFiscalPeriod(dto: FiscalPeriodRead): FiscalPeriod {
+  static toFiscalPeriod(dto: FiscalPeriodDTO): FiscalPeriod {
     return {
       id: CommonMapper.toBrandedId<FiscalPeriodId>(dto.id),
       name: dto.name,

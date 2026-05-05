@@ -6,21 +6,21 @@ import type { components } from '@/shared/api/generated.types'
 
 type Schemas = components['schemas']
 
-export type WarehouseDTO = Schemas['WarehouseSchema']
+export type WarehouseDTO = Schemas['WarehouseDTO']
 
 // TrackingMode is a string enum from backend
 export type TrackingMode = 'NONE' | 'BATCH' | 'SERIAL'
 
-export type ItemDTO = Schemas['ItemSchema']
+export type ItemDTO = Schemas['ItemDTO']
 
-export type StockLevelDTO = Schemas['StockLevelSchema']
+export type StockLevelDTO = Schemas['StockLevelDTO']
 
-export type BatchDTO = Schemas['BatchSchema']
+export type BatchDTO = Schemas['BatchDTO']
 
-export type SerialNumberDTO = Schemas['SerialNumberSchema']
+export type SerialNumberDTO = Schemas['SerialNumberDTO']
 
-export type AdjustmentLineDTO = Schemas['AdjustmentLineSchema']
+export type AdjustmentLineDTO = Schemas['CreateAdjustmentLineDTO']
 
-export type AdjustmentCreateDTO = Schemas['AdjustmentCreateSchema']
+export type AdjustmentCreateDTO = Schemas['CreateAdjustmentDTO']
 
 export type AdjustmentDTO = { id: string } // Excluded from auto-generation pending backend response_model

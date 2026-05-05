@@ -15,7 +15,7 @@ export class WorkflowMapper {
       entityType: dto.entity_type,
       entityId: dto.entity_id,
       currentState: dto.current_state,
-      targetState: dto.target_state,
+      targetState: dto.target_state ?? null,
       requiredRole: CommonMapper.toBrandedId<RoleId>(dto.required_role),
       submittedAt: CommonMapper.toDate(dto.submitted_at),
     }

@@ -1,6 +1,6 @@
 import type { components } from '@/shared/api/generated.types'
 
-export type TaxRuleDTO = components['schemas']['TaxRuleResponse']
+export type TaxRuleDTO = components['schemas']['TaxRuleDTO']
 export type TaxRuleCreateDTO = components['schemas']['TaxRuleCreateRequest']
 
 // Temporarily falling back to unknown for missing backend types to unblock UI development
@@ -9,4 +9,5 @@ export type TaxGroupDTO = unknown
 export type TaxGroupCreateDTO = unknown
 
 export type CalculateTaxRequest = components['schemas']['CalculateTaxRequest']
-export type TaxCalculationResponse = components['schemas']['TaxCalculationResponse']
+export type TaxCalculationResultDTO = components['schemas']['TaxCalculationResultDTO']
+export type TaxCalculationResponse = TaxCalculationResultDTO

@@ -8,7 +8,7 @@ import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../domain/journal-entry.types'
 import type { components } from '@/shared/api/generated.types'
 
-type JournalEntryCreate = components['schemas']['JournalEntryCreate']
+type CreateJournalEntryDTO = components['schemas']['CreateJournalEntryDTO']
 
 /**
  * Use Case: Manage Journal Entries.
@@ -37,9 +37,9 @@ export function useJournalEntries() {
   const { mutateAsync: createEntry, isPending: isCreating } = useApiMutation<
     JournalEntry,
     ApiError,
-    JournalEntryCreate
+    CreateJournalEntryDTO
   >(
-    async (data: JournalEntryCreate) => {
+    async (data: CreateJournalEntryDTO) => {
       const dto = await ledgerAdapter.createJournalEntry(data)
       return LedgerMapper.toJournalEntry(dto)
     },

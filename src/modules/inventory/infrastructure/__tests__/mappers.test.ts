@@ -28,7 +28,9 @@ describe('InventoryMapper', () => {
       product_id: '550e8400-e29b-41d4-a716-446655440003',
       sku: 'SKU-123',
       name: 'Laptop X1',
+      unit_of_measure: 'pcs',
       tracking_mode: 'SERIAL',
+      is_active: true,
     }
 
     const domain = InventoryMapper.toItem(dto)
@@ -42,11 +44,18 @@ describe('InventoryMapper', () => {
   it('should map StockLevelDTO to StockItem domain entity with numeric conversion', () => {
     const dto: StockLevelDTO = {
       stock_item_id: '550e8400-e29b-41d4-a716-446655440004',
+      tenant_id: '550e8400-e29b-41d4-a716-446655440001',
       warehouse_id: '550e8400-e29b-41d4-a716-446655440000',
       item_id: '550e8400-e29b-41d4-a716-446655440002',
-      warehouse_name: 'Main',
       quantity: '10.5',
-      total_value: '1050.00',
+      weighted_average_cost: {
+        amount: '100.00',
+        currency: 'ETB',
+      },
+      total_value: {
+        amount: '1050.00',
+        currency: 'ETB',
+      },
     }
 
     const domain = InventoryMapper.toStockItem(dto)

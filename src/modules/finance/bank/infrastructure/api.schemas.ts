@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 /**
- * BankAccountSchema — Architectural shielding for bank account data.
+ * BankAccountDTO — Architectural shielding for bank account data.
  */
 export const BankAccountSchema = z.object({
   id: z.string().uuid(),
@@ -20,7 +20,7 @@ export const BankAccountSchema = z.object({
 })
 
 /**
- * BankTransactionSchema — Architectural shielding for bank transaction history.
+ * BankTransactionDTO — Architectural shielding for bank transaction history.
  */
 export const BankTransactionSchema = z.object({
   id: z.string().uuid(),
@@ -39,7 +39,7 @@ export const BankTransactionSchema = z.object({
 })
 
 /**
- * ScheduledPaymentSchema — Architectural shielding for future bank obligations.
+ * ScheduledPaymentDTO — Architectural shielding for future bank obligations.
  */
 export const ScheduledPaymentSchema = z.object({
   id: z.string().uuid(),

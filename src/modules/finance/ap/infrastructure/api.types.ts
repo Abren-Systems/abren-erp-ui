@@ -11,7 +11,15 @@ import type {
 
 // --- Payment Request DTOs ---
 
-export type PaymentRequestStatusDTO = z.infer<typeof PaymentRequestSchema>['status']
+export type PaymentRequestStatus =
+  | 'DRAFT'
+  | 'SUBMITTED'
+  | 'APPROVED'
+  | 'AUTHORIZED'
+  | 'REJECTED'
+  | 'CANCELLED'
+  | 'PAID'
+export type PaymentRequestStatusDTO = PaymentRequestStatus
 export type PaymentRequestLineDTO = z.infer<typeof PaymentRequestLineSchema>
 export type PaymentRequestDTO = z.infer<typeof PaymentRequestSchema>
 export interface PaymentRequestLineCreateDTO {
@@ -38,6 +46,7 @@ export type PaymentRequestStatsDTO = z.infer<typeof PaymentRequestStatsSchema>
 // --- Vendor Bill DTOs ---
 
 export type VendorBillLineDTO = z.infer<typeof VendorBillLineSchema>
+export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID' | 'VOIDED'
 export type VendorBillDTO = z.infer<typeof VendorBillSchema>
 export interface VendorBillLineCreateDTO {
   description: string

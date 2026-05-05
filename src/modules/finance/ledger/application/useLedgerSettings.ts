@@ -6,8 +6,8 @@ import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { components } from '@/shared/api/generated.types'
 
-type LedgerSettingsRead = components['schemas']['LedgerSettingsRead']
-type LedgerSettingsUpdate = components['schemas']['LedgerSettingsUpdate']
+type LedgerSettingsDTO = components['schemas']['LedgerSettingsDTO']
+type UpdateLedgerSettingsDTO = components['schemas']['UpdateLedgerSettingsDTO']
 
 /**
  * Use Case: Manage Global Ledger Settings.
@@ -26,16 +26,14 @@ export function useLedgerSettings() {
     data: settings,
     isLoading: isFetching,
     error: fetchError,
-  } = useApiQuery<LedgerSettingsRead>(ledgerKeys.settings(), () =>
-    ledgerAdapter.getLedgerSettings(),
-  )
+  } = useApiQuery<LedgerSettingsDTO>(ledgerKeys.settings(), () => ledgerAdapter.getLedgerSettings())
 
   const {
     mutateAsync: updateSettings,
     isPending: isUpdating,
     error: updateError,
-  } = useApiMutation<void, ApiError, LedgerSettingsUpdate>(
-    async (data: LedgerSettingsUpdate) => {
+  } = useApiMutation<void, ApiError, UpdateLedgerSettingsDTO>(
+    async (data: UpdateLedgerSettingsDTO) => {
       await ledgerAdapter.updateLedgerSettings(data)
     },
     {

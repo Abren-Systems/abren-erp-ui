@@ -1,4 +1,4 @@
-import type { TaxRuleDTO, TaxCalculationResponse, TaxGroupDTO } from './api.types'
+import type { TaxRuleDTO, TaxCalculationResultDTO, TaxGroupDTO } from './api.types'
 import type {
   TaxRule,
   TaxCalculationResult,
@@ -37,18 +37,11 @@ export class TaxMapper {
     }
   }
 
-  static toCalculationResult(dto: TaxCalculationResponse): TaxCalculationResult {
+  static toCalculationResult(dto: TaxCalculationResultDTO): TaxCalculationResult {
     const result: TaxCalculationResult = {
-      net: CommonMapper.toMoney(dto.amount, dto.currency),
+      net: CommonMapper.toMoney(dto.net, dto.currency),
       tax: CommonMapper.toMoney(dto.tax, dto.currency),
-      gross: CommonMapper.toMoney(dto.total, dto.currency),
-    }
-
-    if (dto.breakdown) {
-      result.breakdown = {}
-      for (const [key, value] of Object.entries(dto.breakdown)) {
-        result.breakdown[key] = CommonMapper.toMoney(value, dto.currency)
-      }
+      gross: CommonMapper.toMoney(dto.gross, dto.currency),
     }
 
     return result
