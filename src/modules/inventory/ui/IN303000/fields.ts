@@ -1,8 +1,8 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
 
 export const IN303000_FIELDS = {
-  warehouseId: {
-    key: 'warehouseId',
+  warehouse_id: {
+    key: 'warehouse_id',
     label: 'Warehouse',
     type: 'selector',
     required: () => true,
@@ -13,4 +13,4 @@ export const IN303000_FIELDS = {
     type: 'text',
     required: () => true,
   },
-} satisfies Record<string, FieldDefinition<any>>
+} satisfies Record<string, FieldDefinition<Record<string, unknown>>>

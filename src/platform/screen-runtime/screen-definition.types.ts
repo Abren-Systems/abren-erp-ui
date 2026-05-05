@@ -92,7 +92,7 @@ export interface ScreenPersonalizationPolicy {
 // all consumers of this metadata.
 
 export interface ScreenDefinition<
-  TEntity = unknown,
+  _TEntity = unknown,
   _TContext = unknown,
   TViews extends ScreenViews = ScreenViews,
 > {

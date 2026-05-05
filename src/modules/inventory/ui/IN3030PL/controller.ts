@@ -6,7 +6,7 @@ import { IN3030PL } from './screen'
 export function useAdjustmentsListController() {
   const router = useRouter()
   // Mock data as there's no useAdjustments query currently
-  const adjustments = ref<any[]>([])
+  const adjustments = ref<unknown[]>([])
   const isLoading = ref(false)
   const error = ref(null)
 

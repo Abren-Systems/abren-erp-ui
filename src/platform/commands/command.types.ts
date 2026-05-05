@@ -84,7 +84,7 @@ export function getExpectedNextAction(
  */
 export function groupCommandsByCategory(
   commands: readonly ScreenCommand[],
-  domainState: string,
+  _domainState: string,
 ): Map<string, ScreenCommand[]> {
   const groups = new Map<string, ScreenCommand[]>()
 

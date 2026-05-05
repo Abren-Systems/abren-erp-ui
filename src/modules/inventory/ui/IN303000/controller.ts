@@ -26,7 +26,7 @@ export function useAdjustmentController(id: string) {
       {
         stock_item_id: '',
         quantity_delta: 1,
-        valuation_strategy: 'AUTO' as 'AUTO' | 'MANUAL',
+        valuation_strategy: 'auto' as 'auto' | 'manual',
         manual_unit_cost: undefined as number | undefined,
       },
     ],
@@ -36,7 +36,7 @@ export function useAdjustmentController(id: string) {
     form.value.lines.push({
       stock_item_id: '',
       quantity_delta: 1,
-      valuation_strategy: 'AUTO',
+      valuation_strategy: 'auto',
       manual_unit_cost: undefined,
     })
   }

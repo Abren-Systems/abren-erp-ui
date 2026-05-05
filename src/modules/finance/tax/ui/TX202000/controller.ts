@@ -34,8 +34,8 @@ export function useTaxRuleController(id: string) {
   const form = ref({
     name: '',
     rate: 0,
-    tax_type: 'VAT',
-    direction: 'NON_DIRECTIONAL',
+    tax_type: 'VAT' as 'VAT' | 'WHT' | 'TOT' | 'EXCISE' | 'INCOME',
+    direction: 'NON_DIRECTIONAL' as 'INPUT' | 'OUTPUT' | 'NON_DIRECTIONAL',
     gl_account_id: '',
     is_active: true,
   })

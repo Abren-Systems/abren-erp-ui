@@ -20,7 +20,7 @@ export const accountColumns: ColumnDef<BankAccount>[] = [
     accessorKey: 'balance',
     header: 'Balance',
     cell: ({ row }) => {
-      const balance = row.getValue('balance') as any
+      const balance = row.getValue('balance') as { amount: string } | undefined
       return balance?.amount
     },
   },
@@ -28,7 +28,7 @@ export const accountColumns: ColumnDef<BankAccount>[] = [
     accessorKey: 'currency',
     header: 'Currency',
     cell: ({ row }) => {
-      const currency = row.getValue('currency') as any
+      const currency = row.getValue('currency') as { code: string } | undefined
       return currency?.code
     },
   },

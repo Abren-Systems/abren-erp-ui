@@ -5,7 +5,7 @@ import type { ModuleId } from '@/shared/types/brand.types'
 export const IN303000: ScreenDefinition = {
   id: 'IN303000' as ScreenId,
   moduleId: 'inventory' as ModuleId,
-  kind: 'data-entry',
+  kind: 'dataEntry',
   titleKey: 'Post Inventory Adjustment',
   primaryView: 'adjustment',
   route: {

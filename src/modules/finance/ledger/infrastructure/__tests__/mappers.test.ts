@@ -9,7 +9,7 @@ type FiscalPeriodDTO = components['schemas']['FiscalPeriodDTO']
 
 describe('LedgerMapper', () => {
   describe('toAccount', () => {
-    it('should map AccountRead to Account model', () => {
+    it('should map AccountDTO to Account model', () => {
       const dto: AccountDTO = {
         id: 'acc-1',
         tenant_id: 'tenant-1',
@@ -35,7 +35,7 @@ describe('LedgerMapper', () => {
   })
 
   describe('toJournalEntry', () => {
-    it('should map JournalEntryRead to JournalEntry model', () => {
+    it('should map JournalEntryDTO to JournalEntry model', () => {
       const dto: JournalEntryDTO = {
         id: 'je-1',
         tenant_id: 'tenant-1',

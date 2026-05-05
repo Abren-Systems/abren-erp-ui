@@ -1,4 +1,4 @@
-import type { ScreenDefinition, ScreenId } from '@/platform/screen-runtime'
+import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { toId } from '@/shared/types/brand.types'
 import type { ModuleId } from '@/shared/types/brand.types'
 
