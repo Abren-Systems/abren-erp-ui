@@ -73,96 +73,34 @@ const ctrl = usePaymentRequestEntry(props.id)
         <!-- Top Section (Fieldsets) -->
         <AppFieldset variant="ghost" layout="horizontal" :columns="3">
           <FieldGroup>
+            <AppField v-bind="ctrl.fields.requesterId" />
             <AppField
-              field="requester"
-              label="Requester"
-              :value="ctrl.requesterEmail.value"
-              type="id"
-            />
-
-            <AppFormField
-              v-if="ctrl.isNew.value"
-              :field="ctrl.form.Field('beneficiaryId')"
-              label="Beneficiary"
-              type="text"
-              mode="edit"
+              v-bind="ctrl.fields.beneficiaryId"
+              :mode="ctrl.state.isEditable ? 'edit' : 'read'"
+              :editor-attrs="{ options: ctrl.userOptions.value }"
             />
             <AppField
-              v-else
-              field="beneficiary"
-              label="Beneficiary"
-              :value="ctrl.beneficiaryEmail.value"
-              type="id"
-            />
-
-            <AppField
-              field="status"
-              label="Status"
-              :value="ctrl.displayStatus.value"
+              v-bind="ctrl.fields.status"
               type="status"
               :context="{ entity: 'PaymentRequest' }"
             />
           </FieldGroup>
 
           <FieldGroup>
+            <AppField v-bind="ctrl.fields.submittedAt" />
             <AppField
-              field="submittedAt"
-              label="Submitted On"
-              :value="ctrl.displaySubmittedAt.value"
-              type="date"
-            />
-
-            <AppFormField
-              v-if="ctrl.isNew.value"
-              :field="ctrl.form.Field('justification')"
-              label="Justification"
-              type="text"
-              mode="edit"
-            />
-            <AppField
-              v-else
-              field="justification"
-              label="Justification"
-              :value="ctrl.entity.value?.justification"
-              type="text"
+              v-bind="ctrl.fields.justification"
+              :mode="ctrl.state.isEditable ? 'edit' : 'read'"
             />
           </FieldGroup>
 
           <FieldGroup>
-            <AppFormField
-              v-if="ctrl.isNew.value"
-              :field="ctrl.form.Field('currency')"
-              label="Currency"
-              type="text"
-              mode="edit"
-            />
             <AppField
-              v-else
-              field="currency"
-              label="Currency"
-              :value="ctrl.entity.value?.currency"
-              type="text"
+              v-bind="ctrl.fields.currency"
+              :mode="ctrl.state.isEditable ? 'edit' : 'read'"
+              :editor-attrs="{ options: ctrl.currencyOptions.value }"
             />
-
-            <AppField
-              v-if="ctrl.isNew.value"
-              field="totalAmount"
-              label="Order Total"
-              :value="
-                ctrl.form.state.values.lines?.reduce(
-                  (acc, curr) => acc + (Number(curr.amount) || 0),
-                  0,
-                ) || 0
-              "
-              type="money"
-            />
-            <AppField
-              v-else
-              field="totalAmount"
-              label="Order Total"
-              :value="ctrl.entity.value?.totalAmount"
-              type="money"
-            />
+            <AppField v-bind="ctrl.fields.totalAmount" />
           </FieldGroup>
         </AppFieldset>
 

@@ -56,6 +56,14 @@ export interface ScreenCommand<TData = unknown> {
   /** Whether executing this command requires a confirmation dialog */
   readonly requiresConfirmation?: boolean
 
+  // ── Workflow Transitions ──
+
+  /** The list of Domain States in which this command is allowed to be executed. If undefined, allowed in any state. */
+  readonly from?: string[] // using string instead of DomainState to allow module-specific extension
+
+  /** The Domain State this command transitions the record into upon successful execution. */
+  readonly to?: string
+
   // ── Predicates ──
 
   /** Whether the command button should be rendered at all */

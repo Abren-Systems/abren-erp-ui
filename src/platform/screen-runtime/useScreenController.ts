@@ -1,7 +1,7 @@
 import { ref, computed, onUnmounted, type ComputedRef, type Ref } from 'vue'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData } from './screen-controller.types'
-import type { UIState } from './state-machine.types'
+import type { UIState, DomainState, ScreenStateMachine } from './state-machine.types'
 
 // ── Screen Controller Options ─────────────────────────────
 // Passed by the screen-specific controller to configure data loading.
@@ -22,6 +22,8 @@ export interface ScreenControllerOptions<T> {
   readonly dataSource: ScreenControllerDataSource<T>
   /** Whether this is a new record (creation mode) */
   readonly isNew?: Ref<boolean>
+  /** Optional function to extract DomainState from the entity. Defaults to entity.status */
+  readonly getDomainState?: (entity: T) => DomainState
 }
 
 // ── Granular Data Access ──────────────────────────────────
@@ -58,23 +60,54 @@ function createScreenData<T>(entity: Ref<T | null | undefined>): ScreenData<T> {
   }
 }
 
-// ── UI State Machine ──────────────────────────────────────
+// ── Dual-Layer State Machine ────────────────────────────────
 // Lightweight reactive implementation of the dual-layer state machine.
 
-function createUIStateMachine(isNew: Ref<boolean>) {
+function createStateMachine<T>(
+  isNew: Ref<boolean>,
+  entity: Ref<T | null | undefined>,
+  getDomainState?: (entity: T) => DomainState,
+): ScreenStateMachine {
   const ui = ref<UIState>(isNew.value ? 'NEW' : 'INITIALIZING')
 
-  const isEditable = computed(() => ui.value === 'NEW' || ui.value === 'EDIT')
+  const domain = computed<DomainState>(() => {
+    if (!entity.value) return 'DRAFT'
+    if (getDomainState) return getDomainState(entity.value)
+    // Fallback: look for a 'status' property
+    const status = (entity.value as Record<string, unknown>)['status']
+    return typeof status === 'string' ? (status.toUpperCase() as DomainState) : 'DRAFT'
+  })
+
+  const isEditable = computed(() => {
+    if (ui.value !== 'NEW' && ui.value !== 'EDIT') return false
+    // Acumatica heuristic: Only DRAFT and HOLD are editable states.
+    const editableDomainStates: DomainState[] = ['DRAFT', 'HOLD']
+    return editableDomainStates.includes(domain.value)
+  })
 
   return {
     /** Current UI state */
-    ui: computed(() => ui.value),
+    ui: computed(() => ui.value) as unknown as UIState, // Type cast to satisfy interface while remaining reactive to Vue template
+    /** Current Domain state */
+    domain: domain as unknown as DomainState,
     /** Whether the screen is in an editable mode */
-    isEditable,
+    isEditable: isEditable as unknown as boolean,
 
     /** Transition the UI state */
     transitionUI(newState: UIState) {
+      if (ui.value === 'SAVING' && newState === 'INITIALIZING') {
+        throw new Error('Illegal state transition: SAVING -> INITIALIZING')
+      }
       ui.value = newState
+    },
+
+    transitionDomain(newState: DomainState) {
+      // In this frontend architecture, Domain state is owned by the backend.
+      // This method is a placeholder for optimistic updates if necessary,
+      // but normally we just refresh the entity after a successful command.
+      console.warn(
+        `Attempted optimistic Domain transition to ${newState}. Prefer refreshing entity from backend.`,
+      )
     },
   }
 }
@@ -104,13 +137,13 @@ export interface ControllerCommand {
  * This is the frontend equivalent of Acumatica's PXGraph base class.
  */
 export function useScreenController<T>(options: ScreenControllerOptions<T>) {
-  const { screen, dataSource, isNew = ref(false) } = options
+  const { screen, dataSource, isNew = ref(false), getDomainState } = options
 
   // ── Data Layer ──
   const data = createScreenData(dataSource.entity)
 
   // ── State Machine ──
-  const uiState = createUIStateMachine(isNew)
+  const stateMachine = createStateMachine(isNew, dataSource.entity, getDomainState)
 
   // Sync UI state with data loading lifecycle
   const isLoading = dataSource.isLoading
@@ -142,7 +175,7 @@ export function useScreenController<T>(options: ScreenControllerOptions<T>) {
     entity: dataSource.entity,
 
     /** UI state machine */
-    state: uiState,
+    state: stateMachine,
 
     /** Whether the data source is loading */
     isLoading,

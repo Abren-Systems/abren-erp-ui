@@ -12,8 +12,10 @@ import { useCancelPaymentRequest } from '../../../application/composables/useCan
 import { useSubmitPaymentRequest } from '../../../application/composables/useSubmitPaymentRequest'
 import { useUsers } from '@/modules/core/application/composables/useUsers'
 import { getPaymentRequestActions } from './commands'
-import { CURRENCY_OPTIONS } from './fields'
+import { CURRENCY_OPTIONS, AP301000_FIELDS } from './fields'
 import { AP301000 } from './screen'
+import { useField } from '@/platform/field-system/bindings'
+import type { PaymentRequest, PaymentRequestStatus } from '../../../domain/ap.types'
 
 /**
  * AP301000 — Payment Request Data Entry Controller
@@ -35,15 +37,28 @@ export function usePaymentRequestEntry(id: string) {
   const { request, isLoading, error } = usePaymentRequest(id as PaymentRequestId)
   const { users } = useUsers()
 
+  // ── Creation Form ──
+  const { form, isSubmitting: isCreating, isSaved, saveDraft } = useCreatePaymentRequest()
+
+  // ── Graph Unified Entity ──
+  // The Controller acts as the PXGraph, hiding the difference between a draft and a saved record.
+  const activeEntity = computed<PaymentRequest | null | undefined>(() => {
+    if (isNew.value) {
+      // Cast form state to match the read model shape approximately
+      return {
+        ...(form.state.values as unknown as PaymentRequest),
+        status: 'DRAFT',
+      }
+    }
+    return request.value
+  })
+
   // ── Platform Base ──
   const base = useScreenController({
     screen: AP301000,
-    dataSource: { entity: request, isLoading, error },
+    dataSource: { entity: activeEntity, isLoading, error },
     isNew,
   })
-
-  // ── Creation Form ──
-  const { form, isSubmitting: isCreating, isSaved, saveDraft } = useCreatePaymentRequest()
 
   // ── Workflow Actions ──
   const { approve, isPending: isApproving } = useApprovePaymentRequest(id as PaymentRequestId)
@@ -76,25 +91,25 @@ export function usePaymentRequestEntry(id: string) {
   const isTraceOpen = ref(false)
 
   // ── Domain Derived State ──
-  const isDraft = computed(() => isNew.value || request.value?.status === 'DRAFT')
-  const displayStatus = computed(() => (isNew.value ? 'DRAFT' : request.value?.status))
-  const displaySubmittedAt = computed(() => (isNew.value ? null : request.value?.submittedAt))
+  const isDraft = computed(() => isNew.value || activeEntity.value?.status === 'DRAFT')
+  const displayStatus = computed(() => activeEntity.value?.status)
+  const displaySubmittedAt = computed(() => (isNew.value ? null : activeEntity.value?.submittedAt))
 
   const actions = computed<ActionContract[]>(() => {
     if (isNew.value) return []
-    if (!request.value) return []
-    return getPaymentRequestActions(request.value.status)
+    if (!activeEntity.value?.status) return []
+    return getPaymentRequestActions(activeEntity.value.status as PaymentRequestStatus)
   })
 
   // ── Resolved Display Names ──
   const requesterEmail = computed(() => {
     if (isNew.value) return 'Current User'
-    const user = users.value?.find((u) => u.id === request.value?.requesterId)
-    return user?.email ?? request.value?.requesterId
+    const user = users.value?.find((u) => u.id === activeEntity.value?.requesterId)
+    return user?.email ?? activeEntity.value?.requesterId
   })
 
   const beneficiaryEmail = computed(() => {
-    const targetId = isNew.value ? form.state.values.beneficiaryId : request.value?.beneficiaryId
+    const targetId = activeEntity.value?.beneficiaryId
     if (!targetId) return ''
     const user = users.value?.find((u) => u.id === targetId)
     return user?.email ?? targetId
@@ -102,8 +117,7 @@ export function usePaymentRequestEntry(id: string) {
 
   // ── Grid Data ──
   const currentLines = computed(() => {
-    if (isNew.value) return form.state.values.lines || []
-    return request.value?.lines || []
+    return activeEntity.value?.lines || []
   })
 
   const userOptions = computed(
@@ -133,9 +147,24 @@ export function usePaymentRequestEntry(id: string) {
     }
   })
 
+  // ── Field Bindings ──────────────────────────────────────
+  // This is where behavioral discipline is enforced.
+  const fields = {
+    requesterId: useField(base, AP301000_FIELDS.requesterId),
+    beneficiaryId: useField(base, AP301000_FIELDS.beneficiaryId),
+    status: useField(base, AP301000_FIELDS.status),
+    submittedAt: useField(base, AP301000_FIELDS.submittedAt),
+    justification: useField(base, AP301000_FIELDS.justification),
+    currency: useField(base, AP301000_FIELDS.currency),
+    totalAmount: useField(base, AP301000_FIELDS.totalAmount),
+  }
+
   return {
     // Platform base (data selectors, state machine, commands)
     ...base,
+
+    // Field Bindings
+    fields,
 
     // Creation form
     form,
