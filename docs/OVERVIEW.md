@@ -47,6 +47,7 @@ The Abren ERP UI documentation follows a strict hierarchy. **ARCHITECTURE.md (v3
 | [Error Handling](architecture/ERROR_HANDLING.md)           | Error categories, toast system, and loading states.                   |
 | [Testing Strategy](architecture/TESTING_STRATEGY.md)       | Frontend testing pyramid and coverage targets.                        |
 | [Design System](architecture/DESIGN_SYSTEM.md)             | **Visual Specs** — Colors, spacing, and typography tokens.            |
+| [Naming Standard](architecture/NAMING.md)                  | **Authoritative** — Folders, files, components, and identifiers.      |
 | [DataGrid Spec](design/DATA_GRID_SPEC.md)                  | Detailed specification for the core DataGrid platform component.      |
 
 ### Planning & Strategy

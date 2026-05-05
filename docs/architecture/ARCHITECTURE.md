@@ -191,25 +191,21 @@ Vue Single-File Components (SFCs) must not become dumping grounds for multiple l
 
 ### 3.3 Naming Conventions
 
-| Type              | Pattern                 | Example                   |
-| ----------------- | ----------------------- | ------------------------- |
-| Workspace Page    | `*ListPage.vue`         | `AccountsListPage.vue`    |
-| Focus Page        | `*Focus.vue`            | `PaymentRequestFocus.vue` |
-| Editor Page       | `*EditPage.vue`         | `AccountEditPage.vue`     |
-| Create Page       | `*CreatePage.vue`       | `AccountCreatePage.vue`   |
-| Wizard Page       | `*WizardPage.vue`       | `OnboardingWizard.vue`    |
-| Form Drawer       | `*FormDrawer.vue`       | `AccountFormDrawer.vue`   |
-| Screen Def        | `screen.ts`             | —                         |
-| Screen Controller | `controller.ts`         | —                         |
-| Screen Set        | `screens.ts`            | —                         |
-| Workspace Set     | `workspace.ts`          | —                         |
-| Adapter           | `{module}_adapter.ts`   | `ledger_adapter.ts`       |
-| Mapper            | `{entity}.mapper.ts`    | `account.mapper.ts`       |
-| Composable        | `use{Action}.ts`        | `useLedgerAccounts.ts`    |
-| Types             | `{entity}.types.ts`     | `account.types.ts`        |
-| Branded ID        | `{entity}Id` type       | `UserId`, `TenantId`      |
-| Formatter         | `{entity}-formatter.ts` | `account-formatter.ts`    |
-| Routes            | `routes.ts`             | transitional only         |
+All naming rules are governed by the authoritative **[Naming Standard](./NAMING.md)**. The standard covers folder names, file names, Vue component names, TypeScript identifiers, and the closed role vocabulary for components.
+
+Key rules at a glance:
+
+| Category                       | Rule                                     | Example                               |
+| ------------------------------ | ---------------------------------------- | ------------------------------------- |
+| Vue components (modules)       | `{Entity}{Role}.vue` — entity-first      | `AccountCreateDrawer.vue`             |
+| Vue components (design system) | `App*` prefix                            | `AppButton.vue`, `AppSidePane.vue`    |
+| DataGrid platform              | `DataGrid*` prefix                       | `DataGrid.vue`, `DataGridToolbar.vue` |
+| TS files                       | `kebab-case`, dot-qualified              | `account.types.ts`, `ap.adapter.ts`   |
+| Query keys                     | `query-keys.ts`                          | (one per module)                      |
+| Composables                    | `use{Entity}[Action].ts`                 | `useCreatePaymentRequest.ts`          |
+| Module root                    | `workspace.ts`, `screens.ts`, `index.ts` | —                                     |
+
+> See [NAMING.md](./NAMING.md) for the full standard, prohibited patterns, and backlog of inconsistencies to fix.
 
 ---
 
