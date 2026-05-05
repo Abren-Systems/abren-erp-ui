@@ -33,10 +33,11 @@ const sidePanelContract = computed(() => {
 
 <template>
   <div v-if="screen" class="flex w-full h-full relative overflow-hidden bg-neutral-50/30">
-    <!-- Main Working Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
-      <component :is="WorkingArea" v-if="WorkingArea" :id="props.id" />
-      <div v-else class="flex items-center justify-center h-full text-neutral-400">
+      <KeepAlive :max="10">
+        <component :is="WorkingArea" v-if="WorkingArea" :key="props.id || 'new'" :id="props.id" />
+      </KeepAlive>
+      <div v-if="!WorkingArea" class="flex items-center justify-center h-full text-neutral-400">
         No working area defined for {{ screen.id }}
       </div>
     </div>

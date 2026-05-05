@@ -28,6 +28,8 @@ export type {
   ScreenPersonalizationPolicy,
   ScreenDefinition,
 } from './screen-definition.types'
-export { ScreenRegistry, screenRegistry } from './screen-registry'
+export type { ScreenRegistry } from './screen-registry'
+export { screenRegistry } from './screen-registry'
 export { resolveScreenRoutes } from './screen-route-resolver'
+export type { ScreenInstance } from './screen-instance.types'
 export { default as ScreenRenderer } from './ScreenRenderer.vue'
