@@ -6,28 +6,26 @@ import type { JournalEntry } from '../../domain/journal-entry.types'
  */
 export const GL301000_FIELDS = {
   entryNumber: {
-    name: 'entryNumber',
+    key: 'entryNumber',
     label: 'Entry Number',
     type: 'text',
-    required: false,
-    readOnly: true, // System generated
+    readonly: () => true,
   },
   status: {
-    name: 'status',
+    key: 'status',
     label: 'Status',
-    type: 'status',
-    readOnly: true,
+    type: 'text',
+    readonly: () => true,
   },
   entryDate: {
-    name: 'entryDate',
+    key: 'entryDate',
     label: 'Entry Date',
-    type: 'text', // In a real system, 'date'
-    required: true,
+    type: 'date',
+    required: () => true,
   },
   description: {
-    name: 'description',
+    key: 'description',
     label: 'Description',
     type: 'text',
-    required: false,
   },
 } satisfies Record<string, FieldDefinition<JournalEntry>>

@@ -3,9 +3,6 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import type { TaxGroup } from '../../../domain/tax.types'
 import { AppBadge } from '@/shared/components/primitives'
 
-/**
- * Grid definition for Tax Groups.
- */
 export const taxGroupColumns: ColumnDef<TaxGroup>[] = [
   {
     accessorKey: 'name',

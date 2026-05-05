@@ -3,30 +3,30 @@ import type { Account } from '../../domain/account.types'
 
 export const GL201000_FIELDS = {
   code: {
-    name: 'code',
+    key: 'code',
     label: 'Account Code',
     type: 'text',
-    required: true,
+    required: () => true,
   },
   name: {
-    name: 'name',
+    key: 'name',
     label: 'Name',
     type: 'text',
-    required: true,
+    required: () => true,
   },
   type: {
-    name: 'type',
+    key: 'type',
     label: 'Type',
     type: 'text',
-    required: true,
+    required: () => true,
   },
   isActive: {
-    name: 'isActive',
+    key: 'isActive',
     label: 'Active',
-    type: 'boolean',
+    type: 'checkbox',
   },
   currency: {
-    name: 'currency',
+    key: 'currency',
     label: 'Currency',
     type: 'text',
   },

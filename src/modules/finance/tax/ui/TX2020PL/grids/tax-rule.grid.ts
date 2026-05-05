@@ -3,10 +3,6 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import type { TaxRule } from '../../../domain/tax.types'
 import { AppBadge } from '@/shared/components/primitives'
 
-/**
- * Grid definition for Tax Rules.
- * Displays rule metadata and statutory directionality.
- */
 export const taxRuleColumns: ColumnDef<TaxRule>[] = [
   {
     accessorKey: 'name',
@@ -29,7 +25,6 @@ export const taxRuleColumns: ColumnDef<TaxRule>[] = [
       let variant: 'primary' | 'success' | 'neutral' = 'neutral'
       if (direction === 'INPUT') variant = 'success'
       if (direction === 'OUTPUT') variant = 'primary'
-
       return h(AppBadge, { variant }, () => direction)
     },
   },
