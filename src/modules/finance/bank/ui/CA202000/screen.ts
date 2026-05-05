@@ -1,0 +1,41 @@
+import type { ScreenDefinition } from '@/platform/screen-runtime'
+import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import type { ModuleId } from '@/shared/types/brand.types'
+
+export const CA202000: ScreenDefinition = {
+  id: 'CA202000' as ScreenId,
+  moduleId: 'finance' as ModuleId,
+  kind: 'setup',
+  titleKey: 'Bank Account',
+  primaryView: 'account',
+  route: {
+    path: 'accounts/:id',
+    name: 'finance.bank.account',
+  },
+  permissions: [{ key: 'bank_accounts' }],
+  views: {
+    account: {
+      name: 'account',
+      kind: 'single',
+      containerName: 'BankAccountRecord',
+      queryKey: ['bank', 'accounts', 'detail'] as const,
+    },
+  },
+  layout: {
+    summaryTemplate: '17-17-14',
+    renderTarget: () => import('./view.vue') as never,
+    sidePanel: { tabs: [], defaultCollapsed: true },
+  },
+  commands: [],
+  personalization: {
+    allowTabPersonalization: false,
+    allowGridPersonalization: false,
+    allowFilterSaving: false,
+    allowSectionPersonalization: false,
+  },
+  test: {
+    containerName: 'CA202000',
+    viewNames: [],
+    actionNames: [],
+  },
+}
