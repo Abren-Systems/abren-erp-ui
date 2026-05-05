@@ -18,7 +18,12 @@ import type {
   RowSelectionState,
   VisibilityState,
   ColumnFiltersState,
+  PaginationState,
+  ColumnSizingState,
+  ColumnPinningState,
 } from '@tanstack/vue-table'
+
+export type GridDensity = 'compact' | 'standard' | 'relaxed'
 
 export interface DataGridState {
   sorting: SortingState
@@ -26,6 +31,10 @@ export interface DataGridState {
   columnVisibility: VisibilityState
   columnFilters: ColumnFiltersState
   globalFilter: string
+  pagination: PaginationState
+  columnSizing: ColumnSizingState
+  columnPinning: ColumnPinningState
+  density: GridDensity
 }
 
 export function useDataGrid() {
@@ -35,26 +44,30 @@ export function useDataGrid() {
   const columnFilters = ref<ColumnFiltersState>([])
   const globalFilter = ref('')
 
+  const pagination = ref<PaginationState>({ pageIndex: 0, pageSize: 50 })
+  const columnSizing = ref<ColumnSizingState>({})
+  const columnPinning = ref<ColumnPinningState>({ left: [], right: [] })
+  const density = ref<GridDensity>('standard')
+
   function resetSelection() {
     rowSelection.value = {}
   }
 
   function resetFilters() {
-    /** Clears column-level filters and the global search string. */
     columnFilters.value = []
     globalFilter.value = ''
   }
 
   function resetAll() {
-    /** Full reset — restores the grid to its initial unfiltered, unselected state. */
     sorting.value = []
     rowSelection.value = {}
     columnVisibility.value = {}
     columnFilters.value = []
     globalFilter.value = ''
+    pagination.value = { pageIndex: 0, pageSize: 50 }
+    columnSizing.value = {}
   }
 
-  /** Returns the number of currently selected rows. */
   const selectedCount = () => Object.keys(rowSelection.value).length
 
   return {
@@ -63,6 +76,10 @@ export function useDataGrid() {
     columnVisibility,
     columnFilters,
     globalFilter,
+    pagination,
+    columnSizing,
+    columnPinning,
+    density,
     selectedCount,
     resetSelection,
     resetFilters,

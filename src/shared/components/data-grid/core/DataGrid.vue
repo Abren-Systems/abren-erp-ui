@@ -4,17 +4,24 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   useVueTable,
   type ColumnDef,
   type SortingState,
   type RowSelectionState,
   type VisibilityState,
+  type PaginationState,
+  type ColumnSizingState,
+  type ColumnPinningState,
   type Row,
 } from '@tanstack/vue-table'
-import { computed } from 'vue'
+import { useVirtualizer } from '@tanstack/vue-virtual'
+import { computed, ref } from 'vue'
 import DataGridToolbar from '../plugins/DataGridToolbar.vue'
 import DataGridSkeleton from './DataGridSkeleton.vue'
 import DataGridEmpty from './DataGridEmpty.vue'
+import DataGridPagination from '../plugins/DataGridPagination.vue'
+import type { GridDensity } from '../../composables/useDataGrid'
 
 // ─── Props & Models ──────────────────────────────────────────────────────────
 
@@ -28,12 +35,14 @@ const props = withDefaults(
     showToolbar?: boolean
     emptyMessage?: string
     rowClickable?: boolean
+    virtualize?: boolean
   }>(),
   {
     skeletonRows: 8,
     showToolbar: true,
     loading: false,
     rowClickable: false,
+    virtualize: true,
   },
 )
 
@@ -46,6 +55,14 @@ const columnVisibility = defineModel<VisibilityState>('columnVisibility', {
   default: () => ({}),
 })
 const globalFilter = defineModel<string>('globalFilter', { default: '' })
+const density = defineModel<GridDensity>('density', { default: 'standard' })
+const pagination = defineModel<PaginationState>('pagination', {
+  default: () => ({ pageIndex: 0, pageSize: 50 }),
+})
+const columnSizing = defineModel<ColumnSizingState>('columnSizing', { default: () => ({}) })
+const columnPinning = defineModel<ColumnPinningState>('columnPinning', {
+  default: () => ({ left: [], right: [] }),
+})
 
 // ─── TanStack Table ──────────────────────────────────────────────────────────
 
@@ -59,7 +76,10 @@ const table = useVueTable({
   getCoreRowModel: getCoreRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
   enableRowSelection: true,
+  enableColumnResizing: true,
+  columnResizeMode: 'onChange',
   globalFilterFn: 'includesString',
 
   state: {
@@ -74,6 +94,15 @@ const table = useVueTable({
     },
     get globalFilter() {
       return globalFilter.value
+    },
+    get pagination() {
+      return pagination.value
+    },
+    get columnSizing() {
+      return columnSizing.value
+    },
+    get columnPinning() {
+      return columnPinning.value
     },
   },
 
@@ -90,7 +119,38 @@ const table = useVueTable({
   onGlobalFilterChange: (val) => {
     globalFilter.value = val
   },
+  onPaginationChange: (updater) => {
+    pagination.value = typeof updater === 'function' ? updater(pagination.value) : updater
+  },
+  onColumnSizingChange: (updater) => {
+    columnSizing.value = typeof updater === 'function' ? updater(columnSizing.value) : updater
+  },
+  onColumnPinningChange: (updater) => {
+    columnPinning.value = typeof updater === 'function' ? updater(columnPinning.value) : updater
+  },
 })
+
+// ─── Virtualization ──────────────────────────────────────────────────────────
+
+const scrollContainerRef = ref<HTMLDivElement | null>(null)
+
+const rowHeightMap = {
+  compact: 28,
+  standard: 36,
+  relaxed: 44,
+}
+
+const rowVirtualizer = useVirtualizer(
+  computed(() => ({
+    count: table.getRowModel().rows.length,
+    getScrollElement: () => scrollContainerRef.value,
+    estimateSize: () => rowHeightMap[density.value],
+    overscan: 10,
+  })),
+)
+
+const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems())
+const totalVirtualHeight = computed(() => rowVirtualizer.value.getTotalSize())
 
 const colCount = computed(() => props.columns.length)
 const selectedCount = computed(() => Object.keys(rowSelection.value).length)
@@ -112,6 +172,7 @@ const handleRowClick = (row: Row<TData>) => {
     <DataGridToolbar
       v-if="showToolbar"
       v-model="globalFilter"
+      v-model:density="density"
       :placeholder="placeholder"
       :selected-count="selectedCount"
     >
@@ -122,8 +183,8 @@ const handleRowClick = (row: Row<TData>) => {
     </DataGridToolbar>
 
     <!-- ── Table ───────────────────────────── -->
-    <div class="grid-scroll-container">
-      <table class="grid-table">
+    <div class="grid-scroll-container" ref="scrollContainerRef">
+      <table class="grid-table" :style="{ width: table.getTotalSize() + 'px' }">
         <!-- Sticky Header -->
         <thead class="grid-thead">
           <tr
@@ -134,38 +195,89 @@ const handleRowClick = (row: Row<TData>) => {
             <th
               v-for="header in headerGroup.headers"
               :key="header.id"
-              class="grid-th"
-              :style="{
-                width: header.getSize() !== 150 ? `${header.getSize()}px` : undefined,
-              }"
+              class="grid-th group"
+              :style="{ width: `${header.getSize()}px` }"
             >
-              <FlexRender
-                v-if="!header.isPlaceholder"
-                :render="header.column.columnDef.header"
-                :props="header.getContext()"
-              />
+              <div class="flex items-center justify-between w-full h-full relative">
+                <FlexRender
+                  v-if="!header.isPlaceholder"
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+
+                <div
+                  v-if="header.column.getCanResize()"
+                  @mousedown="header.getResizeHandler()($event)"
+                  @touchstart="header.getResizeHandler()($event)"
+                  class="resizer opacity-0 group-hover:opacity-100 transition-opacity"
+                  :class="{ isResizing: header.column.getIsResizing() }"
+                ></div>
+              </div>
             </th>
           </tr>
         </thead>
 
         <!-- Body -->
-        <tbody class="grid-tbody">
+        <tbody
+          class="grid-tbody"
+          :style="virtualize ? { height: `${totalVirtualHeight}px`, position: 'relative' } : {}"
+        >
           <!-- Loading skeleton -->
           <DataGridSkeleton v-if="loading" :rows="skeletonRows" :colspan="colCount" />
 
           <!-- Data rows -->
           <template v-else-if="table.getRowModel().rows.length">
-            <tr
-              v-for="row in table.getRowModel().rows"
-              :key="row.id"
-              class="grid-row"
-              :class="{ 'grid-row--selected': row.getIsSelected() }"
-              @click="handleRowClick(row)"
-            >
-              <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="grid-td">
-                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-              </td>
-            </tr>
+            <template v-if="virtualize">
+              <tr
+                v-for="virtualRow in virtualRows"
+                :key="virtualRow.index"
+                class="grid-row"
+                :class="[
+                  `grid-row--${density}`,
+                  {
+                    'grid-row--selected': table
+                      .getRowModel()
+                      .rows[virtualRow.index].getIsSelected(),
+                  },
+                ]"
+                :style="{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualRow.start}px)`,
+                  height: `${virtualRow.size}px`,
+                }"
+                @click="handleRowClick(table.getRowModel().rows[virtualRow.index])"
+              >
+                <td
+                  v-for="cell in table.getRowModel().rows[virtualRow.index].getVisibleCells()"
+                  :key="cell.id"
+                  class="grid-td"
+                  :style="{ width: `${cell.column.getSize()}px` }"
+                >
+                  <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr
+                v-for="row in table.getRowModel().rows"
+                :key="row.id"
+                class="grid-row"
+                :class="[`grid-row--${density}`, { 'grid-row--selected': row.getIsSelected() }]"
+                @click="handleRowClick(row)"
+              >
+                <td
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="grid-td"
+                  :style="{ width: `${cell.column.getSize()}px` }"
+                >
+                  <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                </td>
+              </tr>
+            </template>
           </template>
 
           <!-- Empty state -->
@@ -179,8 +291,10 @@ const handleRowClick = (row: Row<TData>) => {
     </div>
 
     <!-- Optional footer slot (pagination, totals) -->
-    <div v-if="$slots['footer']" class="grid-footer">
-      <slot name="footer" />
+    <div class="grid-footer">
+      <slot name="footer">
+        <DataGridPagination :table="table" />
+      </slot>
     </div>
   </div>
 </template>
@@ -294,10 +408,48 @@ const handleRowClick = (row: Row<TData>) => {
   border-right: none;
 }
 
+.grid-row--compact {
+  height: 28px;
+}
+.grid-row--compact .grid-td {
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.grid-row--standard {
+  height: 36px;
+}
+
+.grid-row--relaxed {
+  height: 44px;
+}
+.grid-row--relaxed .grid-td {
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+/* Resizer Handle */
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  background: var(--color-primary-500);
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+.resizer.isResizing {
+  background: var(--color-primary-600);
+  width: 5px;
+  opacity: 1;
+}
+
 .grid-footer {
   display: flex;
   align-items: center;
-  height: 32px;
+  height: 40px;
   padding: 0 12px;
   border-top: 1px solid var(--color-neutral-200);
   background: var(--color-neutral-50);

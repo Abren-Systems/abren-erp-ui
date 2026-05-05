@@ -14,6 +14,7 @@ import { AppInput } from '@/shared/components/primitives'
 
 const props = defineProps<{
   modelValue: string
+  density?: 'compact' | 'standard' | 'relaxed'
   placeholder?: string
   loading?: boolean
   selectedCount?: number
@@ -21,6 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  (e: 'update:density', value: 'compact' | 'standard' | 'relaxed'): void
 }>()
 
 // Debounced search — avoids firing on every keystroke
@@ -80,6 +82,49 @@ function clear() {
             </template>
           </AppInput>
         </div>
+
+        <!-- Density Toggle -->
+        <div
+          class="flex items-center bg-[var(--color-neutral-100)] p-0.5 rounded border border-[var(--color-neutral-200)]"
+        >
+          <button
+            class="px-2 py-1 text-xs rounded-sm transition-colors"
+            :class="
+              props.density === 'compact'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-[var(--color-neutral-500)] hover:text-black'
+            "
+            @click="emit('update:density', 'compact')"
+            title="Compact View"
+          >
+            Compact
+          </button>
+          <button
+            class="px-2 py-1 text-xs rounded-sm transition-colors"
+            :class="
+              props.density === 'standard'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-[var(--color-neutral-500)] hover:text-black'
+            "
+            @click="emit('update:density', 'standard')"
+            title="Standard View"
+          >
+            Standard
+          </button>
+          <button
+            class="px-2 py-1 text-xs rounded-sm transition-colors"
+            :class="
+              props.density === 'relaxed'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-[var(--color-neutral-500)] hover:text-black'
+            "
+            @click="emit('update:density', 'relaxed')"
+            title="Relaxed View"
+          >
+            Relaxed
+          </button>
+        </div>
+
         <slot />
       </div>
 
