@@ -5,13 +5,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: 'coa',
     name: 'LedgerCoa',
-    component: () => import('./ui/accounts/pages/ChartOfAccountsListPage.vue'),
+    component: () => import('./ui/GL2010PL/view.vue'),
     meta: { permission: 'ledger:view' },
   },
   {
-    path: 'coa/:accountId',
+    path: 'coa/:id',
     name: 'LedgerCoaDetail',
-    component: () => import('./ui/accounts/pages/ChartOfAccountsDetailPage.vue'),
+    component: () => import('./ui/GL201000/view.vue'),
     meta: { permission: 'ledger:view' },
     props: true,
   },
@@ -20,13 +20,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: 'journals',
     name: 'LedgerJournals',
-    component: () => import('./ui/journal-entries/pages/JournalEntriesListPage.vue'),
+    component: () => import('./ui/GL3010PL/view.vue'),
     meta: { permission: 'ledger:view' },
   },
   {
-    path: 'journals/:entryId',
+    path: 'journals/:id',
     name: 'LedgerJournalDetail',
-    component: () => import('./ui/journal-entries/pages/JournalEntryDetailPage.vue'),
+    component: () => import('./ui/GL301000/view.vue'),
     meta: { permission: 'ledger:view' },
     props: true,
   },

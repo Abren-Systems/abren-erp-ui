@@ -1,0 +1,46 @@
+import type { ScreenDefinition } from '@/platform/screen-runtime'
+import { GL201000_COMMANDS } from './commands'
+
+import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import type { ModuleId } from '@/shared/types/brand.types'
+
+export const GL201000: ScreenDefinition = {
+  id: 'GL201000' as ScreenId,
+  moduleId: 'ledger' as ModuleId,
+  kind: 'setup',
+  titleKey: 'Chart of Accounts',
+  primaryView: 'account',
+  route: {
+    path: 'accounts/:id',
+    name: 'LedgerCoaDetail',
+  },
+  permissions: [{ key: 'ledger:manage_accounts' }],
+  views: {
+    account: {
+      name: 'account',
+      kind: 'single',
+      containerName: 'AccountRecord',
+      queryKey: ['ledger', 'accounts', 'detail'] as const,
+    },
+  },
+  layout: {
+    summaryTemplate: '1-1',
+    renderTarget: () => import('./view.vue') as never,
+    sidePanel: {
+      tabs: [],
+      defaultCollapsed: true,
+    },
+  },
+  commands: GL201000_COMMANDS,
+  personalization: {
+    allowTabPersonalization: false,
+    allowGridPersonalization: false,
+    allowFilterSaving: false,
+    allowSectionPersonalization: false,
+  },
+  test: {
+    containerName: 'GL201000',
+    viewNames: [],
+    actionNames: [],
+  },
+}
