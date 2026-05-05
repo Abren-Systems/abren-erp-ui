@@ -4,8 +4,8 @@ import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
 import { AppButton, AppSelect, AppInput } from '@/shared/components/primitives'
 import { ClipboardEdit, Plus, Trash2, ArrowLeft } from 'lucide-vue-next'
-import { useInventoryAdjustment } from '../../application/composables/useInventoryAdjustment'
-import { useWarehouses } from '../../application/composables/useWarehouses'
+import { useInventoryAdjustment } from '../../application/useInventoryAdjustment'
+import { useWarehouses } from '../../application/useWarehouses'
 import type { AdjustmentCreateDTO } from '../../infrastructure/api.types'
 
 const router = useRouter()

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/vue-query'
-import { inventoryAdapter } from '../../infrastructure/inventory_adapter'
-import { InventoryMapper } from '../../infrastructure/mappers'
-import { inventoryKeys } from '../keys'
-import type { Warehouse } from '../../domain/types'
+import { inventoryAdapter } from '../infrastructure/inventory.adapter'
+import { InventoryMapper } from '../infrastructure/mappers'
+import { inventoryKeys } from './query-keys'
+import type { Warehouse } from '../domain/inventory.types'
 
 /**
  * Use Case: View Warehouses

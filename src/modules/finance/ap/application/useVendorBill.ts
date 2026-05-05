@@ -1,7 +1,7 @@
 import { useApiQuery } from '@/shared/composables/useApiQuery'
 import type { VendorBillId } from '@/shared/types/brand.types'
 import { type MaybeRefOrGetter, toValue, computed } from 'vue'
-import { apAdapter } from '../infrastructure/ap_adapter'
+import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 
 /**

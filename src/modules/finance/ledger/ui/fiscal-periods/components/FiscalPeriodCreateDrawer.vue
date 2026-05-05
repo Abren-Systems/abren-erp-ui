@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { AppButton, AppInput, AppSidePane } from '@/shared/components/primitives'
-import { useFiscalPeriods } from '../../../application/composables/useFiscalPeriods'
+import { useFiscalPeriods } from '../../../application/useFiscalPeriods'
 import { computed } from 'vue'
 
 /**

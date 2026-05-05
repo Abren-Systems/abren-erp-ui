@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useResourceQuery } from '@/shared/composables/useResourceQuery'
-import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
-import { LedgerMapper } from '../../infrastructure/mappers'
-import { ledgerKeys } from '../keys'
-import type { AccountCreateDTO } from '../../infrastructure/api.types'
+import { ledgerAdapter } from '../infrastructure/ledger.adapter'
+import { LedgerMapper } from '../infrastructure/mappers'
+import { ledgerKeys } from './query-keys'
+import type { AccountCreateDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: View and Manage Chart of Accounts.

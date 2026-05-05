@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cn } from '@/shared/lib/cn'
+import { cn } from '@/shared/utils/cn'
 
 const props = defineProps<{ class?: string }>()
 </script>

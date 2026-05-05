@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useCashflow } from '../application/composables/useCashflow'
+import { useCashflow } from '../application/useCashflow'
 import { BusinessDate } from '@/shared/domain/business-date'
 import ReportingChart from './ReportingChart.vue'
 import { AppButton } from '@/shared/components/primitives'

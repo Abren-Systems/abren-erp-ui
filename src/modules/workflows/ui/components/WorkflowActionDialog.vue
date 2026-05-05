@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import { AppButton, AppInput, AppBadge } from '@/shared/components/primitives'
 import { ShieldCheck, MessageSquare, X, Check, AlertTriangle } from 'lucide-vue-next'
-import { useApprovalAction } from '../../application/composables/useApprovalAction'
+import { useApprovalAction } from '../../application/useApprovalAction'
 
 const props = defineProps<{
   instanceId: string

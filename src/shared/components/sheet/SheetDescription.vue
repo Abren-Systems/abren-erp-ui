@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DialogDescription, type DialogDescriptionProps, useForwardProps } from 'reka-ui'
-import { cn } from '@/shared/lib/cn'
+import { cn } from '@/shared/utils/cn'
 
 const props = defineProps<DialogDescriptionProps & { class?: string }>()
 const forwarded = useForwardProps(props)

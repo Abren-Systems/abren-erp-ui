@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DropdownMenuItem, type DropdownMenuItemProps, useForwardProps } from 'reka-ui'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 const props = defineProps<DropdownMenuItemProps & { class?: string; inset?: boolean }>()
 

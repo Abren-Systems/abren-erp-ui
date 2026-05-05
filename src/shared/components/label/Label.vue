@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Label as RadixLabel, type LabelProps } from 'reka-ui'
 import { type HTMLAttributes, computed } from 'vue'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 const props = defineProps<LabelProps & { class?: HTMLAttributes['class'] }>()
 

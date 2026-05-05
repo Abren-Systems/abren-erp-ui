@@ -1,8 +1,8 @@
 import { useApiMutation } from '@/shared/composables/useApiMutation'
-import { workflowsAdapter } from '../../infrastructure/workflows_adapter'
+import { workflowsAdapter } from '../infrastructure/workflows.adapter'
 import { eventBus } from '@/shared/event-bus/event-bus'
 import { useQueryClient } from '@tanstack/vue-query'
-import { workflowKeys } from '../keys'
+import { workflowKeys } from './query-keys'
 
 /**
  * Use Case: Submit a Workflow Approval Decision.

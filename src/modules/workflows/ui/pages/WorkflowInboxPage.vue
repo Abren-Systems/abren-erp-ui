@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { Inbox, CheckCircle2 } from 'lucide-vue-next'
 import { workflowColumns } from '../grids/workflow.grid'
-import { usePendingApprovals } from '../../application/composables/usePendingApprovals'
+import { usePendingApprovals } from '../../application/usePendingApprovals'
 import WorkflowActionDialog from '../components/WorkflowActionDialog.vue'
 import type { PendingApproval } from '../../domain/workflows.types'
 

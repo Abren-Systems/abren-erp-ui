@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { authAdapter } from './infrastructure/auth_adapter'
+import { authAdapter } from './infrastructure/auth.adapter'
 import { AuthMapper } from './infrastructure/mappers'
 import type { UserId, TenantId } from '@/shared/types/brand.types'
 

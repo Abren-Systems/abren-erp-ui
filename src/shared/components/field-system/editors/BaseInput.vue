@@ -11,7 +11,7 @@
  * @see docs/FIELD_SYSTEM.md — Phase 2
  */
 import { computed, useAttrs } from 'vue'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 defineOptions({ inheritAttrs: false })
 

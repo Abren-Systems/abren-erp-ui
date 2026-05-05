@@ -1,5 +1,5 @@
 import { useResourceQuery } from '@/shared/composables/useResourceQuery'
-import { apAdapter } from '../infrastructure/ap_adapter'
+import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 import type { PaymentRequestStats } from '../domain/ap.types'
 

@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/shared/components/dropdown-menu'
-import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
+import { useLedgerAccounts } from '../../../application/useLedgerAccounts'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import AccountTraceDrawer from '../components/AccountTraceDrawer.vue'
 

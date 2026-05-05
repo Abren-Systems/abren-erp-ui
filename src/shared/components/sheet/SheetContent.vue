@@ -9,7 +9,7 @@ import {
   DialogClose,
 } from 'reka-ui'
 import { X } from 'lucide-vue-next'
-import { cn } from '@/shared/lib/cn'
+import { cn } from '@/shared/utils/cn'
 
 const props = defineProps<DialogContentProps & { class?: string }>()
 const emits = defineEmits<DialogContentEmits>()

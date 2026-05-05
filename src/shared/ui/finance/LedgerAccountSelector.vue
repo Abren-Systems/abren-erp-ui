@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AppSelect } from '@/shared/components/primitives'
-import { useLedgerAccounts } from '@/modules/finance/ledger/application/composables/useLedgerAccounts'
+import { useLedgerAccounts } from '@/modules/finance/ledger/application/useLedgerAccounts'
 
 interface Props {
   modelValue: string | null

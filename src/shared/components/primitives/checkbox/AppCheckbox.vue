@@ -8,7 +8,7 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 import { Check } from 'lucide-vue-next'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 const props = defineProps<CheckboxRootProps & { class?: string }>()
 const emits = defineEmits<CheckboxRootEmits>()

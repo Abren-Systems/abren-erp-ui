@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DialogDescription, type DialogDescriptionProps } from 'reka-ui'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 const props = defineProps<DialogDescriptionProps & { class?: string }>()
 </script>

@@ -15,7 +15,7 @@ import type {
   SerialNumberDTO,
   TrackingMode,
 } from './api.types'
-import type { Warehouse, Item, StockItem, Batch, SerialNumber } from '../domain/types'
+import type { Warehouse, Item, StockItem, Batch, SerialNumber } from '../domain/inventory.types'
 
 /**
  * Mapper-as-Factory for the Inventory Module.

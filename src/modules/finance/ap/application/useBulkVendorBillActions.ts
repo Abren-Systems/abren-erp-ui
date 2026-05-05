@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useQueryClient } from '@tanstack/vue-query'
-import { apAdapter } from '../infrastructure/ap_adapter'
+import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 import type { VendorBillId } from '@/shared/types/brand.types'
 

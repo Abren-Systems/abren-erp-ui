@@ -7,7 +7,7 @@ import {
   DialogPortal,
   useForwardPropsEmits,
 } from 'reka-ui'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 const props = defineProps<DialogContentProps & { class?: string }>()
 const emits = defineEmits<DialogContentEmits>()

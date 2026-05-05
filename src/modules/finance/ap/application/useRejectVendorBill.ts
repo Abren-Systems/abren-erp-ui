@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import type { Ref } from 'vue'
 import { toValue } from 'vue'
-import { apAdapter } from '../infrastructure/ap_adapter'
+import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 import { toId } from '@/shared/types/brand.types'
 import type { VendorBillId } from '@/shared/types/brand.types'

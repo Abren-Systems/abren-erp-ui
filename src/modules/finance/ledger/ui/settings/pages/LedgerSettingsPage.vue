@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useLedgerSettings } from '../../../application/composables/useLedgerSettings'
-import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
+import { useLedgerSettings } from '../../../application/useLedgerSettings'
+import { useLedgerAccounts } from '../../../application/useLedgerAccounts'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { watch } from 'vue'

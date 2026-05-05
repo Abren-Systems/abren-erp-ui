@@ -1,6 +1,6 @@
 import { useApiQuery } from '@/shared/composables/useApiQuery'
-import { workflowsAdapter } from '../../infrastructure/workflows_adapter'
-import { workflowKeys } from '../keys'
+import { workflowsAdapter } from '../infrastructure/workflows.adapter'
+import { workflowKeys } from './query-keys'
 
 /**
  * Use Case: View Pending Workflow Approvals.

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DropdownMenuSeparator, type DropdownMenuSeparatorProps } from 'reka-ui'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 const props = defineProps<DropdownMenuSeparatorProps & { class?: string }>()
 </script>

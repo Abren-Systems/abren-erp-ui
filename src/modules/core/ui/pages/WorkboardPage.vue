@@ -7,7 +7,7 @@ import { useAuditStore } from '@/shared/infrastructure/audit.store'
 import { useAuthStore } from '@/shared/auth/auth.store'
 import { PageHeader } from '@/shared/components/workspace'
 import { useUsers } from '../../application/useUsers'
-import { usePendingApprovals } from '@/modules/workflows/application/composables/usePendingApprovals'
+import { usePendingApprovals } from '@/modules/workflows/application/usePendingApprovals'
 import { usePaymentRequestStats } from '@/modules/finance/ap/application/usePaymentRequestStats'
 
 // Sub-components

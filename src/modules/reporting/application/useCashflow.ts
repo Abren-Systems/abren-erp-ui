@@ -1,10 +1,10 @@
 import { useResourceQuery } from '@/shared/composables/useResourceQuery'
-import { reportingAdapter } from '../../infrastructure/reporting_adapter'
-import type { CashflowQuery } from '../../infrastructure/api.types'
-import { reportingKeys } from '../keys'
-import { ReportingMapper } from '../../infrastructure/mappers'
+import { reportingAdapter } from '../infrastructure/reporting.adapter'
+import type { CashflowQuery } from '../infrastructure/api.types'
+import { reportingKeys } from './query-keys'
+import { ReportingMapper } from '../infrastructure/mappers'
 import { Money, type Currency } from '@/shared/domain/money'
-import type { CashflowStats } from '../../domain/reporting.types'
+import type { CashflowStats } from '../domain/reporting.types'
 import { computed } from 'vue'
 
 /**

@@ -6,7 +6,7 @@ import {
   DropdownMenuPortal,
   useForwardPropsEmits,
 } from 'reka-ui'
-import { cn } from '@/shared/lib'
+import { cn } from '@/shared/utils'
 
 const props = withDefaults(
   defineProps<

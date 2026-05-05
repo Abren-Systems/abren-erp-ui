@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { AppButton, AppInput, AppSelect, AppSidePane } from '@/shared/components/primitives'
-import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
+import { useLedgerAccounts } from '../../../application/useLedgerAccounts'
 import { AccountType } from '../../../domain/account.types'
 
 const props = defineProps<{ open: boolean }>()

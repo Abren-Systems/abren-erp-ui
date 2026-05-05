@@ -1,8 +1,8 @@
 import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
-import { ledgerAdapter } from '../../infrastructure/ledger_adapter'
-import { ledgerKeys } from '../keys'
+import { ledgerAdapter } from '../infrastructure/ledger.adapter'
+import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { components } from '@/shared/api/generated.types'
 

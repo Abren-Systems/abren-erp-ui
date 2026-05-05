@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { inventoryAdapter } from '../../infrastructure/inventory_adapter'
-import { inventoryKeys } from '../keys'
-import type { AdjustmentCreateDTO } from '../../infrastructure/api.types'
+import { inventoryAdapter } from '../infrastructure/inventory.adapter'
+import { inventoryKeys } from './query-keys'
+import type { AdjustmentCreateDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: Create Inventory Adjustment

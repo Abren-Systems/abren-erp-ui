@@ -3,10 +3,10 @@ import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { AppButton, AppBadge } from '@/shared/components/primitives'
 import { Warehouse as WarehouseIcon, MapPin, Plus } from 'lucide-vue-next'
-import { useWarehouses } from '../../application/composables/useWarehouses'
+import { useWarehouses } from '../../application/useWarehouses'
 import TraceabilityBadge from '../components/TraceabilityBadge.vue'
 import { h } from 'vue'
-import type { Warehouse } from '../../domain/types'
+import type { Warehouse } from '../../domain/inventory.types'
 
 const router = useRouter()
 

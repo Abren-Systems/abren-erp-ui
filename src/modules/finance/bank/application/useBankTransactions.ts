@@ -1,9 +1,9 @@
 import { useApiQuery } from '@/shared/composables/useApiQuery'
-import { bankAdapter } from '../../infrastructure/bank_adapter'
-import type { BankTransaction } from '../../domain/bank.types'
+import { bankAdapter } from '../infrastructure/bank.adapter'
+import type { BankTransaction } from '../domain/bank.types'
 import type { BankAccountId } from '@/shared/types/brand.types'
 import { computed } from 'vue'
-import { bankKeys } from '../keys'
+import { bankKeys } from './query-keys'
 
 /**
  * Use Case: View Bank Account Transactions.

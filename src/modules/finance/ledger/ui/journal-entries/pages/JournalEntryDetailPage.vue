@@ -16,7 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/shared/components/dropdown-menu'
-import { useJournalEntry } from '../../../application/composables/useJournalEntry'
+import { useJournalEntry } from '../../../application/useJournalEntry'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import JournalEntryActionModal from '../components/JournalEntryActionModal.vue'
 import JournalEntryTraceDrawer from '../components/JournalEntryTraceDrawer.vue'

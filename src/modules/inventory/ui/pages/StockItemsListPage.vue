@@ -4,11 +4,11 @@ import { useRouter } from 'vue-router'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { Package, MapPin, Plus, ListFilter } from 'lucide-vue-next'
-import { useStockPositions } from '../../application/composables/useStockPositions'
-import { useWarehouses } from '../../application/composables/useWarehouses'
+import { useStockPositions } from '../../application/useStockPositions'
+import { useWarehouses } from '../../application/useWarehouses'
 import TraceabilityBadge from '../components/TraceabilityBadge.vue'
 import { h } from 'vue'
-import type { StockItem } from '../../domain/types'
+import type { StockItem } from '../../domain/inventory.types'
 
 const router = useRouter()
 

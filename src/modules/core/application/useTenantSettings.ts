@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import { coreAdapter } from '../infrastructure/core_adapter'
+import { coreAdapter } from '../infrastructure/core.adapter'
 import type { TenantSettingDTO } from '../infrastructure/api.types'
 
 export function useTenantSettings() {

@@ -1,6 +1,6 @@
 import { useResourceQuery } from '@/shared/composables/useResourceQuery'
-import { bankAdapter } from '../../infrastructure/bank_adapter'
-import { bankKeys } from '../keys'
+import { bankAdapter } from '../infrastructure/bank.adapter'
+import { bankKeys } from './query-keys'
 
 /**
  * Use Case: View Bank Accounts.

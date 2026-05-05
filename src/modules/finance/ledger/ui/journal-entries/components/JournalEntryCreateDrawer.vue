@@ -11,8 +11,8 @@ import {
   Calendar,
   DollarSign,
 } from 'lucide-vue-next'
-import { useJournalEntries } from '../../../application/composables/useJournalEntries'
-import { useLedgerAccounts } from '../../../application/composables/useLedgerAccounts'
+import { useJournalEntries } from '../../../application/useJournalEntries'
+import { useLedgerAccounts } from '../../../application/useLedgerAccounts'
 
 /**
  * JournalEntryCreateDrawer — Multi-line double-entry creation form.
