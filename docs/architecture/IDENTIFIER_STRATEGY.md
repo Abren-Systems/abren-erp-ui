@@ -121,7 +121,7 @@ Here is a robust implementation demonstrating **ID-to-UUID resolution, loading s
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
-import api from '@/core/api'
+import { apiGet } from '@/shared/api/http-client'
 
 /**
  * Resolves a human-readable display ID (or Slug) to its full Entity via backend.
@@ -138,8 +138,7 @@ export function useEntityResolver<T>(endpoint: string, displayId: string) {
     queryKey: [endpoint, displayId],
     queryFn: async () => {
       // Note: The API must support finding by displayId
-      const response = await api.get(`/${endpoint}/resolve/${displayId}`)
-      return response.data.data
+      return apiGet<T>(`/${endpoint}/resolve/${displayId}`)
     },
     retry: false, // Fail fast if ID is invalid
   })
@@ -156,9 +155,9 @@ export function useEntityResolver<T>(endpoint: string, displayId: string) {
 ```vue
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { useEntityResolver } from '@/composables/useEntityResolver'
-import SkeletonLoader from '@/components/ui/SkeletonLoader.vue'
-import NotFoundBoundary from '@/components/error/NotFoundBoundary.vue'
+import { useEntityResolver } from '@/shared/composables/useEntityResolver'
+import SkeletonLoader from '@/shared/components/ui/SkeletonLoader.vue'
+import NotFoundBoundary from '@/shared/components/error/NotFoundBoundary.vue'
 import InvoiceDisplay from './InvoiceDisplay.vue'
 
 const route = useRoute()

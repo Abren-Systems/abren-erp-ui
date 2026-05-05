@@ -9,7 +9,7 @@ tags: [frontend, architecture]
 
 _The definitive source of truth for visual tokens, typography, and spacing used across the Abren ERP UI._
 
-This document defines the visual token layer implemented via **Tailwind CSS v4 `@theme`** in `src/assets/main.css`. ERP component architecture, contracts, and screen primitives are governed together with `ERP_DESIGN_SYSTEM_ARCHITECTURE.md` and `COMPONENT_CONTRACTS.md`. During migration, shared UI may exist under both `src/shared/components/` and `src/shared/ui/`.
+This document defines the visual token layer implemented via **Tailwind CSS v4 `@theme`** in `src/assets/main.css`. ERP component architecture, contracts, and screen primitives are governed by [COMPONENT_SYSTEM.md](./COMPONENT_SYSTEM.md). During migration, shared UI may exist under both `src/shared/components/` and `src/shared/ui/`.
 
 ---
 

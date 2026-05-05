@@ -78,7 +78,7 @@ httpClient.interceptors.response.use(
 Each mutation composable handles domain-specific error scenarios via TanStack Query's `onError` callback:
 
 ```typescript
-// modules/.../application/composables/useSubmitRequest.ts
+// modules/.../application/useSubmitRequest.ts
 return useMutation({
   mutationFn: (id: string) => adapter.submit(id),
   onError: (error: Error) => {

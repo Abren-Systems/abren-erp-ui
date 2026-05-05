@@ -33,7 +33,7 @@ Domain data (entities fetched from the API) must **never** be manually duplicate
 ### 2.1 UI State Store Template (The Ephemeral Local)
 
 ```typescript
-// modules/finance/ledger/ui/stores/ledger-ui.store.ts
+// modules/finance/ledger/ui/ledger-ui.store.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -94,7 +94,7 @@ sequenceDiagram
 ### 3.1 Composable with TanStack Query (Facade)
 
 ```typescript
-// modules/finance/ap/application/composables/usePaymentRequests.ts
+// modules/finance/ap/application/usePaymentRequests.ts
 import { useQuery } from '@tanstack/vue-query'
 import { paymentRequestAdapter } from '../infrastructure/payment_request_adapter'
 import { toViewModel } from '../infrastructure/payment_request.mapper'
@@ -124,7 +124,7 @@ export function usePaymentRequests() {
 Stores **never** import other stores for domain data. When Module A's action should refresh Module B's data, use the Event Bus and Cache Invalidation:
 
 ```typescript
-// modules/finance/ap/application/composables/usePayRequest.ts
+// modules/finance/ap/application/usePayRequest.ts
 import { eventBus } from '@/shared/event-bus/event-bus'
 import { useQueryClient } from '@tanstack/vue-query'
 
@@ -148,7 +148,7 @@ export function usePayRequest() {
   return { payRequest }
 }
 
-// modules/finance/ledger/application/composables/useLedgerAccounts.ts
+// modules/finance/ledger/application/useLedgerAccounts.ts
 // Subscribes to the event — refreshes its own caches
 eventBus.on('ap:pr:paid', () => {
   queryClient.invalidateQueries({ queryKey: ['ledger-accounts'] })
@@ -162,7 +162,7 @@ eventBus.on('ap:pr:paid', () => {
 For actions that should feel instant (like submitting a request), use TanStack Query's built-in `onMutate` / `onError` mechanism. This keeps domain data inside the query cache — consistent with the **Query-First** rule (§1). Never duplicate server state into a Pinia store for optimistic updates.
 
 ```typescript
-// modules/finance/ap/application/composables/useSubmitRequest.ts
+// modules/finance/ap/application/useSubmitRequest.ts
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { paymentRequestAdapter } from '../../infrastructure/payment_request_adapter'
 import type { PaymentRequest } from '../../domain/payment-request.types'

@@ -7,15 +7,14 @@ tags: [frontend, architecture, ux, acumatica]
 
 # Acumatica Alignment Proposal
 
-> **Status:** Proposed
-> **Rewrite companions:** `ACUMATICA_REWRITE_STRATEGY.md`, `FRONTEND_STRUCTURE_EVALUATION.md`
+> **Status:** Proposed — Historical reference. Companion strategies have been consolidated into [ARCHITECTURE.md](./ARCHITECTURE.md) and [SCREEN_RUNTIME.md](./SCREEN_RUNTIME.md).
 > **Sources reviewed:**
 >
 > - `/Users/yuma/Downloads/AcumaticaERP_UIDev.pdf` — Acumatica UI Developer Guide, 2026 R1, last updated 2026-03-15
 > - `/Users/yuma/Downloads/AcumaticaERP_InterfaceGuide.pdf` — Acumatica End-User Interface Guide, 2026 R1, last updated 2026-03-15
 > - `/Users/yuma/Downloads/AcumaticaERP_UIDevRef.pdf` — Acumatica UI Component Guide, 2026 R1, last updated 2026-03-15
 >
-> **Local references reviewed:** `docs/architecture/UX_ARCHITECTURE.md`, `docs/FIELD_SYSTEM.md`, `docs/architecture/MODULE_STRUCTURE.md`, `src/shared/architecture/*`, shared field/grid/workspace components, AP focus/list screens.
+> **Local references reviewed:** `docs/architecture/UX_ARCHITECTURE.md`, `docs/FIELD_SYSTEM.md`, `docs/architecture/ARCHITECTURE.md`, `src/shared/architecture/*`, shared field/grid/workspace components, AP focus/list screens.
 
 ## Executive Decision
 

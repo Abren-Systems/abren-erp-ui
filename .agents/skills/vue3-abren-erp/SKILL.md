@@ -5,6 +5,10 @@ description: Patterns and guardrails for building the Abren ERP UI with Vue 3, T
 
 # Vue 3 Abren ERP Development Skill
 
+> **Architecture Authority:** [`docs/architecture/ARCHITECTURE.md`](../../docs/architecture/ARCHITECTURE.md) (v3.0, Locked Baseline)
+> **Key Companions:** [`docs/architecture/SCREEN_RUNTIME.md`](../../docs/architecture/SCREEN_RUNTIME.md) (Runtime) · [`docs/architecture/COMPONENT_SYSTEM.md`](../../docs/architecture/COMPONENT_SYSTEM.md) (UI & Contracts)
+> This skill file provides AI-specific guardrails and UX doctrine. For structural decisions (module anatomy, layer rules, platform contracts), defer to the Architecture Manifesto.
+
 ## Core Rules
 
 1. **Always** use Vue 3 Composition API with `<script setup lang="ts">`.
@@ -17,6 +21,8 @@ description: Patterns and guardrails for building the Abren ERP UI with Vue 3, T
 8. **Never** import across module internals. Cross-module coordination should happen through explicit boundaries.
 9. **Never** move business logic into `shared/`.
 10. **Always** optimize UX around operational clarity, traceability, and action hierarchy.
+11. **Always** place composables directly in `application/` (flat — no `composables/` sub-folder).
+12. **Always** place screen folders directly under `ui/` keyed by Screen ID (flat — no `transactions/` or `profiles/` sub-folders).
 
 ## Product UX Doctrine
 

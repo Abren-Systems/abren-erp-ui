@@ -22,31 +22,39 @@ Abren ERP UI is the **domain-aware frontend** for the Abren ERP Financial Operat
 
 ---
 
-## Documentation Map
+## Documentation Map & Authority Hierarchy
 
-Navigate by concern:
+The Abren ERP UI documentation follows a strict hierarchy. **ARCHITECTURE.md (v3.0)** is the single root of truth. All other documents are subordinate.
 
-### Architecture
+### Architecture Core
 
-| Document                                                                         | Description                                                                          |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [Frontend Architecture](architecture/ARCHITECTURE.md)                            | **Authority Baseline** — Core patterns, module rules, and layer structure            |
-| [Acumatica Alignment Strategy](architecture/ACUMATICA_ALIGNMENT_STRATEGY.md)     | **ERP UI Authority** — Governing strategy for the screen-runtime rewrite             |
-| [Screen Runtime Architecture](architecture/SCREEN_RUNTIME_ARCHITECTURE.md)       | Registered screens, screen instances, renderer, commands, and runtime model          |
-| [UX Architecture](architecture/UX_ARCHITECTURE.md)                               | **UX Authority** — shell, workspace, progressive disclosure, and interaction grammar |
-| [Field System](FIELD_SYSTEM.md)                                                  | **Field Authority** — AppField, AppFieldset layout engine, registry                  |
-| [Module Structure](architecture/MODULE_STRUCTURE.md)                             | Bounded context mapping, folder conventions, and boundary rules                      |
-| [Module Restructure Plan](architecture/MODULE_RESTRUCTURE_PLAN.md)               | Screen-first module export and folder migration plan                                 |
-| [State Management](architecture/STATE_MANAGEMENT.md)                             | Pinia store patterns, module-scoped state, and cross-module reactivity               |
-| [API Integration](architecture/API_INTEGRATION.md)                               | HTTP client, Anti-Corruption Layer (Mappers), OpenAPI type generation                |
-| [Form Architecture](architecture/FORM_ARCHITECTURE.md)                           | TanStack Form + Zod integration and form layout patterns                             |
-| [Testing Strategy](architecture/TESTING_STRATEGY.md)                             | Frontend testing pyramid, coverage targets, and tooling                              |
-| [UI Foundation Decision](architecture/UI_FOUNDATION_DECISION.md)                 | **ADR** — Evaluation of Primitive libraries and library selection                    |
-| [Design System](architecture/DESIGN_SYSTEM.md)                                   | **Visual Specs** — Colors, spacing, typography, and UX principles                    |
-| [ERP Design System Architecture](architecture/ERP_DESIGN_SYSTEM_ARCHITECTURE.md) | ERP component layers and target shared UI structure                                  |
-| [Component Contracts](architecture/COMPONENT_CONTRACTS.md)                       | ID, label, placement, configuration, personalization, and test contracts             |
-| [UI Components](architecture/UI_COMPONENTS.md)                                   | Component ownership rules and usage expectations                                     |
-| [Migration Roadmap](architecture/MIGRATION_ROADMAP.md)                           | Phased rollout from route/page app to screen-runtime ERP UI                          |
+| Document                                              | Description                                                                            | Authority           |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------- |
+| [Frontend Architecture](architecture/ARCHITECTURE.md) | **Single Root of Truth** — Core patterns, module rules, and layer structure.           | **Locked Baseline** |
+| [Screen Runtime](architecture/SCREEN_RUNTIME.md)      | **Runtime Authority** — Screen instances, controllers (PXGraph), and state machines.   | Subordinate         |
+| [Component System](architecture/COMPONENT_SYSTEM.md)  | **UI Authority** — Component ownership, contracts, and design system alignment.        | Subordinate         |
+| [UX Architecture](architecture/UX_ARCHITECTURE.md)    | **UX Authority** — Progressive disclosure, interaction grammar, and shell foundations. | Subordinate         |
+| [Field System](FIELD_SYSTEM.md)                       | **Field Authority** — AppField, AppFieldset layout engine, and registry.               | Subordinate         |
+
+### Implementation Details
+
+| Document                                                   | Description                                                           |
+| ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| [State Management](architecture/STATE_MANAGEMENT.md)       | Pinia store patterns and reactive state flows.                        |
+| [API Integration](architecture/API_INTEGRATION.md)         | HTTP client, Anti-Corruption Layer (Mappers), and OpenAPI generation. |
+| [Form Architecture](architecture/FORM_ARCHITECTURE.md)     | TanStack Form + Zod integration and form layout patterns.             |
+| [Identifier Strategy](architecture/IDENTIFIER_STRATEGY.md) | Mapping Human IDs to Backend UUIDs.                                   |
+| [Error Handling](architecture/ERROR_HANDLING.md)           | Error categories, toast system, and loading states.                   |
+| [Testing Strategy](architecture/TESTING_STRATEGY.md)       | Frontend testing pyramid and coverage targets.                        |
+| [Design System](architecture/DESIGN_SYSTEM.md)             | **Visual Specs** — Colors, spacing, and typography tokens.            |
+| [DataGrid Spec](design/DATA_GRID_SPEC.md)                  | Detailed specification for the core DataGrid platform component.      |
+
+### Planning & Strategy
+
+| Document                                                              | Description                                               |
+| --------------------------------------------------------------------- | --------------------------------------------------------- |
+| [Implementation Roadmap](IMPLEMENTATION_ROADMAP.md)                   | Horizon-based delivery plan and vertical integrity gates. |
+| [Product Segmentation](architecture/PRODUCT_SEGMENTATION_STRATEGY.md) | GTM packaging tiers and module feature-gating strategy.   |
 
 ### Development
 
@@ -59,7 +67,6 @@ Navigate by concern:
 
 | Backend Document                                                                | Relevance to Frontend                             |
 | ------------------------------------------------------------------------------- | ------------------------------------------------- |
-| [Backend Architecture](architecture/ARCHITECTURE.md)                            | Domain model definitions, bounded context rules   |
 | [API Strategy](../../abren-api/docs/architecture/modules/API_STRATEGY.md)       | Action-oriented endpoint patterns the UI consumes |
 | [Tenant Features](../../abren-api/docs/architecture/modules/TENANT_FEATURES.md) | Feature gate rules mirrored in route guards       |
 | [Webhooks](../../abren-api/docs/architecture/infrastructure/WEBHOOKS.md)        | Webhook management UI requirements                |
@@ -101,8 +108,6 @@ The frontend mirrors the backend's bounded contexts as self-contained modules:
 ### **Standards Note: Permissions**
 
 To ensure structural alignment across the full stack, all module permissions must strictly follow the `[namespace]:[action]` pattern (e.g., `ap:view`), where `namespace` matches the module's ID.
-
----
 
 ---
 

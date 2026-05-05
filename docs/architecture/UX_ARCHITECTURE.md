@@ -10,7 +10,7 @@ tags: [frontend, architecture]
 > **Version:** 2.0
 > **Status:** AUTHORITATIVE — This document dictates the UX and Interaction Philosophy for the Abren ERP frontend.
 > **Last Updated:** May 2026
-> **Companions:** [Architecture Manifesto](./ARCHITECTURE.md) · [Field System](../FIELD_SYSTEM.md) · [Design System](./DESIGN_SYSTEM.md) · `ACUMATICA_ALIGNMENT_STRATEGY.md` · `SCREEN_RUNTIME_ARCHITECTURE.md`
+> **Companions:** [Architecture Manifesto](./ARCHITECTURE.md) · [Field System](../FIELD_SYSTEM.md) · [Design System](./DESIGN_SYSTEM.md) · [Screen Runtime](./SCREEN_RUNTIME.md) · [Component System](./COMPONENT_SYSTEM.md)
 
 > **Global Principle**: "Operations are the source of truth. Accounting is the guaranteed consequence."
 
@@ -21,7 +21,7 @@ Our True North Star is a synthesis of proven enterprise patterns (Acumatica, SAP
 - **Aesthetic**: **Calm operational density** (serious, modern, trustworthy, low-theater)
 - **Workflow**: Linear (State-driven UX clarity isolated by Routing)
 - **Financial UX**: Traceability via Contextual Side Panels
-- **Architecture**: **Screen Runtime** + **ERP Design System** + **Field System**
+- **Architecture**: **Screen Runtime** + **Component System** + **Field System**
 
 ---
 
