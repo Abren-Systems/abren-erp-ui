@@ -91,6 +91,7 @@ const sidePanelContract = computed(() => {
             :is-pending="controllerRef.value.isPending?.value ?? false"
             :is-new="controllerRef.value.isNew?.value ?? false"
             :is-editable="controllerRef.value.interpretedState.value.editable"
+            :available-actions="controllerRef.value.workflow?.availableActions"
           />
         </template>
       </template>

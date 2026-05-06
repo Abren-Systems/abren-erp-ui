@@ -29,13 +29,19 @@ const props = defineProps<{
   executors: Record<string, ControllerCommand>
   /** Whether any command is currently executing */
   isPending: boolean
+  /** Backend-provided available actions for workflow */
+  availableActions?: readonly string[]
 }>()
 
 const isOpen = ref(false)
 
-const expectedNext = computed(() => getExpectedNextAction(props.commands, props.domainState))
+const expectedNext = computed(() =>
+  getExpectedNextAction(props.commands, props.domainState, props.availableActions),
+)
 
-const groups = computed(() => groupCommandsByCategory(props.commands, props.domainState))
+const groups = computed(() =>
+  groupCommandsByCategory(props.commands, props.domainState, props.availableActions),
+)
 
 const CATEGORY_LABELS: Record<string, string> = {
   processing: 'Processing',
@@ -74,7 +80,7 @@ function confirmExecution() {
 
 function isCommandEnabled(command: ScreenCommand): boolean {
   if (props.isPending) return false
-  return isCommandVisible(command, props.domainState)
+  return isCommandVisible(command, props.domainState, props.availableActions)
 }
 
 function toggleMenu() {

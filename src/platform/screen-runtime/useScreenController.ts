@@ -231,5 +231,13 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
 
     /** Whether any command is currently executing */
     isPending,
+
+    /** Workflow projection */
+    workflow: {
+      availableActions: computed(() => {
+        const ent = dataSource.entity.value as Record<string, unknown> | null
+        return (ent?.['available_actions'] || []) as readonly string[]
+      }),
+    },
   }
 }

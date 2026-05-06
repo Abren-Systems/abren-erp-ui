@@ -23,6 +23,15 @@ export interface ScreenCommand {
   /** Visual significance of the command */
   readonly variant: 'primary' | 'neutral' | 'danger'
 
+  /**
+   * Classification of the command for platform resolution.
+   * - workflow: Visibility strictly governed by backend available_actions
+   * - local: Purely frontend UI transition (e.g. wizard step)
+   * - navigation: Redirects to another screen
+   * - utility: Actions like print, export, etc.
+   */
+  readonly kind?: 'workflow' | 'local' | 'navigation' | 'utility'
+
   // ── Acumatica-style Toolbar / More Menu Placement ──
 
   /** Category key for More Menu grouping (e.g., 'processing', 'activities', 'other') */
@@ -60,7 +69,15 @@ export interface ScreenCommand {
  * Determines whether a command is visible given the current domain state.
  * A command with no `from` constraint is always visible.
  */
-export function isCommandVisible(command: ScreenCommand, domainState: string): boolean {
+export function isCommandVisible(
+  command: ScreenCommand,
+  domainState: string,
+  availableActions?: readonly string[],
+): boolean {
+  if (command.kind === 'workflow' && availableActions) {
+    return availableActions.includes(command.key)
+  }
+
   if (!command.from || command.from.length === 0) return true
   return command.from.includes(domainState)
 }
@@ -72,10 +89,19 @@ export function isCommandVisible(command: ScreenCommand, domainState: string): b
 export function getExpectedNextAction(
   commands: readonly ScreenCommand[],
   domainState: string,
+  availableActions?: readonly string[],
 ): ScreenCommand | undefined {
-  return commands.find(
-    (cmd) => cmd.variant === 'primary' && cmd.from !== undefined && cmd.from.includes(domainState),
-  )
+  return commands.find((cmd) => {
+    if (cmd.variant !== 'primary') return false
+
+    // If it's a workflow command and we have backend actions, it MUST be available
+    if (cmd.kind === 'workflow' && availableActions) {
+      return availableActions.includes(cmd.key)
+    }
+
+    // Fallback for non-workflow or if no availableActions provided
+    return cmd.from !== undefined && cmd.from.includes(domainState)
+  })
 }
 
 /**
@@ -85,6 +111,7 @@ export function getExpectedNextAction(
 export function groupCommandsByCategory(
   commands: readonly ScreenCommand[],
   _domainState: string,
+  _availableActions?: readonly string[],
 ): Map<string, ScreenCommand[]> {
   const groups = new Map<string, ScreenCommand[]>()
 

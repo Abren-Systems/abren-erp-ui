@@ -34,6 +34,8 @@ const props = defineProps<{
   isNew: boolean
   /** Whether the record is editable according to the ScreenStatePolicy */
   isEditable: boolean
+  /** Backend-provided available actions for workflow */
+  availableActions?: readonly string[]
 }>()
 
 const emit = defineEmits<{
@@ -42,14 +44,16 @@ const emit = defineEmits<{
 }>()
 
 // ── Expected Next Action ──
-const expectedNext = computed(() => getExpectedNextAction(props.commands, props.domainState))
+const expectedNext = computed(() =>
+  getExpectedNextAction(props.commands, props.domainState, props.availableActions),
+)
 
 // ── Toolbar Favorites (commands shown directly on toolbar) ──
 const toolbarCommands = computed(() =>
   props.commands.filter(
     (cmd) =>
       cmd.displayOnMainToolbar &&
-      isCommandVisible(cmd, props.domainState) &&
+      isCommandVisible(cmd, props.domainState, props.availableActions) &&
       cmd.key !== expectedNext.value?.key,
   ),
 )
@@ -161,6 +165,7 @@ function getButtonVariant(cmd: ScreenCommand) {
       :domain-state="domainState"
       :executors="executors"
       :is-pending="isPending"
+      :available-actions="availableActions"
     />
 
     <!-- Confirmation Dialog for toolbar commands -->

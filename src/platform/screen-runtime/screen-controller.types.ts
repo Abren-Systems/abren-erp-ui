@@ -69,6 +69,11 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
   /** Whether any command is currently executing */
   readonly isPending: ComputedRef<boolean>
 
+  /** Workflow projection */
+  readonly workflow: {
+    readonly availableActions: ComputedRef<readonly string[]>
+  }
+
   /** Register a command on this controller */
   registerCommand(id: string, command: ControllerCommand): void
 }

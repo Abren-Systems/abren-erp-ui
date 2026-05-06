@@ -10,6 +10,7 @@ import type { ScreenCommand } from '@/platform/commands'
 export const AP301000_COMMANDS: readonly ScreenCommand[] = [
   {
     key: 'submit',
+    kind: 'workflow',
     labelKey: 'Submit',
     variant: 'primary',
     categoryKey: 'processing',
@@ -21,6 +22,7 @@ export const AP301000_COMMANDS: readonly ScreenCommand[] = [
   },
   {
     key: 'approve',
+    kind: 'workflow',
     labelKey: 'Approve',
     variant: 'primary',
     categoryKey: 'processing',
@@ -32,6 +34,7 @@ export const AP301000_COMMANDS: readonly ScreenCommand[] = [
   },
   {
     key: 'reject',
+    kind: 'workflow',
     labelKey: 'Reject',
     variant: 'danger',
     categoryKey: 'processing',
@@ -43,6 +46,7 @@ export const AP301000_COMMANDS: readonly ScreenCommand[] = [
   },
   {
     key: 'authorize',
+    kind: 'workflow',
     labelKey: 'Authorize',
     variant: 'primary',
     categoryKey: 'processing',
@@ -54,6 +58,7 @@ export const AP301000_COMMANDS: readonly ScreenCommand[] = [
   },
   {
     key: 'cancel',
+    kind: 'utility',
     labelKey: 'Cancel Request',
     variant: 'danger',
     categoryKey: 'other',
