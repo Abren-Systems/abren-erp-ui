@@ -206,4 +206,28 @@ export default tseslint.config(
       ],
     },
   },
+  /**
+   * 5. MODULE CONTRACT ENFORCEMENT
+   *
+   * Screen definition files must NEVER import from the registry layer.
+   * They must use constants.ts instead to prevent circular dependency
+   * TDZ errors at runtime.
+   */
+  {
+    files: ['src/modules/**/ui/**/screen.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../../screens', '../screens', '*/screens'],
+              message:
+                'Module Contract Violation: Screen definitions must import from "constants.ts", never from "screens.ts". This prevents circular dependency TDZ errors.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 )

@@ -48,10 +48,18 @@ const camelCaseName = moduleName.replace(dashRegexGlobal, (x) => String(x[1]).to
 const pascalCaseName = moduleName.replace(dashRegexStart, (x) =>
   String(x).replace('-', '').toUpperCase(),
 )
+const upperName = moduleName.toUpperCase().replace(/-/g, '_')
 
 // 4. Define Boilerplate Files
+//
+// Module Contract: constants -> definitions -> registry
+//   constants.ts  — Foundation layer (pure IDs, no internal imports)
+//   screens.ts    — Registry layer (aggregates screen definitions)
+//   index.ts      — Public API entry point
 const files = {
-  'index.ts': `import type { BusinessDomain } from '@/shared/types/module.types'\nimport routes from './routes'\n\nexport const ${camelCaseName}Module: BusinessDomain = {\n  id: '${idStr}',\n  name: '${pascalCaseName}',\n  category: 'business',\n  routes,\n  permissions: [],\n  menuItems: [\n    { label: '${pascalCaseName}', route: '${pascalCaseName}List', icon: 'file-text' }\n  ],\n}\n`,
+  'constants.ts': `import type { ModuleId } from '@/shared/types/brand.types'\nimport { toId } from '@/shared/types/brand.types'\n\n/** ${pascalCaseName} module identifier */\nexport const ${upperName}_MODULE_ID = toId<ModuleId>('${idStr}')\n`,
+  'screens.ts': `import type { ScreenDefinition } from '@/platform/screen-runtime'\n\n// Re-export foundation layer for public API consumers\nexport { ${upperName}_MODULE_ID } from './constants'\n\n/** All screens registered by the ${pascalCaseName} module */\nexport const ${camelCaseName}Screens: readonly ScreenDefinition[] = []\n`,
+  'index.ts': `import type { BusinessDomain } from '@/shared/types/module.types'\nimport routes from './routes'\nimport { ${camelCaseName}Screens } from './screens'\n\nexport const ${camelCaseName}Module: BusinessDomain = {\n  id: '${idStr}',\n  name: '${pascalCaseName}',\n  category: 'business',\n  screens: ${camelCaseName}Screens,\n  routes,\n  permissions: [],\n  menuItems: [\n    { label: '${pascalCaseName}', route: '${pascalCaseName}List', icon: 'file-text' }\n  ],\n}\n`,
   'routes.ts': `import type { RouteRecordRaw } from 'vue-router'\n\nconst routes: RouteRecordRaw[] = [\n  {\n    path: '${moduleName}',\n    name: '${pascalCaseName}List',\n    component: () => import('./ui/pages/${pascalCaseName}sListPage.vue'),\n  },\n]\n\nexport default routes\n`,
   [`ui/pages/${pascalCaseName}sListPage.vue`]: `<script setup lang="ts">\n// Orchestrator List Page for the ${moduleName} module\n</script>\n\n<template>\n  <div class="p-6 space-y-6">\n    <header class="flex items-center justify-between">\n      <div>\n        <h1 class="text-2xl font-bold tracking-tight">${pascalCaseName}s</h1>\n      </div>\n    </header>\n    <!-- DataGrid goes here -->\n  </div>\n</template>\n`,
   [`domain/${moduleName}.types.ts`]: `import type { Brand } from '@/shared/types/brand.types'\n\nexport type ${pascalCaseName}Id = Brand<string, '${pascalCaseName}Id'>\n\nexport interface ${pascalCaseName} {\n  id: ${pascalCaseName}Id\n}\n`,

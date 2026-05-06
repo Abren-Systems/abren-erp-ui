@@ -1,6 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import { toId } from '@/shared/types/brand.types'
-import type { ModuleId } from '@/shared/types/brand.types'
+
+// Re-export foundation layer for public API consumers
+export { INVENTORY_MODULE_ID } from './constants'
 
 import { IN2040PL } from './ui/IN2040PL/screen'
 import { IN204000 } from './ui/IN204000/screen'
@@ -20,6 +21,3 @@ export const inventoryScreens: readonly ScreenDefinition[] = [
   IN3030PL,
   IN303000,
 ]
-
-/** Inventory module identifier */
-export const INVENTORY_MODULE_ID = toId<ModuleId>('inventory')

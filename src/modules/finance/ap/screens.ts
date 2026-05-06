@@ -1,8 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ModuleId } from '@/shared/types/brand.types'
-import { toId } from '@/shared/types/brand.types'
 
-import type { ScreenId } from '@/platform/screen-runtime'
+// Re-export foundation layer for public API consumers
+export { AP_MODULE_ID, apScreenId } from './constants'
 
 // ── AP Screen Definitions ─────────────────────────────────
 // Each screen is a formal registry entry. Routes, menus, permissions,
@@ -20,15 +19,3 @@ export { AP3010PL, AP301000, AP3020PL, AP302000 }
 
 /** All screens registered by the AP module */
 export const apScreens: readonly ScreenDefinition[] = [AP3010PL, AP301000, AP3020PL, AP302000]
-
-// Screens will be pushed into this array as they are defined.
-// For now this is a placeholder — the actual wiring happens in Phase 2
-// when the ScreenRegistry consumes module exports.
-
-/** AP module identifier */
-export const AP_MODULE_ID = toId<ModuleId>('ap')
-
-/** Helper to create AP screen IDs with type safety */
-export function apScreenId(id: string): ScreenId {
-  return toId<ScreenId>(id)
-}

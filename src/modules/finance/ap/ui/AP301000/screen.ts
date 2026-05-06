@@ -1,5 +1,5 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import { AP_MODULE_ID, apScreenId } from '../../screens'
+import { AP_MODULE_ID, apScreenId } from '../../constants'
 import { AP301000_COMMANDS } from './commands'
 
 /**
