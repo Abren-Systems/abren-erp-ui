@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import {
   Dialog,
   DialogContent,
@@ -9,49 +8,17 @@ import {
   DialogFooter,
 } from '@/shared/components/dialog'
 import { AppButton, AppInput } from '@/shared/components/primitives'
-import { ShieldCheck } from 'lucide-vue-next'
-import { useRoles } from '../../application/useRoles'
+import { ShieldAlert, ShieldCheck } from 'lucide-vue-next'
+import type { RolesController } from '../controller'
 
 const props = defineProps<{
   open: boolean
+  controller: RolesController
 }>()
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
 }>()
-
-const { createRole, isCreating, permissions } = useRoles()
-
-const form = ref({
-  name: '',
-  description: '',
-  permissions: [] as string[],
-})
-
-async function handleSubmit() {
-  if (!form.value.name) return
-
-  try {
-    await createRole({
-      name: form.value.name,
-      description: form.value.description,
-      permissions: form.value.permissions,
-    })
-    emit('update:open', false)
-    form.value = { name: '', description: '', permissions: [] }
-  } catch (err) {
-    console.error('Failed to create role:', err)
-  }
-}
-
-function togglePermission(code: string) {
-  const index = form.value.permissions.indexOf(code)
-  if (index > -1) {
-    form.value.permissions.splice(index, 1)
-  } else {
-    form.value.permissions.push(code)
-  }
-}
 </script>
 
 <template>
@@ -79,14 +46,14 @@ function togglePermission(code: string) {
       <div class="flex-1 overflow-y-auto p-6 space-y-6">
         <AppInput
           label="Boundary Name"
-          v-model="form.name"
+          v-model="controller.createName.value"
           placeholder="e.g. Senior Accountant"
           required
         />
 
         <AppInput
           label="Purpose / Description"
-          v-model="form.description"
+          v-model="controller.createDescription.value"
           placeholder="Describe the scope of this boundary..."
           description="A brief explanation of why this role exists."
         />
@@ -100,15 +67,15 @@ function togglePermission(code: string) {
             class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto border border-[var(--color-neutral-200)] rounded-sm p-4 bg-[var(--color-neutral-50)]/50"
           >
             <div
-              v-for="perm in permissions"
+              v-for="perm in controller.permissions.value"
               :key="perm.code"
               class="flex items-center space-x-3 p-2 rounded-sm hover:bg-white transition-colors border border-transparent hover:border-[var(--color-neutral-200)] hover:shadow-sm"
             >
               <input
                 type="checkbox"
                 :id="perm.code"
-                :checked="form.permissions.includes(perm.code)"
-                @change="togglePermission(perm.code)"
+                :checked="controller.createPermissions.value.includes(perm.code)"
+                @change="controller.togglePermission(perm.code)"
                 class="w-3.5 h-3.5 rounded-sm border-[var(--color-neutral-300)] text-[var(--color-primary-600)] focus:ring-[var(--color-primary-500)] cursor-pointer"
               />
               <label
@@ -123,11 +90,26 @@ function togglePermission(code: string) {
       </div>
 
       <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
-        <AppButton variant="outline" @click="emit('update:open', false)" :disabled="isCreating">
+        <AppButton
+          variant="outline"
+          @click="emit('update:open', false)"
+          :disabled="controller.commands.value['executeCreate']?.isPending.value"
+        >
           Cancel
         </AppButton>
-        <AppButton variant="primary" @click="handleSubmit" :disabled="!form.name || isCreating">
-          {{ isCreating ? 'Creating...' : 'Save Boundary' }}
+        <AppButton
+          variant="primary"
+          @click="controller.commands.value['executeCreate']?.execute()"
+          :disabled="
+            !controller.createName.value ||
+            controller.commands.value['executeCreate']?.isPending.value
+          "
+        >
+          {{
+            controller.commands.value['executeCreate']?.isPending.value
+              ? 'Creating...'
+              : 'Save Boundary'
+          }}
         </AppButton>
       </DialogFooter>
     </DialogContent>

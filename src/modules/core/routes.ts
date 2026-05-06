@@ -1,4 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { resolveScreenRoutes } from '@/platform/screen-runtime/screen-route-resolver'
+import { coreScreens } from './screens'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -7,21 +9,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./ui/pages/LoginPage.vue'),
     meta: { layout: 'public' },
   },
-  {
-    path: 'users',
-    name: 'CoreUsers',
-    component: () => import('./ui/pages/UsersPage.vue'),
-  },
-  {
-    path: 'roles',
-    name: 'CoreRoles',
-    component: () => import('./ui/pages/RolesListPage.vue'),
-  },
-  {
-    path: 'tenants',
-    name: 'CoreTenants',
-    component: () => import('./ui/pages/TenantsListPage.vue'),
-  },
+  ...resolveScreenRoutes(coreScreens),
 ]
 
 export default routes

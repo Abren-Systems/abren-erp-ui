@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import {
   Dialog,
   DialogContent,
@@ -10,38 +9,16 @@ import {
 } from '@/shared/components/dialog'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { UserCog } from 'lucide-vue-next'
-import { useRoles } from '../../application/useRoles'
-import { useUsers } from '../../application/useUsers'
-import type { User } from '../../domain/user.types'
+import type { UsersController } from '../controller'
 
 const props = defineProps<{
-  user: User | null
   open: boolean
+  controller: UsersController
 }>()
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
 }>()
-
-const { roles, isRolesPending } = useRoles()
-const { assignRole, isAssigning } = useUsers()
-
-const selectedRoleId = ref<string>('')
-
-async function handleAssign() {
-  if (!props.user || !selectedRoleId.value) return
-
-  try {
-    await assignRole({
-      user_id: props.user.id,
-      role_id: selectedRoleId.value,
-    })
-    emit('update:open', false)
-    selectedRoleId.value = ''
-  } catch (err) {
-    console.error('Failed to assign role:', err)
-  }
-}
 </script>
 
 <template>
@@ -58,7 +35,8 @@ async function handleAssign() {
               >Assign Access</DialogTitle
             >
             <DialogDescription class="text-sm text-[var(--color-neutral-600)] mt-2">
-              Grant additional access boundaries to <strong>{{ user?.email }}</strong
+              Grant additional access boundaries to
+              <strong>{{ controller.selectedUser.value?.email }}</strong
               >.
             </DialogDescription>
           </div>
@@ -68,13 +46,13 @@ async function handleAssign() {
       <div class="p-6">
         <AppSelect
           label="Available Roles"
-          v-model="selectedRoleId"
-          :options="roles?.map((r) => ({ label: r.name, value: r.id })) ?? []"
+          v-model="controller.assignRoleId.value"
+          :options="controller.roles.value?.map((r) => ({ label: r.name, value: r.id })) ?? []"
           placeholder="Select a boundary..."
           required
         />
         <p
-          v-if="isRolesPending"
+          v-if="controller.isRolesPending.value"
           class="text-[10px] text-[var(--color-neutral-400)] italic animate-pulse mt-2"
         >
           Hydrating identity boundaries...
@@ -82,15 +60,26 @@ async function handleAssign() {
       </div>
 
       <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
-        <AppButton variant="outline" @click="emit('update:open', false)" :disabled="isAssigning">
+        <AppButton
+          variant="outline"
+          @click="emit('update:open', false)"
+          :disabled="controller.commands.value['executeAssign']?.isPending.value"
+        >
           Cancel
         </AppButton>
         <AppButton
           variant="primary"
-          @click="handleAssign"
-          :disabled="!selectedRoleId || isAssigning"
+          @click="controller.commands.value['executeAssign']?.execute()"
+          :disabled="
+            !controller.assignRoleId.value ||
+            controller.commands.value['executeAssign']?.isPending.value
+          "
         >
-          {{ isAssigning ? 'Assigning...' : 'Assign Access' }}
+          {{
+            controller.commands.value['executeAssign']?.isPending.value
+              ? 'Assigning...'
+              : 'Assign Access'
+          }}
         </AppButton>
       </DialogFooter>
     </DialogContent>

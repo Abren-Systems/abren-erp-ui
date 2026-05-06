@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { h, ref } from 'vue'
+import { h, inject, computed } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { AppButton, AppBadge, AppSidePane } from '@/shared/components/primitives'
-import { Shield, ShieldPlus, ShieldCheck } from 'lucide-vue-next'
-import { useRoles } from '../../application/useRoles'
+import { AppSidePane } from '@/shared/components/workspace'
+import { AppButton, AppBadge } from '@/shared/components/primitives'
+import { ShieldPlus, ShieldCheck } from 'lucide-vue-next'
+import { useRolesController, type RolesController } from './controller'
+import { ScreenControllerKey } from '@/platform/screen-runtime/injection-keys'
+import RoleCreateDialog from './components/RoleCreateDialog.vue'
 import type { Role } from '../../domain/user.types'
-import RoleCreateDialog from '../components/RoleCreateDialog.vue'
 
-const { roles, isRolesPending } = useRoles()
+const controllerRef = inject(ScreenControllerKey)!
+const controller = computed(() => controllerRef.value as RolesController)
 const gridState = useDataGrid()
-
-const isCreateOpen = ref(false)
-const isDetailOpen = ref(false)
-const selectedRole = ref<Role | null>(null)
 
 const roleColumns = [
   {
@@ -57,70 +56,33 @@ const roleColumns = [
     },
   },
 ]
-
-function handleRowClick(role: Role) {
-  selectedRole.value = role
-  isDetailOpen.value = true
-}
 </script>
 
 <template>
   <div class="flex h-full flex-col bg-[var(--app-canvas)]">
-    <!-- Page Header -->
-    <div
-      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
-    >
-      <div class="flex items-center gap-4">
-        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
-          <Shield class="h-6 w-6 text-[var(--color-primary-600)]" />
-        </div>
-        <div>
-          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
-            Identity Roles
-          </h1>
-          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
-            Manage system boundaries and custom multi-tenant permission matrices.
-          </p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <AppButton variant="primary" @click="isCreateOpen = true">
-          <template #start>
-            <ShieldPlus :size="14" />
-          </template>
-          Define Boundary
-        </AppButton>
-      </div>
-    </div>
-
     <!-- DataGrid Orchestration -->
-    <div class="min-h-0 flex-1 p-8">
+    <div class="flex-1 p-8 min-h-0">
       <DataGrid
-        :data="roles || []"
+        v-model:sorting="gridState.sorting"
+        v-model:row-selection="gridState.rowSelection"
+        v-model:column-visibility="gridState.columnVisibility"
+        v-model:global-filter="gridState.globalFilter"
+        :data="controller.data.selectGrid('roles').value as Role[]"
         :columns="roleColumns"
-        :loading="isRolesPending"
-        :state="gridState"
+        :loading="controller.isLoading.value"
+        placeholder="Search roles..."
         empty-message="No custom roles defined. Create functional boundaries to segregate access."
-        @row-click="handleRowClick"
-      >
-        <template #empty-action>
-          <AppButton class="mt-4" @click="isCreateOpen = true">
-            <template #start>
-              <ShieldPlus :size="14" />
-            </template>
-            Define Identity Boundary
-          </AppButton>
-        </template>
-      </DataGrid>
+        row-clickable
+        @row-click="controller.handleRowClick"
+      />
     </div>
 
-    <RoleCreateDialog v-model:open="isCreateOpen" />
+    <RoleCreateDialog v-model:open="controller.isCreateOpen.value" :controller="controller" />
 
     <!-- Read-Only Role Detail Pane -->
     <AppSidePane
-      v-model:open="isDetailOpen"
-      :title="selectedRole?.name ?? 'Role Detail'"
+      v-model:open="controller.isDetailOpen.value"
+      :title="controller.selectedRole.value?.name ?? 'Role Detail'"
       description="Inspecting role boundary and permissions"
       mode="overlay"
       :show-backdrop="true"
@@ -132,14 +94,16 @@ function handleRowClick(role: Role) {
         </div>
       </template>
 
-      <div v-if="selectedRole" class="space-y-6">
+      <div v-if="controller.selectedRole.value" class="space-y-6">
         <!-- Role Metadata -->
         <div class="space-y-4">
           <div class="space-y-1">
             <p class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
               Boundary Name
             </p>
-            <p class="text-sm font-semibold text-neutral-900">{{ selectedRole.name }}</p>
+            <p class="text-sm font-semibold text-neutral-900">
+              {{ controller.selectedRole.value.name }}
+            </p>
           </div>
 
           <div class="space-y-1">
@@ -147,13 +111,13 @@ function handleRowClick(role: Role) {
               Description
             </p>
             <p class="text-sm text-neutral-600">
-              {{ selectedRole.description || 'No description provided.' }}
+              {{ controller.selectedRole.value.description || 'No description provided.' }}
             </p>
           </div>
 
           <div class="flex items-center gap-2">
-            <AppBadge :variant="selectedRole.isSystem ? 'info' : 'neutral'">
-              {{ selectedRole.isSystem ? 'System-Defined' : 'Custom' }}
+            <AppBadge :variant="controller.selectedRole.value.isSystem ? 'info' : 'neutral'">
+              {{ controller.selectedRole.value.isSystem ? 'System-Defined' : 'Custom' }}
             </AppBadge>
           </div>
         </div>
@@ -163,16 +127,19 @@ function handleRowClick(role: Role) {
         <!-- Permission List (Read-Only) -->
         <div class="space-y-3">
           <p class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-            Granted Permissions ({{ selectedRole.permissions.length }})
+            Granted Permissions ({{ controller.selectedRole.value.permissions.length }})
           </p>
 
-          <div v-if="selectedRole.permissions.length === 0" class="text-xs text-neutral-400 italic">
+          <div
+            v-if="controller.selectedRole.value.permissions.length === 0"
+            class="text-xs text-neutral-400 italic"
+          >
             No permissions assigned to this boundary.
           </div>
 
           <div v-else class="space-y-1.5 max-h-[400px] overflow-y-auto">
             <div
-              v-for="perm in selectedRole.permissions"
+              v-for="perm in controller.selectedRole.value.permissions"
               :key="perm"
               class="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-50 border border-neutral-100"
             >

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import {
   Dialog,
   DialogContent,
@@ -10,47 +9,16 @@ import {
 } from '@/shared/components/dialog'
 import { AppButton, AppInput } from '@/shared/components/primitives'
 import { UserPlus, AlertCircle } from 'lucide-vue-next'
-import { useUsers } from '../../application/useUsers'
+import type { UsersController } from '../controller'
 
 const props = defineProps<{
   open: boolean
+  controller: UsersController
 }>()
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
 }>()
-
-const { createUser, isCreating } = useUsers()
-
-const form = ref({
-  email: '',
-  password: '',
-})
-
-const errorMessage = ref<string | null>(null)
-
-async function handleSubmit() {
-  errorMessage.value = null
-
-  if (!form.value.email || !form.value.password) return
-  if (form.value.password.length < 8) {
-    errorMessage.value = 'Password must be at least 8 characters.'
-    return
-  }
-
-  try {
-    await createUser({
-      email: form.value.email,
-      password: form.value.password,
-    })
-    emit('update:open', false)
-    form.value = { email: '', password: '' }
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to create user. Check for duplicate emails.'
-    errorMessage.value = message
-  }
-}
 </script>
 
 <template>
@@ -78,15 +46,15 @@ async function handleSubmit() {
       <div class="flex-1 overflow-y-auto p-6 space-y-5">
         <!-- Error Banner -->
         <div
-          v-if="errorMessage"
+          v-if="controller.inviteErrorMessage.value"
           class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3"
         >
           <AlertCircle class="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
-          <p class="text-xs text-red-700 font-medium">{{ errorMessage }}</p>
+          <p class="text-xs text-red-700 font-medium">{{ controller.inviteErrorMessage.value }}</p>
         </div>
 
         <AppInput
-          v-model="form.email"
+          v-model="controller.inviteEmail.value"
           label="Email Address"
           type="email"
           placeholder="user@company.com"
@@ -95,7 +63,7 @@ async function handleSubmit() {
 
         <div class="space-y-2">
           <AppInput
-            v-model="form.password"
+            v-model="controller.invitePassword.value"
             label="Temporary Password"
             type="password"
             placeholder="Minimum 8 characters"
@@ -108,15 +76,27 @@ async function handleSubmit() {
       </div>
 
       <DialogFooter class="p-6 bg-[var(--color-neutral-50)] border-t">
-        <AppButton variant="outline" @click="emit('update:open', false)" :disabled="isCreating">
+        <AppButton
+          variant="outline"
+          @click="emit('update:open', false)"
+          :disabled="controller.commands.value['executeInvite']?.isPending.value"
+        >
           Cancel
         </AppButton>
         <AppButton
           variant="primary"
-          @click="handleSubmit"
-          :disabled="!form.email || !form.password || isCreating"
+          @click="controller.commands.value['executeInvite']?.execute()"
+          :disabled="
+            !controller.inviteEmail.value ||
+            !controller.invitePassword.value ||
+            controller.commands.value['executeInvite']?.isPending.value
+          "
         >
-          {{ isCreating ? 'Creating...' : 'Create User' }}
+          {{
+            controller.commands.value['executeInvite']?.isPending.value
+              ? 'Creating...'
+              : 'Create User'
+          }}
         </AppButton>
       </DialogFooter>
     </DialogContent>
