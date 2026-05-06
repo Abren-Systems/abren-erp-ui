@@ -1,31 +1,27 @@
-import { computed, ref } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  useScreenController,
-  MAINTENANCE_SCREEN_POLICY,
-  statusDomainState,
-} from '@/platform/screen-runtime'
-// Mocking as hooks don't exist
+import { useScreenController } from '@/platform/screen-runtime'
 import type { BankAccount } from '../../domain/bank.types'
 import { CA202000 } from './screen'
 import { CA202000_FIELDS } from './fields'
+import { CA202000_POLICY, type BankAccountStatus } from './policy'
 import { useField } from '@/platform/field-system/bindings'
 
 export function useBankAccountController(id: string) {
   const router = useRouter()
   const isNew = computed(() => id === 'new')
 
-  const account = ref<BankAccount | null>(null)
+  const account = shallowRef<BankAccount | null>(null)
   const isLoading = ref(false)
   const error = ref(null)
   const isCreating = ref(false)
 
-  const base = useScreenController({
+  const base = useScreenController<BankAccount, BankAccountStatus>({
     screen: CA202000,
     dataSource: { entity: account, isLoading, error },
     isNew,
-    getDomainState: (entity) => statusDomainState(entity as { status: string }),
-    statePolicy: MAINTENANCE_SCREEN_POLICY,
+    getDomainState: (entity) => entity.status,
+    statePolicy: CA202000_POLICY,
   })
 
   const fields = {

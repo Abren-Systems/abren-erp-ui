@@ -1,6 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { CA202000_COMMANDS } from './commands'
 
 export const CA202000: ScreenDefinition = {
   id: 'CA202000' as ScreenId,
@@ -26,7 +27,7 @@ export const CA202000: ScreenDefinition = {
     renderTarget: () => import('./view.vue') as never,
     sidePanel: { tabs: [], defaultCollapsed: true },
   },
-  commands: [],
+  commands: CA202000_COMMANDS,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: false,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { FormTitleBar, AppTemplate } from '@/platform/chrome'
+import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { useBankAccountController } from './controller'
 import { AppButton, AppInput, AppSelect } from '@/shared/components/primitives'
 
@@ -31,6 +31,15 @@ const statusOptions = [
         :form-title="ctrl.screen.titleKey"
         :record-title="ctrl.isNew.value ? 'New Bank Account' : ctrl.entity.value?.accountName"
         back-route="finance.bank.accounts"
+      />
+
+      <FormToolbar
+        v-if="!ctrl.isNew.value"
+        :commands="ctrl.screen.commands"
+        :domain-state="String(ctrl.state.domain)"
+        :executors="ctrl.commands.value"
+        :is-pending="ctrl.isPending.value"
+        :is-new="ctrl.isNew.value"
       />
 
       <template v-if="!ctrl.isNew.value">
