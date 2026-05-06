@@ -14,6 +14,7 @@ export type ScreenKind =
   | 'primaryList' // Dense list scanning, saved filters, navigation to dataEntry
   | 'dataEntry' // Transaction/profile creation and editing
   | 'setup' // Preferences, numbering, posting rules, governance
+  | 'maintenance' // Master Data creation and editing (e.g. Customers, Vendors)
   | 'processing' // Select many records, execute server action, show result
   | 'inquiry' // Read-only filtered analysis and drilldown
   | 'report' // Parameterized report with templates

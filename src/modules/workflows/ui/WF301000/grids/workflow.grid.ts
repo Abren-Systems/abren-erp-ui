@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { DateCell } from '@/shared/components/data-grid'
-import type { PendingApproval } from '../../domain/workflows.types'
+import type { PendingApproval } from '../../../domain/workflows.types'
 
 export const workflowColumns: ColumnDef<PendingApproval>[] = [
   {
