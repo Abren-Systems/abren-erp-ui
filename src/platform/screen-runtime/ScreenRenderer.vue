@@ -88,8 +88,9 @@ const sidePanelContract = computed(() => {
             :commands="screen.commands"
             :domain-state="controllerRef.value.state.domain"
             :executors="controllerRef.value.commands.value"
-            :is-pending="false"
-            :is-new="controllerRef.value.state.ui === 'NEW'"
+            :is-pending="controllerRef.value.isPending?.value ?? false"
+            :is-new="controllerRef.value.isNew?.value ?? false"
+            :is-editable="controllerRef.value.interpretedState.value.editable"
           />
         </template>
       </template>

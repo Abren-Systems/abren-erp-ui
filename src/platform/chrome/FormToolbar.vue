@@ -32,6 +32,8 @@ const props = defineProps<{
   isPending: boolean
   /** Whether the record is new (hides navigation) */
   isNew: boolean
+  /** Whether the record is editable according to the ScreenStatePolicy */
+  isEditable: boolean
 }>()
 
 const emit = defineEmits<{
@@ -89,7 +91,12 @@ function getButtonVariant(cmd: ScreenCommand) {
   <div class="form-toolbar">
     <!-- Standard Buttons (implicitly injected by platform) -->
     <div class="form-toolbar__standard">
-      <AppButton variant="outline" size="sm" :disabled="isPending" @click="emit('save')">
+      <AppButton
+        variant="outline"
+        size="sm"
+        :disabled="isPending || !isEditable"
+        @click="emit('save')"
+      >
         <Save :size="14" class="mr-1.5" />
         Save
       </AppButton>
