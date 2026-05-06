@@ -1,6 +1,10 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useLedgerAccounts } from '../../application/useLedgerAccounts'
 import { GL2010PL } from './screen'
 
@@ -12,6 +16,8 @@ export function useAccountListController() {
     screen: GL2010PL,
     dataSource: { entity: computed(() => null), isLoading: isPending, error },
     isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   function handleRowClick(row: { id: string }) {

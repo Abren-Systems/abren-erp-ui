@@ -1,6 +1,10 @@
 import { computed, ref, toRef } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useTaxRule, useCreateTaxRule } from '../../application/useTaxRules'
 import { toId } from '@/shared/types/brand.types'
 import type { TaxRuleId } from '@/shared/types/brand.types'
@@ -20,6 +24,8 @@ export function useTaxRuleController(id: string) {
     screen: TX202000,
     dataSource: { entity: rule, isLoading, error },
     isNew,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   const fields = {

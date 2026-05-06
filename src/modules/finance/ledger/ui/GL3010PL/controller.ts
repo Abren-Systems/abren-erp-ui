@@ -1,6 +1,10 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useJournalEntries } from '../../application/useJournalEntries'
 import { GL3010PL } from './screen'
 
@@ -13,6 +17,8 @@ export function useJournalEntriesListController() {
     screen: GL3010PL,
     dataSource: { entity: computed(() => null), isLoading, error },
     isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   function handleRowClick(row: { id: string }) {

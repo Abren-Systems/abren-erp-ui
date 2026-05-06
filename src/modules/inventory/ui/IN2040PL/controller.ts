@@ -1,6 +1,10 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useWarehouses } from '../../application/useWarehouses'
 import { IN2040PL } from './screen'
 
@@ -12,6 +16,8 @@ export function useWarehousesListController() {
     screen: IN2040PL,
     dataSource: { entity: computed(() => null), isLoading, error },
     isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   function handleCreate() {

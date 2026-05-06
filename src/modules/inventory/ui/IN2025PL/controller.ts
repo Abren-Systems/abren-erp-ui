@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useStockPositions } from '../../application/useStockPositions'
 import { useWarehouses } from '../../application/useWarehouses'
 import { IN2025PL } from './screen'
@@ -21,6 +25,8 @@ export function useStockItemsListController() {
     screen: IN2025PL,
     dataSource: { entity: computed(() => null), isLoading, error },
     isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   function handleCreateAdjustment() {

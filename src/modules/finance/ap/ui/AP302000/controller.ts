@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import { useScreenController, type ScreenStatePolicy } from '@/platform/screen-runtime'
 import { useVendorBill } from '../../application/useVendorBill'
 import { useCreateVendorBill } from '../../application/useCreateVendorBill'
 import { useValidateVendorBill } from '../../application/useValidateVendorBill'
@@ -11,6 +11,16 @@ import type { VendorBillId } from '@/shared/types/brand.types'
 import { AP302000 } from './screen'
 import { AP302000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings'
+import type { VendorBill, VendorBillStatus } from '../../domain/ap.types'
+
+const AP302000_POLICY: ScreenStatePolicy<VendorBillStatus> = {
+  states: {
+    DRAFT: { editable: true },
+    VALIDATED: { editable: false },
+    PAID: { editable: false },
+    VOIDED: { editable: false },
+  },
+}
 
 export function useVendorBillController(id: string) {
   const router = useRouter()
@@ -26,10 +36,12 @@ export function useVendorBillController(id: string) {
   const { form, isSubmitting: isCreating } = useCreateVendorBill()
   useFormPersistence(form, 'abren_draft_vendor_bill')
 
-  const base = useScreenController({
+  const base = useScreenController<VendorBill, VendorBillStatus>({
     screen: AP302000,
     dataSource: { entity: bill, isLoading, error: ref(null) },
     isNew,
+    getDomainState: (entity) => entity.status,
+    statePolicy: AP302000_POLICY,
   })
 
   // Commands

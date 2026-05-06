@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 // No individual useWarehouse hook currently, mocking it
 import type { Warehouse } from '../../domain/inventory.types'
 import { IN204000 } from './screen'
@@ -20,6 +24,8 @@ export function useWarehouseController(id: string) {
     screen: IN204000,
     dataSource: { entity: warehouse, isLoading, error },
     isNew,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   const fields = {

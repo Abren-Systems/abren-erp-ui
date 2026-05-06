@@ -1,7 +1,9 @@
 import { ref, computed, onUnmounted, type ComputedRef, type Ref } from 'vue'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData } from './screen-controller.types'
-import type { UIState, DomainState, ScreenStateMachine } from './state-machine.types'
+import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
+import type { ScreenStatePolicy } from './screen-state-policy.types'
+import { interpretStatePolicy, type InterpretedState } from './interpret-state-policy'
 
 // ── Screen Controller Options ─────────────────────────────
 // Passed by the screen-specific controller to configure data loading.
@@ -15,15 +17,17 @@ export interface ScreenControllerDataSource<T> {
   readonly error: Ref<Error | null | undefined>
 }
 
-export interface ScreenControllerOptions<T> {
+export interface ScreenControllerOptions<T, TDomain extends string = BaseDomainState> {
   /** The ScreenDefinition metadata */
   readonly screen: ScreenDefinition
   /** The primary data source — wired by the screen-specific controller */
   readonly dataSource: ScreenControllerDataSource<T>
   /** Whether this is a new record (creation mode) */
   readonly isNew?: Ref<boolean>
-  /** Optional function to extract DomainState from the entity. Defaults to entity.status */
-  readonly getDomainState?: (entity: T) => DomainState
+  /** Function to extract the module-specific DomainState from the entity */
+  readonly getDomainState: (entity: T) => TDomain
+  /** Per-screen state policy — drives editability and field overrides */
+  readonly statePolicy: ScreenStatePolicy<TDomain>
 }
 
 // ── Granular Data Access ──────────────────────────────────
@@ -63,33 +67,34 @@ function createScreenData<T>(entity: Ref<T | null | undefined>): ScreenData<T> {
 // ── Dual-Layer State Machine ────────────────────────────────
 // Lightweight reactive implementation of the dual-layer state machine.
 
-function createStateMachine<T>(
+function createStateMachine<T, TDomain extends string>(
   isNew: Ref<boolean>,
   entity: Ref<T | null | undefined>,
-  getDomainState?: (entity: T) => DomainState,
-): ScreenStateMachine {
+  getDomainState: (entity: T) => TDomain,
+  statePolicy: ScreenStatePolicy<TDomain>,
+): { stateMachine: ScreenStateMachine<TDomain>; interpretedState: ComputedRef<InterpretedState> } {
   const ui = ref<UIState>(isNew.value ? 'NEW' : 'INITIALIZING')
 
-  const domain = computed<DomainState>(() => {
-    if (!entity.value) return 'DRAFT'
-    if (getDomainState) return getDomainState(entity.value)
-    // Fallback: look for a 'status' property
-    const status = (entity.value as Record<string, unknown>)['status']
-    return typeof status === 'string' ? (status.toUpperCase() as DomainState) : 'DRAFT'
+  const domain = computed<TDomain>(() => {
+    if (!entity.value) return Object.keys(statePolicy.states)[0] as TDomain
+    return getDomainState(entity.value)
   })
+
+  // Interpreted state — the single truth for all consumers
+  const interpretedState = computed<InterpretedState>(() =>
+    interpretStatePolicy(statePolicy, domain.value),
+  )
 
   const isEditable = computed(() => {
     if (ui.value !== 'NEW' && ui.value !== 'EDIT') return false
-    // Acumatica heuristic: Only DRAFT and HOLD are editable states.
-    const editableDomainStates: DomainState[] = ['DRAFT', 'HOLD']
-    return editableDomainStates.includes(domain.value)
+    return interpretedState.value.editable
   })
 
-  return {
+  const stateMachine: ScreenStateMachine<TDomain> = {
     /** Current UI state */
     ui: computed(() => ui.value) as unknown as UIState, // Type cast to satisfy interface while remaining reactive to Vue template
     /** Current Domain state */
-    domain: domain as unknown as DomainState,
+    domain: domain as unknown as TDomain,
     /** Whether the screen is in an editable mode */
     isEditable: isEditable as unknown as boolean,
 
@@ -101,7 +106,7 @@ function createStateMachine<T>(
       ui.value = newState
     },
 
-    transitionDomain(newState: DomainState) {
+    transitionDomain(newState: TDomain) {
       // In this frontend architecture, Domain state is owned by the backend.
       // This method is a placeholder for optimistic updates if necessary,
       // but normally we just refresh the entity after a successful command.
@@ -110,6 +115,8 @@ function createStateMachine<T>(
       )
     },
   }
+
+  return { stateMachine, interpretedState }
 }
 
 // ── Command Registry ──────────────────────────────────────
@@ -129,21 +136,28 @@ export interface ControllerCommand {
  * useScreenController — Platform base composable.
  *
  * Provides the standard lifecycle, granular data access, UI state machine,
- * and command registration that every screen needs.
+ * interpreted state policy, and command registration that every screen needs.
  *
  * Screen-specific controllers call this internally, then extend it with
  * domain-specific computed properties, watchers, and navigation guards.
  *
  * This is the frontend equivalent of Acumatica's PXGraph base class.
  */
-export function useScreenController<T>(options: ScreenControllerOptions<T>) {
-  const { screen, dataSource, isNew = ref(false), getDomainState } = options
+export function useScreenController<T, TDomain extends string = BaseDomainState>(
+  options: ScreenControllerOptions<T, TDomain>,
+) {
+  const { screen, dataSource, isNew = ref(false), getDomainState, statePolicy } = options
 
   // ── Data Layer ──
   const data = createScreenData(dataSource.entity)
 
-  // ── State Machine ──
-  const stateMachine = createStateMachine(isNew, dataSource.entity, getDomainState)
+  // ── State Machine + Interpreted State ──
+  const { stateMachine, interpretedState } = createStateMachine(
+    isNew,
+    dataSource.entity,
+    getDomainState,
+    statePolicy,
+  )
 
   // Sync UI state with data loading lifecycle
   const isLoading = dataSource.isLoading
@@ -177,6 +191,9 @@ export function useScreenController<T>(options: ScreenControllerOptions<T>) {
     /** UI state machine */
     state: stateMachine,
 
+    /** Interpreted state policy — the single truth for field/editability behavior */
+    interpretedState,
+
     /** Whether the data source is loading */
     isLoading,
 
@@ -198,4 +215,6 @@ export function useScreenController<T>(options: ScreenControllerOptions<T>) {
 }
 
 /** The return type of useScreenController, for use in screen-specific controllers */
-export type ScreenControllerInstance<T> = ReturnType<typeof useScreenController<T>>
+export type ScreenControllerInstance<T, TDomain extends string = BaseDomainState> = ReturnType<
+  typeof useScreenController<T, TDomain>
+>

@@ -14,18 +14,23 @@ export type UIState =
   | 'SAVING' // An active mutation is in flight
 
 /**
- * The business logic state of the underlying aggregate.
- * Specific domains (e.g., AP, GL) may extend or narrow these states.
+ * Base domain states shared across modules.
+ * Each module extends this with its own state union via the generic parameter.
  */
-export type DomainState = 'DRAFT' | 'BALANCED' | 'HOLD' | 'RELEASED' | 'VOIDED'
+export type BaseDomainState = 'DRAFT' | 'BALANCED' | 'HOLD' | 'RELEASED' | 'VOIDED'
 
 /**
  * The formal state machine governing all screen interactions.
- * Mutations to state MUST happen via explicit transitions, not direct assignment.
+ * Generic over TDomain so each module can define its own domain state union.
+ *
+ * @example
+ * // AP module defines:
+ * type APDomainState = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'AUTHORIZED' | 'CANCELLED'
+ * // Controller uses: ScreenStateMachine<APDomainState>
  */
-export interface ScreenStateMachine {
+export interface ScreenStateMachine<TDomain extends string = BaseDomainState> {
   readonly ui: UIState
-  readonly domain: DomainState
+  readonly domain: TDomain
 
   /**
    * Evaluates if the current combination of UI and Domain state
@@ -43,5 +48,5 @@ export interface ScreenStateMachine {
    * Safely attempts to transition the Domain state.
    * Typically triggered by a successful backend Command effect.
    */
-  transitionDomain(newState: DomainState): void
+  transitionDomain(newState: TDomain): void
 }

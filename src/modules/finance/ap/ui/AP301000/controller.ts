@@ -12,8 +12,9 @@ import { useSubmitPaymentRequest } from '../../application/useSubmitPaymentReque
 import { useUsers } from '@/modules/core/application/useUsers'
 import { CURRENCY_OPTIONS, AP301000_FIELDS } from './fields'
 import { AP301000 } from './screen'
+import { AP301000_POLICY } from './policy'
 import { useField } from '@/platform/field-system/bindings'
-import type { PaymentRequest } from '../../domain/ap.types'
+import type { PaymentRequest, PaymentRequestStatus } from '../../domain/ap.types'
 
 /**
  * AP301000 — Payment Request Data Entry Controller
@@ -49,17 +50,19 @@ export function usePaymentRequestEntry(id: string) {
       // Cast form state to match the read model shape approximately
       return {
         ...(form.state.values as unknown as PaymentRequest),
-        status: 'DRAFT',
+        status: 'DRAFT' as PaymentRequestStatus,
       }
     }
     return request.value
   })
 
   // ── Platform Base ──
-  const base = useScreenController({
+  const base = useScreenController<PaymentRequest, PaymentRequestStatus>({
     screen: AP301000,
     dataSource: { entity: activeEntity, isLoading, error },
     isNew,
+    getDomainState: (entity) => entity.status,
+    statePolicy: AP301000_POLICY,
   })
 
   // ── Workflow Action Executors ──

@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useInventoryAdjustment } from '../../application/useInventoryAdjustment'
 import { useWarehouses } from '../../application/useWarehouses'
 import type { AdjustmentCreateDTO } from '../../infrastructure/api.types'
@@ -17,6 +21,8 @@ export function useAdjustmentController(id: string) {
     screen: IN303000,
     dataSource: { entity: computed(() => null), isLoading: ref(false), error: ref(null) },
     isNew,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   const form = ref({

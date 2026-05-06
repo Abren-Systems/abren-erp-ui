@@ -1,6 +1,10 @@
 import { computed, ref, h } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import type { Table, Row } from '@tanstack/vue-table'
 import { usePaymentRequests } from '../../application/usePaymentRequests'
 import { usePermissions } from '@/shared/auth/usePermissions'
@@ -42,6 +46,8 @@ export function usePaymentRequestList() {
       isLoading,
       error: ref(null),
     },
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // ── Data Grid State ──

@@ -1,6 +1,10 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useActiveTaxRules } from '../../application/useTaxRules'
 import { TX2020PL } from './screen'
 
@@ -13,6 +17,8 @@ export function useTaxRulesListController() {
     screen: TX2020PL,
     dataSource: { entity: computed(() => null), isLoading, error },
     isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   function handleCreate() {

@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  MAINTENANCE_SCREEN_POLICY,
+  statusDomainState,
+} from '@/platform/screen-runtime'
 // Mocking as hooks don't exist
 import type { BankAccount } from '../../domain/bank.types'
 import { CA202000 } from './screen'
@@ -20,6 +24,8 @@ export function useBankAccountController(id: string) {
     screen: CA202000,
     dataSource: { entity: account, isLoading, error },
     isNew,
+    getDomainState: (entity) => statusDomainState(entity as { status: string }),
+    statePolicy: MAINTENANCE_SCREEN_POLICY,
   })
 
   const fields = {

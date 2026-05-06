@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { IN3030PL } from './screen'
 
 export function useAdjustmentsListController() {
@@ -14,6 +18,8 @@ export function useAdjustmentsListController() {
     screen: IN3030PL,
     dataSource: { entity: computed(() => null), isLoading, error },
     isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   function handleCreate() {

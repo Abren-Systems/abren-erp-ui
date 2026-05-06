@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useLedgerAccounts } from '../../application/useLedgerAccounts'
 import { GL201000 } from './screen'
 import { GL201000_FIELDS } from './fields'
@@ -19,6 +23,8 @@ export function useAccountController(id: string) {
     screen: GL201000,
     dataSource: { entity: account, isLoading, error: ref(null) },
     isNew,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // Command Execution

@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useCreateTaxGroup, useActiveTaxRules } from '../../application/useTaxRules'
 // We don't have a useTaxGroup composable for detail yet, mocking it for completeness
 import type { TaxGroup } from '../../domain/tax.types'
@@ -24,6 +28,8 @@ export function useTaxGroupController(id: string) {
     screen: TX201000,
     dataSource: { entity: group, isLoading, error },
     isNew,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   const fields = {

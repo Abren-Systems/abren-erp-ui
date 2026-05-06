@@ -1,6 +1,10 @@
 import { computed, ref } from 'vue'
 
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 // No individual useStockItem hook currently, mocking it
 import type { StockItem } from '../../domain/inventory.types'
 import { IN202500 } from './screen'
@@ -18,6 +22,8 @@ export function useStockItemController(id: string) {
     screen: IN202500,
     dataSource: { entity: stockItem, isLoading, error },
     isNew,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   const fields = {
