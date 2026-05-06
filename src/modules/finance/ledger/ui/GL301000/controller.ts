@@ -1,13 +1,11 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  useScreenController,
-  MAINTENANCE_SCREEN_POLICY,
-  statusDomainState,
-} from '@/platform/screen-runtime'
+import { useScreenController } from '@/platform/screen-runtime'
+import type { JournalEntry } from '../../domain/journal-entry.types'
 import { useJournalEntry } from '../../application/useJournalEntry'
 import { GL301000 } from './screen'
 import { GL301000_FIELDS } from './fields'
+import { GL301000_POLICY, type JournalEntryStatus } from './policy'
 import { useField } from '@/platform/field-system/bindings'
 
 export function useJournalEntryController(id: string) {
@@ -18,12 +16,12 @@ export function useJournalEntryController(id: string) {
   const { entry, isLoading, postEntry, voidEntry } = useJournalEntry(id)
 
   // ── Platform Base ──
-  const base = useScreenController({
+  const base = useScreenController<JournalEntry, JournalEntryStatus>({
     screen: GL301000,
     dataSource: { entity: entry, isLoading, error: ref(null) },
     isNew,
-    getDomainState: (entity) => statusDomainState(entity as { status: string }),
-    statePolicy: MAINTENANCE_SCREEN_POLICY,
+    getDomainState: (entity) => entity.status,
+    statePolicy: GL301000_POLICY,
   })
 
   // ── Command Executors ──
