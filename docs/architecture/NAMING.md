@@ -15,12 +15,13 @@ tags: [frontend, architecture, naming, standards]
 
 ## Guiding Principles
 
-1. **Role before content.** A name answers _what does this do_, not _what is inside_.
-2. **Layer signals ownership.** The layer name (`domain/`, `application/`, `infrastructure/`, `ui/`) is the authoritative container. Sub-folders inside a layer must not duplicate that signal.
-3. **Consistency over cleverness.** If a pattern exists, extend it — never invent a new one for a single case.
-4. **Entity-first for discoverability.** Files are grouped by entity, not by action. In a codebase with 100+ screens, entity-first is the only naming that scales.
-5. **`App*` means visible to the user.** The prefix is reserved for shared design-system UI primitives. It is never applied to composables, domain types, schemas, runtime objects, or domain selectors.
-6. **File name provides context. Don't repeat it inside.** If the file is `account.types.ts`, the type inside is `Account`, not `AccountType` or `AccountData`.
+1. **Entity before action.** A name must first identify the domain noun it belongs to.
+2. **Role defines behavior.** The suffix communicates how the component behaves.
+3. **Layer signals ownership.** The layer name (`domain/`, `application/`, `infrastructure/`, `ui/`) is the authoritative container. Sub-folders inside a layer must not duplicate that signal.
+4. **Consistency over cleverness.** If a pattern exists, extend it — never invent a new one for a single case.
+5. **Entity-first for discoverability.** Files are grouped by entity, not by action. In a codebase with 100+ screens, entity-first is the only naming that scales.
+6. **`App*` means visible to the user.** The prefix is reserved for shared design-system UI primitives. It is never applied to composables, domain types, schemas, runtime objects, or domain selectors.
+7. **File name provides context. Don't repeat it inside.** If the file is `account.types.ts`, the type inside is `Account`, not `AccountType` or `AccountData`.
 
 ---
 
@@ -178,23 +179,61 @@ shared/ui/finance/
 
 ### 3.6 Components in Business Modules
 
-**Rule: `{Entity}{Role}.vue` — Entity-first, always.**
+**Rule: `{Entity}{Qualifier?}{Action?}{Role}.vue` — Entity-first, always.**
+
+Where:
+
+- **Entity:** required (e.g., `PaymentRequest`)
+- **Qualifier:** optional, for disambiguation (e.g., `Batch`)
+- **Action:** required for action components (e.g., `Release`)
+- **Role:** required, from the closed vocabulary (e.g., `Dialog`)
 
 Grouping files by entity enables instant discovery of everything related to a domain noun (`PaymentRequest*`) without folder hierarchies.
 
+#### Qualifiers
+
+Qualifiers refine the entity when multiple sub-entities exist or the action targets a specific aspect.
+Examples:
+
+- `PaymentBatchReleaseDialog.vue`
+- `UserPermissionUpdateDrawer.vue`
+
+Qualifiers must be:
+
+- Singular
+- Domain-specific
+- Placed exactly between the Entity and the Action
+
+#### Closed Action Vocabulary
+
+All action terms used in component naming MUST come from this list. No synonyms are allowed (e.g., use `DELETE`, not `REMOVE`).
+
+- `CREATE`
+- `UPDATE`
+- `DELETE`
+- `APPROVE`
+- `REJECT`
+- `RELEASE`
+- `POST`
+- `VOID`
+- `CANCEL`
+- `ASSIGN`
+- `INVITE`
+
 #### Closed Role Vocabulary
 
-| Role suffix        | When to use                                     | Example                          |
-| ------------------ | ----------------------------------------------- | -------------------------------- |
-| `CreateDrawer.vue` | Slide-out form for creating a record            | `AccountCreateDrawer.vue`        |
-| `EditDrawer.vue`   | Slide-out form for editing a record             | `AccountEditDrawer.vue`          |
-| `FilterPane.vue`   | Docked filter side panel                        | `PaymentRequestFilterPane.vue`   |
-| `Dialog.vue`       | Modal confirmation or workflow action           | `PaymentRequestRejectDialog.vue` |
-| `ActionBar.vue`    | Floating bulk action toolbar                    | `PaymentRequestActionBar.vue`    |
-| `Timeline.vue`     | Chronological event list                        | `PaymentRequestTimeline.vue`     |
-| `Badge.vue`        | Inline status/type display                      | `PaymentRequestBadge.vue`        |
-| `ListPage.vue`     | **Transitional only** — legacy workspace screen | `PaymentRequestListPage.vue`     |
-| `Focus.vue`        | **Transitional only** — legacy focus screen     | `VendorBillFocus.vue`            |
+Role suffixes are **behavioral contracts**, not just visual indicators.
+
+| Role suffix      | Semantic Rule / When to use                                         | Example                          |
+| ---------------- | ------------------------------------------------------------------- | -------------------------------- |
+| `Drawer.vue`     | **Non-blocking.** Used for create/edit forms. Extended interaction. | `AccountCreateDrawer.vue`        |
+| `Dialog.vue`     | **Blocking.** Irreversible action, confirmation. NEVER for editing. | `PaymentRequestRejectDialog.vue` |
+| `FilterPane.vue` | Docked filter side panel                                            | `PaymentRequestFilterPane.vue`   |
+| `ActionBar.vue`  | Floating bulk action toolbar                                        | `PaymentRequestActionBar.vue`    |
+| `Timeline.vue`   | Chronological event list                                            | `PaymentRequestTimeline.vue`     |
+| `Badge.vue`      | Inline status/type display                                          | `PaymentRequestBadge.vue`        |
+| `ListPage.vue`   | **Transitional only.** MUST NOT be used in new screens.             | `PaymentRequestListPage.vue`     |
+| `Focus.vue`      | **Transitional only.** MUST NOT be used in new screens.             | `VendorBillFocus.vue`            |
 
 > **`view.vue`** — Reserved exclusively for Screen ID folders. Never entity-prefixed.
 
@@ -233,7 +272,9 @@ AppSidePane (docked, contextual to working area)
   └── Tab: "Activity"    → sidepanels/activity.vue
 ```
 
+**SidePane Content Rule:**
 These templates are content slots — not standalone components. There is no `Trace*`, no `Drawer*` suffix. Audit/trace functionality is a content tab, not a component type.
+All contextual side-pane content MUST live in `{ScreenID}/sidepanels/*.vue`. No entity-prefixed SidePane components (e.g., `PaymentRequestAuditSidePane.vue`) are allowed.
 
 ### 3.8 Prohibited Patterns
 
