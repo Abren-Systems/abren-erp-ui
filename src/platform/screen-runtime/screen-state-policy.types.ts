@@ -24,12 +24,28 @@ export interface ScreenStatePolicy<
   readonly states: Record<TState, StateBehavior<TFieldKey>>
 }
 
+export interface BannerPolicy {
+  readonly messageKey: string
+  readonly variant: 'info' | 'warning' | 'danger'
+}
+
+export interface SectionStateOverride {
+  readonly hidden?: boolean
+  readonly disabled?: boolean
+}
+
 /**
  * Declares UI behavior for a single domain state.
  */
 export interface StateBehavior<TFieldKey extends string = string> {
   /** Is the record editable in this state? */
   readonly editable: boolean
+
+  /** Optional banner to display at the top of the form in this state */
+  readonly banner?: BannerPolicy
+
+  /** Sections with state-dependent visibility or disablement */
+  readonly sections?: Partial<Record<string, SectionStateOverride>>
 
   /** Fields with non-default behavior in this state */
   readonly fields?: Partial<Record<TFieldKey, FieldStateOverride>>

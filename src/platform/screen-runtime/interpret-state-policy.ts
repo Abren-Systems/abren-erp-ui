@@ -5,7 +5,7 @@
 //
 // Principle: Policy defines truth. Interpreter enforces consistency.
 
-import type { ScreenStatePolicy } from './screen-state-policy.types'
+import type { ScreenStatePolicy, BannerPolicy } from './screen-state-policy.types'
 
 /**
  * The interpreted result of a ScreenStatePolicy for the current domain state.
@@ -14,6 +14,15 @@ import type { ScreenStatePolicy } from './screen-state-policy.types'
 export interface InterpretedState {
   /** Whether the record is editable in the current domain state */
   readonly editable: boolean
+
+  /** Optional banner to render */
+  readonly banner: BannerPolicy | undefined
+
+  /** Whether a specific section is hidden */
+  isSectionHidden(sectionKey: string): boolean
+
+  /** Whether a specific section is disabled */
+  isSectionDisabled(sectionKey: string): boolean
 
   /** Whether a specific field is readonly in the current state */
   isFieldReadonly(fieldKey: string): boolean
@@ -41,6 +50,9 @@ export function interpretStatePolicy<TState extends string, TFieldKey extends st
 
   return {
     editable,
+    banner: behavior?.banner,
+    isSectionHidden: (key: string) => behavior?.sections?.[key]?.hidden ?? false,
+    isSectionDisabled: (key: string) => behavior?.sections?.[key]?.disabled ?? !editable,
     isFieldReadonly: (key: string) => behavior?.fields?.[key as TFieldKey]?.readonly ?? !editable,
     isFieldRequired: (key: string) => behavior?.fields?.[key as TFieldKey]?.required ?? false,
     isFieldHidden: (key: string) => behavior?.fields?.[key as TFieldKey]?.hidden ?? false,

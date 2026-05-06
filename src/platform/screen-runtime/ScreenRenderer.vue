@@ -6,6 +6,7 @@ import { AppSidePanel, PageHeader } from '@/shared/components/workspace'
 import { AppButton } from '@/shared/components/primitives'
 import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
 import FormToolbar from '@/platform/chrome/FormToolbar.vue'
+import FormBanner from '@/platform/chrome/FormBanner.vue'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenId } from './screen-id.types'
 import { ScreenControllerKey } from './injection-keys'
@@ -92,6 +93,10 @@ const sidePanelContract = computed(() => {
             :is-new="controllerRef.value.isNew?.value ?? false"
             :is-editable="controllerRef.value.interpretedState.value.editable"
             :available-actions="controllerRef.value.workflow?.availableActions"
+          />
+          <FormBanner
+            v-if="controllerRef.value.interpretedState.value.banner"
+            :banner="controllerRef.value.interpretedState.value.banner"
           />
         </template>
       </template>
