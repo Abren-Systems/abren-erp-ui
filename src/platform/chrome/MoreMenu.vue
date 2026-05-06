@@ -13,35 +13,30 @@ import { AppButton } from '@/shared/components/primitives'
 import { MoreHorizontal } from 'lucide-vue-next'
 import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
-import {
-  isCommandVisible,
-  getExpectedNextAction,
-  groupCommandsByCategory,
-} from '../commands/command.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
 
 const props = defineProps<{
-  /** All commands declared for this screen */
-  commands: readonly ScreenCommand[]
-  /** Current domain status — drives visibility/enablement */
-  domainState: string
+  /** Secondary commands provided by the projection */
+  secondaryCommands: readonly ScreenCommand[]
+  /** Expected next action from projection (for green dot rendering) */
+  expectedNext?: ScreenCommand
   /** Registered command executors from the controller */
   executors: Record<string, ControllerCommand>
   /** Whether any command is currently executing */
   isPending: boolean
-  /** Backend-provided available actions for workflow */
-  availableActions?: readonly string[]
 }>()
 
 const isOpen = ref(false)
 
-const expectedNext = computed(() =>
-  getExpectedNextAction(props.commands, props.domainState, props.availableActions),
-)
-
-const groups = computed(() =>
-  groupCommandsByCategory(props.commands, props.domainState, props.availableActions),
-)
+const groups = computed(() => {
+  const map = new Map<string, ScreenCommand[]>()
+  for (const cmd of props.secondaryCommands) {
+    const category = cmd.categoryKey ?? 'other'
+    if (!map.has(category)) map.set(category, [])
+    map.get(category)!.push(cmd)
+  }
+  return map
+})
 
 const CATEGORY_LABELS: Record<string, string> = {
   processing: 'Processing',
@@ -79,8 +74,7 @@ function confirmExecution() {
 }
 
 function isCommandEnabled(command: ScreenCommand): boolean {
-  if (props.isPending) return false
-  return isCommandVisible(command, props.domainState, props.availableActions)
+  return !props.isPending
 }
 
 function toggleMenu() {

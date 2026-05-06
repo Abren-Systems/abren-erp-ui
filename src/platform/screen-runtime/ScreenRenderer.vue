@@ -86,13 +86,11 @@ const sidePanelContract = computed(() => {
         >
           <FormTitleBar :title="screen.titleKey" />
           <FormToolbar
-            :commands="screen.commands"
-            :domain-state="controllerRef.value.state.domain"
+            :projection="controllerRef.value.projection.value"
             :executors="controllerRef.value.commands.value"
             :is-pending="controllerRef.value.isPending?.value ?? false"
             :is-new="controllerRef.value.isNew?.value ?? false"
             :is-editable="controllerRef.value.interpretedState.value.editable"
-            :available-actions="controllerRef.value.workflow?.availableActions"
           />
           <FormBanner
             v-if="controllerRef.value.interpretedState.value.banner"

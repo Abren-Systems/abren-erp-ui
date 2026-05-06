@@ -4,6 +4,7 @@ import type { ScreenData, ControllerCommand, ScreenController } from './screen-c
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { ScreenStatePolicy } from './screen-state-policy.types'
 import { interpretStatePolicy, type InterpretedState } from './interpret-state-policy'
+import { resolveScreenProjection } from './resolve-screen-projection'
 import { debugBus } from '../debug/debug-bus'
 
 // ── Screen Controller Options ─────────────────────────────
@@ -239,5 +240,16 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
         return (ent?.['available_actions'] || []) as readonly string[]
       }),
     },
+
+    /** The pure derived UI projection */
+    projection: computed(() => {
+      const ent = dataSource.entity.value as Record<string, unknown> | null
+      const availableActions = (ent?.['available_actions'] || []) as readonly string[]
+      return resolveScreenProjection(
+        screen.commands,
+        stateMachine.domain as string,
+        availableActions,
+      )
+    }),
   }
 }

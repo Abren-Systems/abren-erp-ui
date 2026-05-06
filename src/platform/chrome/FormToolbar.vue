@@ -18,14 +18,12 @@ import { Save, X, ChevronFirst, ChevronLeft, ChevronRight, ChevronLast } from 'l
 import MoreMenu from './MoreMenu.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
-import { isCommandVisible, getExpectedNextAction } from '../commands/command.types'
+import type { ScreenProjection } from '../screen-runtime/screen-projection.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
 
 const props = defineProps<{
-  /** All commands declared for this screen */
-  commands: readonly ScreenCommand[]
-  /** Current domain status — drives visibility/enablement */
-  domainState: string
+  /** Pure UI projection containing command hierarchy */
+  projection: ScreenProjection
   /** Registered command executors from the controller */
   executors: Record<string, ControllerCommand>
   /** Whether any command is currently executing */
@@ -34,29 +32,12 @@ const props = defineProps<{
   isNew: boolean
   /** Whether the record is editable according to the ScreenStatePolicy */
   isEditable: boolean
-  /** Backend-provided available actions for workflow */
-  availableActions?: readonly string[]
 }>()
 
 const emit = defineEmits<{
   (e: 'save'): void
   (e: 'cancel'): void
 }>()
-
-// ── Expected Next Action ──
-const expectedNext = computed(() =>
-  getExpectedNextAction(props.commands, props.domainState, props.availableActions),
-)
-
-// ── Toolbar Favorites (commands shown directly on toolbar) ──
-const toolbarCommands = computed(() =>
-  props.commands.filter(
-    (cmd) =>
-      cmd.displayOnMainToolbar &&
-      isCommandVisible(cmd, props.domainState, props.availableActions) &&
-      cmd.key !== expectedNext.value?.key,
-  ),
-)
 
 // ── Confirmation State ──
 const confirmState = ref<{ open: boolean; command: ScreenCommand | null }>({
@@ -132,19 +113,19 @@ function getButtonVariant(cmd: ScreenCommand) {
 
     <!-- Expected Next Action (highlighted) -->
     <AppButton
-      v-if="expectedNext"
+      v-if="projection.commands.expectedNext"
       variant="primary"
       size="sm"
       :disabled="isPending"
       class="form-toolbar__expected-next"
-      @click="executeCommand(expectedNext)"
+      @click="executeCommand(projection.commands.expectedNext)"
     >
-      {{ expectedNext.labelKey }}
+      {{ projection.commands.expectedNext.labelKey }}
     </AppButton>
 
     <!-- Toolbar Favorites -->
     <AppButton
-      v-for="cmd in toolbarCommands"
+      v-for="cmd in projection.commands.primary"
       :key="cmd.key"
       :variant="getButtonVariant(cmd)"
       size="sm"
@@ -161,11 +142,10 @@ function getButtonVariant(cmd: ScreenCommand) {
 
     <!-- More Menu -->
     <MoreMenu
-      :commands="commands"
-      :domain-state="domainState"
+      :secondary-commands="projection.commands.secondary"
+      :expected-next="projection.commands.expectedNext"
       :executors="executors"
       :is-pending="isPending"
-      :available-actions="availableActions"
     />
 
     <!-- Confirmation Dialog for toolbar commands -->

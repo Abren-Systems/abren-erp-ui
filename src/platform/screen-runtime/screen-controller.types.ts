@@ -26,6 +26,7 @@ export interface ScreenData<T = unknown> {
 
 import type { ScreenDefinition } from './screen-definition.types'
 import type { InterpretedState } from './interpret-state-policy'
+import type { ScreenProjection } from './screen-projection.types'
 
 export interface ControllerCommand {
   /** Execute this command */
@@ -69,10 +70,13 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
   /** Whether any command is currently executing */
   readonly isPending: ComputedRef<boolean>
 
-  /** Workflow projection */
+  /** Workflow raw data */
   readonly workflow: {
     readonly availableActions: ComputedRef<readonly string[]>
   }
+
+  /** The pure derived UI projection (commands hierarchy, etc.) */
+  readonly projection: ComputedRef<ScreenProjection>
 
   /** Register a command on this controller */
   registerCommand(id: string, command: ControllerCommand): void
