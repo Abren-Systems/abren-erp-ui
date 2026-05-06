@@ -1,6 +1,6 @@
 import { ref, computed, watch, onUnmounted, type ComputedRef, type Ref } from 'vue'
 import type { ScreenDefinition } from './screen-definition.types'
-import type { ScreenData } from './screen-controller.types'
+import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { ScreenStatePolicy } from './screen-state-policy.types'
 import { interpretStatePolicy, type InterpretedState } from './interpret-state-policy'
@@ -120,17 +120,6 @@ function createStateMachine<T, TDomain extends string>(
   return { stateMachine, interpretedState }
 }
 
-// ── Command Registry ──────────────────────────────────────
-// Screens register their commands via registerCommand().
-// The view template reads from commands for rendering.
-
-export interface ControllerCommand {
-  /** Execute this command */
-  execute: (...args: unknown[]) => Promise<void>
-  /** Whether the command is currently executing */
-  isPending: Ref<boolean>
-}
-
 // ── The Composable ────────────────────────────────────────
 
 /**
@@ -146,7 +135,7 @@ export interface ControllerCommand {
  */
 export function useScreenController<T, TDomain extends string = BaseDomainState>(
   options: ScreenControllerOptions<T, TDomain>,
-) {
+): ScreenController<T, TDomain> {
   const { screen, dataSource, isNew = ref(false), getDomainState, statePolicy } = options
 
   // ── Data Layer ──
@@ -244,8 +233,3 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     isPending,
   }
 }
-
-/** The return type of useScreenController, for use in screen-specific controllers */
-export type ScreenControllerInstance<T, TDomain extends string = BaseDomainState> = ReturnType<
-  typeof useScreenController<T, TDomain>
->

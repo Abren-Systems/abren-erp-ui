@@ -4,6 +4,7 @@ import type { ScreenId } from './screen-id.types'
 import type { ScreenViews } from './screen-view.types'
 import type { ScreenCommand } from '../commands/command.types'
 import type { SidePanelContract } from '../component-contracts'
+import type { ScreenContext, ScreenController } from './screen-controller.types'
 
 // ── Screen Taxonomy ───────────────────────────────────────
 // Maps directly to Acumatica form types.
@@ -16,6 +17,7 @@ export type ScreenKind =
   | 'processing' // Select many records, execute server action, show result
   | 'inquiry' // Read-only filtered analysis and drilldown
   | 'report' // Parameterized report with templates
+  | 'dashboard' // Widget collection
 
 // ── Layout Templates ──────────────────────────────────────
 // Named column templates equivalent to Acumatica's qp-template.
@@ -39,7 +41,7 @@ export interface ScreenLayoutDefinition {
   /** The primary column template for the summary/header area */
   readonly summaryTemplate: LayoutTemplate
   /** The render target component — allows compatibility with existing SFCs during migration */
-  readonly renderTarget?: Component
+  readonly renderTarget?: () => Promise<Component> | Component
   /** The contextual right-pane side panel contract */
   readonly sidePanel?: SidePanelContract
 }
@@ -100,6 +102,9 @@ export interface ScreenDefinition<
 
   /** The module that owns this screen */
   readonly moduleId: ModuleId
+
+  /** Optional during migration. The platform uses this to instantiate the controller. */
+  readonly controller?: (ctx: ScreenContext) => ScreenController<unknown, string>
 
   /** Acumatica-style screen taxonomy */
   readonly kind: ScreenKind

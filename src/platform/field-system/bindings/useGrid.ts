@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ScreenControllerInstance } from '@/platform/screen-runtime/useScreenController'
+import type { ScreenController } from '@/platform/screen-runtime/screen-controller.types'
 
 export interface GridBinding<TRow = unknown> {
   rows: ComputedRef<TRow[]>
@@ -13,7 +13,7 @@ export interface GridBinding<TRow = unknown> {
  * This guarantees that grids cannot fetch their own data or mutate it independently.
  */
 export function useGrid<TEntity, K extends keyof TEntity>(
-  controller: ScreenControllerInstance<TEntity>,
+  controller: ScreenController<TEntity>,
   gridKey: K,
 ): GridBinding<TEntity[K] extends unknown[] ? TEntity[K][number] : unknown> {
   const rows = controller.data.selectGrid(gridKey) as ComputedRef<unknown[]>

@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, provide, shallowRef, watch } from 'vue'
+import { computed, provide, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { screenRegistry } from './screen-registry'
-import { AppSidePanel } from '@/shared/components/workspace'
+import { AppSidePanel, PageHeader } from '@/shared/components/workspace'
+import { AppButton } from '@/shared/components/primitives'
+import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
+import FormToolbar from '@/platform/chrome/FormToolbar.vue'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenId } from './screen-id.types'
+import { ScreenControllerKey } from './injection-keys'
+import type { ScreenContext, ScreenController } from './screen-controller.types'
 
 const props = defineProps<{
   id?: string // E.g., 'new', or UUID from router params
@@ -17,6 +22,27 @@ const screenId = computed(() => route.meta.screenId as string)
 const screen = computed(
   () => screenRegistry.get(screenId.value as ScreenId) as ScreenDefinition | undefined,
 )
+
+// Platform-Owned Controller Lifecycle
+const controllerRef = shallowRef<ScreenController<unknown, string> | null>(null)
+
+watch(
+  () => [screen.value?.id, route.params, route.query],
+  () => {
+    if (screen.value?.controller) {
+      const ctx: ScreenContext = {
+        params: route.params,
+        query: route.query,
+      }
+      controllerRef.value = screen.value.controller(ctx)
+    } else {
+      controllerRef.value = null
+    }
+  },
+  { immediate: true, deep: true },
+)
+
+provide(ScreenControllerKey, controllerRef)
 
 // Resolve the Working Area view component (currently from renderTarget,
 // eventually this will resolve dynamically from views contract)
@@ -32,11 +58,52 @@ const sidePanelContract = computed(() => {
 </script>
 
 <template>
-  <div v-if="screen" class="flex w-full h-full relative overflow-hidden bg-neutral-50/30">
+  <div v-if="screen" class="flex w-full h-full relative overflow-hidden bg-[var(--app-canvas)]">
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
+      <!-- Platform Chrome controlled by ScreenKind -->
+      <template v-if="controllerRef.value">
+        <!-- Inquiry & Lists get the generic PageHeader -->
+        <PageHeader
+          v-if="['inquiry', 'primaryList', 'dashboard'].includes(screen.kind)"
+          :title="screen.titleKey"
+        >
+          <template #actions>
+            <AppButton
+              v-for="cmd in screen.commands?.filter((c) => c.displayOnMainToolbar)"
+              :key="cmd.key"
+              :variant="cmd.variant === 'primary' ? 'primary' : 'outline'"
+              size="sm"
+              @click="controllerRef.value.commands.value[cmd.key]?.execute()"
+            >
+              {{ cmd.labelKey }}
+            </AppButton>
+          </template>
+        </PageHeader>
+        <!-- Data Entry & Master Data get the dense Form Toolbar -->
+        <template
+          v-else-if="['dataEntry', 'maintenance', 'setup', 'processing'].includes(screen.kind)"
+        >
+          <FormTitleBar :title="screen.titleKey" />
+          <FormToolbar
+            :commands="screen.commands"
+            :domain-state="controllerRef.value.state.domain"
+            :executors="controllerRef.value.commands.value"
+            :is-pending="false"
+            :is-new="controllerRef.value.state.ui === 'NEW'"
+          />
+        </template>
+      </template>
+
+      <!-- Pure Working Area -->
       <KeepAlive :max="10">
-        <component :is="WorkingArea" v-if="WorkingArea" :key="props.id || 'new'" :id="props.id" />
+        <component
+          :is="WorkingArea"
+          v-if="WorkingArea"
+          :key="screen.id + ':' + (props.id || 'new')"
+          :id="props.id"
+        />
       </KeepAlive>
+
       <div v-if="!WorkingArea" class="flex items-center justify-center h-full text-neutral-400">
         No working area defined for {{ screen.id }}
       </div>

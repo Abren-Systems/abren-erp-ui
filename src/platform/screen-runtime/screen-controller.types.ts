@@ -1,6 +1,12 @@
-import type { ComputedRef } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 import type { ScreenStateMachine } from './state-machine.types'
-import type { ScreenCommand } from '../commands/command.types'
+
+export interface ScreenContext {
+  /** The current route parameters for dynamic resolution */
+  params: Record<string, string | string[]>
+  /** Querystring parameters */
+  query: Record<string, string | string[]>
+}
 
 // ── Screen Data (Granular Reactivity) ─────────────────────
 // Enforces the memoized selector pattern to prevent re-render storms.
@@ -18,32 +24,51 @@ export interface ScreenData<T = unknown> {
   selectGrid<K extends keyof T>(gridKey: K): ComputedRef<unknown[]>
 }
 
+import type { ScreenDefinition } from './screen-definition.types'
+import type { InterpretedState } from './interpret-state-policy'
+
+export interface ControllerCommand {
+  /** Execute this command */
+  execute: (...args: unknown[]) => Promise<void>
+  /** Whether the command is currently executing */
+  isPending: Ref<boolean>
+}
+
 // ── Screen Controller ─────────────────────────────────────
 // The central orchestrator for a screen's aggregate.
 // Strictly separates state, data access, commands, and lifecycle.
 
-export interface ScreenController<T = unknown> {
-  /** The dual-layered state machine (UI + Domain) */
-  readonly state: ScreenStateMachine
+export interface ScreenController<T = unknown, TDomain extends string = string> {
+  /** The ScreenDefinition metadata */
+  readonly screen: ScreenDefinition
 
-  /** The granular data access layer */
+  /** Granular, memoized data access */
   readonly data: ScreenData<T>
 
-  /** The declared commands for this screen (flat data objects) */
-  readonly commands: readonly ScreenCommand[]
+  /** The primary entity ref (for direct access when selectors aren't needed) */
+  readonly entity: Ref<T | null | undefined>
 
-  /**
-   * Internal mutation gateway.
-   * UI components NEVER call this directly; they use Commands
-   * or the useField/useGrid composables which bridge to this securely.
-   */
-  _mutate(fn: (draft: T) => void): void
+  /** UI state machine */
+  readonly state: ScreenStateMachine<TDomain>
 
-  /** Lifecycle orchestration */
-  readonly lifecycle: {
-    /** Bootstraps the controller — fetches data or initializes a new draft */
-    load(id?: string): Promise<void>
-    /** Cleans up subscriptions and releases memory when the instance is closed */
-    destroy(): void
-  }
+  /** Interpreted state policy — the single truth for field/editability behavior */
+  readonly interpretedState: ComputedRef<InterpretedState>
+
+  /** Whether the data source is loading */
+  readonly isLoading: Ref<boolean>
+
+  /** Error from the data source */
+  readonly error: Ref<Error | null | undefined>
+
+  /** Whether this is a new record */
+  readonly isNew: Ref<boolean>
+
+  /** Registered commands */
+  readonly commands: Ref<Record<string, ControllerCommand>>
+
+  /** Whether any command is currently executing */
+  readonly isPending: ComputedRef<boolean>
+
+  /** Register a command on this controller */
+  registerCommand(id: string, command: ControllerCommand): void
 }

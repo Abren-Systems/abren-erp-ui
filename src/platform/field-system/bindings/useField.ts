@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from 'vue'
 import type { FieldDefinition } from '../field-definition.types'
-import type { ScreenControllerInstance } from '@/platform/screen-runtime/useScreenController'
+import type { ScreenController } from '@/platform/screen-runtime/screen-controller.types'
 import type { ScreenStateMachine } from '@/platform/screen-runtime/state-machine.types'
 import { debugBus } from '@/platform/debug/debug-bus'
 
@@ -23,7 +23,7 @@ export interface FieldBinding<TValue = unknown> {
  * and that all readonly/required rules are evaluated centrally by the State Machine.
  */
 export function useField<TEntity, TValue>(
-  controller: ScreenControllerInstance<TEntity, string>,
+  controller: ScreenController<TEntity, string>,
   definition: FieldDefinition<TEntity, TValue>,
 ): FieldBinding<TValue> {
   const value = controller.data.select(definition.key) as ComputedRef<TValue | undefined>

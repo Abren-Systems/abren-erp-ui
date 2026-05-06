@@ -10,13 +10,8 @@
 export type { ScreenId, ScreenInstanceId } from './screen-id.types'
 export type { ScreenView, ScreenViews, ScreenViewKind } from './screen-view.types'
 export type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
-export type { ScreenData, ScreenController } from './screen-controller.types'
-export type {
-  ScreenControllerDataSource,
-  ScreenControllerOptions,
-  ControllerCommand,
-  ScreenControllerInstance,
-} from './useScreenController'
+export type { ScreenData, ScreenController, ControllerCommand } from './screen-controller.types'
+export type { ScreenControllerDataSource, ScreenControllerOptions } from './useScreenController'
 export { useScreenController } from './useScreenController'
 export type {
   ScreenKind,
