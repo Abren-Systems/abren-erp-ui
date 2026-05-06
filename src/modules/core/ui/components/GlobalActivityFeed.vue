@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAuditStore } from '@/shared/infrastructure/audit.store'
+import { useAuditStore } from '@/shared/composables/audit.store'
 import { storeToRefs } from 'pinia'
 import { useTimeAgo } from '@vueuse/core'
 import {

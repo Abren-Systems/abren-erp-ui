@@ -6,9 +6,9 @@ import {
   listScreenDomainState,
 } from '@/platform/screen-runtime'
 import { useInventoryAdjustment } from '../../application/useInventoryAdjustment'
-import { useWarehouses } from '../../application/useWarehouses'
 import type { AdjustmentCreateDTO } from '../../infrastructure/api.types'
 import { IN303000 } from './screen'
+import { useWarehouses } from '../../application/useWarehouses'
 
 export function useAdjustmentController(id: string) {
   const router = useRouter()

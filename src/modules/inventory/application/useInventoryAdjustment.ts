@@ -3,6 +3,8 @@ import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { inventoryKeys } from './query-keys'
 import type { AdjustmentCreateDTO } from '../infrastructure/api.types'
 
+export type { AdjustmentCreateDTO }
+
 /**
  * Use Case: Create Inventory Adjustment
  *
