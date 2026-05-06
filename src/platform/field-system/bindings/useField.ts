@@ -2,6 +2,7 @@ import { computed, type ComputedRef } from 'vue'
 import type { FieldDefinition } from '../field-definition.types'
 import type { ScreenControllerInstance } from '@/platform/screen-runtime/useScreenController'
 import type { ScreenStateMachine } from '@/platform/screen-runtime/state-machine.types'
+import { debugBus } from '@/platform/debug/debug-bus'
 
 export interface FieldBinding<TValue = unknown> {
   value: ComputedRef<TValue | undefined>
@@ -74,19 +75,38 @@ export function useField<TEntity, TValue>(
   const onChange = (newValue: TValue) => {
     if (isReadonly.value) return // Block mutation if State Machine forbids it
 
-    // Optimistic update - in a full implementation, the controller would handle this via a command
-    // or TanStack Form's mutator methods.
+    const fieldKey = definition.key
+    const previousValue = value.value
+
+    // Route 1: New record — write to the attached form instance
     if (controller.isNew.value && 'form' in controller) {
-      // If there is a form instance (e.g. TanStack form) attached to the controller:
       const formControl = (
         controller as unknown as { form: { setFieldValue: (k: keyof TEntity, v: TValue) => void } }
       ).form
-      formControl.setFieldValue(definition.key, newValue)
-    } else {
-      console.warn(
-        `Controller mutation not fully implemented for ${String(definition.key)}. Use the form directly or implement mutation actions.`,
-      )
+      formControl.setFieldValue(fieldKey, newValue)
     }
+    // Route 2: Edit mode — write through controller's setFieldValue if available
+    else if ('setFieldValue' in controller) {
+      const mutator = controller as unknown as {
+        setFieldValue: (k: keyof TEntity, v: TValue) => void
+      }
+      mutator.setFieldValue(fieldKey, newValue)
+    }
+    // Route 3: No mutation path available — warn (should not happen in production)
+    else {
+      console.warn(
+        `[useField] No mutation path for field "${String(fieldKey)}". ` +
+          `Attach a form instance or implement setFieldValue on the controller.`,
+      )
+      return // Don't emit debug event for failed mutations
+    }
+
+    // Emit debug event for successful mutations
+    debugBus.emit(controller.screen.id, 'field_mutation', {
+      field: String(fieldKey),
+      previousValue,
+      newValue,
+    })
   }
 
   return {

@@ -1,9 +1,10 @@
-import { ref, computed, onUnmounted, type ComputedRef, type Ref } from 'vue'
+import { ref, computed, watch, onUnmounted, type ComputedRef, type Ref } from 'vue'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { ScreenStatePolicy } from './screen-state-policy.types'
 import { interpretStatePolicy, type InterpretedState } from './interpret-state-policy'
+import { debugBus } from '../debug/debug-bus'
 
 // ── Screen Controller Options ─────────────────────────────
 // Passed by the screen-specific controller to configure data loading.
@@ -167,11 +168,41 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   const commands = ref<Record<string, ControllerCommand>>({})
 
   function registerCommand(id: string, command: ControllerCommand) {
-    commands.value[id] = command
+    // Wrap execute() with debug instrumentation
+    const wrappedCommand: ControllerCommand = {
+      isPending: command.isPending,
+      execute: async (...args: unknown[]) => {
+        debugBus.emit(screen.id, 'command_start', { commandId: id, args })
+        try {
+          await command.execute(...args)
+          debugBus.emit(screen.id, 'command_end', { commandId: id })
+        } catch (error) {
+          debugBus.emit(screen.id, 'command_error', {
+            commandId: id,
+            error: error instanceof Error ? error.message : String(error),
+          })
+          throw error
+        }
+      },
+    }
+    commands.value[id] = wrappedCommand
+    debugBus.emit(screen.id, 'command_registered', { commandId: id })
   }
 
   // ── Aggregate Pending State ──
   const isPending = computed(() => Object.values(commands.value).some((cmd) => cmd.isPending.value))
+
+  // ── Debug: log policy interpretation on domain state changes ──
+  watch(
+    () => interpretedState.value,
+    (interpreted) => {
+      debugBus.emit(screen.id, 'policy_interpreted', {
+        editable: interpreted.editable,
+        actionRequiredLabel: interpreted.actionRequiredLabel,
+      })
+    },
+    { immediate: true },
+  )
 
   // ── Cleanup ──
   onUnmounted(() => {
