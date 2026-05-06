@@ -288,7 +288,7 @@ src/modules/{domain-group}/{module-name}/
 > - `application/` is **flat** — no `composables/` sub-folder. Composable files live directly in `application/`.
 > - `ui/` is **flat** — no `transactions/`, `profiles/`, or `inquiries/` sub-folders. Screen IDs self-categorize by their numbering convention (1xx=setup, 2xx=profile, 3xx=transaction, 4xx=inquiry, 5xx=processing, 6xx=report).
 > - Each screen folder is named by its **Screen ID** (e.g., `AP301000`). Paired screens (Focus + Workspace) are siblings: `AP301000/` and `AP3010PL/`.
-> - Legacy modules using `pages/components/grids/` patterns under `ui/` must migrate to the Screen ID pattern when next touched.
+> - The `ui/` directory MUST ONLY contain Screen ID folders. Any cross-module UI concepts (e.g. `TraceabilityBadge`) must live in the UI Kernel at `src/shared/ui/`.
 
 ### 5.3 Module Registration Pattern
 
@@ -314,6 +314,8 @@ export const ledgerModule: ModuleDefinition = {
 4. **Screen ownership**: Each module exports registered screens and workspace entries. Direct route ownership is transitional only.
 5. **Composable Orchestration**: All business logic and API orchestration MUST live in Composables, keeping `.vue` files as thin view-only layers.
 6. **Unbreakable DRY**: Domain UI patterns (like specialized selects or status badges) must be extracted and reused, never duplicated.
+7. **UI Component Kernel**: Components rendered across multiple modules MUST be published to `src/shared/ui/` to prevent cross-module UI coupling.
+8. **Stateless Workflow**: The frontend treats workflows as a cross-cutting action dispatcher. The UI NEVER orchestrates domain state transitions; it only projects backend state via the `ScreenStatePolicy`.
 
 ### 5.5 5-Component Scaffolding Checklist
 

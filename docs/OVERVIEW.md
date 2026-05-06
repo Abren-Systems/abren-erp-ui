@@ -28,13 +28,14 @@ The Abren ERP UI documentation follows a strict hierarchy. **ARCHITECTURE.md (v3
 
 ### Architecture Core
 
-| Document                                              | Description                                                                            | Authority           |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------- |
-| [Frontend Architecture](architecture/ARCHITECTURE.md) | **Single Root of Truth** — Core patterns, module rules, and layer structure.           | **Locked Baseline** |
-| [Screen Runtime](architecture/SCREEN_RUNTIME.md)      | **Runtime Authority** — Screen instances, controllers (PXGraph), and state machines.   | Subordinate         |
-| [Component System](architecture/COMPONENT_SYSTEM.md)  | **UI Authority** — Component ownership, contracts, and design system alignment.        | Subordinate         |
-| [UX Architecture](architecture/UX_ARCHITECTURE.md)    | **UX Authority** — Progressive disclosure, interaction grammar, and shell foundations. | Subordinate         |
-| [Field System](FIELD_SYSTEM.md)                       | **Field Authority** — AppField, AppFieldset layout engine, and registry.               | Subordinate         |
+| Document                                                    | Description                                                                            | Authority           |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------- |
+| [Frontend Architecture](architecture/ARCHITECTURE.md)       | **Single Root of Truth** — Core patterns, module rules, and layer structure.           | **Locked Baseline** |
+| [Screen Runtime](architecture/SCREEN_RUNTIME.md)            | **Runtime Authority** — Screen instances, controllers (PXGraph), and state machines.   | Subordinate         |
+| [Acumatica Model Analysis](ACUAMATICA_UI_MODEL_ANALYSIS.md) | **Mental Model Authority** — The exact mapping between Acumatica patterns and Abren.   | Subordinate         |
+| [Component System](architecture/COMPONENT_SYSTEM.md)        | **UI Authority** — Component ownership, contracts, and design system alignment.        | Subordinate         |
+| [UX Architecture](architecture/UX_ARCHITECTURE.md)          | **UX Authority** — Progressive disclosure, interaction grammar, and shell foundations. | Subordinate         |
+| [Field System](FIELD_SYSTEM.md)                             | **Field Authority** — AppField, AppFieldset layout engine, and registry.               | Subordinate         |
 
 ### Implementation Details
 

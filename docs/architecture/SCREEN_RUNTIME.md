@@ -69,7 +69,8 @@ The Screen Controller is the absolute authority for a form's behavior. The View 
 3. **Dual-Layer State Machine**: The controller evaluates permissions based on:
    - **UIState**: `INITIALIZING`, `NEW`, `VIEW`, `EDIT`, `SAVING`.
    - **DomainState**: `DRAFT`, `SUBMITTED`, `APPROVED`, etc. (backend-owned).
-4. **Mutation Guards**: All mutations must throw or block if the State Machine dictates the record is read-only.
+4. **Declarative UI Projection (ScreenStatePolicy)**: The frontend NEVER orchestrates transitions. The controller interprets a declarative `ScreenStatePolicy` (`policy.ts`) that maps domain states to presentation logic (e.g., `editable`, `readonly` fields, `actionRequiredLabel`).
+5. **Mutation Guards**: All mutations flow through `useField` and are strictly blocked if the `ScreenStatePolicy` dictates the field or record is read-only.
 
 ---
 
@@ -107,10 +108,11 @@ The Form Toolbar is rendered by the `FormToolbar` component (platform-level). Co
 
 ```
 Input: commands[] from controller.getCommands()
-       currentState from controller.getState()
+       interpretedState from controller.interpretedState
        userFavorites from user preferences storage
 
-1. Filter: visible commands = commands.filter(c => c.isVisible(currentState))
+1. Filter: visible commands = commands.filter(c => isCommandVisible(c, domainState))
+2. Guard: Disable `Save` and mutation actions if `!interpretedState.editable`
 2. Partition:
    - standardCommands = [save, cancel, add, delete, copy, undo, nav]
    - expectedNext = commands.find(c => c.expectedNext(currentState))
