@@ -5,6 +5,7 @@ export const coreModule: PlatformEngine = {
   id: 'core',
   name: 'Core',
   category: 'platform',
+  screens: [],
   routes,
   permissions: ['core:view', 'core:user_edit', 'core:role_edit'],
   menuItems: [

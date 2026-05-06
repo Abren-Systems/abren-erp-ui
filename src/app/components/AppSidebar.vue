@@ -95,13 +95,6 @@ function toNavigationItem(moduleId: string, item: MenuItem): NavigationItem {
   }
 }
 
-const startGroups = computed<NavigationGroup[]>(() => [
-  {
-    title: 'Start',
-    items: [{ label: 'Workboard', icon: LayoutDashboard, href: '/app' }],
-  },
-])
-
 const businessGroups = computed<NavigationGroup[]>(() =>
   businessModules.map((module: BusinessDomain) => ({
     title: module.name,
@@ -187,31 +180,6 @@ function toggleSidebar() {
     </div>
 
     <nav class="flex-1 space-y-4 overflow-y-auto px-3 py-3">
-      <div v-for="group in startGroups" :key="group.title" class="space-y-2">
-        <p
-          v-if="!collapsed"
-          class="px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]"
-        >
-          {{ group.title }}
-        </p>
-        <RouterLink
-          v-for="item in group.items.filter(canAccess)"
-          :key="item.label"
-          :to="item.href || item.to!"
-          :class="[
-            'group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium transition-colors',
-            isItemActive(item)
-              ? 'bg-[var(--color-primary-600)] text-white shadow-[0_14px_28px_rgba(79,70,229,0.22)]'
-              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-100)]',
-            collapsed ? 'justify-center px-0' : '',
-          ]"
-          @click="closeMobileSidebar"
-        >
-          <component :is="item.icon" class="h-4 w-4 shrink-0" />
-          <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
-        </RouterLink>
-      </div>
-
       <div class="space-y-3">
         <div v-for="group in businessGroups" :key="group.title" class="space-y-1.5">
           <p

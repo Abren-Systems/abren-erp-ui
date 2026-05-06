@@ -196,7 +196,7 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 | ------ | ------------------ | ------------------------- |
 | `AP`   | Accounts Payable   | `modules/finance/ap/`     |
 | `GL`   | General Ledger     | `modules/finance/ledger/` |
-| `BK`   | Banking            | `modules/finance/bank/`   |
+| `CA`   | Banking            | `modules/finance/bank/`   |
 | `TX`   | Tax                | `modules/finance/tax/`    |
 | `IN`   | Inventory          | `modules/inventory/`      |
 | `CR`   | Core (Users/Roles) | `modules/core/`           |
@@ -211,7 +211,7 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 | `GL301000` | Data Entry  | Journal Entry         | ❌ Legacy                   |
 | `GL201000` | Maintenance | Chart of Accounts     | ❌ Legacy                   |
 | `GL3010PL` | Inquiry     | Journal Entries List  | ❌ Legacy                   |
-| `BK201000` | Maintenance | Bank Accounts         | ❌ Legacy                   |
+| `CA202000` | Maintenance | Bank Accounts         | ❌ Legacy                   |
 | `TX101000` | Setup       | Tax Preferences       | ❌ Legacy                   |
 | `IN202000` | Maintenance | Stock Items           | ❌ Legacy                   |
 | `IN301000` | Data Entry  | Inventory Adjustments | ❌ Legacy                   |

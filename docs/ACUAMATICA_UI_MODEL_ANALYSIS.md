@@ -183,9 +183,9 @@ Acumatica screen IDs are **8-character codes** with strict semantic meaning:
 | Prefix | Module | Examples |
 |--------|--------|----------|
 | `AP` | Accounts Payable | AP301000 (Bills), AP3010PL (Bill List) |
-| `GL` | General Ledger | GL301000 (Journal Entry), GL201000 (Chart of Accounts) |
-| `BK` | Banking | BK201000 (Bank Accounts) |
-| `TX` | Tax | TX101000 (Tax Preferences) |
+| `GL` | General Ledger | GL301000 (Journal Entry) |
+| `CA` | Banking | CA202000 (Bank Accounts) |
+| `TX` | Tax | TX201000 (Tax Groups) |
 | `IN` | Inventory | IN202000 (Stock Items), IN301000 (Adjustments) |
 | `CR` | Core (Users/Roles) | CR201000 (Users), CR301000 (Roles) |
 

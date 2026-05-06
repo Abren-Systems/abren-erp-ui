@@ -290,7 +290,7 @@ Add the screen's route to the module's router configuration, pointing to the `vi
 | P1       | Vendor Bill Entry     | `vendor-bills/pages/VendorBillFocus.vue` | `AP302000` | Data Entry  |
 | P1       | Journal Entry         | (ledger legacy)                          | `GL301000` | Data Entry  |
 | P1       | Chart of Accounts     | (ledger legacy)                          | `GL201000` | Maintenance |
-| P2       | Bank Accounts         | (bank legacy)                            | `BK201000` | Maintenance |
+| P2       | Bank Accounts         | (bank legacy)                            | `CA202000` | Maintenance |
 | P2       | Tax Preferences       | (tax legacy)                             | `TX101000` | Setup       |
 | P2       | Stock Items           | (inventory legacy)                       | `IN202000` | Maintenance |
 | P2       | Inventory Adjustments | (inventory legacy)                       | `IN301000` | Data Entry  |

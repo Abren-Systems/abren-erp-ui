@@ -16,7 +16,6 @@ export type ScreenKind =
   | 'processing' // Select many records, execute server action, show result
   | 'inquiry' // Read-only filtered analysis and drilldown
   | 'report' // Parameterized report with templates
-  | 'workboard' // Cross-screen operational launchpad
 
 // ── Layout Templates ──────────────────────────────────────
 // Named column templates equivalent to Acumatica's qp-template.
