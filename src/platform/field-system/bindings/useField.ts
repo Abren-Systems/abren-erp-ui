@@ -29,10 +29,10 @@ export function useField<TEntity, TValue>(
   const value = controller.data.select(definition.key) as ComputedRef<TValue | undefined>
 
   const isReadonly = computed(() => {
-    // Priority 1: Interpreted state policy (single source of truth)
-    const interpreted = controller.interpretedState.value
-    if (interpreted) {
-      return interpreted.isFieldReadonly(String(definition.key))
+    // Priority 1: Unified model field overrides (single source of truth)
+    const fieldOverride = controller.model.value.ui.fields.overrides[String(definition.key)]
+    if (fieldOverride?.readonly !== undefined) {
+      return fieldOverride.readonly
     }
     // Priority 2: Field-level custom readonly function (legacy fallback)
     if (definition.readonly) {
@@ -41,14 +41,15 @@ export function useField<TEntity, TValue>(
         controller.entity.value as Partial<TEntity>,
       )
     }
-    return !controller.state.isEditable
+    // Priority 3: Global editability from domain capabilities
+    return !controller.model.value.domain.capabilities.canEdit
   })
 
   const isRequired = computed(() => {
-    // Priority 1: Interpreted state policy
-    const interpreted = controller.interpretedState.value
-    if (interpreted) {
-      return interpreted.isFieldRequired(String(definition.key))
+    // Priority 1: Unified model field overrides
+    const fieldOverride = controller.model.value.ui.fields.overrides[String(definition.key)]
+    if (fieldOverride?.required !== undefined) {
+      return fieldOverride.required
     }
     // Priority 2: Field-level custom required function (legacy fallback)
     if (definition.required) {

@@ -16,7 +16,7 @@ export type DebugEventKind =
   | 'command_error'
   | 'field_mutation'
   | 'state_transition'
-  | 'policy_interpreted'
+  | 'model_resolved'
 
 export interface DebugEvent {
   /** Monotonically increasing event ID */
