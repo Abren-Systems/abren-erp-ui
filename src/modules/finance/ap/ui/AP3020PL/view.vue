@@ -1,41 +1,27 @@
 <script setup lang="ts">
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { PageHeader } from '@/shared/components/workspace'
+import { FormTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { Plus, RefreshCcw } from 'lucide-vue-next'
 import { vendorBillColumns } from './grids/vendor-bill.grid'
 import { useVendorBillsListController } from './controller'
 
 const ctrl = useVendorBillsListController()
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
+const gridState = useDataGrid()
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <PageHeader
-      :title="ctrl.screen.titleKey"
-      description="Manage supplier invoices and bills."
-      icon="Receipt"
-      plain
-    >
-      <template #actions>
-        <AppButton variant="primary" size="sm" @click="ctrl.handleCreate">
-          <template #start>
-            <Plus :size="14" />
-          </template>
-          New
-        </AppButton>
-      </template>
-    </PageHeader>
+  <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
+    <FormTitleBar :form-title="ctrl.screen.titleKey" />
 
-    <div class="flex-1 p-8 min-h-0">
+    <div class="min-h-0 flex-1 p-8">
       <DataGrid
-        v-model:sorting="sorting"
-        v-model:row-selection="rowSelection"
-        v-model:column-visibility="columnVisibility"
-        v-model:global-filter="globalFilter"
+        v-model:sorting="gridState.sorting"
+        v-model:row-selection="gridState.rowSelection"
+        v-model:column-visibility="gridState.columnVisibility"
+        v-model:global-filter="gridState.globalFilter"
         :columns="vendorBillColumns"
-        :data="ctrl.bills.value ?? []"
+        :data="ctrl.bills.value || []"
         :loading="ctrl.isLoading.value"
         placeholder="Search bills..."
         empty-message="No vendor bills found."
@@ -43,11 +29,18 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="stealth" @click="ctrl.refresh()">
+          <AppButton variant="stealth" size="sm" @click="ctrl.commands.value['refresh']?.execute()">
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
             </template>
             Refresh
+          </AppButton>
+        </template>
+
+        <template #toolbar-controls>
+          <AppButton variant="primary" size="sm" @click="ctrl.commands.value['create']?.execute()">
+            <template #start><Plus :size="14" /></template>
+            New Bill
           </AppButton>
         </template>
       </DataGrid>

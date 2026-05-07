@@ -1,5 +1,6 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { AP_MODULE_ID, apScreenId } from '../../constants'
+import { AP3010PL_COMMANDS_LIST } from './commands'
 
 /**
  * AP3010PL — Payment Requests Workspace (List)
@@ -31,7 +32,7 @@ export const AP3010PL: ScreenDefinition = {
     summaryTemplate: '1',
     renderTarget: () => import('./view.vue') as never,
   },
-  commands: [],
+  commands: AP3010PL_COMMANDS_LIST,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,

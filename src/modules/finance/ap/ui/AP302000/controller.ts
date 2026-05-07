@@ -44,6 +44,9 @@ export function useVendorBillController(id: string) {
     statePolicy: AP302000_POLICY,
   })
 
+  // Attach form to base so useField can find it for new records
+  Object.assign(base, { form })
+
   // Commands
   base.registerCommand('validate', {
     execute: async () => void validate(),

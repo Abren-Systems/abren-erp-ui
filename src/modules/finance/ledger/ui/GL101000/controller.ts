@@ -74,6 +74,9 @@ export function useLedgerSettingsController() {
     statePolicy: GL101000_POLICY,
   })
 
+  // Attach form to base so useField can find it
+  Object.assign(base, { form })
+
   const handleSave = async () => {
     void form.handleSubmit()
   }

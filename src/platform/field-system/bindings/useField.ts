@@ -88,12 +88,21 @@ export function useField<TEntity, TValue>(
       ).form
       formControl.setFieldValue(fieldKey, newValue)
     }
-    // Route 2: Edit mode — write through controller's setFieldValue if available
-    else if ('setFieldValue' in controller) {
-      const mutator = controller as unknown as {
-        setFieldValue: (k: keyof TEntity, v: TValue) => void
+    // Route 2: Edit mode — write through controller's setFieldValue or attached form
+    else if ('setFieldValue' in controller || 'form' in controller) {
+      if ('setFieldValue' in controller) {
+        const mutator = controller as unknown as {
+          setFieldValue: (k: keyof TEntity, v: TValue) => void
+        }
+        mutator.setFieldValue(fieldKey, newValue)
+      } else {
+        const formControl = (
+          controller as unknown as {
+            form: { setFieldValue: (k: keyof TEntity, v: TValue) => void }
+          }
+        ).form
+        formControl.setFieldValue(fieldKey, newValue)
       }
-      mutator.setFieldValue(fieldKey, newValue)
     }
     // Route 3: No mutation path available — warn (should not happen in production)
     else {

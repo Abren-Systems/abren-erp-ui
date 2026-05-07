@@ -1,13 +1,8 @@
 import { computed, ref, h } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  useScreenController,
-  LIST_SCREEN_POLICY,
-  listScreenDomainState,
-} from '@/platform/screen-runtime'
+import { useScreenController } from '@/platform/screen-runtime'
 import type { Table, Row } from '@tanstack/vue-table'
 import { usePaymentRequests } from '../../application/usePaymentRequests'
-import { usePermissions } from '@/shared/auth/usePermissions'
 import type { PaymentRequest } from '../../domain/ap.types'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { useUsers } from '@/modules/core/application/useUsers'
@@ -20,38 +15,42 @@ import { CheckCircle, XCircle, Plus, History } from 'lucide-vue-next'
 import { paymentRequestColumns } from './grids/primary.grid'
 import { PAYMENT_REQUEST_STATUS_OPTIONS, PAYMENT_REQUEST_FILTER_PRESETS } from '../AP301000/fields'
 import { AP3010PL } from './screen'
+import { AP3010PL_POLICY } from './policy'
 
-/**
- * AP3010PL — Payment Requests Primary List Controller
- *
- * Extends useScreenController with workspace-specific behavior:
- * - Bucket filtering (All / Needs Attention / In Review)
- * - Fine-grained filter drawer state
- * - Row selection and bulk actions
- * - Quick triage trace panel
- * - User name hydration
- * - Grid column composition (selection + domain + action required + trace)
- */
 export function usePaymentRequestList() {
   const router = useRouter()
-  const { hasPermission } = usePermissions()
-  const { requests, isLoading } = usePaymentRequests()
+  const { requests, isLoading, refetch } = usePaymentRequests()
   const { users } = useUsers()
 
-  // ── Platform Base ──
-  const base = useScreenController({
+  const base = useScreenController<PaymentRequest[], 'LIST'>({
     screen: AP3010PL,
     dataSource: {
       entity: requests,
       isLoading,
       error: ref(null),
     },
-    getDomainState: listScreenDomainState,
-    statePolicy: LIST_SCREEN_POLICY,
+    isNew: computed(() => false),
+    getDomainState: () => 'LIST',
+    statePolicy: AP3010PL_POLICY,
+  })
+
+  // Register Commands
+  base.registerCommand('create', {
+    execute: async () => {
+      void router.push({ name: 'PaymentRequestDetail', params: { id: 'new' } })
+    },
+    isPending: computed(() => false),
+  })
+
+  base.registerCommand('refresh', {
+    execute: async () => {
+      await refetch()
+    },
+    isPending: isLoading,
   })
 
   // ── Data Grid State ──
-  const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
+  const gridState = useDataGrid()
 
   // ── Filter State ──
   const statusFilter = ref('all')
@@ -69,25 +68,22 @@ export function usePaymentRequestList() {
   const traceTarget = ref<PaymentRequest | null>(null)
 
   // ── Derived State ──
-  const selectedCount = computed(() => Object.keys(rowSelection.value).length)
+  const selectedCount = computed(() => Object.keys(gridState.rowSelection.value).length)
 
   const filteredRequests = computed(() => {
     if (!requests.value) return []
     let data = requests.value
 
-    // 1. Bucket Filtering (Tabs)
     if (statusFilter.value === 'needs_attention') {
       data = data.filter((r) => ['DRAFT', 'REJECTED'].includes(r.status))
     } else if (statusFilter.value === 'in_review') {
       data = data.filter((r) => ['SUBMITTED', 'APPROVED', 'AUTHORIZED'].includes(r.status))
     }
 
-    // 2. Fine-grained Filtering (Drawer)
     if (filterState.value.statuses.length > 0) {
       data = data.filter((r) => filterState.value.statuses.includes(r.status))
     }
 
-    // Hydrate names and add action logic
     return data.map((r) => {
       const requester = users.value?.find((u) => u.id === r.requesterId)
       const beneficiary = users.value?.find((u) => u.id === r.beneficiaryId)
@@ -126,7 +122,7 @@ export function usePaymentRequestList() {
   })
 
   const selectedIds = computed(() => {
-    return Object.keys(rowSelection.value) as PaymentRequestId[]
+    return Object.keys(gridState.rowSelection.value) as PaymentRequestId[]
   })
 
   // ── Grid Columns ──
@@ -202,58 +198,40 @@ export function usePaymentRequestList() {
     isTraceOpen.value = true
   }
 
-  function goToDetail(pr: PaymentRequest) {
-    void router.push({ name: 'PaymentRequestDetail', params: { id: pr.id } })
-  }
-
-  function handleCreate() {
-    void router.push({ name: 'PaymentRequestDetail', params: { id: 'new' } })
+  const handleRowClick = (row: unknown) => {
+    void router.push({
+      name: 'PaymentRequestDetail',
+      params: { id: (row as PaymentRequest).id },
+    })
   }
 
   function clearFilters() {
     statusFilter.value = 'all'
     filterState.value = { statuses: [], dateFrom: '', dateTo: '' }
-    globalFilter.value = ''
+    gridState.globalFilter.value = ''
   }
 
   function clearSelection() {
-    rowSelection.value = {}
+    gridState.rowSelection.value = {}
   }
 
   return {
     ...base,
-
-    // Permissions
-    hasPermission,
-
-    // Grid state
-    sorting,
-    rowSelection,
-    columnVisibility,
-    globalFilter,
-    columns,
-
-    // Filter state
+    gridState,
     statusFilter,
     isFilterOpen,
     filterState,
     filterPresets,
     statusOptions,
-
-    // Trace state
     isTraceOpen,
     traceTarget,
-
-    // Derived
     selectedCount,
     filteredRequests,
     totalFilteredAmount,
     selectedIds,
-
-    // Handlers
+    columns,
     handleTrace,
-    goToDetail,
-    handleCreate,
+    handleRowClick,
     clearFilters,
     clearSelection,
   }

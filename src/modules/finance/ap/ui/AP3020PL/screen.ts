@@ -1,6 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { AP3020PL_COMMANDS_LIST } from './commands'
 
 export const AP3020PL: ScreenDefinition = {
   id: 'AP3020PL' as ScreenId,
@@ -29,7 +30,7 @@ export const AP3020PL: ScreenDefinition = {
       defaultCollapsed: true,
     },
   },
-  commands: [],
+  commands: AP3020PL_COMMANDS_LIST,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,

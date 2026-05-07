@@ -65,6 +65,9 @@ export function usePaymentRequestEntry(id: string) {
     statePolicy: AP301000_POLICY,
   })
 
+  // Attach form to base so useField can find it for new records
+  Object.assign(base, { form })
+
   // ── Workflow Action Executors ──
   const { approve, isPending: isApproving } = useApprovePaymentRequest(id as PaymentRequestId)
   const { reject, isPending: isRejecting } = useRejectPaymentRequest(id as PaymentRequestId)
