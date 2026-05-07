@@ -14,18 +14,29 @@ export function useWarehousesListController() {
 
   const base = useScreenController({
     screen: IN2040PL,
-    dataSource: { entity: computed(() => null), isLoading, error },
+    dataSource: { entity: warehouses, isLoading, error },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,
   })
 
-  function handleCreate() {
-    void router.push({ name: 'inventory.warehouse-create' })
+  // Register Creation Command
+  base.registerCommand('create', {
+    execute: async () => {
+      void router.push({ name: 'inventory.warehouse-detail', params: { id: 'new' } })
+    },
+    isPending: computed(() => false),
+  })
+
+  const handleCreate = () => {
+    void base.commands.value['create']?.execute()
   }
 
-  function handleRowClick(row: { id: string }) {
-    void router.push({ name: 'inventory.warehouse-detail', params: { id: row.id } })
+  const handleRowClick = (row: unknown) => {
+    void router.push({
+      name: 'inventory.warehouse-detail',
+      params: { id: (row as { id: string }).id },
+    })
   }
 
   return {

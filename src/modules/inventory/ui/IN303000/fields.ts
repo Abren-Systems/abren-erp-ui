@@ -1,4 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
+import type { AdjustmentDTO } from '../../infrastructure/api.types'
 
 export const IN303000_FIELDS = {
   warehouse_id: {
@@ -13,4 +14,4 @@ export const IN303000_FIELDS = {
     type: 'text',
     required: () => true,
   },
-} satisfies Record<string, FieldDefinition<Record<string, unknown>>>
+} satisfies Record<string, FieldDefinition<AdjustmentDTO>>

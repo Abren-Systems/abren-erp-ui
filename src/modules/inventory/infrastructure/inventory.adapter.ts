@@ -28,6 +28,16 @@ export const inventoryAdapter = {
     return raw.map((item) => WarehouseSchema.parse(item))
   },
 
+  async getWarehouseById(id: string): Promise<WarehouseDTO> {
+    const raw = await apiGet<unknown>(`/inventory/warehouses/${id}`)
+    return WarehouseSchema.parse(raw)
+  },
+
+  async createWarehouse(dto: Partial<WarehouseDTO>): Promise<WarehouseDTO> {
+    const raw = await apiPost<unknown>('/inventory/warehouses', dto)
+    return WarehouseSchema.parse(raw)
+  },
+
   async getItems(): Promise<ItemDTO[]> {
     const raw = await apiGet<unknown[]>('/inventory/items')
     return raw.map((item) => ItemSchema.parse(item))
@@ -55,6 +65,16 @@ export const inventoryAdapter = {
 
   async postAdjustment(dto: AdjustmentCreateDTO): Promise<AdjustmentDTO> {
     const raw = await apiPost<unknown>('/inventory/adjustments', dto)
-    return AdjustmentSchema.parse(raw)
+    return AdjustmentSchema.parse(raw) as unknown as AdjustmentDTO
+  },
+
+  async getAdjustmentById(id: string): Promise<AdjustmentDTO> {
+    const raw = await apiGet<unknown>(`/inventory/adjustments/${id}`)
+    return AdjustmentSchema.parse(raw) as unknown as AdjustmentDTO
+  },
+
+  async getAdjustments(): Promise<AdjustmentDTO[]> {
+    const raw = await apiGet<unknown[]>('/inventory/adjustments')
+    return raw.map((item) => AdjustmentSchema.parse(item) as unknown as AdjustmentDTO)
   },
 }

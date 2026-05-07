@@ -74,4 +74,7 @@ export const CreateAdjustmentSchema = z.object({
 
 export const AdjustmentSchema = z.object({
   id: z.string().uuid(),
+  warehouse_id: z.string().uuid(),
+  reason: z.string(),
+  lines: z.array(AdjustmentLineSchema),
 })

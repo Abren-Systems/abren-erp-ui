@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AppInput, AppSelect, AppButton } from '@/shared/components/primitives'
-import { FormTitleBar } from '@/platform/chrome'
+import { AppField, FieldGroup } from '@/shared/components/field-system'
+import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { Plus, Trash2 } from 'lucide-vue-next'
 import { useAdjustmentController } from './controller'
 
@@ -8,64 +9,38 @@ const props = defineProps<{ id: string }>()
 const ctrl = useAdjustmentController(props.id)
 
 const valuationOptions = [
-  { label: 'WAC Auto', value: 'AUTO' },
-  { label: 'Manual Override', value: 'MANUAL' },
+  { label: 'WAC Auto', value: 'auto' },
+  { label: 'Manual Override', value: 'manual' },
 ]
 </script>
 
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+    <FormTitleBar
+      :form-title="ctrl.screen.titleKey"
+      :record-title="ctrl.isNew.value ? 'New Adjustment' : ctrl.entity.value?.id.slice(0, 8)"
+      back-route="inventory.adjustments"
+    />
+
+    <FormToolbar @save="ctrl.handlePost" />
+
     <div v-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
       Loading adjustment...
     </div>
 
     <template v-else>
-      <FormTitleBar
-        :form-title="ctrl.screen.titleKey"
-        :record-title="ctrl.isNew.value ? 'New Adjustment' : ctrl.entity.value?.id"
-        back-route="inventory.adjustments"
-      >
-        <template #actions>
-          <AppButton
-            v-if="ctrl.isNew.value"
-            variant="primary"
-            :loading="ctrl.isSubmitting.value"
-            @click="ctrl.handleSubmit"
-          >
-            Post Adjustment
-          </AppButton>
-        </template>
-      </FormTitleBar>
-
       <div class="flex-1 overflow-y-auto p-8">
         <div class="max-w-4xl mx-auto space-y-6">
           <!-- General Info -->
-          <div
-            class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
-          >
-            <div class="space-y-1.5">
-              <label
-                class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
-                >Warehouse</label
-              >
-              <AppSelect
-                v-model="ctrl.form.value.warehouse_id"
-                :options="
-                  ctrl.warehouses.value?.map((wh) => ({
-                    label: `${wh.name} (${wh.code})`,
-                    value: wh.id,
-                  })) ?? []
-                "
+          <div class="p-6 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
+            <FieldGroup>
+              <AppField
+                v-bind="ctrl.fields.warehouse_id"
+                :options="ctrl.warehouseOptions.value"
                 placeholder="Select Warehouse"
               />
-            </div>
-            <div class="space-y-1.5">
-              <label
-                class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
-                >Reason for Adjustment</label
-              >
-              <AppInput v-model="ctrl.form.value.reason" placeholder="e.g. Cycle count shrinkage" />
-            </div>
+              <AppField v-bind="ctrl.fields.reason" />
+            </FieldGroup>
           </div>
 
           <!-- Line Items Section -->
@@ -76,14 +51,19 @@ const valuationOptions = [
               >
                 Adjustment Lines
               </h2>
-              <AppButton type="button" variant="outline" @click="ctrl.addLine">
+              <AppButton
+                v-if="ctrl.state.isEditable"
+                type="button"
+                variant="outline"
+                @click="ctrl.addLine"
+              >
                 <Plus :size="14" class="mr-2" /> Add Line
               </AppButton>
             </div>
 
             <div class="space-y-4">
               <div
-                v-for="(line, index) in ctrl.form.value.lines"
+                v-for="(line, index) in ctrl.form.getFieldValue('lines')"
                 :key="index"
                 class="grid grid-cols-12 gap-4 items-end p-5 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
               >
@@ -92,7 +72,11 @@ const valuationOptions = [
                     class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
                     >Stock Item ID</label
                   >
-                  <AppInput v-model="line.stock_item_id" placeholder="UUID..." />
+                  <AppInput
+                    v-model="line.stock_item_id"
+                    placeholder="UUID..."
+                    :disabled="!ctrl.state.isEditable"
+                  />
                 </div>
 
                 <div class="col-span-6 md:col-span-2 space-y-1.5">
@@ -100,7 +84,11 @@ const valuationOptions = [
                     class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
                     >Delta</label
                   >
-                  <AppInput type="number" v-model.number="line.quantity_delta" />
+                  <AppInput
+                    type="number"
+                    v-model.number="line.quantity_delta"
+                    :disabled="!ctrl.state.isEditable"
+                  />
                 </div>
 
                 <div class="col-span-6 md:col-span-3 space-y-1.5">
@@ -108,15 +96,20 @@ const valuationOptions = [
                     class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
                     >Valuation</label
                   >
-                  <AppSelect v-model="line.valuation_strategy" :options="valuationOptions" />
+                  <AppSelect
+                    v-model="line.valuation_strategy"
+                    :options="valuationOptions"
+                    :disabled="!ctrl.state.isEditable"
+                  />
                 </div>
 
                 <div class="col-span-12 md:col-span-2 text-right">
                   <AppButton
+                    v-if="ctrl.state.isEditable"
                     type="button"
                     variant="stealth"
                     @click="ctrl.removeLine(index)"
-                    :disabled="ctrl.form.value.lines.length === 1"
+                    :disabled="ctrl.form.getFieldValue('lines').length === 1"
                   >
                     <Trash2 :size="16" class="text-[var(--color-danger-600)]" />
                   </AppButton>

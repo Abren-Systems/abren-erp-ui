@@ -23,4 +23,9 @@ export type AdjustmentLineDTO = Schemas['CreateAdjustmentLineDTO']
 
 export type AdjustmentCreateDTO = Schemas['CreateAdjustmentDTO']
 
-export type AdjustmentDTO = { id: string } // Excluded from auto-generation pending backend response_model
+export type AdjustmentDTO = {
+  id: string
+  warehouse_id: string
+  reason: string
+  lines: AdjustmentLineDTO[]
+}

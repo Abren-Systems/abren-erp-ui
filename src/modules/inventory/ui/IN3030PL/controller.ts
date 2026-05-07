@@ -1,39 +1,48 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   useScreenController,
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
+import { useAdjustments } from '../../application/useInventoryAdjustment'
 import { IN3030PL } from './screen'
 
 export function useAdjustmentsListController() {
   const router = useRouter()
-  // Mock data as there's no useAdjustments query currently
-  const adjustments = ref<unknown[]>([])
-  const isLoading = ref(false)
-  const error = ref(null)
+  const { adjustments, isLoading, error, refetch: refresh } = useAdjustments()
 
   const base = useScreenController({
     screen: IN3030PL,
-    dataSource: { entity: computed(() => null), isLoading, error },
+    dataSource: { entity: adjustments, isLoading, error },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,
   })
 
-  function handleCreate() {
-    void router.push({ name: 'inventory.adjustment-create' })
+  // Register Creation Command
+  base.registerCommand('create', {
+    execute: async () => {
+      void router.push({ name: 'inventory.adjustment-detail', params: { id: 'new' } })
+    },
+    isPending: computed(() => false),
+  })
+
+  const handleCreate = () => {
+    void base.commands.value['create']?.execute()
   }
 
-  function handleRowClick(row: { id: string }) {
-    void router.push({ name: 'inventory.adjustment-detail', params: { id: row.id } })
+  const handleRowClick = (row: unknown) => {
+    void router.push({
+      name: 'inventory.adjustment-detail',
+      params: { id: (row as { id: string }).id },
+    })
   }
 
   return {
     ...base,
     adjustments,
-    refresh: () => {},
+    refresh,
     handleCreate,
     handleRowClick,
   }
