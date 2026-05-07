@@ -277,10 +277,10 @@ Allowed: `entity`, `field`. Not allowed: permissions, workflow state, user roles
 
 ## Phase Roadmap
 
-| Phase                   | Scope                   | Key Deliverable                                   |
-| :---------------------- | :---------------------- | :------------------------------------------------ |
-| **Phase 1**             | Read-only field display | `AppField`, `AppFieldset`, `FieldGroup`, Registry |
-| **Phase 1.5** (current) | Layout & Density        | CSS Grid System, `AppTabs`, Acumatica Alignment   |
-| **Phase 2**             | Editable fields + forms | `AppField` gains `mode="edit"`, form integration  |
-| **Phase 3**             | Metadata-driven screens | `ScreenDefinition` schema + interpreter           |
-| **Phase 4**             | Personalization         | User-driven field show/hide/reorder               |
+| Phase         | Scope                   | Key Deliverable                                   | Status         |
+| :------------ | :---------------------- | :------------------------------------------------ | :------------- |
+| **Phase 1**   | Read-only field display | `AppField`, `AppFieldset`, `FieldGroup`, Registry | ✅ Complete    |
+| **Phase 1.5** | Layout & Density        | CSS Grid System, `AppTabs`, Acumatica Alignment   | ✅ Complete    |
+| **Phase 2**   | Editable fields + forms | `AppField` gains `mode="edit"`, form integration  | ✅ Complete    |
+| **Phase 3**   | Metadata-driven screens | `ScreenDefinition` schema + `ScreenModel` runtime | 🚧 In Progress |
+| **Phase 4**   | Personalization         | User-driven field show/hide/reorder               | 📋 Backlog     |

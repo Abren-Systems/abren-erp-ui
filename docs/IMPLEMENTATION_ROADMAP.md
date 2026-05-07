@@ -73,8 +73,8 @@ Parallel to functional delivery, the UI architecture evolves through its own str
 | **Phase 1**   | Primitives & Value Purity          | ✅ Done   | `AppField`, `AppFieldset`, Field Registry, no pre-formatting.            |
 | **Phase 1.5** | Layout Engine & Grid Discipline    | ✅ Done   | `AppFieldset` drives CSS Grid, `140px` baseline, Golden Screens.         |
 | **Phase 2.0** | Module Flattening & Screen Runtime | ✅ Done   | Flat `application/`, `ui/{ScreenID}/` pattern. AP module fully migrated. |
-| **Phase 2.5** | Editable Forms & Zod Binding       | 📋 Next   | Input variants, Zod schema binding, inline validation.                   |
-| **Phase 3**   | Server-Driven Metadata             | 📋 Target | `ScreenDefinition` schema, JSON-driven screen generation.                |
+| **Phase 2.5** | Editable Forms & Zod Binding       | ✅ Done   | Input variants, Zod schema binding, `ScreenModel` field overrides.       |
+| **Phase 3**   | Server-Driven Metadata             | 🚧 Active | `ScreenModel` runtime established; JSON-driven snapshotting active.      |
 
 ### The Golden Reference Screens
 

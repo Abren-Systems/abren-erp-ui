@@ -107,23 +107,25 @@ The Form Toolbar is rendered by the `FormToolbar` component (platform-level). Co
 ### Rendering Algorithm:
 
 ```
-Input: commands[] from controller.getCommands()
-       interpretedState from controller.interpretedState
-       userFavorites from user preferences storage
+Input: ScreenModel from controller.model
 
-1. Filter: visible commands = commands.filter(c => isCommandVisible(c, domainState))
-2. Guard: Disable `Save` and mutation actions if `!interpretedState.editable`
-2. Partition:
-   - standardCommands = [save, cancel, add, delete, copy, undo, nav]
-   - expectedNext = commands.find(c => c.expectedNext(currentState))
-   - favoriteCommands = commands.filter(c => userFavorites.has(c.key))
-   - moreMenuCommands = remaining visible commands
+1. Access actions: model.ui.actions
+2. Access expectedNext: model.ui.actions.expectedNext (already filtered and projected)
+3. Partition:
+   - standardCommands = model.ui.actions.primary
+   - secondaryActions = model.ui.actions.secondary (to be grouped in More Menu)
+```
 
-3. Render:
+### Standard Buttons (per Form Kind):
+
+The platform automatically injects standard actions (Save, Cancel, Add) into the `primary` actions array based on the `FormKind` and domain capabilities (e.g., `canEdit`).
+
+4. Render:
    [Standard Buttons] | [Expected Next ▶ highlighted] | [Favorites] | [··· More]
 
-4. Responsive:
+5. Responsive:
    On resize, cascade commands from toolbar → More Menu (right to left)
+
 ```
 
 ### Standard Buttons (per Form Kind):
@@ -143,21 +145,23 @@ Input: commands[] from controller.getCommands()
 ### More Menu Rendering:
 
 ```
+
 ┌─────────────────────────────────┐
-│ Processing          Activities  │  ← Category titles (bold)
-│ ● Submit       ★    Create Task │  ← ● = expected next, ★ = favorite
-│   Release            Create Note│
-│   Void (greyed)                 │  ← greyed = isEnabled returns false
-│                                 │
-│ Other                           │
-│   Print                         │
-│   Recalculate                   │
+│ Processing Activities │ ← Category titles (bold)
+│ ● Submit ★ Create Task │ ← ● = expected next, ★ = favorite
+│ Release Create Note│
+│ Void (greyed) │ ← greyed = isEnabled returns false
+│ │
+│ Other │
+│ Print │
+│ Recalculate │
 └─────────────────────────────────┘
-```
+
+````
 
 Multi-column layout when multiple categories exist. Single column on small screens.
 
-> **Build status:** `FormToolbar` component is ❌ not built. AP currently renders commands manually in `view.vue`.
+> **Build status:** `FormToolbar` component is ✅ built and consumes the `ScreenModel` projection. AP and other modules use it via `ScreenRenderer`.
 
 ---
 
@@ -167,9 +171,9 @@ Components must never bind directly to raw data. They use the **Binding API** to
 
 ### Binding Composables:
 
-- `useField(key)`: Retrieves the memoized value, evaluates `readonly` against the State Machine and `FieldDefinition`, and exposes an `onChange` mutation.
+- `useField(key)`: Retrieves the memoized value, evaluates `readonly` and `required` states against the **ScreenModel's field overrides**, and exposes an `onChange` mutation.
 - `useGrid(key)`: Retrieves a tabular subgraph. Grids do not fetch their own data; they are projections of the controller's data graph.
-- `useCommand(key)`: Binds a button to a command. Automatically handles `disabled/hidden` states based on the state machine and command's `isVisible`/`isEnabled` predicates.
+- `useCommand(key)`: Binds a button to a command using the **CommandProjection** metadata (visible, enabled, reason).
 
 ### View Constraints:
 
@@ -180,7 +184,7 @@ Components must never bind directly to raw data. They use the **Binding API** to
 <!-- RIGHT: View is pure projection via Binding API -->
 <AppField v-bind="useField('status')" />
 <AppButton v-bind="useCommand('release')" />
-```
+````
 
 ---
 
