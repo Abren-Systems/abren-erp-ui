@@ -1,14 +1,12 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  useScreenController,
-  LIST_SCREEN_POLICY,
-  listScreenDomainState,
-} from '@/platform/screen-runtime'
+import { useScreenController } from '@/platform/screen-runtime'
 import { useLedgerAccounts } from '../../application/useLedgerAccounts'
 import { GL201000 } from './screen'
 import { GL201000_FIELDS } from './fields'
-import { useField } from '@/platform/field-system/bindings'
+import { GL201000_POLICY, type AccountStatus } from './policy'
+import { useField } from '@/platform/field-system/bindings/useField'
+import type { Account } from '../../domain/account.types'
 
 export function useAccountController(id: string) {
   const router = useRouter()
@@ -19,12 +17,12 @@ export function useAccountController(id: string) {
   const { accounts, isPending: isLoading } = useLedgerAccounts()
   const account = computed(() => accounts.value?.find((a) => a.id === id) ?? null)
 
-  const base = useScreenController({
+  const base = useScreenController<Account, AccountStatus>({
     screen: GL201000,
     dataSource: { entity: account, isLoading, error: ref(null) },
     isNew,
-    getDomainState: listScreenDomainState,
-    statePolicy: LIST_SCREEN_POLICY,
+    getDomainState: (ent) => (ent.isActive ? 'ACTIVE' : 'INACTIVE'),
+    statePolicy: GL201000_POLICY,
   })
 
   // Command Execution

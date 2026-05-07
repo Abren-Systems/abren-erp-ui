@@ -1,7 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { GL2010PL_COMMANDS } from './commands'
 
 export const GL2010PL: ScreenDefinition = {
   id: 'GL2010PL' as ScreenId,
@@ -30,7 +30,7 @@ export const GL2010PL: ScreenDefinition = {
       defaultCollapsed: true,
     },
   },
-  commands: [],
+  commands: GL2010PL_COMMANDS,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,

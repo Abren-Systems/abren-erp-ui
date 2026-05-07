@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   useScreenController,
@@ -23,6 +23,13 @@ export function useAccountListController() {
   function handleRowClick(row: { id: string }) {
     void router.push({ name: 'LedgerCoaDetail', params: { id: row.id } })
   }
+
+  base.registerCommand('create', {
+    execute: async () => {
+      void router.push({ name: 'LedgerCoaDetail', params: { id: 'new' } })
+    },
+    isPending: ref(false),
+  })
 
   return {
     ...base,

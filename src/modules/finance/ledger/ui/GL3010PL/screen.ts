@@ -1,6 +1,5 @@
-import type { ScreenDefinition } from '@/platform/screen-runtime'
-
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import type { ScreenDefinition, ScreenId } from '@/platform'
+import { GL3010PL_COMMANDS } from './commands'
 import type { ModuleId } from '@/shared/types/brand.types'
 
 export const GL3010PL: ScreenDefinition = {
@@ -30,7 +29,7 @@ export const GL3010PL: ScreenDefinition = {
       defaultCollapsed: true,
     },
   },
-  commands: [],
+  commands: GL3010PL_COMMANDS,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,

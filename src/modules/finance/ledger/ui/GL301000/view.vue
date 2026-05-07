@@ -27,8 +27,7 @@ const ctrl = useJournalEntryController(props.id)
 
       <FormToolbar
         v-if="!ctrl.isNew.value"
-        :commands="ctrl.screen.commands"
-        :domain-state="String(ctrl.state.domain)"
+        :model="ctrl.model.value"
         :executors="ctrl.commands.value"
         :is-pending="ctrl.isPending.value"
         :is-new="ctrl.isNew.value"

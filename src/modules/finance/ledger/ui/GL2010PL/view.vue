@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { PageHeader } from '@/shared/components/workspace'
+import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
-import { Plus, RefreshCcw } from 'lucide-vue-next'
+import { RefreshCcw } from 'lucide-vue-next'
 import { accountColumns } from './grids/account.grid'
 import { useAccountListController } from './controller'
 
@@ -11,23 +11,15 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <PageHeader
-      :title="ctrl.screen.titleKey"
-      description="Manage your ledger accounts and financial structure."
-      icon="LayoutGrid"
-    >
-      <template #actions>
-        <router-link :to="{ name: 'LedgerCoaDetail', params: { id: 'new' } }">
-          <AppButton variant="primary">
-            <template #start>
-              <Plus :size="14" />
-            </template>
-            New Account
-          </AppButton>
-        </router-link>
-      </template>
-    </PageHeader>
+  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+    <FormTitleBar :form-title="ctrl.screen.titleKey" />
+
+    <FormToolbar
+      :model="ctrl.model.value"
+      :executors="ctrl.commands.value"
+      :is-pending="ctrl.isPending.value"
+      :is-new="false"
+    />
 
     <div class="flex-1 p-8 min-h-0">
       <DataGrid

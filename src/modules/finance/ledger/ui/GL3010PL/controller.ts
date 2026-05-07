@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   useScreenController,
@@ -24,6 +24,13 @@ export function useJournalEntriesListController() {
   function handleRowClick(row: { id: string }) {
     void router.push({ name: 'LedgerJournalDetail', params: { id: row.id } })
   }
+
+  base.registerCommand('create', {
+    execute: async () => {
+      void router.push({ name: 'LedgerJournalDetail', params: { id: 'new' } })
+    },
+    isPending: ref(false),
+  })
 
   return {
     ...base,

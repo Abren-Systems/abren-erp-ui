@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { PageHeader } from '@/shared/components/workspace'
+import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
-import { Plus, RefreshCcw } from 'lucide-vue-next'
+import { RefreshCcw } from 'lucide-vue-next'
 import { journalEntryColumns } from './grids/journal-entry.grid'
 import { useJournalEntriesListController } from './controller'
 
@@ -12,23 +11,15 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <PageHeader
-      :title="ctrl.screen.titleKey"
-      description="View and manage double-entry accounting records."
-      icon="BookOpen"
-    >
-      <template #actions>
-        <router-link :to="{ name: 'LedgerJournalDetail', params: { id: 'new' } }">
-          <AppButton variant="primary">
-            <template #start>
-              <Plus :size="14" />
-            </template>
-            New Entry
-          </AppButton>
-        </router-link>
-      </template>
-    </PageHeader>
+  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+    <FormTitleBar :form-title="ctrl.screen.titleKey" />
+
+    <FormToolbar
+      :model="ctrl.model.value"
+      :executors="ctrl.commands.value"
+      :is-pending="ctrl.isPending.value"
+      :is-new="false"
+    />
 
     <div class="flex-1 p-8 min-h-0">
       <DataGrid
