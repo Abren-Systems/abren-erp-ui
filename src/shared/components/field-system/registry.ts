@@ -14,11 +14,19 @@
 
 import { Money } from '@/shared/domain/money'
 import type { Component } from 'vue'
-import { BaseInput, BaseMoneyInput } from './editors'
+import { BaseInput, BaseMoneyInput, BaseSelect } from './editors'
 
 // --- Type Definitions ---
 
-export type FieldType = 'text' | 'money' | 'status' | 'date' | 'id' | 'number'
+export type FieldType =
+  | 'text'
+  | 'money'
+  | 'status'
+  | 'date'
+  | 'id'
+  | 'number'
+  | 'selector'
+  | 'checkbox'
 
 export type FieldAlign = 'left' | 'right'
 export type FieldEmphasis = 'normal' | 'strong' | 'muted'
@@ -196,6 +204,29 @@ const definitions = new Map<FieldType, FieldDefinition>([
       emptyDisplay: '—',
       editor: BaseInput,
       editorProps: () => ({ type: 'number', inputmode: 'numeric' }),
+    },
+  ],
+  [
+    'selector',
+    {
+      format: (v) => String(v),
+      align: 'left',
+      emphasis: 'normal',
+      empty: (v) => v === null || v === undefined || v === '',
+      emptyDisplay: '—',
+      editor: BaseSelect,
+    },
+  ],
+  [
+    'checkbox',
+    {
+      format: (v) => (v ? 'Yes' : 'No'),
+      align: 'left',
+      emphasis: 'normal',
+      empty: (v) => v === null || v === undefined,
+      emptyDisplay: '—',
+      editor: BaseInput, // Placeholder until BaseCheckbox is added
+      editorProps: () => ({ type: 'checkbox' }),
     },
   ],
 ])

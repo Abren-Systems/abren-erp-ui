@@ -3,6 +3,7 @@ import type { FieldDefinition } from '../field-definition.types'
 import type { ScreenController } from '@/platform/screen-runtime/screen-controller.types'
 import type { ScreenStateMachine } from '@/platform/screen-runtime/state-machine.types'
 import { debugBus } from '@/platform/debug/debug-bus'
+import type { FieldType } from '@/shared/components/field-system/registry'
 
 export interface FieldBinding<TValue = unknown> {
   field: string
@@ -13,7 +14,7 @@ export interface FieldBinding<TValue = unknown> {
   required: ComputedRef<boolean>
   'onUpdate:modelValue': (newValue: TValue) => void
   error: ComputedRef<string | null>
-  type: string
+  type: FieldType
 }
 
 /**
@@ -120,6 +121,6 @@ export function useField<TEntity, TValue>(
     required: isRequired,
     'onUpdate:modelValue': onChange,
     error,
-    type: definition.type,
+    type: definition.type as FieldType,
   }
 }
