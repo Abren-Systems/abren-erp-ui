@@ -1,17 +1,20 @@
-import type { ScreenCommand } from '@/platform/commands'
+import type { ScreenCommand } from '@/platform/commands/command.types'
 
-export const roleCommands: ScreenCommand[] = [
-  {
+/**
+ * CR101000 Command Registry
+ */
+export const CR101000_COMMANDS: Record<string, ScreenCommand> = {
+  create: {
     key: 'create',
-    labelKey: 'core.CR101000.actions.create',
-    icon: 'shield-plus',
+    labelKey: 'Add Role',
     variant: 'primary',
-    categoryKey: 'processing',
     displayOnMainToolbar: true,
   },
-  {
+  executeCreate: {
     key: 'executeCreate',
-    labelKey: 'core.CR101000.actions.executeCreate',
+    labelKey: 'Save Role',
     variant: 'primary',
   },
-]
+}
+
+export const CR101000_COMMANDS_LIST = Object.values(CR101000_COMMANDS)

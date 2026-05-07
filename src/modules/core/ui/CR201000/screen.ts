@@ -1,7 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
-import { userCommands } from './commands'
+import { CR201000_COMMANDS_LIST } from './commands'
 import { useUsersController } from './controller'
 
 export const CR201000: ScreenDefinition = {
@@ -41,7 +41,7 @@ export const CR201000: ScreenDefinition = {
     renderTarget: () => import('./view.vue'),
   },
 
-  commands: userCommands,
+  commands: CR201000_COMMANDS_LIST,
 
   personalization: {
     allowTabPersonalization: false,

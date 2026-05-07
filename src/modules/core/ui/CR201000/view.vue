@@ -1,88 +1,102 @@
 <script setup lang="ts">
-import { h, inject, computed } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { AppBadge, AppButton } from '@/shared/components/primitives'
-import { UserPlus } from 'lucide-vue-next'
-import { useUsersController, type UsersController } from './controller'
-import { ScreenControllerKey } from '@/platform/screen-runtime/injection-keys'
-import UserRoleAssignmentDialog from './components/UserRoleAssignmentDialog.vue'
-import UserInviteDialog from './components/UserInviteDialog.vue'
-import type { User } from '../../domain/user.types'
+import { FormTitleBar } from '@/platform/chrome'
+import { AppButton, AppInput, AppSelect } from '@/shared/components/primitives'
+import { AppDialog } from '@/shared/components/workspace'
+import { userColumns } from './grids/user.grid'
+import { useUsersController } from './controller'
 
-const controllerRef = inject(ScreenControllerKey)!
-const controller = computed(() => controllerRef.value as UsersController)
+const ctrl = useUsersController()
 const gridState = useDataGrid()
-
-const userColumns = [
-  {
-    accessorKey: 'email',
-    header: 'Identity (Email)',
-    cell: ({ row }: { row: { original: User } }) => {
-      return h('div', { class: 'font-medium' }, row.original.email)
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: 'Account Status',
-    cell: ({ row }: { row: { original: User } }) => {
-      const status = row.original.status
-      const variant = status === 'ACTIVE' ? 'success' : status === 'PENDING' ? 'info' : 'neutral'
-      return h(AppBadge, { variant }, () => status)
-    },
-  },
-  {
-    accessorKey: 'roles',
-    header: 'Assigned Boundaries',
-    cell: ({ row }: { row: { original: User } }) => {
-      const roles = row.original.roles || []
-
-      if (roles.length === 0)
-        return h('span', { class: 'text-[var(--color-neutral-400)] italic text-xs' }, 'No Access')
-
-      return h(
-        'div',
-        { class: 'flex gap-1 flex-wrap' },
-        roles.map((r) => h(AppBadge, { variant: 'neutral' }, () => r.name.toLowerCase())),
-      )
-    },
-  },
-  {
-    accessorKey: 'lastLoginAt',
-    header: 'Last Authorized',
-    cell: ({ row }: { row: { original: User } }) => {
-      const date = row.original.lastLoginAt
-      if (!date) return 'Never'
-      return new Intl.DateTimeFormat('en-US', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(date)
-    },
-  },
-]
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <div class="flex-1 p-8 min-h-0">
+  <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
+    <FormTitleBar :form-title="ctrl.screen.titleKey" />
+
+    <div class="min-h-0 flex-1 p-8">
       <DataGrid
         v-model:sorting="gridState.sorting"
         v-model:row-selection="gridState.rowSelection"
         v-model:column-visibility="gridState.columnVisibility"
         v-model:global-filter="gridState.globalFilter"
-        :data="controller.data.selectGrid('users').value as User[]"
+        :data="ctrl.users.value || []"
         :columns="userColumns"
-        :loading="controller.isLoading.value"
+        :loading="ctrl.isLoading.value"
         placeholder="Search users..."
-        empty-message="No active users found in this tenant."
         row-clickable
-        @row-click="controller.handleRowClick"
-      />
+        @row-click="ctrl.handleRowClick"
+      >
+        <template #toolbar>
+          <AppButton variant="primary" size="sm" @click="ctrl.commands.value['invite']?.execute()">
+            Invite User
+          </AppButton>
+        </template>
+      </DataGrid>
     </div>
 
-    <UserRoleAssignmentDialog
-      v-model:open="controller.isAssignmentOpen.value"
-      :controller="controller"
-    />
-    <UserInviteDialog v-model:open="controller.isInviteOpen.value" :controller="controller" />
+    <!-- Invite Dialog -->
+    <AppDialog
+      v-model:open="ctrl.isInviteOpen.value"
+      title="Invite User"
+      description="Send an invitation to join the organization."
+    >
+      <div class="space-y-4 py-4">
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Email Address</label>
+          <AppInput v-model="ctrl.inviteEmail.value" placeholder="user@example.com" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Initial Password</label>
+          <AppInput v-model="ctrl.invitePassword.value" type="password" />
+        </div>
+        <p v-if="ctrl.inviteErrorMessage.value" class="text-sm text-red-600">
+          {{ ctrl.inviteErrorMessage.value }}
+        </p>
+      </div>
+      <template #footer>
+        <AppButton variant="ghost" @click="ctrl.isInviteOpen.value = false">Cancel</AppButton>
+        <AppButton
+          variant="primary"
+          :loading="ctrl.commands.value['executeInvite']?.isPending.value"
+          @click="ctrl.commands.value['executeInvite']?.execute()"
+        >
+          Send Invite
+        </AppButton>
+      </template>
+    </AppDialog>
+
+    <!-- Assign Role Dialog -->
+    <AppDialog
+      v-model:open="ctrl.isAssignmentOpen.value"
+      title="Assign Role"
+      description="Update the user's permissions and access level."
+    >
+      <div class="space-y-4 py-4">
+        <div v-if="ctrl.selectedUser.value" class="space-y-1">
+          <p class="text-sm">
+            Assigning role for <strong>{{ ctrl.selectedUser.value.email }}</strong>
+          </p>
+        </div>
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Role</label>
+          <AppSelect
+            v-model="ctrl.assignRoleId.value"
+            :options="ctrl.roleOptions.value"
+            placeholder="Select a role"
+          />
+        </div>
+      </div>
+      <template #footer>
+        <AppButton variant="ghost" @click="ctrl.isAssignmentOpen.value = false">Cancel</AppButton>
+        <AppButton
+          variant="primary"
+          :loading="ctrl.commands.value['executeAssign']?.isPending.value"
+          @click="ctrl.commands.value['executeAssign']?.execute()"
+        >
+          Update Role
+        </AppButton>
+      </template>
+    </AppDialog>
   </div>
 </template>

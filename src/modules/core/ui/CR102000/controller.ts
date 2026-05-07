@@ -1,51 +1,39 @@
-import { ref, watch } from 'vue'
-import { useScreenController, type ScreenController } from '@/platform/screen-runtime'
-import { LIST_SCREEN_POLICY } from '@/platform/screen-runtime/common-policies'
+import { computed, ref } from 'vue'
+import { useScreenController } from '@/platform/screen-runtime'
 import { CR102000 } from './screen'
-import { tenantCommands } from './commands'
+import { CR102000_POLICY } from './policy'
 import { useTenantSettings } from '../../application/useTenantSettings'
 
-// Using a basic interface since the domain type wasn't exported in the legacy component
 export interface TenantSetting {
   key: string
   value: string | null
 }
 
-export type TenantSettingsController = ScreenController<{ settings: TenantSetting[] }, 'VIEW'>
-
-export function useTenantSettingsController(): TenantSettingsController {
+export function useTenantSettingsController() {
   const { settings, isSettingsPending } = useTenantSettings()
 
-  const controller = useScreenController<{ settings: TenantSetting[] }, 'VIEW'>({
+  const base = useScreenController<{ settings: TenantSetting[] }, 'VIEW'>({
     screen: CR102000,
     dataSource: {
-      entity: ref({ settings: (settings.value as TenantSetting[]) || [] }), // Wrap array
+      entity: computed(() => ({ settings: (settings.value as TenantSetting[]) || [] })),
       isLoading: isSettingsPending,
       error: ref(null),
     },
+    isNew: computed(() => false),
     getDomainState: () => 'VIEW',
-    statePolicy: LIST_SCREEN_POLICY,
-  })
-
-  // Watch for settings updates
-  watch(settings, (newSettings) => {
-    controller.entity.value = { settings: (newSettings as TenantSetting[]) || [] }
+    statePolicy: CR102000_POLICY,
   })
 
   // Register commands
-  tenantCommands.forEach((cmd) => {
-    if (cmd.key === 'bulkEdit') {
-      controller.registerCommand(cmd.key, {
-        isPending: ref(false),
-        execute: async () => {
-          // Placeholder for bulk edit action
-          console.log('Bulk edit initiated')
-        },
-      })
-    }
+  base.registerCommand('bulkEdit', {
+    execute: async () => {
+      console.log('Bulk edit initiated')
+    },
+    isPending: computed(() => false),
   })
 
   return {
-    ...controller,
+    ...base,
+    settings,
   }
 }

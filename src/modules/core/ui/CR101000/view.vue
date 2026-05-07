@@ -1,154 +1,120 @@
 <script setup lang="ts">
-import { h, inject, computed } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { AppSidePane } from '@/shared/components/workspace'
-import { AppButton, AppBadge } from '@/shared/components/primitives'
-import { ShieldPlus, ShieldCheck } from 'lucide-vue-next'
-import { useRolesController, type RolesController } from './controller'
-import { ScreenControllerKey } from '@/platform/screen-runtime/injection-keys'
-import RoleCreateDialog from './components/RoleCreateDialog.vue'
-import type { Role } from '../../domain/user.types'
+import { FormTitleBar } from '@/platform/chrome'
+import { AppButton, AppInput } from '@/shared/components/primitives'
+import { AppDialog } from '@/shared/components/workspace'
+import { roleColumns } from './grids/role.grid'
+import { useRolesController } from './controller'
 
-const controllerRef = inject(ScreenControllerKey)!
-const controller = computed(() => controllerRef.value as RolesController)
+const ctrl = useRolesController()
 const gridState = useDataGrid()
-
-const roleColumns = [
-  {
-    accessorKey: 'name',
-    header: 'Role Identity',
-    cell: ({ row }: { row: { original: Role } }) => {
-      return h('div', { class: 'font-medium flex items-center gap-2' }, [
-        row.original.name,
-        row.original.isSystem ? h(AppBadge, { variant: 'info' }, () => 'System') : null,
-      ])
-    },
-  },
-  {
-    accessorKey: 'description',
-    header: 'Description',
-  },
-  {
-    accessorKey: 'permissions',
-    header: 'Access Scope (Permissions)',
-    cell: ({ row }: { row: { original: Role } }) => {
-      // Just show the first 3 permissions to avoid massive table row wrapping
-      const perms = row.original.permissions || []
-      const display = perms.slice(0, 3)
-      const remainder = perms.length - 3
-
-      const chips = display.map((p: string) =>
-        h(AppBadge, { variant: 'neutral' }, () => p.toLowerCase()),
-      )
-
-      if (remainder > 0) {
-        chips.push(h(AppBadge, { variant: 'neutral' }, () => `+${remainder} more`))
-      }
-
-      if (chips.length === 0)
-        return h(
-          'span',
-          { class: 'text-[var(--color-neutral-400)] italic text-xs' },
-          'No Boundaries Defined',
-        )
-
-      return h('div', { class: 'flex flex-wrap gap-1' }, chips)
-    },
-  },
-]
 </script>
 
 <template>
-  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
-    <!-- DataGrid Orchestration -->
-    <div class="flex-1 p-8 min-h-0">
+  <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
+    <FormTitleBar :form-title="ctrl.screen.titleKey" />
+
+    <div class="min-h-0 flex-1 p-8">
       <DataGrid
         v-model:sorting="gridState.sorting"
         v-model:row-selection="gridState.rowSelection"
         v-model:column-visibility="gridState.columnVisibility"
         v-model:global-filter="gridState.globalFilter"
-        :data="controller.data.selectGrid('roles').value as Role[]"
+        :data="ctrl.roles.value || []"
         :columns="roleColumns"
-        :loading="controller.isLoading.value"
+        :loading="ctrl.isLoading.value"
         placeholder="Search roles..."
-        empty-message="No custom roles defined. Create functional boundaries to segregate access."
         row-clickable
-        @row-click="controller.handleRowClick"
-      />
+        @row-click="ctrl.handleRowClick"
+      >
+        <template #toolbar>
+          <AppButton variant="primary" size="sm" @click="ctrl.commands.value['create']?.execute()">
+            Add Role
+          </AppButton>
+        </template>
+      </DataGrid>
     </div>
 
-    <RoleCreateDialog v-model:open="controller.isCreateOpen.value" :controller="controller" />
-
-    <!-- Read-Only Role Detail Pane -->
-    <AppSidePane
-      v-model:open="controller.isDetailOpen.value"
-      :title="controller.selectedRole.value?.name ?? 'Role Detail'"
-      description="Inspecting role boundary and permissions"
-      mode="overlay"
-      :show-backdrop="true"
-      width="360px"
+    <!-- Create Dialog -->
+    <AppDialog
+      v-model:open="ctrl.isCreateOpen.value"
+      title="Create New Role"
+      description="Define a new role and its associated permissions."
     >
-      <template #icon>
-        <div class="h-6 w-6 rounded-md bg-primary-50 flex items-center justify-center">
-          <ShieldCheck class="h-3.5 w-3.5 text-primary-600" />
+      <div class="space-y-4 py-4">
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Role Name</label>
+          <AppInput v-model="ctrl.createName.value" placeholder="e.g. Sales Manager" />
         </div>
-      </template>
-
-      <div v-if="controller.selectedRole.value" class="space-y-6">
-        <!-- Role Metadata -->
-        <div class="space-y-4">
-          <div class="space-y-1">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-              Boundary Name
-            </p>
-            <p class="text-sm font-semibold text-neutral-900">
-              {{ controller.selectedRole.value.name }}
-            </p>
-          </div>
-
-          <div class="space-y-1">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-              Description
-            </p>
-            <p class="text-sm text-neutral-600">
-              {{ controller.selectedRole.value.description || 'No description provided.' }}
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <AppBadge :variant="controller.selectedRole.value.isSystem ? 'info' : 'neutral'">
-              {{ controller.selectedRole.value.isSystem ? 'System-Defined' : 'Custom' }}
-            </AppBadge>
-          </div>
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Description</label>
+          <AppInput v-model="ctrl.createDescription.value" placeholder="Optional..." />
         </div>
-
-        <div class="h-px bg-neutral-200" />
-
-        <!-- Permission List (Read-Only) -->
-        <div class="space-y-3">
-          <p class="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-            Granted Permissions ({{ controller.selectedRole.value.permissions.length }})
-          </p>
-
+        <div class="space-y-2">
+          <label class="text-sm font-medium">Permissions</label>
           <div
-            v-if="controller.selectedRole.value.permissions.length === 0"
-            class="text-xs text-neutral-400 italic"
+            class="max-h-48 overflow-y-auto rounded-sm border border-[var(--color-neutral-200)] p-2"
           >
-            No permissions assigned to this boundary.
-          </div>
-
-          <div v-else class="space-y-1.5 max-h-[400px] overflow-y-auto">
             <div
-              v-for="perm in controller.selectedRole.value.permissions"
-              :key="perm"
-              class="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-50 border border-neutral-100"
+              v-for="perm in ctrl.permissions.value as any[]"
+              :key="perm.code"
+              class="flex items-center gap-2 py-1"
             >
-              <div class="h-1.5 w-1.5 rounded-full bg-neutral-400" />
-              <span class="text-xs font-medium text-neutral-700">{{ perm }}</span>
+              <input
+                type="checkbox"
+                :checked="ctrl.createPermissions.value.includes(perm.code)"
+                @change="ctrl.togglePermission(perm.code)"
+                class="rounded border-[var(--color-neutral-300)] text-[var(--color-primary-600)]"
+              />
+              <span class="text-sm">{{ perm.name }}</span>
             </div>
           </div>
         </div>
       </div>
-    </AppSidePane>
+      <template #footer>
+        <AppButton variant="ghost" @click="ctrl.isCreateOpen.value = false">Cancel</AppButton>
+        <AppButton
+          variant="primary"
+          :loading="ctrl.commands.value['executeCreate']?.isPending.value"
+          @click="ctrl.commands.value['executeCreate']?.execute()"
+        >
+          Create Role
+        </AppButton>
+      </template>
+    </AppDialog>
+
+    <!-- Detail Dialog -->
+    <AppDialog v-model:open="ctrl.isDetailOpen.value" title="Role Details">
+      <div v-if="ctrl.selectedRole.value" class="space-y-4 py-4">
+        <div>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-[var(--color-neutral-500)]">
+            Name
+          </h3>
+          <p class="text-base font-medium">{{ ctrl.selectedRole.value.name }}</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-[var(--color-neutral-500)]">
+            Description
+          </h3>
+          <p class="text-sm text-[var(--color-neutral-600)]">
+            {{ ctrl.selectedRole.value.description || 'No description provided.' }}
+          </p>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-[var(--color-neutral-500)]">
+            Permissions
+          </h3>
+          <div class="mt-2 flex flex-wrap gap-1">
+            <span
+              v-for="perm in ctrl.selectedRole.value.permissions"
+              :key="perm"
+              class="rounded-full bg-[var(--color-neutral-100)] px-2 py-0.5 text-xs font-medium text-[var(--color-neutral-700)] border border-[var(--color-neutral-200)]"
+            >
+              {{ perm }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </AppDialog>
   </div>
 </template>

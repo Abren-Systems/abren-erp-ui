@@ -1,12 +1,15 @@
-import type { ScreenCommand } from '@/platform/commands'
+import type { ScreenCommand } from '@/platform/commands/command.types'
 
-export const tenantCommands: ScreenCommand[] = [
-  {
+/**
+ * CR102000 Command Registry
+ */
+export const CR102000_COMMANDS: Record<string, ScreenCommand> = {
+  bulkEdit: {
     key: 'bulkEdit',
-    labelKey: 'core.CR102000.actions.bulkEdit',
-    icon: 'edit-3',
-    variant: 'neutral', // Neutral because it's a secondary bulk action, maybe primary depending on context, legacy was "outline"
-    categoryKey: 'processing',
+    labelKey: 'Edit Settings',
+    variant: 'primary',
     displayOnMainToolbar: true,
   },
-]
+}
+
+export const CR102000_COMMANDS_LIST = Object.values(CR102000_COMMANDS)

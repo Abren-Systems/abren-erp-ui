@@ -1,22 +1,25 @@
-import type { ScreenCommand } from '@/platform/commands'
+import type { ScreenCommand } from '@/platform/commands/command.types'
 
-export const userCommands: ScreenCommand[] = [
-  {
+/**
+ * CR201000 Command Registry
+ */
+export const CR201000_COMMANDS: Record<string, ScreenCommand> = {
+  invite: {
     key: 'invite',
-    labelKey: 'core.CR201000.actions.invite',
-    icon: 'user-plus',
+    labelKey: 'Invite User',
     variant: 'primary',
-    categoryKey: 'processing',
     displayOnMainToolbar: true,
   },
-  {
+  executeInvite: {
     key: 'executeInvite',
-    labelKey: 'core.CR201000.actions.executeInvite',
+    labelKey: 'Send Invite',
     variant: 'primary',
   },
-  {
+  executeAssign: {
     key: 'executeAssign',
-    labelKey: 'core.CR201000.actions.executeAssign',
+    labelKey: 'Assign Role',
     variant: 'primary',
   },
-]
+}
+
+export const CR201000_COMMANDS_LIST = Object.values(CR201000_COMMANDS)

@@ -1,7 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
-import { roleCommands } from './commands'
+import { CR101000_COMMANDS_LIST } from './commands'
 import { useRolesController } from './controller'
 
 export const CR101000: ScreenDefinition = {
@@ -41,7 +41,7 @@ export const CR101000: ScreenDefinition = {
     renderTarget: () => import('./view.vue'),
   },
 
-  commands: roleCommands,
+  commands: CR101000_COMMANDS_LIST,
 
   personalization: {
     allowTabPersonalization: false,
