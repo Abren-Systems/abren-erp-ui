@@ -50,9 +50,9 @@ Each [Form Kind](ACUMATICA_ALIGNMENT.md#3-form-kinds-what-appears-in-the-working
 
 ---
 
-## 2. The Authority Model
+## 2. The Four Layers of Authority Model
 
-Forms in Abren are governed by the **Controller Authority** principle (see [Screen Runtime §3](SCREEN_RUNTIME.md#3-controller-authority-the-pxgraph)). The `view.vue` is a pure projection — zero business logic.
+Forms in Abren are governed by the **Four Layers of Authority** (see [Architecture Manifesto](ARCHITECTURE.md#12-the-four-layers-of-authority) and [Screen Runtime §3](SCREEN_RUNTIME.md#3-controller-authority-the-pxgraph)). The `view.vue` is a pure **Projection** of the `ScreenModel`, which is produced by the **Semantic Compiler** (`resolve-screen-model.ts`).
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -64,14 +64,28 @@ Forms in Abren are governed by the **Controller Authority** principle (see [Scre
 │  │ (fields.ts)  │  │(commands.ts│  │ (UI + Domain)   │  │
 │  └──────┬───────┘  └──────┬─────┘  └──────┬──────────┘  │
 │         │                 │               │              │
-│    useField()        useCommand()    evaluates           │
-│    useGrid()                        readonly/visible     │
+│         ▼                 ▼               ▼              │
+│       resolveScreenModel()  ◄──── State Policies         │
+│         (Platform Engine)                                │
 └────────────────────────┬────────────────────────────────┘
-                         │ binds to
-                    ┌────▼─────┐
-                    │ view.vue │  (pure layout — no logic)
-                    └──────────┘
+                         │ projects
+                  ┌──────▼──────┐
+                  │ ScreenModel │  (Pure execution contract)
+                  └──────┬──────┘
+                         │ renders
+                  ┌──────▼─────┐
+                  │  view.vue  │  (Pure layout — no logic)
+                  └────────────┘
 ```
+
+### Authority Assignments
+
+| Layer          | Responsibility                              | Authority                  |
+| :------------- | :------------------------------------------ | :------------------------- |
+| **Platform**   | Chrome assembly & Resolution pipeline       | **ScreenModel Contract**   |
+| **Kernel**     | Semantic component authority (`shared/ui`)  | **Semantic Normalization** |
+| **Module**     | Business rules, commands, and data fetching | **Controller Authority**   |
+| **Projection** | Rendering the resolved model                | **View Purity**            |
 
 ### What the Controller Owns
 

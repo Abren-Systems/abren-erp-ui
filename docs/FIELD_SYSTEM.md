@@ -7,20 +7,20 @@ tags: [architecture, field-system, ui, constraints]
 # Field System Architecture
 
 > **Version:** 1.0
-> **Status:** Active — Phase 1 (Read-Only)
-> **Last Updated:** 2026-05-03
+> **Status:** AUTHORITATIVE — Phase 3 (Deterministic Runtime)
+> **Last Updated:** May 2026
 
 ## Why This Exists
 
-> This system exists to enable a future metadata-driven UI runtime without rewriting screens.
+> This system exists to enable a deterministic, metadata-driven UI runtime where screens are pure projections.
 
-The Abren ERP frontend follows the **"Constrain early, abstract late"** strategy. Rather than hand-coding screens with ad-hoc components and later extracting patterns (which fails for interconnected ERP screens), we enforce a small set of structural primitives from day one.
+The Abren ERP frontend follows the **"Constrain early, abstract late"** strategy. We enforce a small set of structural primitives governed by the **Four Layers of Authority** (Platform, Semantic Kernel, Business Modules, Projections).
 
 These primitives are designed so that:
 
-1. **Phase 1** (now): Screens use `<AppField>` and `<AppFieldset>` with hand-written templates.
-2. **Phase 2** (next): Editable field variants are added; forms use the same system.
-3. **Phase 3** (future): A `ScreenDefinition` schema describes screens as data. A screen runtime interpreter renders them using the same primitives. No screen rewrite is needed because the component contracts are already correct.
+1. **Phase 1**: Screens used `<AppField>` and `<AppFieldset>` with hand-written templates.
+2. **Phase 2**: Editable field variants were added; forms integrated with the system.
+3. **Phase 3** (Current): The **Screen Runtime** is active. Screens are declared as `ScreenDefinition` metadata, resolved by a **Semantic Compiler**, and rendered as a pure `ScreenModel` projection. No screen rewrite is needed because the component contracts are already correct.
 
 This is the same architectural trajectory taken by Acumatica's Modern UI, SAP Fiori, and Oracle APEX — but implemented incrementally.
 
@@ -277,10 +277,10 @@ Allowed: `entity`, `field`. Not allowed: permissions, workflow state, user roles
 
 ## Phase Roadmap
 
-| Phase         | Scope                   | Key Deliverable                                   | Status         |
-| :------------ | :---------------------- | :------------------------------------------------ | :------------- |
-| **Phase 1**   | Read-only field display | `AppField`, `AppFieldset`, `FieldGroup`, Registry | ✅ Complete    |
-| **Phase 1.5** | Layout & Density        | CSS Grid System, `AppTabs`, Acumatica Alignment   | ✅ Complete    |
-| **Phase 2**   | Editable fields + forms | `AppField` gains `mode="edit"`, form integration  | ✅ Complete    |
-| **Phase 3**   | Metadata-driven screens | `ScreenDefinition` schema + `ScreenModel` runtime | 🚧 In Progress |
-| **Phase 4**   | Personalization         | User-driven field show/hide/reorder               | 📋 Backlog     |
+| Phase         | Scope                   | Key Deliverable                                   | Status      |
+| :------------ | :---------------------- | :------------------------------------------------ | :---------- |
+| **Phase 1**   | Read-only field display | `AppField`, `AppFieldset`, `FieldGroup`, Registry | ✅ Complete |
+| **Phase 1.5** | Layout & Density        | CSS Grid System, `AppTabs`, Acumatica Alignment   | ✅ Complete |
+| **Phase 2**   | Editable fields + forms | `AppField` gains `mode="edit"`, form integration  | ✅ Complete |
+| **Phase 3**   | Metadata-driven screens | `ScreenDefinition` schema + `ScreenModel` runtime | ✅ Active   |
+| **Phase 4**   | Personalization         | User-driven field show/hide/reorder               | 📋 Backlog  |

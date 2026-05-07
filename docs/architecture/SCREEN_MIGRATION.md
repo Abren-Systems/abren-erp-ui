@@ -216,7 +216,7 @@ export function usePaymentRequestEntry(id: string) {
 
 ### Step 5: Create `view.vue` (Pure Layout)
 
-The view is a **pure projection** of the controller. Zero business logic.
+The view is a **pure projection** of the `ScreenModel`. It has zero business logic and zero knowledge of the controller's implementation details. It simply renders the deterministic execution contract produced by the platform's resolution engine.
 
 ```vue
 <script setup lang="ts">

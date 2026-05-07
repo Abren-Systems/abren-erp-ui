@@ -21,13 +21,13 @@ Our True North Star is a synthesis of proven enterprise patterns (Acumatica, SAP
 - **Aesthetic**: **Calm operational density** (serious, modern, trustworthy, low-theater)
 - **Workflow**: Linear (State-driven UX clarity isolated by Routing)
 - **Financial UX**: Traceability via Contextual Side Panels
-- **Architecture**: **Screen Runtime** + **Component System** + **Field System**
+- **Architecture**: **The Four Layers of Authority** (Platform, Semantic Kernel, Business Modules, Projections).
 
 ---
 
 ## 0. The Three Persistent Regions (App Shell)
 
-Every screen in Abren ERP exists within a rigid macro-architecture. The shell has **3 persistent regions** and a **center area that transitions between states** (see [Acumatica Alignment §2](ACUMATICA_ALIGNMENT.md#2-the-ui-hierarchy-3-persistent-regions--center-area-state-machine)).
+Every screen in Abren ERP exists within a rigid macro-architecture. The shell has **3 persistent regions** and a **center area that transitions between states** (see [Acumatica Alignment §2](ACUMATICA_ALIGNMENT.md#2-the-ui-hierarchy-3-persistent-regions--center-area-state-machine)). We enforce **Semantic Normalization** across these regions—ensuring that business concepts (like "Paid" status) carry the same visual and business authority everywhere.
 
 ```text
 ┌──────────────────────────────────────────────────────────────────┐
