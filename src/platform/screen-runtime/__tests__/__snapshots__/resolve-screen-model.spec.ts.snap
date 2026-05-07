@@ -1,0 +1,121 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`resolveScreenModel > should resolve a valid model for DRAFT state 1`] = `
+{
+  "domain": {
+    "backend": {
+      "availableActions": [
+        "RELEASE",
+      ],
+      "status": "DRAFT",
+    },
+    "capabilities": {
+      "canEdit": true,
+    },
+  },
+  "meta": {
+    "projectionId": "00000000-0000-0000-0000-000000000000",
+    "screenId": "AP301000",
+    "timestamp": 1715068800000,
+  },
+  "ui": {
+    "actions": {
+      "expectedNext": {
+        "command": {
+          "displayOnMainToolbar": true,
+          "key": "RELEASE",
+          "kind": "workflow",
+          "labelKey": "Release",
+          "variant": "primary",
+        },
+        "enabled": true,
+        "visible": true,
+      },
+      "primary": [
+        {
+          "command": {
+            "displayOnMainToolbar": true,
+            "key": "save",
+            "kind": "primary",
+            "labelKey": "Save",
+            "variant": "primary",
+          },
+          "enabled": true,
+          "visible": true,
+        },
+      ],
+      "secondary": [],
+    },
+    "chrome": {
+      "actionRequiredLabel": undefined,
+      "banner": undefined,
+    },
+    "fields": {
+      "overrides": {
+        "totalAmount": {
+          "readonly": true,
+        },
+        "vendorId": {
+          "required": true,
+        },
+      },
+    },
+    "layout": {
+      "sections": {},
+    },
+  },
+  "version": 1,
+}
+`;
+
+exports[`resolveScreenModel > should resolve a valid model for RELEASED state 1`] = `
+{
+  "domain": {
+    "backend": {
+      "availableActions": [],
+      "status": "RELEASED",
+    },
+    "capabilities": {
+      "canEdit": false,
+    },
+  },
+  "meta": {
+    "projectionId": "00000000-0000-0000-0000-000000000000",
+    "screenId": "AP301000",
+    "timestamp": 1715068800000,
+  },
+  "ui": {
+    "actions": {
+      "expectedNext": undefined,
+      "primary": [
+        {
+          "command": {
+            "displayOnMainToolbar": true,
+            "key": "save",
+            "kind": "primary",
+            "labelKey": "Save",
+            "variant": "primary",
+          },
+          "enabled": true,
+          "visible": true,
+        },
+      ],
+      "secondary": [],
+    },
+    "chrome": {
+      "actionRequiredLabel": undefined,
+      "banner": {
+        "messageKey": "Record is released and read-only",
+        "variant": "info",
+      },
+    },
+    "fields": {
+      "overrides": {},
+    },
+    "layout": {
+      "sections": {},
+    },
+  },
+  "version": 1,
+}
+`;
