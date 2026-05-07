@@ -29,7 +29,27 @@ Conceptually, the architecture is organized into four distinct layers of authori
 3. **Business Modules** (`src/modules/`): The authoritative **Domain Logic**. Owns the state machines, domain types, and data adapters for specific business bounded contexts.
 4. **Screen Projections** (`resolve-screen-model.ts`): The authoritative **Presentation State**. This pure function "compiles" the platform, kernel, and module inputs into a deterministic, JSON-serializable model for rendering.
 
-### 1.3 The Alignment Principle
+### 1.3 The Five Pillars of Deterministic Execution
+
+The architecture is built upon five foundational patterns that shift the UI from "framework-guided application development" to a **"runtime-governed enterprise execution architecture"**. 
+
+Our absolute foundational doctrine is: **The UI does not decide truth. The runtime derives truth.**
+
+1. **Deterministic Projection Architecture**: `Raw Domain State → Projection Engine → Serializable ScreenModel → Reactive Renderer`. Components never interpret raw business state. Projections are authoritative, making rendering deterministic and AI generation safe.
+2. **Capability-Based UI**: We ban hardcoded conditional rendering (`if user.isAdmin`). Capability is resolved centrally by runtime policy (`command.enabled`, `field.editable`, `tab.visible`), ensuring auditable behavior and workflow enforcement.
+3. **CQRS-Lite**: Explicit mutation boundaries (Commands) mutate state, while Queries/Projections derive UI state. This creates deterministic flows and replayable transitions essential for accounting systems.
+4. **Explicit Workflow State Machines**: ERP forms are workflow engines disguised as forms. State transitions (e.g., Draft → Submitted → Approved) are centralized in the controller to prevent invalid mutations and stabilize command availability.
+5. **Immutable Projection Thinking**: Projections are treated as derived immutable truth, not mutable working state. This dramatically improves predictability and replayability.
+
+#### Tier 2 & Tier 3 Trajectories (Target Evolution)
+- **Ports & Adapters (Hexagonal Influence)**: Infrastructure remains replaceable plugins (Vue is an adapter, API is an adapter), preventing framework lock-in.
+- **Policy-Based Architecture**: Moving from hardcoded component rules to interpreted policies (fields, visibility, editing).
+- **Event-Driven Mutation Pipelines**: Explicit business actions (`ReleaseInvoice`, `ApproveDocument`) instead of random reactive mutations.
+- **Functional Core / Imperative Shell**: Pure deterministic business logic wrapped in a thin imperative orchestration layer.
+- **Schema/Metadata-Driven UI**: Screens as declarative contracts interpreted at runtime.
+- **Controlled Local UI State**: Strict separation between transient interaction state (focus, hover) and enterprise business state.
+
+### 1.4 The Alignment Principle
 
 The frontend is **domain-aware and backend-aligned**, not an exact mirror. The backend's DDD layers (Entity → Service → Repository → UoW) are too granular for a UI. We collapse them into a simpler, pragmatic structure while preserving the same module names, action names, and domain vocabulary.
 
@@ -42,18 +62,18 @@ The frontend is **domain-aware and backend-aligned**, not an exact mirror. The b
 | Use Case                 | Composable            | **Lifecycle Aware** — e.g. `useLedgerAccounts`  |
 | Anti-Corruption Layer    | Mapper + Adapter      | **The Shield** — Infrastructure isolation       |
 
-### 1.4 Two Axes of Growth
+### 1.5 Two Axes of Growth
 
 The project is designed for **zero-rewrite scaling**, following the exact same principles as the backend's **Architecture First** journey. The frontend grows along two independent axes:
 
 1. **Vertical (Architecture): Constant.** Every module is built with strict statelessness, domain-aligned boundaries, mapper isolation, and the full security model from the moment of implementation. No exceptions.
 2. **Horizontal (Product Depth): Additive.** New features plug into the existing screen runtime, platform services, state, and API client capabilities without requiring structural rewrites of the core platform.
 
-### 1.5 The "Gold Standard" Principle
+### 1.6 The "Gold Standard" Principle
 
 The architecture guarantees that progressive depth is always additive, never corrective. The path forward is exclusively about expanding functional scope.
 
-### 1.6 Symmetry, Not Parity (Architectural Philosophy) [STRATEGIC]
+### 1.7 Symmetry, Not Parity (Architectural Philosophy) [STRATEGIC]
 
 We follow the principle of **"Mirroring the Bounded Context, Adapting the Medium."** The frontend is structurally symmetric with the backend to ensure predictability, but it is not a blind, code-level replica.
 
@@ -61,7 +81,7 @@ We follow the principle of **"Mirroring the Bounded Context, Adapting the Medium
 - **Symmetry (Patterns)**: We mirror the backend's _intent_ using Vue-idiomatic patterns. The backend's `facade.py` finds its symmetric counterpart in the frontend's **Action-Oriented Composables** (e.g., `usePayRequest`).
 - **Integrity (Absolute)**: The **Mapper-as-Factory** and **Layer Isolation** rules are absolute on both sides. The domain logic must be shielded from raw DTO shapes regardless of the language.
 
-### 1.7 Full-Stack Symmetry: The DTO Contract
+### 1.8 Full-Stack Symmetry: The DTO Contract
 
 The backend's **OpenAPI Specification** is the authoritative contract for the full stack.
 
@@ -159,7 +179,18 @@ We also strictly forbid cross-module imports natively using relative blockers:
 | **UI (Shared)**    | Semantic ERP Kernel         | `src/shared/ui/domain-aware-components`                                       | Domain, Core UI      | **Shared Semantics**    |
 | **Platform**       | Deterministic Runtime       | `src/platform/screen-runtime`                                                 | Nothing (Pure)       | **ScreenModel (Proxy)** |
 
-### 2.4 Component Sizing and Separation of Concerns
+### 2.4 Authority Boundaries
+
+Every layer must explicitly define what it may own, derive, mutate, and what it must never know. This matrix prevents architectural drift.
+
+| Layer | Responsibility | Forbidden |
+| :--- | :--- | :--- |
+| **Vue Component** | Rendering and transient interaction | Making business decisions, orchestrating commands |
+| **Projection Engine** | Compiling derived UI truth (`ScreenModel`) | Executing side-effects, interacting with persistence |
+| **Controller** | Orchestration, grid authority, workflows | Rendering logic, DOM manipulation, HTML/CSS |
+| **Domain Runtime** | Managing business invariants and state | DOM awareness, Framework-specific primitives |
+
+### 2.5 Component Sizing and Separation of Concerns
 
 Vue Single-File Components (SFCs) must not become dumping grounds for multiple layout regions, complex dialogs, and heavy orchestration. The architecture explicitly bans the **SFC God-Component** anti-pattern.
 
@@ -647,17 +678,17 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 | Anti-Pattern                         | Why It Fails                            | Alternative                                |
 | ------------------------------------ | --------------------------------------- | ------------------------------------------ |
+| **Component-Centric Architecture**   | Components become business authorities instead of rendering surfaces | Components render `ScreenModel` strictly |
+| **Composable-Centric Logic**         | Dissolves ERP semantics into scattered reactive fragments | Centralized Controller/Policy classes |
+| **Heavy Classical MVVM**             | Duplicates our deterministic projection pipeline unnecessarily | `ScreenModel` projection |
+| **Framework-Driven State**           | Vue APIs dictate the app instead of runtime contracts | The UI does not decide truth; the runtime derives truth. |
+| **Redux-Style Global Mutations**     | Detached from explicit ERP workflows and localized constraints | CQRS-Lite with Controller action dispatch |
 | **Raw API types in components**      | Backend DTO change breaks 50 components | Mapper → ViewModel pattern                 |
 | **Cross-module store imports**       | Creates invisible dependency graphs     | Event Bus or Core types                    |
-| **Business logic in templates**      | Untestable, duplicated across views     | Composables (Use Case Hooks)               |
+| **Business logic in templates**      | Untestable, duplicated across views     | Controllers and Projections                |
 | **Global CSS classes**               | Styling conflicts across modules        | Scoped styles + design tokens              |
 | **`any` types**                      | Defeats TypeScript's entire purpose     | Strict mode, branded types                 |
 | **Direct Axios calls in components** | Untestable, no error interception       | Module-scoped API client                   |
-| **Storing tokens in localStorage**   | XSS vulnerability                       | httpOnly cookies or in-memory              |
-| **Inline styles for theming**        | Unmaintainable at scale                 | Tailwind v4 `@theme` design tokens         |
-| **Raw HTML tables**                  | No sorting, pagination, virtual scroll  | shared ERP `DataGrid` platform             |
-| **Bypassing design system**          | UI inconsistency                        | Always use shared ERP/screen components    |
-| **`console.log`**                    | Leaks debug data, litters production    | Use high-level error boundaries or logging |
 | **SFC God-Component**                | Page files >400 lines, unmaintainable   | Extract action bars, panes, and dialogs    |
 
 ---

@@ -68,16 +68,16 @@ Every screen in Abren ERP exists within a rigid macro-architecture. The shell ha
 ### 0.3 Center Area — State A: Workspace View
 
 **Purpose:** A navigation surface showing categorized links/tiles to forms, reports, and dashboards of a module. Entered when a module is clicked in the Main Menu.
-**Components:** `WorkspacePanel` with categorized tiles, favorites, queue counts.
-**Constraint:** Workspace View and Working Area are **mutually exclusive states** of the center area. No Side Panel in this state.
+**Components:** `WorkspaceView` which renders `WorkspaceCategoryPanel` for categorized links, tiles, favorites, and queue counts.
+**Constraint:** Workspace View and Working Area are **mutually exclusive states** of the center area. No Side Panel in this state. It is strictly a capability discovery and navigation surface.
 
 ### 0.4 Center Area — State B: Working Area
 
-**Purpose:** The dedicated canvas for performing actual work. Entered when a link/tile is clicked in the Workspace View, or via direct URL navigation.
+**Purpose:** The dedicated canvas for performing actual work. Entered when a link/tile is clicked in the Workspace View, or via direct URL navigation. It represents a strict transaction or inquiry boundary.
 **Components:** The screen runtime payload rendered through a `ScreenRenderer` using the controller/view pattern (`controller.ts` → `view.vue`).
 **Internal Anatomy** (see [Acumatica Alignment §5](ACUMATICA_ALIGNMENT.md#5-form-anatomy-6-basic-parts)):
 
-- **Form Title Bar** — `FormTitleBar` with form title, record title, and record services (Notes, Activities, Files, Settings).
+- **Form Title Bar** — `FormTitleBar` with form title, record title, and the **RecordServicesMenu** (Notes, Activities, Files, Settings).
 - **Form Toolbar** — `FormToolbar` with standard buttons, Expected Next Action, and More Menu.
 - **Summary Area** — `AppTemplate` + `AppFieldset` groups for high-level record data.
 - **Details Area** — `AppTabs` containing `DataGrid`, `AppFieldset` sections, or audit history.

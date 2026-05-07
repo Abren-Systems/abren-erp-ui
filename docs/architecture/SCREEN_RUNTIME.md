@@ -72,13 +72,13 @@ The `resolveScreenModel` function acts as a **Semantic Compiler**. It takes raw 
 
 ### Rules:
 
-1. **Owns Data Access**: The controller fetches data via the module's infrastructure layer (adapter → composable). No external hooks passed in.
-2. **Owns Command Registry**: All commands are declared as data objects in `commands.ts` and registered in the controller. The view binds to them, never creates them.
-3. **Dual-Layer State Machine**: The controller evaluates permissions based on:
-   - **UIState**: `INITIALIZING`, `NEW`, `VIEW`, `EDIT`, `SAVING`.
-   - **DomainState**: `DRAFT`, `SUBMITTED`, `APPROVED`, etc. (backend-owned).
-4. **Declarative UI Projection (ScreenStatePolicy)**: The frontend NEVER orchestrates transitions. The controller interprets a declarative `ScreenStatePolicy` (`policy.ts`) that maps domain states to presentation logic (e.g., `editable`, `readonly` fields, `actionRequiredLabel`).
-5. **Mutation Guards**: All mutations flow through `useField` and are strictly blocked if the `ScreenStatePolicy` dictates the field or record is read-only.
+1. **Owns Data Access**: The controller fetches data via the module's infrastructure layer. No external hooks passed in.
+2. **Owns Command Registry**: All commands are declared as data objects in `commands.ts` and registered in the controller.
+3. **Grid Authority**: The controller owns the initialization and orchestration of `useDataGrid()`. The View merely binds to `ctrl.model.value.ui.grids`.
+4. **Projection Purity**: The View (`view.vue`) must exclusively consume the resolved `ScreenModel`. It is **banned** from accessing `ctrl.state` or `ctrl.commands` directly. The UI does not decide truth; the runtime derives truth.
+5. **Dual-Layer State Machine**: The controller evaluates permissions based on UIState (`NEW`, `VIEW`, `EDIT`) and DomainState (`DRAFT`, `APPROVED`).
+6. **Declarative UI Projection**: The frontend NEVER orchestrates transitions. The controller interprets a declarative `ScreenStatePolicy`.
+7. **Mutation Guards**: All mutations flow through `useField` and are strictly blocked if the `ScreenStatePolicy` dictates readonly.
 
 ---
 
