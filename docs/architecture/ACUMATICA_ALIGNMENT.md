@@ -203,18 +203,47 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 
 ### Planned Screen Registry
 
-| Screen ID  | Form Kind   | Title                 | Status                      |
-| ---------- | ----------- | --------------------- | --------------------------- |
-| `AP301000` | Data Entry  | Payment Request Entry | ✅ Built                    |
-| `AP3010PL` | Inquiry     | Payment Requests List | ✅ Built                    |
-| `AP302000` | Data Entry  | Vendor Bill Entry     | ❌ Legacy (needs migration) |
-| `GL301000` | Data Entry  | Journal Entry         | ❌ Legacy                   |
-| `GL201000` | Maintenance | Chart of Accounts     | ❌ Legacy                   |
-| `GL3010PL` | Inquiry     | Journal Entries List  | ❌ Legacy                   |
-| `CA202000` | Maintenance | Bank Accounts         | ❌ Legacy                   |
-| `TX101000` | Setup       | Tax Preferences       | ❌ Legacy                   |
-| `IN202000` | Maintenance | Stock Items           | ❌ Legacy                   |
-| `IN301000` | Data Entry  | Inventory Adjustments | ❌ Legacy                   |
+#### Accounts Payable (AP)
+
+| Screen ID  | Form Kind  | Title                 | Acumatica Equivalent | Status    |
+| ---------- | ---------- | --------------------- | -------------------- | --------- |
+| `AP301000` | Data Entry | Payment Request Entry | AP301000             | ✅ Built  |
+| `AP3010PL` | Inquiry    | Payment Requests List | AP3010PL             | ✅ Built  |
+| `AP302000` | Data Entry | Vendor Bill Entry     | AP301000 (Bills)     | ❌ Legacy |
+
+#### General Ledger (GL)
+
+> [!WARNING]
+> **Screen ID Alignment Issue**: Our current `GL101000` (Ledger Settings) maps to Acumatica's `GL102000` (General Ledger Preferences), and our current `GL102000` (Fiscal Periods) conflates functionality that Acumatica splits across `GL101000` (Financial Year) + `GL201000` (Master Financial Calendar) + `GL503000` (Manage Financial Periods). A Screen ID realignment is documented in [FISCAL_CALENDAR_DESIGN.md](FISCAL_CALENDAR_DESIGN.md) and will be addressed as a dedicated domain redesign initiative.
+
+| Screen ID  | Form Kind   | Title                      | Acumatica Equivalent | Status                          |
+| ---------- | ----------- | -------------------------- | -------------------- | ------------------------------- |
+| `GL101000` | Setup       | Ledger Settings            | GL102000 (GL Prefs)  | ⚠️ Needs normalization          |
+| `GL102000` | Setup       | Fiscal Periods             | GL101000 + GL201000  | ⚠️ **Domain redesign required** |
+| `GL201000` | Maintenance | Chart of Accounts (Detail) | GL201500 (CoA)       | ⚠️ Needs normalization          |
+| `GL2010PL` | Inquiry     | Chart of Accounts (List)   | GL2010PL             | ⚠️ Needs normalization          |
+| `GL301000` | Data Entry  | Journal Entry              | GL301000             | ⚠️ Needs normalization          |
+| `GL3010PL` | Inquiry     | Journal Entries List       | GL3010PL             | ⚠️ Needs normalization          |
+| `GL503000` | Processing  | Manage Financial Periods   | GL503000             | 📋 Future                       |
+
+#### Banking (CA)
+
+| Screen ID  | Form Kind   | Title         | Acumatica Equivalent | Status    |
+| ---------- | ----------- | ------------- | -------------------- | --------- |
+| `CA202000` | Maintenance | Bank Accounts | CA202000             | ❌ Legacy |
+
+#### Tax (TX)
+
+| Screen ID  | Form Kind | Title           | Acumatica Equivalent | Status    |
+| ---------- | --------- | --------------- | -------------------- | --------- |
+| `TX101000` | Setup     | Tax Preferences | TX101000             | ❌ Legacy |
+
+#### Inventory (IN)
+
+| Screen ID  | Form Kind   | Title                 | Acumatica Equivalent | Status    |
+| ---------- | ----------- | --------------------- | -------------------- | --------- |
+| `IN202000` | Maintenance | Stock Items           | IN202500             | ❌ Legacy |
+| `IN301000` | Data Entry  | Inventory Adjustments | IN301000             | ❌ Legacy |
 
 ### The `PL` Suffix
 
