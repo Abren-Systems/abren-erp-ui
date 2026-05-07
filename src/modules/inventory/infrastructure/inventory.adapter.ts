@@ -38,6 +38,11 @@ export const inventoryAdapter = {
     return raw.map((item) => StockLevelSchema.parse(item))
   },
 
+  async getStockItemById(stockItemId: string): Promise<StockLevelDTO> {
+    const raw = await apiGet<unknown>(`/inventory/stock/${stockItemId}`)
+    return StockLevelSchema.parse(raw)
+  },
+
   async getBatches(itemId: string): Promise<BatchDTO[]> {
     const raw = await apiGet<unknown[]>(`/inventory/items/${itemId}/batches`)
     return raw.map((item) => BatchSchema.parse(item))

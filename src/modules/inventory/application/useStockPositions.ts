@@ -30,3 +30,34 @@ export function useStockPositions(warehouseId: Ref<string | undefined>) {
 
   return { stockItems, isPending, error, refetch }
 }
+
+/**
+ * Use Case: View Stock Item Detail
+ */
+export function useStockItem(stockItemId: Ref<string | null>) {
+  const {
+    data: stockItem,
+    isPending,
+    error,
+    refetch,
+  } = useQuery<StockItem, Error>({
+    queryKey: computed(() => ['inventory', 'stock', 'detail', stockItemId.value]),
+    queryFn: async () => {
+      if (!stockItemId.value) throw new Error('Stock Item ID is required')
+      const dto = await inventoryAdapter.getStockItemById(stockItemId.value)
+      return InventoryMapper.toStockItem(dto)
+    },
+    enabled: computed(() => !!stockItemId.value),
+    staleTime: 1000 * 60,
+  })
+
+  const isLoading = computed(() => isPending.value)
+  const queryError = computed(() => error.value)
+
+  return {
+    stockItem,
+    isLoading,
+    error: queryError,
+    refetch,
+  }
+}

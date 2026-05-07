@@ -83,11 +83,12 @@ export function useTaxGroupController(id: string) {
       error,
     },
     isNew,
-    getDomainState: (ent) => {
-      return ent?.isActive ? 'ACTIVE' : 'INACTIVE'
-    },
+    getDomainState: (ent: TaxGroup) => (ent?.isActive ? 'ACTIVE' : 'INACTIVE') as TaxGroupStatus,
     statePolicy: TX201000_POLICY,
   })
+
+  // Attach form to base so useField can find it
+  Object.assign(base, { form })
 
   const fields = {
     name: useField(base, TX201000_FIELDS.name),

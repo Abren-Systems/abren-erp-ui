@@ -93,11 +93,12 @@ export function useTaxRuleController(id: string) {
       error,
     },
     isNew,
-    getDomainState: (ent) => {
-      return ent?.isActive ? 'ACTIVE' : 'INACTIVE'
-    },
+    getDomainState: (ent: TaxRule) => (ent?.isActive ? 'ACTIVE' : 'INACTIVE') as TaxRuleStatus,
     statePolicy: TX202000_POLICY,
   })
+
+  // Attach form to base so useField can find it
+  Object.assign(base, { form })
 
   const fields = {
     name: useField(base, TX202000_FIELDS.name),
