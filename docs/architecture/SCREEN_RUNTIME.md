@@ -60,7 +60,15 @@ The frontend is organized by Acumatica-style archetypes encoded in the **Screen 
 
 ## 3. Controller Authority (The PXGraph)
 
-The Screen Controller is the absolute authority for a form's behavior. The View (`view.vue`) is a pure projection — **not allowed** to mutate data, fetch data, or evaluate visibility rules.
+The Screen Controller is the absolute authority for a form's behavior. The View (`view.vue`) is a pure **Projection** — it has no logic and simply renders the `ScreenModel` produced by the platform's resolution engine.
+
+### The Resolver as Semantic Compiler
+
+The `resolveScreenModel` function acts as a **Semantic Compiler**. It takes raw inputs from the module (commands, capabilities, field definitions) and the platform (kind, state policies) and compiles them into a single, JSON-serializable execution contract. This ensures:
+
+- **Determinism**: The same inputs always produce the same UI projection.
+- **Traceability**: UI states can be snapshotted, replayed, and audited.
+- **Isolation**: The View is shielded from the complexity of business rule evaluation.
 
 ### Rules:
 

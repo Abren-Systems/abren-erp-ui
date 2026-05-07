@@ -20,7 +20,16 @@ tags: [frontend, architecture]
 
 A **domain-aware frontend** for a Financial Operating System — not a collection of CRUD forms. We strictly adhere to the **Modular Monolith Mirroring** principle: the frontend is structurally aligned with the backend's bounded contexts, while the ERP UI itself is governed by a **screen runtime** rather than ad hoc route pages.
 
-### 1.2 The Alignment Principle
+### 1.2 The Four Layers of Authority
+
+Conceptually, the architecture is organized into four distinct layers of authority that govern how data becomes a user interface:
+
+1. **Platform Runtime** (`src/platform/`): The authoritative **Engine**. Owns the Screen Model contract, the deterministic resolution pipeline, and the "Chrome" (shell) components. It has zero knowledge of business rules.
+2. **Shared Semantic Kernel** (`src/shared/ui/`): The authoritative **ERP Vocabulary**. Owns "Domain-Aware" components (e.g., `MoneyDisplay`, `StatusBadge`, `AccountSelector`) that understand financial concepts but are module-agnostic.
+3. **Business Modules** (`src/modules/`): The authoritative **Domain Logic**. Owns the state machines, domain types, and data adapters for specific business bounded contexts.
+4. **Screen Projections** (`resolve-screen-model.ts`): The authoritative **Presentation State**. This pure function "compiles" the platform, kernel, and module inputs into a deterministic, JSON-serializable model for rendering.
+
+### 1.3 The Alignment Principle
 
 The frontend is **domain-aware and backend-aligned**, not an exact mirror. The backend's DDD layers (Entity → Service → Repository → UoW) are too granular for a UI. We collapse them into a simpler, pragmatic structure while preserving the same module names, action names, and domain vocabulary.
 
@@ -33,18 +42,18 @@ The frontend is **domain-aware and backend-aligned**, not an exact mirror. The b
 | Use Case                 | Composable            | **Lifecycle Aware** — e.g. `useLedgerAccounts`  |
 | Anti-Corruption Layer    | Mapper + Adapter      | **The Shield** — Infrastructure isolation       |
 
-### 1.3 Two Axes of Growth
+### 1.4 Two Axes of Growth
 
 The project is designed for **zero-rewrite scaling**, following the exact same principles as the backend's **Architecture First** journey. The frontend grows along two independent axes:
 
 1. **Vertical (Architecture): Constant.** Every module is built with strict statelessness, domain-aligned boundaries, mapper isolation, and the full security model from the moment of implementation. No exceptions.
 2. **Horizontal (Product Depth): Additive.** New features plug into the existing screen runtime, platform services, state, and API client capabilities without requiring structural rewrites of the core platform.
 
-### 1.4 The "Gold Standard" Principle
+### 1.5 The "Gold Standard" Principle
 
 The architecture guarantees that progressive depth is always additive, never corrective. The path forward is exclusively about expanding functional scope.
 
-### 1.5 Symmetry, Not Parity (Architectural Philosophy) [STRATEGIC]
+### 1.6 Symmetry, Not Parity (Architectural Philosophy) [STRATEGIC]
 
 We follow the principle of **"Mirroring the Bounded Context, Adapting the Medium."** The frontend is structurally symmetric with the backend to ensure predictability, but it is not a blind, code-level replica.
 
@@ -52,7 +61,7 @@ We follow the principle of **"Mirroring the Bounded Context, Adapting the Medium
 - **Symmetry (Patterns)**: We mirror the backend's _intent_ using Vue-idiomatic patterns. The backend's `facade.py` finds its symmetric counterpart in the frontend's **Action-Oriented Composables** (e.g., `usePayRequest`).
 - **Integrity (Absolute)**: The **Mapper-as-Factory** and **Layer Isolation** rules are absolute on both sides. The domain logic must be shielded from raw DTO shapes regardless of the language.
 
-### 1.6 Full-Stack Symmetry: The DTO Contract
+### 1.7 Full-Stack Symmetry: The DTO Contract
 
 The backend's **OpenAPI Specification** is the authoritative contract for the full stack.
 
@@ -141,12 +150,14 @@ We also strictly forbid cross-module imports natively using relative blockers:
 
 ### 2.3 Layer Responsibilities
 
-| Layer              | Responsibility              | Contains                                                                      | May Import           | Authority          |
-| ------------------ | --------------------------- | ----------------------------------------------------------------------------- | -------------------- | ------------------ |
-| **Domain**         | Pure business rules & types | `*.types.ts`, `Money.ts`                                                      | Nothing              | Business Logic     |
-| **Application**    | Orchestration & Use Cases   | `application/useXxx.ts`, `application/query-keys.ts`                          | Domain, Infra        | **TanStack Query** |
-| **Infrastructure** | ACL, Mapping, Adapters      | `infrastructure/adapter.ts`                                                   | Domain, Core API     | **DTOs** (input)   |
-| **UI**             | Presentation & Rendering    | `ui/{ScreenID}/` (screen.ts, controller.ts, fields.ts, commands.ts, view.vue) | Application, Core UI | Presentation       |
+| Layer              | Responsibility              | Contains                                                                      | May Import           | Authority               |
+| ------------------ | --------------------------- | ----------------------------------------------------------------------------- | -------------------- | ----------------------- |
+| **Domain**         | Pure business rules & types | `*.types.ts`, `Money.ts`                                                      | Nothing              | Business Logic          |
+| **Application**    | Orchestration & Use Cases   | `application/useXxx.ts`, `application/query-keys.ts`                          | Domain, Infra        | **TanStack Query**      |
+| **Infrastructure** | ACL, Mapping, Adapters      | `infrastructure/adapter.ts`                                                   | Domain, Core API     | **DTOs** (input)        |
+| **UI (Module)**    | Screen-specific layout      | `ui/{ScreenID}/` (screen.ts, controller.ts, fields.ts, commands.ts, view.vue) | Application, Core UI | **Module Controller**   |
+| **UI (Shared)**    | Semantic ERP Kernel         | `src/shared/ui/domain-aware-components`                                       | Domain, Core UI      | **Shared Semantics**    |
+| **Platform**       | Deterministic Runtime       | `src/platform/screen-runtime`                                                 | Nothing (Pure)       | **ScreenModel (Proxy)** |
 
 ### 2.4 Component Sizing and Separation of Concerns
 
@@ -338,9 +349,9 @@ When creating a new module or a major new aggregate root (e.g., `procurement`):
 
 The backend evolves independently. **DTOs** (Data Transfer Objects) are the raw, volatile shapes from the server. The Mapper-as-Factory ensures:
 
-1.  **Isolation**: Backend field renames only propagate to the mapper file, not to components or stores.
-2.  **Integrity**: DTOs (raw data) are "sanitized" and transformed into high-integrity **Domain Models** or **ViewModels** (encapsulated logic).
-3.  **Predictability**: Every component receives the same predictable data shape regardless of API versioning.
+1. **Isolation**: Backend field renames only propagate to the mapper file, not to components or stores.
+2. **Integrity**: DTOs (raw data) are "sanitized" and transformed into high-integrity **Domain Models** or **ViewModels** (encapsulated logic).
+3. **Predictability**: Every component receives the same predictable data shape regardless of API versioning.
 
 ### 6.2 The Contract
 

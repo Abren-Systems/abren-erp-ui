@@ -21,8 +21,8 @@ This document defines how UI components are built, consumed, and governed in Abr
 
 Business modules must consume **Abren-owned shared components**, not raw vendor primitives.
 
-- Use Abren-owned primitives and ERP components from `src/shared/ui/` as the target structure.
-- During migration, compatibility exports from `src/shared/components/` are acceptable.
+- Use **Technical Primitives** (`src/shared/components/`) for visual mechanics (Buttons, Inputs).
+- Use **Semantic Kernel Components** (`src/shared/ui/`) for ERP concepts (Money, Account Selectors).
 - The product contract belongs to Abren, not to any vendor library.
 
 ### 1.2 Headless Direction
@@ -43,21 +43,33 @@ The old Fluent-based wrapper layer is historical context, not an active foundati
 
 ## 2. Component Layers
 
-### 2.1 Primitive Layer
+### 2.1 Technical Primitive Layer (`shared/components/`)
 
-Atomic interactions built via Abren-owned headless composition:
+Pure visual mechanics. These components are **dumb**—they have no knowledge of accounting, workflows, or domain types.
 
-| Component     | Purpose                            | Status   |
-| ------------- | ---------------------------------- | -------- |
-| `AppButton`   | Clickable actions                  | ✅ Built |
-| `AppInput`    | Text/number input                  | ✅ Built |
-| `AppSelect`   | Dropdown selection                 | ✅ Built |
-| `AppBadge`    | Status indicators                  | ✅ Built |
-| `AppDrawer`   | Slide-out panels                   | ✅ Built |
-| `AppDialog`   | Modal dialogs                      | ✅ Built |
-| `AppSidePane` | Contextual overlays (filter/trace) | ✅ Built |
+| Component     | Purpose                            | Authority         |
+| ------------- | ---------------------------------- | ----------------- |
+| `AppButton`   | Clickable actions                  | Design System     |
+| `AppInput`    | Text/number input                  | Design System     |
+| `AppSelect`   | Dropdown selection                 | Design System     |
+| `AppBadge`    | Generic status indicators          | Design System     |
+| `AppDrawer`   | Slide-out panels                   | Interaction Model |
+| `AppDialog`   | Modal dialogs                      | Interaction Model |
+| `AppSidePane` | Contextual overlays (filter/trace) | Layout System     |
 
-### 2.2 Screen Layer (Platform Chrome)
+### 2.2 Semantic ERP Kernel (`shared/ui/`)
+
+Domain-aware components that represent **Canonical ERP Semantics**. They understand business types and workflow states.
+
+| Component               | Domain Knowledge                | Used By          |
+| ----------------------- | ------------------------------- | ---------------- |
+| `MoneyDisplay`          | `Money` Value Object            | All Modules      |
+| `StatusBadge`           | Global Workflow States          | AP, Ledger, Bank |
+| `LedgerAccountSelector` | Chart of Accounts entity        | AP, Bank, Tax    |
+| `BusinessDateDisplay`   | Fiscal/Posting date logic       | All Modules      |
+| `TraceabilityBadge`     | Audit trail & system indicators | All Modules      |
+
+### 2.3 Screen Layer (Platform Chrome) (`platform/chrome/`)
 
 Repeatable screen structure compositions that implement [Acumatica Form Anatomy](ACUMATICA_ALIGNMENT.md#5-form-anatomy-6-basic-parts):
 
