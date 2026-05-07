@@ -3,8 +3,7 @@ import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { ScreenStatePolicy } from './screen-state-policy.types'
-import { interpretStatePolicy, type InterpretedState } from './interpret-state-policy'
-import { resolveScreenProjection } from './resolve-screen-projection'
+import { resolveScreenModel } from './resolve-screen-model'
 import { debugBus } from '../debug/debug-bus'
 
 // ── Screen Controller Options ─────────────────────────────
@@ -74,7 +73,7 @@ function createStateMachine<T, TDomain extends string>(
   entity: Ref<T | null | undefined>,
   getDomainState: (entity: T) => TDomain,
   statePolicy: ScreenStatePolicy<TDomain>,
-): { stateMachine: ScreenStateMachine<TDomain>; interpretedState: ComputedRef<InterpretedState> } {
+): { stateMachine: ScreenStateMachine<TDomain>; domain: ComputedRef<TDomain> } {
   const ui = ref<UIState>(isNew.value ? 'NEW' : 'INITIALIZING')
 
   const domain = computed<TDomain>(() => {
@@ -82,19 +81,15 @@ function createStateMachine<T, TDomain extends string>(
     return getDomainState(entity.value)
   })
 
-  // Interpreted state — the single truth for all consumers
-  const interpretedState = computed<InterpretedState>(() =>
-    interpretStatePolicy(statePolicy, domain.value),
-  )
-
   const isEditable = computed(() => {
     if (ui.value !== 'NEW' && ui.value !== 'EDIT') return false
-    return interpretedState.value.editable
+    const behavior = statePolicy.states[domain.value]
+    return behavior?.editable ?? false
   })
 
   const stateMachine: ScreenStateMachine<TDomain> = {
     /** Current UI state */
-    ui: computed(() => ui.value) as unknown as UIState, // Type cast to satisfy interface while remaining reactive to Vue template
+    ui: computed(() => ui.value) as unknown as UIState,
     /** Current Domain state */
     domain: domain as unknown as TDomain,
     /** Whether the screen is in an editable mode */
@@ -109,16 +104,14 @@ function createStateMachine<T, TDomain extends string>(
     },
 
     transitionDomain(newState: TDomain) {
-      // In this frontend architecture, Domain state is owned by the backend.
-      // This method is a placeholder for optimistic updates if necessary,
-      // but normally we just refresh the entity after a successful command.
+      // Domain state is owned by the backend. This is a placeholder for optimistic updates.
       console.warn(
         `Attempted optimistic Domain transition to ${newState}. Prefer refreshing entity from backend.`,
       )
     },
   }
 
-  return { stateMachine, interpretedState }
+  return { stateMachine, domain }
 }
 
 // ── The Composable ────────────────────────────────────────
@@ -127,7 +120,7 @@ function createStateMachine<T, TDomain extends string>(
  * useScreenController — Platform base composable.
  *
  * Provides the standard lifecycle, granular data access, UI state machine,
- * interpreted state policy, and command registration that every screen needs.
+ * unified screen model, and command registration that every screen needs.
  *
  * Screen-specific controllers call this internally, then extend it with
  * domain-specific computed properties, watchers, and navigation guards.
@@ -142,8 +135,8 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   // ── Data Layer ──
   const data = createScreenData(dataSource.entity)
 
-  // ── State Machine + Interpreted State ──
-  const { stateMachine, interpretedState } = createStateMachine(
+  // ── State Machine ──
+  const { stateMachine, domain } = createStateMachine(
     isNew,
     dataSource.entity,
     getDomainState,
@@ -182,13 +175,27 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   // ── Aggregate Pending State ──
   const isPending = computed(() => Object.values(commands.value).some((cmd) => cmd.isPending.value))
 
-  // ── Debug: log policy interpretation on domain state changes ──
+  // ── Unified Screen Model ──
+  const model = computed(() => {
+    const ent = dataSource.entity.value as Record<string, unknown> | null
+    const availableActions = (ent?.['available_actions'] || []) as readonly string[]
+    return resolveScreenModel({
+      screenId: screen.id,
+      commands: screen.commands,
+      domainState: domain.value,
+      availableActions,
+      statePolicy,
+    })
+  })
+
+  // ── Debug: log model changes ──
   watch(
-    () => interpretedState.value,
-    (interpreted) => {
-      debugBus.emit(screen.id, 'policy_interpreted', {
-        editable: interpreted.editable,
-        actionRequiredLabel: interpreted.actionRequiredLabel,
+    () => model.value,
+    (m) => {
+      debugBus.emit(screen.id, 'model_resolved', {
+        canEdit: m.domain.capabilities.canEdit,
+        status: m.domain.backend.status,
+        primaryActions: m.ui.actions.primary.length,
       })
     },
     { immediate: true },
@@ -212,8 +219,8 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     /** UI state machine */
     state: stateMachine,
 
-    /** Interpreted state policy — the single truth for field/editability behavior */
-    interpretedState,
+    /** The unified screen model — single deterministic rendering contract */
+    model,
 
     /** Whether the data source is loading */
     isLoading,
@@ -232,24 +239,5 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
 
     /** Whether any command is currently executing */
     isPending,
-
-    /** Workflow projection */
-    workflow: {
-      availableActions: computed(() => {
-        const ent = dataSource.entity.value as Record<string, unknown> | null
-        return (ent?.['available_actions'] || []) as readonly string[]
-      }),
-    },
-
-    /** The pure derived UI projection */
-    projection: computed(() => {
-      const ent = dataSource.entity.value as Record<string, unknown> | null
-      const availableActions = (ent?.['available_actions'] || []) as readonly string[]
-      return resolveScreenProjection(
-        screen.commands,
-        stateMachine.domain as string,
-        availableActions,
-      )
-    }),
   }
 }

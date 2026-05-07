@@ -25,8 +25,7 @@ export interface ScreenData<T = unknown> {
 }
 
 import type { ScreenDefinition } from './screen-definition.types'
-import type { InterpretedState } from './interpret-state-policy'
-import type { ScreenProjection } from './screen-projection.types'
+import type { ScreenModel } from './screen-model.types'
 
 export interface ControllerCommand {
   /** Execute this command */
@@ -52,8 +51,8 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
   /** UI state machine */
   readonly state: ScreenStateMachine<TDomain>
 
-  /** Interpreted state policy — the single truth for field/editability behavior */
-  readonly interpretedState: ComputedRef<InterpretedState>
+  /** The unified screen model — single deterministic rendering contract */
+  readonly model: ComputedRef<ScreenModel>
 
   /** Whether the data source is loading */
   readonly isLoading: Ref<boolean>
@@ -69,14 +68,6 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
 
   /** Whether any command is currently executing */
   readonly isPending: ComputedRef<boolean>
-
-  /** Workflow raw data */
-  readonly workflow: {
-    readonly availableActions: ComputedRef<readonly string[]>
-  }
-
-  /** The pure derived UI projection (commands hierarchy, etc.) */
-  readonly projection: ComputedRef<ScreenProjection>
 
   /** Register a command on this controller */
   registerCommand(id: string, command: ControllerCommand): void
