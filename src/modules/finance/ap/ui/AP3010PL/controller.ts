@@ -1,6 +1,11 @@
 import { computed, ref, h } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
+import { usePermissions } from '@/shared/auth/usePermissions'
 import type { Table, Row } from '@tanstack/vue-table'
 import { usePaymentRequests } from '../../application/usePaymentRequests'
 import type { PaymentRequest } from '../../domain/ap.types'
@@ -15,23 +20,23 @@ import { CheckCircle, XCircle, Plus, History } from 'lucide-vue-next'
 import { paymentRequestColumns } from './grids/primary.grid'
 import { PAYMENT_REQUEST_STATUS_OPTIONS, PAYMENT_REQUEST_FILTER_PRESETS } from '../AP301000/fields'
 import { AP3010PL } from './screen'
-import { AP3010PL_POLICY } from './policy'
 
 export function usePaymentRequestList() {
   const router = useRouter()
-  const { requests, isLoading, refetch } = usePaymentRequests()
+  const { hasPermission } = usePermissions()
+  const { requests, isLoading, error, refetch } = usePaymentRequests()
   const { users } = useUsers()
 
-  const base = useScreenController<PaymentRequest[], 'LIST'>({
+  const base = useScreenController<PaymentRequest[], 'VIEW'>({
     screen: AP3010PL,
     dataSource: {
       entity: requests,
       isLoading,
-      error: ref(null),
+      error,
     },
     isNew: computed(() => false),
-    getDomainState: () => 'LIST',
-    statePolicy: AP3010PL_POLICY,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // Register Commands
@@ -217,6 +222,7 @@ export function usePaymentRequestList() {
 
   return {
     ...base,
+    hasPermission,
     gridState,
     statusFilter,
     isFilterOpen,

@@ -6,6 +6,7 @@
  */
 
 export { default as FormTitleBar } from './FormTitleBar.vue'
+export { default as ListTitleBar } from './ListTitleBar.vue'
 export { default as FormToolbar } from './FormToolbar.vue'
 export { default as MoreMenu } from './MoreMenu.vue'
 export { default as ConfirmDialog } from './ConfirmDialog.vue'

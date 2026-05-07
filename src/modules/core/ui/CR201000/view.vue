@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { FormTitleBar } from '@/platform/chrome'
-import { AppButton, AppInput, AppSelect } from '@/shared/components/primitives'
+import { ListTitleBar } from '@/platform/chrome'
+import { AppButton, AppInput } from '@/shared/components/primitives'
+import { AppField } from '@/shared/components/field-system'
 import { AppDialog } from '@/shared/components/workspace'
 import { userColumns } from './grids/user.grid'
 import { useUsersController } from './controller'
@@ -12,7 +13,7 @@ const gridState = useDataGrid()
 
 <template>
   <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
-    <FormTitleBar :form-title="ctrl.screen.titleKey" />
+    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
 
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
@@ -42,10 +43,15 @@ const gridState = useDataGrid()
       description="Send an invitation to join the organization."
     >
       <div class="space-y-4 py-4">
-        <div class="space-y-1">
-          <label class="text-sm font-medium">Email Address</label>
-          <AppInput v-model="ctrl.inviteEmail.value" placeholder="user@example.com" />
-        </div>
+        <AppField
+          field="invite-email"
+          label="Email Address"
+          type="text"
+          mode="edit"
+          :model-value="ctrl.inviteEmail.value"
+          @update:model-value="ctrl.inviteEmail.value = $event"
+          :editor-attrs="{ placeholder: 'user@example.com' }"
+        />
         <div class="space-y-1">
           <label class="text-sm font-medium">Initial Password</label>
           <AppInput v-model="ctrl.invitePassword.value" type="password" />
@@ -78,14 +84,15 @@ const gridState = useDataGrid()
             Assigning role for <strong>{{ ctrl.selectedUser.value.email }}</strong>
           </p>
         </div>
-        <div class="space-y-1">
-          <label class="text-sm font-medium">Role</label>
-          <AppSelect
-            v-model="ctrl.assignRoleId.value"
-            :options="ctrl.roleOptions.value"
-            placeholder="Select a role"
-          />
-        </div>
+        <AppField
+          field="assign-role"
+          label="Role"
+          type="selector"
+          mode="edit"
+          :model-value="ctrl.assignRoleId.value"
+          @update:model-value="ctrl.assignRoleId.value = $event"
+          :editor-attrs="{ options: ctrl.roleOptions.value, placeholder: 'Select a role' }"
+        />
       </div>
       <template #footer>
         <AppButton variant="ghost" @click="ctrl.isAssignmentOpen.value = false">Cancel</AppButton>

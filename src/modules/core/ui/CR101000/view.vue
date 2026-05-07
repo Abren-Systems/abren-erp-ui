@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { FormTitleBar } from '@/platform/chrome'
-import { AppButton, AppInput } from '@/shared/components/primitives'
+import { ListTitleBar } from '@/platform/chrome'
+import { AppButton } from '@/shared/components/primitives'
+import { AppField } from '@/shared/components/field-system'
 import { AppDialog } from '@/shared/components/workspace'
 import { roleColumns } from './grids/role.grid'
 import { useRolesController } from './controller'
@@ -12,7 +13,7 @@ const gridState = useDataGrid()
 
 <template>
   <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
-    <FormTitleBar :form-title="ctrl.screen.titleKey" />
+    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
 
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
@@ -42,14 +43,24 @@ const gridState = useDataGrid()
       description="Define a new role and its associated permissions."
     >
       <div class="space-y-4 py-4">
-        <div class="space-y-1">
-          <label class="text-sm font-medium">Role Name</label>
-          <AppInput v-model="ctrl.createName.value" placeholder="e.g. Sales Manager" />
-        </div>
-        <div class="space-y-1">
-          <label class="text-sm font-medium">Description</label>
-          <AppInput v-model="ctrl.createDescription.value" placeholder="Optional..." />
-        </div>
+        <AppField
+          field="create-role-name"
+          label="Role Name"
+          type="text"
+          mode="edit"
+          :model-value="ctrl.createName.value"
+          @update:model-value="ctrl.createName.value = $event"
+          :editor-attrs="{ placeholder: 'e.g. Sales Manager' }"
+        />
+        <AppField
+          field="create-role-description"
+          label="Description"
+          type="text"
+          mode="edit"
+          :model-value="ctrl.createDescription.value"
+          @update:model-value="ctrl.createDescription.value = $event"
+          :editor-attrs="{ placeholder: 'Optional...' }"
+        />
         <div class="space-y-2">
           <label class="text-sm font-medium">Permissions</label>
           <div

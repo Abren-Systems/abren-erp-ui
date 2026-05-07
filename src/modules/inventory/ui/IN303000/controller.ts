@@ -1,4 +1,4 @@
-import { computed, type Ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import {
@@ -56,7 +56,11 @@ export function useAdjustmentController(id: string) {
     },
     onSubmit: async ({ value }) => {
       if (isNew.value) {
-        await createAdjustment(value as unknown as AdjustmentCreateDTO)
+        await createAdjustment({
+          warehouse_id: value.warehouse_id,
+          reason: value.reason,
+          lines: value.lines,
+        } as AdjustmentCreateDTO)
         void router.push({ name: 'inventory.stock' })
       }
     },
@@ -65,7 +69,7 @@ export function useAdjustmentController(id: string) {
   const base = useScreenController<AdjustmentDTO, AdjustmentStatus>({
     screen: IN303000,
     dataSource: {
-      entity: entity as unknown as Ref<AdjustmentDTO | null>,
+      entity,
       isLoading,
       error,
     },
@@ -115,6 +119,14 @@ export function useAdjustmentController(id: string) {
     }
   }
 
+  /** Route line item mutations through TanStack Form for validation tracking */
+  const updateLine = (index: number, field: string, value: unknown) => {
+    const lines = form
+      .getFieldValue('lines')
+      .map((line, i) => (i === index ? { ...line, [field]: value } : line))
+    form.setFieldValue('lines', lines)
+  }
+
   return {
     ...base,
     fields,
@@ -123,6 +135,7 @@ export function useAdjustmentController(id: string) {
     isSubmitting,
     addLine,
     removeLine,
+    updateLine,
     handlePost: () => base.commands.value['post']?.execute(),
   }
 }

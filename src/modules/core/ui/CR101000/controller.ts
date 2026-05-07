@@ -1,23 +1,26 @@
 import { computed, ref } from 'vue'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { CR101000 } from './screen'
-import { CR101000_POLICY } from './policy'
 import { useRoles } from '../../application/useRoles'
 import type { Role } from '../../domain/user.types'
 
 export function useRolesController() {
-  const { roles, isRolesPending, createRole, isCreating, permissions } = useRoles()
+  const { roles, isRolesPending, rolesError, createRole, isCreating, permissions } = useRoles()
 
   const base = useScreenController<{ roles: Role[] }, 'VIEW'>({
     screen: CR101000,
     dataSource: {
       entity: computed(() => ({ roles: roles.value || [] })),
       isLoading: isRolesPending,
-      error: ref(null),
+      error: rolesError,
     },
     isNew: computed(() => false),
-    getDomainState: () => 'VIEW',
-    statePolicy: CR101000_POLICY,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // Dialog state

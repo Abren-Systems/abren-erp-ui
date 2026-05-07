@@ -1,13 +1,16 @@
 import { computed, ref } from 'vue'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { CR201000 } from './screen'
-import { CR201000_POLICY } from './policy'
 import { useUsers } from '../../application/useUsers'
 import { useRoles } from '../../application/useRoles'
 import type { User } from '../../domain/user.types'
 
 export function useUsersController() {
-  const { users, isPending, createUser, assignRole, isCreating, isAssigning } = useUsers()
+  const { users, isPending, error, createUser, assignRole, isCreating, isAssigning } = useUsers()
   const { roles, isRolesPending } = useRoles()
 
   const base = useScreenController<{ users: User[] }, 'VIEW'>({
@@ -15,11 +18,11 @@ export function useUsersController() {
     dataSource: {
       entity: computed(() => ({ users: users.value || [] })),
       isLoading: isPending,
-      error: ref(null),
+      error,
     },
     isNew: computed(() => false),
-    getDomainState: () => 'VIEW',
-    statePolicy: CR201000_POLICY,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // Dialog state

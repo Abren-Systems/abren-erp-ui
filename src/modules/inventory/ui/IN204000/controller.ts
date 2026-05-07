@@ -43,7 +43,7 @@ export function useWarehouseController(id: string) {
         void router.push({ name: 'inventory.warehouses' })
       } else {
         // TODO: Implement update mutation
-        console.log('Update not implemented', value)
+        console.warn('[TODO] Update not yet implemented', value)
       }
     },
   })

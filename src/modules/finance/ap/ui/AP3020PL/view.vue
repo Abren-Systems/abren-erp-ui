@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { FormTitleBar } from '@/platform/chrome'
+import { ListTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { Plus, RefreshCcw } from 'lucide-vue-next'
 import { vendorBillColumns } from './grids/vendor-bill.grid'
@@ -12,7 +12,7 @@ const gridState = useDataGrid()
 
 <template>
   <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
-    <FormTitleBar :form-title="ctrl.screen.titleKey" />
+    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
 
     <div class="min-h-0 flex-1 p-8">
       <DataGrid

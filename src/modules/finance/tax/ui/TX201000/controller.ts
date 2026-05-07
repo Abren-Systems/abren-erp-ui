@@ -1,4 +1,4 @@
-import { computed, watch, ref, type ComputedRef } from 'vue'
+import { computed, watch, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import { useTaxGroup, useCreateTaxGroup, useActiveTaxRules } from '../../application/useTaxRules'
@@ -8,7 +8,7 @@ import { TX201000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
-import type { TaxGroup, TaxRule } from '../../domain/tax.types'
+import type { TaxRule, CalculationMethod } from '../../domain/tax.types'
 import type { TaxGroupId } from '@/shared/types/brand.types'
 
 const taxGroupSchema = z.object({
@@ -19,6 +19,14 @@ const taxGroupSchema = z.object({
 })
 
 type TaxGroupFormValues = z.infer<typeof taxGroupSchema>
+
+/** Form-projection entity shape passed to the screen controller */
+interface TaxGroupFormEntity {
+  name: string
+  method: CalculationMethod
+  ruleIds: string[]
+  isActive: boolean
+}
 
 export function useTaxGroupController(id: string) {
   const router = useRouter()
@@ -41,12 +49,11 @@ export function useTaxGroupController(id: string) {
     },
     onSubmit: async ({ value }) => {
       if (isNew.value) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await createGroup(value as any)
+        await createGroup(value)
         void router.push({ name: 'finance.tax.groups' })
       } else {
         // TODO: Implement update mutation
-        console.log('Update not implemented yet', value)
+        console.warn('[TODO] Update not yet implemented', value)
       }
     },
   })
@@ -65,7 +72,7 @@ export function useTaxGroupController(id: string) {
     { immediate: true },
   )
 
-  const activeEntity = computed(() => {
+  const activeEntity = computed<TaxGroupFormEntity | null>(() => {
     const vals = form.state.values
     return {
       name: vals.name,
@@ -75,15 +82,15 @@ export function useTaxGroupController(id: string) {
     }
   })
 
-  const base = useScreenController<TaxGroup, TaxGroupStatus>({
+  const base = useScreenController<TaxGroupFormEntity, TaxGroupStatus>({
     screen: TX201000,
     dataSource: {
-      entity: activeEntity as unknown as ComputedRef<TaxGroup>,
+      entity: activeEntity,
       isLoading: computed(() => isLoading.value || isRulesLoading.value),
       error,
     },
     isNew,
-    getDomainState: (ent: TaxGroup) => (ent?.isActive ? 'ACTIVE' : 'INACTIVE') as TaxGroupStatus,
+    getDomainState: (ent) => (ent?.isActive ? 'ACTIVE' : 'INACTIVE') as TaxGroupStatus,
     statePolicy: TX201000_POLICY,
   })
 

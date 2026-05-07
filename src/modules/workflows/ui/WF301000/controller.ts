@@ -1,14 +1,17 @@
 import { computed, ref } from 'vue'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { usePendingApprovals } from '../../application/usePendingApprovals'
 import { WF301000 } from './screen'
-import { WF301000_POLICY } from './policy'
 import type { PendingApproval } from '../../domain/workflows.types'
 
 export function useWorkflowInboxController() {
   const { tasks, isLoading, error, refresh } = usePendingApprovals()
 
-  const base = useScreenController<PendingApproval[], 'INBOX'>({
+  const base = useScreenController<PendingApproval[], 'VIEW'>({
     screen: WF301000,
     dataSource: {
       entity: tasks,
@@ -16,8 +19,8 @@ export function useWorkflowInboxController() {
       error,
     },
     isNew: computed(() => false),
-    getDomainState: () => 'INBOX',
-    statePolicy: WF301000_POLICY,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // Register Commands

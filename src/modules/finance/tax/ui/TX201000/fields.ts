@@ -1,5 +1,13 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { TaxGroup } from '../../domain/tax.types'
+import type { CalculationMethod } from '../../domain/tax.types'
+
+/** Matches the form-projection entity shape used in the controller */
+interface TaxGroupFormEntity {
+  name: string
+  method: CalculationMethod
+  ruleIds: string[]
+  isActive: boolean
+}
 
 export const TX201000_FIELDS = {
   name: {
@@ -7,18 +15,18 @@ export const TX201000_FIELDS = {
     label: 'Group Name',
     type: 'text',
     required: () => true,
-  } as FieldDefinition<TaxGroup, string>,
+  } as FieldDefinition<TaxGroupFormEntity, string>,
 
   method: {
     key: 'method',
     label: 'Calculation Method',
     type: 'selector',
     required: () => true,
-  } as FieldDefinition<TaxGroup, string>,
+  } as FieldDefinition<TaxGroupFormEntity, string>,
 
   isActive: {
     key: 'isActive',
     label: 'Active',
     type: 'checkbox',
-  } as FieldDefinition<TaxGroup, boolean>,
+  } as FieldDefinition<TaxGroupFormEntity, boolean>,
 } as const

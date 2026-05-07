@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AppInput, AppSelect, AppButton } from '@/shared/components/primitives'
+import { AppButton } from '@/shared/components/primitives'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
 import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { Plus, Trash2 } from 'lucide-vue-next'
@@ -67,38 +67,40 @@ const valuationOptions = [
                 :key="index"
                 class="grid grid-cols-12 gap-4 items-end p-5 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
               >
-                <div class="col-span-12 md:col-span-5 space-y-1.5">
-                  <label
-                    class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
-                    >Stock Item ID</label
-                  >
-                  <AppInput
-                    v-model="line.stock_item_id"
-                    placeholder="UUID..."
+                <div class="col-span-12 md:col-span-5">
+                  <AppField
+                    :field="`line-${index}-stock-item-id`"
+                    label="Stock Item ID"
+                    type="text"
+                    mode="edit"
+                    :model-value="line.stock_item_id"
+                    @update:model-value="ctrl.updateLine(index, 'stock_item_id', $event)"
+                    :editor-attrs="{ placeholder: 'UUID...' }"
                     :disabled="!ctrl.state.isEditable"
                   />
                 </div>
 
-                <div class="col-span-6 md:col-span-2 space-y-1.5">
-                  <label
-                    class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
-                    >Delta</label
-                  >
-                  <AppInput
+                <div class="col-span-6 md:col-span-2">
+                  <AppField
+                    :field="`line-${index}-quantity-delta`"
+                    label="Delta"
                     type="number"
-                    v-model.number="line.quantity_delta"
+                    mode="edit"
+                    :model-value="line.quantity_delta"
+                    @update:model-value="ctrl.updateLine(index, 'quantity_delta', Number($event))"
                     :disabled="!ctrl.state.isEditable"
                   />
                 </div>
 
-                <div class="col-span-6 md:col-span-3 space-y-1.5">
-                  <label
-                    class="text-xs font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
-                    >Valuation</label
-                  >
-                  <AppSelect
-                    v-model="line.valuation_strategy"
-                    :options="valuationOptions"
+                <div class="col-span-6 md:col-span-3">
+                  <AppField
+                    :field="`line-${index}-valuation-strategy`"
+                    label="Valuation"
+                    type="selector"
+                    mode="edit"
+                    :model-value="line.valuation_strategy"
+                    @update:model-value="ctrl.updateLine(index, 'valuation_strategy', $event)"
+                    :editor-attrs="{ options: valuationOptions }"
                     :disabled="!ctrl.state.isEditable"
                   />
                 </div>

@@ -1,7 +1,10 @@
-import { computed, ref } from 'vue'
-import { useScreenController } from '@/platform/screen-runtime'
+import { computed } from 'vue'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { CR102000 } from './screen'
-import { CR102000_POLICY } from './policy'
 import { useTenantSettings } from '../../application/useTenantSettings'
 
 export interface TenantSetting {
@@ -10,24 +13,24 @@ export interface TenantSetting {
 }
 
 export function useTenantSettingsController() {
-  const { settings, isSettingsPending } = useTenantSettings()
+  const { settings, isSettingsPending, settingsError } = useTenantSettings()
 
   const base = useScreenController<{ settings: TenantSetting[] }, 'VIEW'>({
     screen: CR102000,
     dataSource: {
       entity: computed(() => ({ settings: (settings.value as TenantSetting[]) || [] })),
       isLoading: isSettingsPending,
-      error: ref(null),
+      error: settingsError,
     },
     isNew: computed(() => false),
-    getDomainState: () => 'VIEW',
-    statePolicy: CR102000_POLICY,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // Register commands
   base.registerCommand('bulkEdit', {
     execute: async () => {
-      console.log('Bulk edit initiated')
+      console.warn('[TODO] Bulk edit not yet implemented')
     },
     isPending: computed(() => false),
   })

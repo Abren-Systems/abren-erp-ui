@@ -40,10 +40,10 @@ export function useStockItemController(id: string) {
     onSubmit: async ({ value }) => {
       if (isNew.value) {
         // TODO: Implement create mutation
-        console.log('Create not implemented', value)
+        console.warn('[TODO] Create not yet implemented', value)
       } else {
         // TODO: Implement update mutation
-        console.log('Update not implemented', value)
+        console.warn('[TODO] Update not yet implemented', value)
       }
     },
   })

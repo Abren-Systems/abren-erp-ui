@@ -8,6 +8,7 @@ export function useTenantSettings() {
   const {
     data: settings,
     isPending: isSettingsPending,
+    error: settingsError,
     refetch: refetchSettings,
   } = useQuery<TenantSettingDTO[], Error>({
     queryKey: ['core', 'settings'],
@@ -25,6 +26,7 @@ export function useTenantSettings() {
   return {
     settings,
     isSettingsPending,
+    settingsError,
     refetchSettings,
     updateSetting,
     isUpdating,

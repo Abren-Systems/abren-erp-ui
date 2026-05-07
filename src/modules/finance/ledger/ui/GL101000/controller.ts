@@ -1,4 +1,4 @@
-import { computed, watch, type ComputedRef } from 'vue'
+import { computed, watch } from 'vue'
 import { useScreenController } from '@/platform/screen-runtime'
 import { useLedgerSettings } from '../../application/useLedgerSettings'
 import { useLedgerAccounts } from '../../application/useLedgerAccounts'
@@ -8,9 +8,6 @@ import { GL101000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
-import type { components } from '@/shared/api/generated.types'
-
-type LedgerSettingsDTO = components['schemas']['LedgerSettingsDTO']
 
 const ledgerSettingsSchema = z.object({
   default_bridge_account_id: z.string().min(1, 'Required'),
@@ -18,6 +15,9 @@ const ledgerSettingsSchema = z.object({
 })
 
 type LedgerSettingsFormValues = z.infer<typeof ledgerSettingsSchema>
+
+/** Form-projection entity shape passed to the screen controller */
+type LedgerSettingsFormEntity = LedgerSettingsFormValues
 
 export function useLedgerSettingsController() {
   const { settings, isLoading, error, updateSettings } = useLedgerSettings()
@@ -51,16 +51,14 @@ export function useLedgerSettingsController() {
     { immediate: true },
   )
 
-  const activeEntity = computed(() => {
-    return {
-      ...form.state.values,
-    }
+  const activeEntity = computed<LedgerSettingsFormEntity | null>(() => {
+    return { ...form.state.values }
   })
 
-  const base = useScreenController<LedgerSettingsDTO, LedgerSettingsStatus>({
+  const base = useScreenController<LedgerSettingsFormEntity, LedgerSettingsStatus>({
     screen: GL101000,
     dataSource: {
-      entity: activeEntity as unknown as ComputedRef<LedgerSettingsDTO>,
+      entity: activeEntity,
       isLoading: computed(() => isLoading.value || isAccountsLoading.value),
       error,
     },

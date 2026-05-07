@@ -1,25 +1,29 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
 import { useVendorBills } from '../../application/useVendorBills'
 import { AP3020PL } from './screen'
-import { AP3020PL_POLICY } from './policy'
+
 import type { VendorBill } from '../../domain/ap.types'
 
 export function useVendorBillsListController() {
   const router = useRouter()
-  const { bills, isLoading, refetch } = useVendorBills()
+  const { bills, isLoading, error, refetch } = useVendorBills()
 
-  const base = useScreenController<VendorBill[], 'LIST'>({
+  const base = useScreenController<VendorBill[], 'VIEW'>({
     screen: AP3020PL,
     dataSource: {
       entity: bills,
       isLoading,
-      error: ref(null),
+      error,
     },
     isNew: computed(() => false),
-    getDomainState: () => 'LIST',
-    statePolicy: AP3020PL_POLICY,
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
   // Register Commands
