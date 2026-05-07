@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -10,6 +11,7 @@ import type { BankAccount } from '../../domain/bank.types'
 import { CA2020PL } from './screen'
 
 export function useBankAccountsListController() {
+  const gridState = useDataGrid()
   const router = useRouter()
   const accounts = ref<BankAccount[]>([])
   const isLoading = ref(false)
@@ -35,6 +37,7 @@ export function useBankAccountsListController() {
     ...base,
     accounts,
     refresh: () => {},
+    gridState,
     handleCreate,
     handleRowClick,
   }

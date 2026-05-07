@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -9,6 +10,7 @@ import { useActiveTaxGroups } from '../../application/useTaxRules'
 import { TX2010PL } from './screen'
 
 export function useTaxGroupsListController() {
+  const gridState = useDataGrid()
   const router = useRouter()
   const { data: groups, isLoading, error, refetch } = useActiveTaxGroups()
 
@@ -49,5 +51,6 @@ export function useTaxGroupsListController() {
     handleRowClick,
     handleCreate,
     refresh: refetch,
-  }
+    gridState,
+}
 }

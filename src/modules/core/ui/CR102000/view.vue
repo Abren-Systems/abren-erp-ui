@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { DataGrid } from '@/shared/components/data-grid'
 import { ListTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { useTenantSettingsController, type TenantSetting } from './controller'
 
 const ctrl = useTenantSettingsController()
-const gridState = useDataGrid()
+
 
 const settingColumns = [
   {
@@ -27,10 +27,10 @@ const settingColumns = [
     <!-- DataGrid Orchestration -->
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
-        v-model:sorting="gridState.sorting"
-        v-model:row-selection="gridState.rowSelection"
-        v-model:column-visibility="gridState.columnVisibility"
-        v-model:global-filter="gridState.globalFilter"
+        v-model:sorting="ctrl.gridState.sorting"
+        v-model:row-selection="ctrl.gridState.rowSelection"
+        v-model:column-visibility="ctrl.gridState.columnVisibility"
+        v-model:global-filter="ctrl.gridState.globalFilter"
         :data="(ctrl.settings.value as TenantSetting[]) || []"
         :columns="settingColumns"
         :loading="ctrl.isLoading.value"
@@ -41,7 +41,7 @@ const settingColumns = [
           <AppButton
             variant="primary"
             size="sm"
-            @click="ctrl.commands.value['bulkEdit']?.execute()"
+            @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'bulkEdit') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'bulkEdit'))?.command?.execute()"
           >
             Edit Settings
           </AppButton>

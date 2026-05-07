@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed, ref } from 'vue'
 import {
   useScreenController,
@@ -9,6 +10,7 @@ import { WF301000 } from './screen'
 import type { PendingApproval } from '../../domain/workflows.types'
 
 export function useWorkflowInboxController() {
+  const gridState = useDataGrid()
   const { tasks, isLoading, error, refresh } = usePendingApprovals()
 
   const base = useScreenController<PendingApproval[], 'VIEW'>({
@@ -52,5 +54,6 @@ export function useWorkflowInboxController() {
     isDialogOpen,
     handleRowClick,
     handleSuccess,
-  }
+    gridState,
+}
 }

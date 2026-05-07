@@ -1,6 +1,6 @@
 export { default as PageHeader } from './PageHeader.vue'
 export { default as AppSidePanel } from './AppSidePanel.vue'
-export { default as WorkspacePanel } from './WorkspacePanel.vue'
+export { default as WorkspaceCategoryPanel } from './WorkspaceCategoryPanel.vue'
 export { default as MetricCard } from './MetricCard.vue'
 export { default as WorkspaceTable } from './WorkspaceTable.vue'
 export { default as PageToolbar } from './PageToolbar.vue'

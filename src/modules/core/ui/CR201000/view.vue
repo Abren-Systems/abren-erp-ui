@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { DataGrid } from '@/shared/components/data-grid'
 import { ListTitleBar } from '@/platform/chrome'
 import { AppButton, AppInput } from '@/shared/components/primitives'
 import { AppField } from '@/shared/components/field-system'
@@ -8,7 +8,7 @@ import { userColumns } from './grids/user.grid'
 import { useUsersController } from './controller'
 
 const ctrl = useUsersController()
-const gridState = useDataGrid()
+
 </script>
 
 <template>
@@ -17,10 +17,10 @@ const gridState = useDataGrid()
 
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
-        v-model:sorting="gridState.sorting"
-        v-model:row-selection="gridState.rowSelection"
-        v-model:column-visibility="gridState.columnVisibility"
-        v-model:global-filter="gridState.globalFilter"
+        v-model:sorting="ctrl.gridState.sorting"
+        v-model:row-selection="ctrl.gridState.rowSelection"
+        v-model:column-visibility="ctrl.gridState.columnVisibility"
+        v-model:global-filter="ctrl.gridState.globalFilter"
         :data="ctrl.users.value || []"
         :columns="userColumns"
         :loading="ctrl.isLoading.value"
@@ -29,7 +29,7 @@ const gridState = useDataGrid()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="primary" size="sm" @click="ctrl.commands.value['invite']?.execute()">
+          <AppButton variant="primary" size="sm" @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'invite') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'invite'))?.command?.execute()">
             Invite User
           </AppButton>
         </template>
@@ -64,8 +64,8 @@ const gridState = useDataGrid()
         <AppButton variant="ghost" @click="ctrl.isInviteOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="ctrl.commands.value['executeInvite']?.isPending.value"
-          @click="ctrl.commands.value['executeInvite']?.execute()"
+          :loading="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeInvite') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeInvite'))?.command?.isPending.value"
+          @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeInvite') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeInvite'))?.command?.execute()"
         >
           Send Invite
         </AppButton>
@@ -98,8 +98,8 @@ const gridState = useDataGrid()
         <AppButton variant="ghost" @click="ctrl.isAssignmentOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="ctrl.commands.value['executeAssign']?.isPending.value"
-          @click="ctrl.commands.value['executeAssign']?.execute()"
+          :loading="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeAssign') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeAssign'))?.command?.isPending.value"
+          @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeAssign') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeAssign'))?.command?.execute()"
         >
           Update Role
         </AppButton>

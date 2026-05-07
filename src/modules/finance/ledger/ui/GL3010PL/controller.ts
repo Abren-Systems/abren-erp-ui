@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -9,6 +10,7 @@ import { useJournalEntries } from '../../application/useJournalEntries'
 import { GL3010PL } from './screen'
 
 export function useJournalEntriesListController() {
+  const gridState = useDataGrid()
   const router = useRouter()
   const { entries, isLoading, error, refresh } = useJournalEntries()
 
@@ -37,5 +39,6 @@ export function useJournalEntriesListController() {
     entries,
     refresh,
     handleRowClick,
-  }
+    gridState,
+}
 }

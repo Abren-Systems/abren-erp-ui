@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { Plus } from 'lucide-vue-next'
-import { useFiscalPeriods } from '../../../application/useFiscalPeriods'
 import { fiscalPeriodColumns } from '../../grids/fiscal-period.grid'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import FiscalPeriodCreateDrawer from '../components/FiscalPeriodCreateDrawer.vue'
+import { useFiscalPeriodsController } from './controller'
 
 /**
  * Stage 1: Queue — Fiscal Periods List Page.
@@ -15,8 +15,7 @@ import FiscalPeriodCreateDrawer from '../components/FiscalPeriodCreateDrawer.vue
  * Creation handled via slide-out Drawer per the Progressive Disclosure pattern.
  */
 
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
-const { periods, isLoading } = useFiscalPeriods()
+const ctrl = useFiscalPeriodsController()
 const { hasPermission } = usePermissions()
 
 const isCreateOpen = ref(false)
@@ -48,13 +47,13 @@ const isCreateOpen = ref(false)
 
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
-        v-model:sorting="sorting"
-        v-model:row-selection="rowSelection"
-        v-model:column-visibility="columnVisibility"
-        v-model:global-filter="globalFilter"
+        v-model:sorting="ctrl.gridState.sorting"
+        v-model:row-selection="ctrl.gridState.rowSelection"
+        v-model:column-visibility="ctrl.gridState.columnVisibility"
+        v-model:global-filter="ctrl.gridState.globalFilter"
         :columns="fiscalPeriodColumns"
-        :data="periods ?? []"
-        :loading="isLoading"
+        :data="ctrl.periods.value ?? []"
+        :loading="ctrl.isLoading.value"
         placeholder="Search periods..."
       >
         <template #toolbar>

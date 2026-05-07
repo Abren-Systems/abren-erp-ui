@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -9,6 +10,7 @@ import { useLedgerAccounts } from '../../application/useLedgerAccounts'
 import { GL2010PL } from './screen'
 
 export function useAccountListController() {
+  const gridState = useDataGrid()
   const router = useRouter()
   const { accounts, isPending, error, refetch } = useLedgerAccounts()
 
@@ -36,5 +38,6 @@ export function useAccountListController() {
     accounts,
     refresh: refetch,
     handleRowClick,
-  }
+    gridState,
+}
 }

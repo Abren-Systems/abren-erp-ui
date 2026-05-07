@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { DataGrid } from '@/shared/components/data-grid'
 import { ListTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
@@ -8,7 +8,7 @@ import { useWorkflowInboxController } from './controller'
 import WorkflowActionDialog from '../components/WorkflowActionDialog.vue'
 
 const ctrl = useWorkflowInboxController()
-const gridState = useDataGrid()
+
 </script>
 
 <template>
@@ -18,10 +18,10 @@ const gridState = useDataGrid()
     <!-- DataGrid Orchestration -->
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
-        v-model:sorting="gridState.sorting"
-        v-model:row-selection="gridState.rowSelection"
-        v-model:column-visibility="gridState.columnVisibility"
-        v-model:global-filter="gridState.globalFilter"
+        v-model:sorting="ctrl.gridState.sorting"
+        v-model:row-selection="ctrl.gridState.rowSelection"
+        v-model:column-visibility="ctrl.gridState.columnVisibility"
+        v-model:global-filter="ctrl.gridState.globalFilter"
         :data="ctrl.tasks.value || []"
         :columns="workflowColumns"
         :loading="ctrl.isLoading.value"
@@ -31,7 +31,7 @@ const gridState = useDataGrid()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="stealth" @click="ctrl.commands.value['refresh']?.execute()">
+          <AppButton variant="stealth" @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'refresh') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'refresh'))?.command?.execute()">
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
             </template>

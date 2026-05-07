@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed } from 'vue'
 import {
   useScreenController,
@@ -13,6 +14,7 @@ export interface TenantSetting {
 }
 
 export function useTenantSettingsController() {
+  const gridState = useDataGrid()
   const { settings, isSettingsPending, settingsError } = useTenantSettings()
 
   const base = useScreenController<{ settings: TenantSetting[] }, 'VIEW'>({
@@ -38,5 +40,6 @@ export function useTenantSettingsController() {
   return {
     ...base,
     settings,
-  }
+    gridState,
+}
 }

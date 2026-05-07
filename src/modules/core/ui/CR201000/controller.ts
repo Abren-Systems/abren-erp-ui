@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed, ref } from 'vue'
 import {
   useScreenController,
@@ -10,6 +11,7 @@ import { useRoles } from '../../application/useRoles'
 import type { User } from '../../domain/user.types'
 
 export function useUsersController() {
+  const gridState = useDataGrid()
   const { users, isPending, error, createUser, assignRole, isCreating, isAssigning } = useUsers()
   const { roles, isRolesPending } = useRoles()
 
@@ -97,5 +99,6 @@ export function useUsersController() {
     roleOptions,
     isRolesPending,
     handleRowClick,
-  }
+    gridState,
+}
 }

@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -9,6 +10,7 @@ import { useAdjustments } from '../../application/useInventoryAdjustment'
 import { IN3030PL } from './screen'
 
 export function useAdjustmentsListController() {
+  const gridState = useDataGrid()
   const router = useRouter()
   const { adjustments, isLoading, error, refetch: refresh } = useAdjustments()
 
@@ -45,5 +47,6 @@ export function useAdjustmentsListController() {
     refresh,
     handleCreate,
     handleRowClick,
-  }
+    gridState,
+}
 }

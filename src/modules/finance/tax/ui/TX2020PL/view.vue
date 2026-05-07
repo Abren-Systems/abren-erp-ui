@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { DataGrid } from '@/shared/components/data-grid'
 import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
@@ -7,7 +7,7 @@ import { taxRuleColumns } from './grids/tax-rule.grid'
 import { useTaxRulesListController } from './controller'
 
 const ctrl = useTaxRulesListController()
-const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
+
 </script>
 
 <template>
@@ -26,10 +26,10 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
     <!-- Main Content -->
     <div class="flex-1 p-8 min-h-0 overflow-y-auto">
       <DataGrid
-        v-model:sorting="sorting"
-        v-model:row-selection="rowSelection"
-        v-model:column-visibility="columnVisibility"
-        v-model:global-filter="globalFilter"
+        v-model:sorting="ctrl.gridState.sorting"
+        v-model:row-selection="ctrl.gridState.rowSelection"
+        v-model:column-visibility="ctrl.gridState.columnVisibility"
+        v-model:global-filter="ctrl.gridState.globalFilter"
         :columns="taxRuleColumns"
         :data="ctrl.rules.value ?? []"
         :loading="ctrl.isLoading.value"

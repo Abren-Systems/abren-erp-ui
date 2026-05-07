@@ -12,8 +12,8 @@
  * services don't exist yet. The chrome reserves the space.
  */
 import { useRouter } from 'vue-router'
-import { AppButton } from '@/shared/components/primitives'
-import { ArrowLeft, StickyNote, Paperclip, Mail, Settings } from 'lucide-vue-next'
+import { ArrowLeft } from 'lucide-vue-next'
+import RecordServicesMenu from './RecordServicesMenu.vue'
 
 const props = defineProps<{
   /** Form title (e.g., "Payment Requests") */
@@ -52,28 +52,7 @@ function goBack() {
     </div>
 
     <div class="form-title-bar__services">
-      <button class="form-title-bar__service-btn" title="Notes" disabled aria-label="Notes">
-        <StickyNote :size="16" />
-      </button>
-      <button class="form-title-bar__service-btn" title="Files" disabled aria-label="Attach files">
-        <Paperclip :size="16" />
-      </button>
-      <button
-        class="form-title-bar__service-btn"
-        title="Activities"
-        disabled
-        aria-label="Activities"
-      >
-        <Mail :size="16" />
-      </button>
-      <button
-        class="form-title-bar__service-btn"
-        title="Settings"
-        disabled
-        aria-label="Form settings"
-      >
-        <Settings :size="16" />
-      </button>
+      <RecordServicesMenu />
     </div>
   </div>
 </template>
@@ -143,27 +122,5 @@ function goBack() {
   gap: 0.125rem;
 }
 
-.form-title-bar__service-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.375rem;
-  border: none;
-  background: transparent;
-  color: var(--color-neutral-400);
-  cursor: not-allowed;
-  transition: all 0.15s ease;
-}
 
-.form-title-bar__service-btn:not(:disabled) {
-  color: var(--color-neutral-500);
-  cursor: pointer;
-}
-
-.form-title-bar__service-btn:not(:disabled):hover {
-  background: var(--color-neutral-100);
-  color: var(--color-neutral-900);
-}
 </style>

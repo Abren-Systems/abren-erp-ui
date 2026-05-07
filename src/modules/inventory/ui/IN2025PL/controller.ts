@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -10,6 +11,7 @@ import { useWarehouses } from '../../application/useWarehouses'
 import { IN2025PL } from './screen'
 
 export function useStockItemsListController() {
+  const gridState = useDataGrid()
   const router = useRouter()
   const selectedWarehouseId = ref<string | undefined>(undefined)
 
@@ -45,5 +47,6 @@ export function useStockItemsListController() {
     refresh,
     handleCreateAdjustment,
     handleRowClick,
-  }
+    gridState,
+}
 }

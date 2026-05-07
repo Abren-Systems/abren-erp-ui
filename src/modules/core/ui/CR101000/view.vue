@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
+import { DataGrid } from '@/shared/components/data-grid'
 import { ListTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { AppField } from '@/shared/components/field-system'
@@ -8,7 +8,7 @@ import { roleColumns } from './grids/role.grid'
 import { useRolesController } from './controller'
 
 const ctrl = useRolesController()
-const gridState = useDataGrid()
+
 </script>
 
 <template>
@@ -17,10 +17,10 @@ const gridState = useDataGrid()
 
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
-        v-model:sorting="gridState.sorting"
-        v-model:row-selection="gridState.rowSelection"
-        v-model:column-visibility="gridState.columnVisibility"
-        v-model:global-filter="gridState.globalFilter"
+        v-model:sorting="ctrl.gridState.sorting"
+        v-model:row-selection="ctrl.gridState.rowSelection"
+        v-model:column-visibility="ctrl.gridState.columnVisibility"
+        v-model:global-filter="ctrl.gridState.globalFilter"
         :data="ctrl.roles.value || []"
         :columns="roleColumns"
         :loading="ctrl.isLoading.value"
@@ -29,7 +29,7 @@ const gridState = useDataGrid()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="primary" size="sm" @click="ctrl.commands.value['create']?.execute()">
+          <AppButton variant="primary" size="sm" @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'create') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'create'))?.command?.execute()">
             Add Role
           </AppButton>
         </template>
@@ -86,8 +86,8 @@ const gridState = useDataGrid()
         <AppButton variant="ghost" @click="ctrl.isCreateOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="ctrl.commands.value['executeCreate']?.isPending.value"
-          @click="ctrl.commands.value['executeCreate']?.execute()"
+          :loading="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeCreate') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeCreate'))?.command?.isPending.value"
+          @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeCreate') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeCreate'))?.command?.execute()"
         >
           Create Role
         </AppButton>

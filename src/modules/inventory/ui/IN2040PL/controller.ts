@@ -1,3 +1,4 @@
+import { useDataGrid } from '@/shared/components/data-grid'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -9,6 +10,7 @@ import { useWarehouses } from '../../application/useWarehouses'
 import { IN2040PL } from './screen'
 
 export function useWarehousesListController() {
+  const gridState = useDataGrid()
   const router = useRouter()
   const { warehouses, isPending: isLoading, error, refetch: refresh } = useWarehouses()
 
@@ -45,5 +47,6 @@ export function useWarehousesListController() {
     refresh,
     handleCreate,
     handleRowClick,
-  }
+    gridState,
+}
 }
