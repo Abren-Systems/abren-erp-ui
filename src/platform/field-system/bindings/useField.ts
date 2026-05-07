@@ -5,6 +5,7 @@ import type { ScreenStateMachine } from '@/platform/screen-runtime/state-machine
 import { debugBus } from '@/platform/debug/debug-bus'
 
 export interface FieldBinding<TValue = unknown> {
+  field: string
   value: ComputedRef<TValue | undefined>
   modelValue: ComputedRef<TValue | undefined>
   label: string
@@ -111,6 +112,7 @@ export function useField<TEntity, TValue>(
   }
 
   return {
+    field: String(definition.key),
     value,
     modelValue: value,
     label: definition.label,
