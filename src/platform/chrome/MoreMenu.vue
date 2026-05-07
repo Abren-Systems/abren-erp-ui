@@ -13,13 +13,14 @@ import { AppButton } from '@/shared/components/primitives'
 import { MoreHorizontal } from 'lucide-vue-next'
 import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
+import type { CommandProjection } from '../screen-runtime/screen-model.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
 
 const props = defineProps<{
-  /** Secondary commands provided by the projection */
-  secondaryCommands: readonly ScreenCommand[]
-  /** Expected next action from projection (for green dot rendering) */
-  expectedNext?: ScreenCommand
+  /** Secondary command projections from the unified model */
+  secondaryActions: readonly CommandProjection[]
+  /** Expected next action from model (for green dot rendering) */
+  expectedNext?: CommandProjection
   /** Registered command executors from the controller */
   executors: Record<string, ControllerCommand>
   /** Whether any command is currently executing */
@@ -28,12 +29,13 @@ const props = defineProps<{
 
 const isOpen = ref(false)
 
+// UI-owned visual grouping by categoryKey
 const groups = computed(() => {
-  const map = new Map<string, ScreenCommand[]>()
-  for (const cmd of props.secondaryCommands) {
-    const category = cmd.categoryKey ?? 'other'
+  const map = new Map<string, CommandProjection[]>()
+  for (const cp of props.secondaryActions) {
+    const category = cp.command.categoryKey ?? 'other'
     if (!map.has(category)) map.set(category, [])
-    map.get(category)!.push(cmd)
+    map.get(category)!.push(cp)
   }
   return map
 })
@@ -52,7 +54,7 @@ const confirmState = ref<{ open: boolean; command: ScreenCommand | null }>({
 })
 
 function executeCommand(command: ScreenCommand) {
-  if (!isCommandEnabled(command)) return
+  if (props.isPending) return
 
   if (command.requiresConfirmation) {
     confirmState.value = { open: true, command }
@@ -71,10 +73,6 @@ function confirmExecution() {
     if (executor) void executor.execute()
   }
   confirmState.value = { open: false, command: null }
-}
-
-function isCommandEnabled(command: ScreenCommand): boolean {
-  return !props.isPending
 }
 
 function toggleMenu() {
@@ -100,34 +98,34 @@ function closeMenu() {
 
     <Transition name="more-menu-fade">
       <div v-if="isOpen" class="more-menu__panel">
-        <template v-for="[category, cmds] in groups" :key="category">
+        <template v-for="[category, cps] in groups" :key="category">
           <div class="more-menu__category">
             <span class="more-menu__category-title">
               {{ CATEGORY_LABELS[category] ?? category }}
             </span>
             <button
-              v-for="cmd in cmds"
-              :key="cmd.key"
+              v-for="cp in cps"
+              :key="cp.command.key"
               class="more-menu__item"
               :class="{
-                'more-menu__item--disabled': !isCommandEnabled(cmd),
-                'more-menu__item--danger': cmd.variant === 'danger',
+                'more-menu__item--disabled': !cp.enabled || isPending,
+                'more-menu__item--danger': cp.command.variant === 'danger',
               }"
-              :disabled="!isCommandEnabled(cmd)"
-              @click="executeCommand(cmd)"
+              :disabled="!cp.enabled || isPending"
+              @click="executeCommand(cp.command)"
             >
               <span
-                v-if="expectedNext?.key === cmd.key"
+                v-if="expectedNext?.command.key === cp.command.key"
                 class="more-menu__expected-dot"
                 title="Expected next action"
                 >●</span
               >
               <span v-else class="more-menu__dot-spacer" />
 
-              <span class="more-menu__item-label">{{ cmd.labelKey }}</span>
+              <span class="more-menu__item-label">{{ cp.command.labelKey }}</span>
 
               <span
-                v-if="cmd.favoriteEligible"
+                v-if="cp.command.favoriteEligible"
                 class="more-menu__favorite"
                 title="Add to toolbar favorites"
                 >★</span

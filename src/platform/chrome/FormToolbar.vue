@@ -18,20 +18,18 @@ import { Save, X, ChevronFirst, ChevronLeft, ChevronRight, ChevronLast } from 'l
 import MoreMenu from './MoreMenu.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
-import type { ScreenProjection } from '../screen-runtime/screen-projection.types'
+import type { ScreenModel, CommandProjection } from '../screen-runtime/screen-model.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
 
 const props = defineProps<{
-  /** Pure UI projection containing command hierarchy */
-  projection: ScreenProjection
+  /** The unified screen model — single deterministic rendering contract */
+  model: ScreenModel
   /** Registered command executors from the controller */
   executors: Record<string, ControllerCommand>
   /** Whether any command is currently executing */
   isPending: boolean
   /** Whether the record is new (hides navigation) */
   isNew: boolean
-  /** Whether the record is editable according to the ScreenStatePolicy */
-  isEditable: boolean
 }>()
 
 const emit = defineEmits<{
@@ -79,7 +77,7 @@ function getButtonVariant(cmd: ScreenCommand) {
       <AppButton
         variant="outline"
         size="sm"
-        :disabled="isPending || !isEditable"
+        :disabled="isPending || !model.domain.capabilities.canEdit"
         @click="emit('save')"
       >
         <Save :size="14" class="mr-1.5" />
@@ -113,37 +111,37 @@ function getButtonVariant(cmd: ScreenCommand) {
 
     <!-- Expected Next Action (highlighted) -->
     <AppButton
-      v-if="projection.commands.expectedNext"
+      v-if="model.ui.actions.expectedNext"
       variant="primary"
       size="sm"
       :disabled="isPending"
       class="form-toolbar__expected-next"
-      @click="executeCommand(projection.commands.expectedNext)"
+      @click="executeCommand(model.ui.actions.expectedNext.command)"
     >
-      {{ projection.commands.expectedNext.labelKey }}
+      {{ model.ui.actions.expectedNext.command.labelKey }}
     </AppButton>
 
     <!-- Toolbar Favorites -->
     <AppButton
-      v-for="cmd in projection.commands.primary"
-      :key="cmd.key"
-      :variant="getButtonVariant(cmd)"
+      v-for="cp in model.ui.actions.primary"
+      :key="cp.command.key"
+      :variant="getButtonVariant(cp.command)"
       size="sm"
-      :disabled="isPending"
+      :disabled="isPending || !cp.enabled"
       :class="
-        cmd.variant === 'danger'
+        cp.command.variant === 'danger'
           ? 'text-[var(--color-danger-600)] hover:bg-[var(--color-danger-50)]'
           : ''
       "
-      @click="executeCommand(cmd)"
+      @click="executeCommand(cp.command)"
     >
-      {{ cmd.labelKey }}
+      {{ cp.command.labelKey }}
     </AppButton>
 
     <!-- More Menu -->
     <MoreMenu
-      :secondary-commands="projection.commands.secondary"
-      :expected-next="projection.commands.expectedNext"
+      :secondary-actions="model.ui.actions.secondary"
+      :expected-next="model.ui.actions.expectedNext"
       :executors="executors"
       :is-pending="isPending"
     />
