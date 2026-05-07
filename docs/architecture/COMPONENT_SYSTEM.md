@@ -21,7 +21,7 @@ This document defines how UI components are built, consumed, and governed in Abr
 
 Business modules must consume **Abren-owned shared components**, not raw vendor primitives.
 
-- Use **Technical Primitives** (`src/shared/components/`) for visual mechanics (Buttons, Inputs).
+- Use **Technical Primitives** (`src/shared/components/primitives/`) for visual mechanics (Buttons, Inputs).
 - Use **Semantic Kernel Components** (`src/shared/ui/`) for ERP concepts (Money, Account Selectors).
 - The product contract belongs to Abren, not to any vendor library.
 
