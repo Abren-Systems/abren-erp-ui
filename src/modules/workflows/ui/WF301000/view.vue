@@ -1,68 +1,53 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { Inbox, CheckCircle2 } from 'lucide-vue-next'
+import { FormTitleBar } from '@/platform/chrome'
+import { AppButton } from '@/shared/components/primitives'
+import { RefreshCcw } from 'lucide-vue-next'
 import { workflowColumns } from '../grids/workflow.grid'
-import { usePendingApprovals } from '../../application/usePendingApprovals'
+import { useWorkflowInboxController } from './controller'
 import WorkflowActionDialog from '../components/WorkflowActionDialog.vue'
-import type { PendingApproval } from '../../domain/workflows.types'
 
-const { tasks, isLoading, refresh } = usePendingApprovals()
+const ctrl = useWorkflowInboxController()
 const gridState = useDataGrid()
-
-const selectedTask = ref<PendingApproval | null>(null)
-const isDialogOpen = ref(false)
-
-function handleRowClick(task: PendingApproval) {
-  selectedTask.value = task
-  isDialogOpen.value = true
-}
-
-function handleSuccess() {
-  refresh()
-  selectedTask.value = null
-}
 </script>
 
 <template>
-  <div class="flex h-full flex-col bg-[var(--app-canvas)]">
-    <!-- Page Header -->
-    <div
-      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
-    >
-      <div class="flex items-center gap-4">
-        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
-          <Inbox class="h-6 w-6 text-[var(--color-primary-600)]" />
-        </div>
-        <div>
-          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
-            Workflow Inbox
-          </h1>
-          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
-            Review and approve pending tasks across all modules.
-          </p>
-        </div>
-      </div>
-    </div>
+  <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
+    <FormTitleBar :form-title="ctrl.screen.titleKey" />
 
     <!-- DataGrid Orchestration -->
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
-        :data="tasks || []"
+        v-model:sorting="gridState.sorting"
+        v-model:row-selection="gridState.rowSelection"
+        v-model:column-visibility="gridState.columnVisibility"
+        v-model:global-filter="gridState.globalFilter"
+        :data="ctrl.tasks.value || []"
         :columns="workflowColumns"
-        :loading="isLoading"
-        :state="gridState"
-        @row-click="handleRowClick"
-      />
+        :loading="ctrl.isLoading.value"
+        placeholder="Search pending tasks..."
+        empty-message="No pending approvals found."
+        row-clickable
+        @row-click="ctrl.handleRowClick"
+      >
+        <template #toolbar>
+          <AppButton variant="stealth" @click="ctrl.commands.value['refresh']?.execute()">
+            <template #start>
+              <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
+            </template>
+            Refresh
+          </AppButton>
+        </template>
+      </DataGrid>
     </div>
 
     <WorkflowActionDialog
-      v-if="selectedTask"
-      :instance-id="selectedTask.id"
-      :target-state="selectedTask.targetState || ''"
-      :is-open="isDialogOpen"
-      @close="isDialogOpen = false"
-      @success="handleSuccess"
+      v-if="ctrl.selectedTask.value"
+      :instance-id="ctrl.selectedTask.value.id"
+      :target-state="ctrl.selectedTask.value.targetState || ''"
+      :is-open="ctrl.isDialogOpen.value"
+      @close="ctrl.isDialogOpen.value = false"
+      @success="ctrl.handleSuccess"
     />
   </div>
 </template>
