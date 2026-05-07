@@ -66,4 +66,13 @@ export const TaxAdapter = {
     const parsedDto = TaxGroupSchema.parse(response) as TaxGroupDTO
     return TaxMapper.toTaxGroup(parsedDto)
   },
+
+  /**
+   * Retrieves a specific tax group by its identifier.
+   */
+  async getGroupById(groupId: string): Promise<TaxGroup> {
+    const response = await apiGet<TaxGroupDTO>(`/finance/tax/groups/${groupId}`)
+    const dto = TaxGroupSchema.parse(response) as TaxGroupDTO
+    return TaxMapper.toTaxGroup(dto)
+  },
 }

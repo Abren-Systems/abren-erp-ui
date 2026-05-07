@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { DataGrid, useDataGrid } from '@/shared/components/data-grid'
-import { PageHeader } from '@/shared/components/workspace'
+import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
-import { Plus, RefreshCcw } from 'lucide-vue-next'
+import { RefreshCcw } from 'lucide-vue-next'
 import { taxGroupColumns } from './grids/tax-group.grid'
 import { useTaxGroupsListController } from './controller'
 
@@ -12,23 +12,19 @@ const { sorting, rowSelection, columnVisibility, globalFilter } = useDataGrid()
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <PageHeader
-      :title="ctrl.screen.titleKey"
-      description="Combine multiple tax rules into compound calculations."
-      icon="LayoutGrid"
-      plain
-    >
-      <template #actions>
-        <AppButton variant="primary" size="sm" @click="ctrl.handleCreate">
-          <template #start>
-            <Plus :size="14" />
-          </template>
-          New Tax Group
-        </AppButton>
-      </template>
-    </PageHeader>
+    <!-- Header -->
+    <FormTitleBar :form-title="ctrl.screen.titleKey" />
 
-    <div class="flex-1 p-8 min-h-0">
+    <!-- Toolbar -->
+    <FormToolbar
+      :model="ctrl.model.value"
+      :executors="ctrl.commands.value"
+      :is-pending="ctrl.isPending.value"
+      :is-new="false"
+    />
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8 min-h-0 overflow-y-auto">
       <DataGrid
         v-model:sorting="sorting"
         v-model:row-selection="rowSelection"

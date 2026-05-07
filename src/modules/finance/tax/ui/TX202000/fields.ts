@@ -7,34 +7,39 @@ export const TX202000_FIELDS = {
     label: 'Rule Name',
     type: 'text',
     required: () => true,
-  },
+  } as FieldDefinition<TaxRule, string>,
+
   rate: {
     key: 'rate',
     label: 'Rate',
     type: 'number',
     required: () => true,
-  },
+  } as FieldDefinition<TaxRule, number>,
+
   taxType: {
     key: 'taxType',
     label: 'Tax Type',
     type: 'selector',
     required: () => true,
-  },
+  } as FieldDefinition<TaxRule, string>,
+
   direction: {
     key: 'direction',
     label: 'Direction',
     type: 'selector',
     required: () => true,
-  },
+  } as FieldDefinition<TaxRule, string>,
+
   glAccountId: {
     key: 'glAccountId',
     label: 'GL Account',
     type: 'selector',
     required: () => true,
-  },
+  } as FieldDefinition<TaxRule, string>,
+
   isActive: {
     key: 'isActive',
     label: 'Active',
     type: 'checkbox',
-  },
-} satisfies Record<string, FieldDefinition<TaxRule>>
+  } as FieldDefinition<TaxRule, boolean>,
+} as const

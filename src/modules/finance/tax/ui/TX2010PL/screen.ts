@@ -1,6 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { TX2010PL_COMMANDS } from './commands'
 
 export const TX2010PL: ScreenDefinition = {
   id: 'TX2010PL' as ScreenId,
@@ -26,7 +27,7 @@ export const TX2010PL: ScreenDefinition = {
     renderTarget: () => import('./view.vue') as never,
     sidePanel: { tabs: [], defaultCollapsed: true },
   },
-  commands: [],
+  commands: Object.values(TX2010PL_COMMANDS),
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,

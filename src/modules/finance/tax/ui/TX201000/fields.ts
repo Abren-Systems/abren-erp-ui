@@ -7,16 +7,18 @@ export const TX201000_FIELDS = {
     label: 'Group Name',
     type: 'text',
     required: () => true,
-  },
+  } as FieldDefinition<TaxGroup, string>,
+
   method: {
     key: 'method',
     label: 'Calculation Method',
     type: 'selector',
     required: () => true,
-  },
+  } as FieldDefinition<TaxGroup, string>,
+
   isActive: {
     key: 'isActive',
     label: 'Active',
     type: 'checkbox',
-  },
-} satisfies Record<string, FieldDefinition<TaxGroup>>
+  } as FieldDefinition<TaxGroup, boolean>,
+} as const

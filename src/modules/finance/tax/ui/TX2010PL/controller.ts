@@ -9,31 +9,45 @@ import { useActiveTaxGroups } from '../../application/useTaxRules'
 import { TX2010PL } from './screen'
 
 export function useTaxGroupsListController() {
-  const { data: groups, isPending: isLoading, error, refetch: refresh } = useActiveTaxGroups()
-
   const router = useRouter()
+  const { data: groups, isLoading, error, refetch } = useActiveTaxGroups()
 
   const base = useScreenController({
     screen: TX2010PL,
-    dataSource: { entity: computed(() => null), isLoading, error },
+    dataSource: {
+      entity: groups,
+      isLoading,
+      error,
+    },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,
   })
 
-  function handleCreate() {
-    void router.push({ name: 'finance.tax.group', params: { id: 'new' } })
+  // Register Creation Command
+  base.registerCommand('create', {
+    execute: async () => {
+      void router.push({ name: 'finance.tax.groups.detail', params: { id: 'new' } })
+    },
+    isPending: computed(() => false),
+  })
+
+  const handleRowClick = (row: unknown) => {
+    void router.push({
+      name: 'finance.tax.groups.detail',
+      params: { id: (row as { id: string }).id },
+    })
   }
 
-  function handleRowClick(row: { id: string }) {
-    void router.push({ name: 'finance.tax.group', params: { id: row.id } })
+  const handleCreate = () => {
+    void base.commands.value['create']?.execute()
   }
 
   return {
     ...base,
     groups,
-    refresh,
-    handleCreate,
     handleRowClick,
+    handleCreate,
+    refresh: refetch,
   }
 }

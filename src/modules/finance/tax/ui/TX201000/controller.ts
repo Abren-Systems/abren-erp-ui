@@ -1,35 +1,92 @@
-import { computed, ref } from 'vue'
+import { computed, watch, ref, type ComputedRef } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  useScreenController,
-  LIST_SCREEN_POLICY,
-  listScreenDomainState,
-} from '@/platform/screen-runtime'
-import { useCreateTaxGroup, useActiveTaxRules } from '../../application/useTaxRules'
-// We don't have a useTaxGroup composable for detail yet, mocking it for completeness
-import type { TaxGroup } from '../../domain/tax.types'
+import { useScreenController } from '@/platform/screen-runtime'
+import { useTaxGroup, useCreateTaxGroup, useActiveTaxRules } from '../../application/useTaxRules'
 import { TX201000 } from './screen'
+import { TX201000_POLICY, type TaxGroupStatus } from './policy'
 import { TX201000_FIELDS } from './fields'
-import { useField } from '@/platform/field-system/bindings'
+import { useField } from '@/platform/field-system/bindings/useField'
+import { useForm } from '@tanstack/vue-form'
+import { z } from 'zod'
+import type { TaxGroup, TaxRule } from '../../domain/tax.types'
+import type { TaxGroupId } from '@/shared/types/brand.types'
+
+const taxGroupSchema = z.object({
+  name: z.string().min(1, 'Required'),
+  method: z.enum(['SIMPLE', 'COMPOUND']),
+  rule_ids: z.array(z.string()).min(1, 'At least one rule is required'),
+  is_active: z.boolean(),
+})
+
+type TaxGroupFormValues = z.infer<typeof taxGroupSchema>
 
 export function useTaxGroupController(id: string) {
   const router = useRouter()
   const isNew = computed(() => id === 'new')
+  const groupId = computed(() => (isNew.value ? null : (id as TaxGroupId)))
 
-  // Mock fetching a single group since API might not have it yet
-  const group = ref<TaxGroup | null>(null)
-  const isLoading = ref(false)
-  const error = ref(null)
-
-  const { data: availableRules } = useActiveTaxRules()
+  const { data: entity, isLoading, error } = useTaxGroup(groupId)
+  const { data: availableRules, isLoading: isRulesLoading } = useActiveTaxRules()
   const { mutateAsync: createGroup, isPending: isCreating } = useCreateTaxGroup()
 
-  const base = useScreenController({
+  const form = useForm({
+    defaultValues: {
+      name: '',
+      method: 'SIMPLE',
+      rule_ids: [],
+      is_active: true,
+    } as TaxGroupFormValues,
+    validators: {
+      onChange: taxGroupSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (isNew.value) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await createGroup(value as any)
+        void router.push({ name: 'finance.tax.groups' })
+      } else {
+        // TODO: Implement update mutation
+        console.log('Update not implemented yet', value)
+      }
+    },
+  })
+
+  // Sync server state to form state
+  watch(
+    entity,
+    (newVal) => {
+      if (newVal && !isNew.value) {
+        form.setFieldValue('name', newVal.name)
+        form.setFieldValue('method', newVal.method)
+        form.setFieldValue('rule_ids', newVal.ruleIds as string[])
+        form.setFieldValue('is_active', newVal.isActive)
+      }
+    },
+    { immediate: true },
+  )
+
+  const activeEntity = computed(() => {
+    const vals = form.state.values
+    return {
+      name: vals.name,
+      method: vals.method,
+      ruleIds: vals.rule_ids,
+      isActive: vals.is_active,
+    }
+  })
+
+  const base = useScreenController<TaxGroup, TaxGroupStatus>({
     screen: TX201000,
-    dataSource: { entity: group, isLoading, error },
+    dataSource: {
+      entity: activeEntity as unknown as ComputedRef<TaxGroup>,
+      isLoading: computed(() => isLoading.value || isRulesLoading.value),
+      error,
+    },
     isNew,
-    getDomainState: listScreenDomainState,
-    statePolicy: LIST_SCREEN_POLICY,
+    getDomainState: (ent) => {
+      return ent?.isActive ? 'ACTIVE' : 'INACTIVE'
+    },
+    statePolicy: TX201000_POLICY,
   })
 
   const fields = {
@@ -38,43 +95,52 @@ export function useTaxGroupController(id: string) {
     isActive: useField(base, TX201000_FIELDS.isActive),
   }
 
-  const form = ref({
-    name: '',
-    method: 'SIMPLE' as 'SIMPLE' | 'COMPOUND',
-    rule_ids: [] as string[],
-  })
-
   const selectedRuleId = ref('')
 
-  function addRule() {
-    if (selectedRuleId.value && !form.value.rule_ids.includes(selectedRuleId.value)) {
-      form.value.rule_ids.push(selectedRuleId.value)
+  const handleAddRule = () => {
+    const currentRules = form.getFieldValue('rule_ids')
+    if (selectedRuleId.value && !currentRules.includes(selectedRuleId.value)) {
+      form.setFieldValue('rule_ids', [...currentRules, selectedRuleId.value])
       selectedRuleId.value = ''
     }
   }
 
-  function removeRule(ruleId: string) {
-    form.value.rule_ids = form.value.rule_ids.filter((id) => id !== ruleId)
+  const handleRemoveRule = (ruleId: string) => {
+    const currentRules = form.getFieldValue('rule_ids')
+    form.setFieldValue(
+      'rule_ids',
+      currentRules.filter((id) => id !== ruleId),
+    )
   }
 
-  async function handleSubmit() {
-    if (form.value.rule_ids.length === 0) {
-      alert('Please select at least one tax rule.')
-      return
-    }
-    await createGroup(form.value)
-    void router.push({ name: 'finance.tax.groups' })
+  const handleSave = async () => {
+    void form.handleSubmit()
   }
+
+  const ruleOptions = computed(
+    () =>
+      availableRules.value?.map((r: TaxRule) => ({
+        label: `${r.name} (${(r.rate * 100).toFixed(1)}%)`,
+        value: r.id,
+      })) || [],
+  )
+
+  const selectedRules = computed(() => {
+    const currentIds = form.getFieldValue('rule_ids')
+    return (
+      availableRules.value?.filter((r) => (currentIds as string[]).includes(r.id as string)) || []
+    )
+  })
 
   return {
     ...base,
     fields,
-    form,
-    isCreating,
-    availableRules,
+    ruleOptions,
+    selectedRules,
     selectedRuleId,
-    addRule,
-    removeRule,
-    handleSubmit,
+    isCreating,
+    handleAddRule,
+    handleRemoveRule,
+    handleSave,
   }
 }
