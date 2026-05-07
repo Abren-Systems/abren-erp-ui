@@ -75,7 +75,8 @@ Repeatable screen structure compositions that implement [Acumatica Form Anatomy]
 
 | Component            | Acumatica Part            | Purpose                                                  | Status       |
 | -------------------- | ------------------------- | -------------------------------------------------------- | ------------ |
-| `FormTitleBar`       | Part 1: Form Title Bar    | Form title, record title, record service buttons         | ❌ Not built |
+| `FormTitleBar`       | Part 1: Form Title Bar    | Full chrome: back nav, record title, services            | ✅ Built     |
+| `ListTitleBar`       | Part 1: List Title Bar    | Minimal chrome for lists/workspaces: title, actions slot | ✅ Built     |
 | `FormToolbar`        | Part 2: Form Toolbar      | Standard buttons + Expected Next + More Menu             | ❌ Not built |
 | `MoreMenu`           | Part 2: More Menu         | Categorized commands, favorites, expected next indicator | ❌ Not built |
 | `RecordServicesMenu` | Part 1: Title Bar buttons | Notes, Files, Activities, Settings                       | ❌ Not built |

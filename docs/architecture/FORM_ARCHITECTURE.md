@@ -21,20 +21,25 @@ In Abren ERP, a **form** is the primary interaction surface. Every financial tra
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ 1. FORM TITLE BAR        (rendered by platform — FormTitleBar)  │
+│ 1. TITLE BAR                                                     │
+│    FormTitleBar (setup, maintenance, dataEntry)                   │
+│    ListTitleBar (inquiry, primaryList, processing, dashboard)     │
 ├─────────────────────────────────────────────────────────────────┤
-│ 2. FORM TOOLBAR           (rendered by platform — FormToolbar)  │
+│ 2. FORM TOOLBAR           (form kinds only — FormToolbar)        │
 ├─────────────────────────────────────────────────────────────────┤
-│ 3. SUMMARY AREA           (AppTemplate + AppFieldset groups)    │
+│ 3. SUMMARY AREA           (AppTemplate + AppFieldset groups)     │
 ├─────────────────────────────────────────────────────────────────┤
-│ 4. TABS                   (AppTabs — personalizable)            │
+│ 4. TABS                   (AppTabs — personalizable)             │
 ├─────────────────────────────────────────────────────────────────┤
-│ 5. DETAILS AREA           (DataGrid, AppFieldset, or Rich Text) │
-│    6. ROW                 (line items in grid)                   │
+│ 5. DETAILS AREA           (DataGrid, AppFieldset, or Rich Text)  │
+│    6. ROW                 (line items in grid)                    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-Parts 1 and 2 (Title Bar, Toolbar) are **platform chrome** — the screen's `view.vue` never renders them. Parts 3–6 are what `view.vue` provides as pure layout projection from the controller.
+**Chrome selection is driven by `ScreenKind`** (see [Screen Runtime §4](SCREEN_RUNTIME.md#4-working-area-chrome-title-bar--toolbar)):
+
+- **Form kinds** (`setup`, `maintenance`, `dataEntry`): Parts 1–2 (FormTitleBar + FormToolbar) are **platform chrome** — the screen's `view.vue` never renders them. Parts 3–6 are what `view.vue` provides as pure layout projection from the controller.
+- **List kinds** (`inquiry`, `primaryList`, `processing`, `dashboard`): Part 1 (ListTitleBar) is platform chrome — minimal, with no record context. Part 2 (FormToolbar) is not rendered. The DataGrid component provides its own toolbar via the `#toolbar` slot.
 
 ### Form Kinds and Their Layout Contracts
 

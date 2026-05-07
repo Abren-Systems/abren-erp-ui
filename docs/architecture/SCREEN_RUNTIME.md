@@ -28,8 +28,8 @@ Vue Router
         -> Command Registry (PXAction declarations)
       -> ScreenRenderer
         -> ScreenDefinition (Metadata — screen.ts)
-        -> FormTitleBar (record-level services)
-        -> FormToolbar (command rendering)
+        -> Title Bar Chrome (FormTitleBar | ListTitleBar — by ScreenKind)
+        -> FormToolbar (command rendering — form kinds only)
         -> Working Area (view.vue — pure layout)
         -> AppSidePanel (contextual record details)
 ```
@@ -82,29 +82,92 @@ The `resolveScreenModel` function acts as a **Semantic Compiler**. It takes raw 
 
 ---
 
-## 4. Form Title Bar Rendering
+## 4. Working Area Chrome (Title Bar + Toolbar)
 
-The Form Title Bar is rendered by the `FormTitleBar` component (platform-level). It is **not** hand-coded per form.
+The Working Area chrome is **not hand-coded per screen** — the platform selects the correct chrome components based on `ScreenKind`. This is a fundamental Acumatica distinction: list/inquiry screens have lightweight chrome (no record context), while data-entry and maintenance screens have full record-aware chrome.
 
-### Rendering Rules:
+### 4.1 Chrome Selection by Screen Kind
+
+The ScreenRenderer assembles chrome based on the `ScreenKind` declared in the screen definition:
+
+| Chrome Component      | Setup | Maintenance | Data Entry | Inquiry / PL | Processing | Dashboard |
+| --------------------- | ----- | ----------- | ---------- | ------------ | ---------- | --------- |
+| **FormTitleBar**      | ✅    | ✅          | ✅         | —            | —          | —         |
+| **ListTitleBar**      | —     | —           | —          | ✅           | ✅         | ✅        |
+| **FormToolbar**       | ✅    | ✅          | ✅         | —            | —          | —         |
+| **FormBanner**        | ✅    | ✅          | ✅         | —            | —          | —         |
+| **Record Navigation** | —     | ✅          | ✅         | —            | —          | —         |
+| **Record Services**   | —     | ✅          | ✅         | —            | —          | —         |
+| **Side Panel**        | —     | Optional    | Optional   | Optional     | —          | —         |
+
+> [!IMPORTANT]
+> **FormTitleBar ≠ ListTitleBar.** `FormTitleBar` renders back navigation, a record title (e.g., "PR-0042"), and record-level service buttons (Notes, Files, Activities, Settings). `ListTitleBar` renders only the screen title — no back button, no record context, no service strip. List screens are top-level workspace destinations, not drill-down targets.
+
+### 4.2 FormTitleBar (Record-Context Chrome)
+
+Used by: `setup`, `maintenance`, `dataEntry`
+
+The Form Title Bar provides record-level context and record-level service buttons:
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
-│ {screenDefinition.title}                                              │
-│ {recordId} - {recordTitle}           [📝 Note] [📧 Activities] [📎 Files] [⚙] │
+│ [←] {screenDefinition.titleKey}                                       │
+│     {recordId} — {recordTitle}       [📝 Note] [📧 Activities] [📎 Files] [⚙] │
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
 | Element           | Source                                   | Behavior                                        |
 | ----------------- | ---------------------------------------- | ----------------------------------------------- |
-| Form title        | `screenDefinition.title`                 | Static — set once from screen metadata          |
+| Back button       | `backRoute` prop (PL screen)             | Navigates to the paired list screen             |
+| Form title        | `screenDefinition.titleKey`              | Static — set once from screen metadata          |
 | Record title      | Controller's primary view current record | Reactive — updates on record navigation         |
 | Note button       | Platform `RecordNotes` service           | Opens note attachment dialog for current record |
 | Activities button | Platform `RecordActivities` service      | Opens task/event/email creation in new tab      |
 | Files button      | Platform `RecordAttachments` service     | Opens file attachment dialog for current record |
 | Settings button   | Platform `ScreenConfiguration` service   | Form personalization and configuration          |
 
-> **Build status:** All title bar service buttons are ❌ not built. The `FormTitleBar` component must be created as platform chrome.
+> **Title Bar buttons ≠ Toolbar buttons.** The Toolbar has document-level commands (Save, Release). The Title Bar has record-level attachments (Notes, Files, Activities).
+
+> **Build status:** `FormTitleBar` component is ✅ built. Record service buttons are ❌ not built (placeholder icons shown).
+
+### 4.3 ListTitleBar (Workspace-Destination Chrome)
+
+Used by: `inquiry`, `primaryList`, `processing`, `dashboard`
+
+The List Title Bar is intentionally minimal — list screens are top-level workspace destinations, not record-context forms:
+
+```
+┌───────────────────────────────────────────────────────────────────────┐
+│ {screenDefinition.titleKey}                            [slot:actions] │
+└───────────────────────────────────────────────────────────────────────┘
+```
+
+| Element      | Source                      | Behavior                                   |
+| ------------ | --------------------------- | ------------------------------------------ |
+| Screen title | `screenDefinition.titleKey` | Static                                     |
+| Actions slot | Named slot `#actions`       | Optional — for screen-level action buttons |
+
+**What ListTitleBar does NOT have:**
+
+- No back button (lists are not drill-down targets)
+- No record title (no single-record context)
+- No record services (Notes, Files, Activities belong to records, not lists)
+- No separator or record identifier
+
+> **Build status:** `ListTitleBar` component is ✅ built.
+
+### 4.4 Chrome Assembly in ScreenRenderer
+
+The `ScreenRenderer` is the platform component that selects and mounts the correct chrome:
+
+```typescript
+// Simplified ScreenRenderer chrome selection logic
+const isFormKind = ['setup', 'maintenance', 'dataEntry'].includes(screen.kind)
+const isListKind = ['inquiry', 'primaryList', 'processing', 'dashboard'].includes(screen.kind)
+
+// FormTitleBar + FormToolbar + FormBanner for record-context screens
+// ListTitleBar for list/inquiry screens (no toolbar, no banner)
+```
 
 ---
 
