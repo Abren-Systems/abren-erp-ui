@@ -25,7 +25,7 @@ A **domain-aware frontend** for a Financial Operating System — not a collectio
 Conceptually, the architecture is organized into four distinct layers of authority that govern how data becomes a user interface:
 
 1. **Platform Runtime** (`src/platform/`): The authoritative **Engine**. Owns the Screen Model contract, the deterministic resolution pipeline, and the "Chrome" (shell) components. It has zero knowledge of business rules.
-2. **Shared Semantic Kernel** (`src/shared/ui/`): The authoritative **ERP Vocabulary**. Owns "Domain-Aware" components (e.g., `MoneyDisplay`, `StatusBadge`, `AccountSelector`) that understand financial concepts but are module-agnostic.
+2. **Shared Semantic Kernel** (`src/shared/ui/`): The authoritative **ERP Vocabulary**. Owns "Domain-Aware" components (e.g., `MoneyDisplay`, `StatusBadge`, `AccountSelector`) that understand financial concepts but are module-agnostic. This layer enforces **Semantic Normalization**—ensuring every ERP concept has exactly one visual authority.
 3. **Business Modules** (`src/modules/`): The authoritative **Domain Logic**. Owns the state machines, domain types, and data adapters for specific business bounded contexts.
 4. **Screen Projections** (`resolve-screen-model.ts`): The authoritative **Presentation State**. This pure function "compiles" the platform, kernel, and module inputs into a deterministic, JSON-serializable model for rendering.
 

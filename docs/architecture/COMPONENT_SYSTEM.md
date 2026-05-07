@@ -225,3 +225,28 @@ The `FormToolbar` component reads commands and renders them. No hand-coding per 
 - No raw business layout outside `AppTemplate` or `AppFieldset`.
 - All interactive elements must have a unique, descriptive ID.
 - Business grids must use a `DataGridPreset`.
+
+---
+
+## 8. Maturity & Governance
+
+### 8.1 Semantic Normalization
+
+The primary goal of the `shared/ui/` layer is **Semantic Normalization**. Every ERP concept (e.g., "Paid" status, "Money" formatting, "Ledger Account" selection) must have exactly one visual authority. This prevents UI drift where different modules interpret the same business concept with different colors, icons, or behaviors.
+
+### 8.2 Negative Constraints (What NOT to Share)
+
+To prevent `shared/ui/` from becoming a dumping ground, we strictly forbid **Workflow-Semantic** components.
+
+- **Forbidden**: `ApproveInvoiceButton`, `PostBatchWizard`, `APDocumentWorkflowPanel`.
+- **Rationale**: These are module-specific behaviors. Moving them to shared destroys modular boundaries and modular monolith integrity.
+- **Rule**: If a component triggers a specific business module action, it belongs inside that module's `ui/` folder, not in shared.
+
+### 8.3 Maturity Roadmap
+
+| Evolution                   | Description                                                                                                   | Status      |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------- |
+| **Deterministic Runtime**   | Screens are pure projections of authoritative state via `resolveScreenModel`.                                 | ✅ Active   |
+| **Capability-Based UI**     | UI elements are controlled by `screen.capabilities` (e.g., `canApprove`) rather than hardcoded module checks. | 🚧 Planning |
+| **Semantic Registry**       | Screens declare semantics (e.g., type: 'Money'); runtime automatically resolves the correct renderer.         | 🚧 Planning |
+| **Declarative Composition** | `view.vue` becomes a thin layout shell; field placement and grouping is driven by metadata.                   | 🚧 Planning |
