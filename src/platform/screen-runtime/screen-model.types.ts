@@ -1,0 +1,62 @@
+import type { ScreenCommand } from '../commands/command.types'
+import type {
+  BannerPolicy,
+  SectionStateOverride,
+  FieldStateOverride,
+} from './screen-state-policy.types'
+
+export interface CommandProjection {
+  readonly command: ScreenCommand
+  readonly visible: boolean
+  readonly enabled: boolean
+  readonly reason?: string
+  // future: loading, emphasis
+}
+
+/**
+ * ScreenModel
+ *
+ * The single deterministic rendering contract for a screen.
+ * It is produced by a pure function mapping the Controller's state + metadata -> Screen Model.
+ *
+ * 100% JSON-serializable, zero functions.
+ */
+export interface ScreenModel {
+  readonly version: 1
+  readonly meta: {
+    readonly screenId: string
+    readonly projectionId: string
+    readonly timestamp: number
+  }
+
+  /** 1. Domain Constraints (Backend-Derived Truth) */
+  readonly domain: {
+    readonly backend: {
+      readonly availableActions: readonly string[]
+      readonly status?: string
+    }
+    readonly capabilities: {
+      readonly canEdit: boolean
+      // future: canCreate, canDelete, etc. derived from backend metadata/permissions
+    }
+  }
+
+  /** 2. UI Presentation (Frontend-Derived Rendering) */
+  readonly ui: {
+    readonly chrome: {
+      readonly banner?: BannerPolicy
+      readonly actionRequiredLabel?: string
+    }
+    readonly actions: {
+      readonly expectedNext?: CommandProjection
+      readonly primary: readonly CommandProjection[]
+      readonly secondary: readonly CommandProjection[]
+    }
+    readonly layout: {
+      readonly sections: Record<string, SectionStateOverride>
+    }
+    readonly fields: {
+      readonly overrides: Record<string, FieldStateOverride>
+    }
+  }
+}
