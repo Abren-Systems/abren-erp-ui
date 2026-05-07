@@ -17,26 +17,23 @@ const ctrl = useLedgerSettingsController()
       :executors="ctrl.commands.value"
       :is-pending="ctrl.isPending.value"
       :is-new="false"
+      @save="ctrl.handleSave"
     />
 
     <!-- Main Content -->
-    <div class="flex-1 overflow-y-auto p-8">
-      <div class="max-w-2xl mx-auto">
-        <div class="bg-white p-8 rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
-          <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
-            <FieldGroup title="Account Mappings">
-              <AppField
-                v-bind="ctrl.fields.default_bridge_account_id"
-                :editor-attrs="{ options: ctrl.accountOptions.value }"
-              />
-              <AppField
-                v-bind="ctrl.fields.pr_payable_account_id"
-                :editor-attrs="{ options: ctrl.accountOptions.value }"
-              />
-            </FieldGroup>
-          </AppTemplate>
-        </div>
-      </div>
+    <div class="px-6 py-5">
+      <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
+        <FieldGroup title="Account Mappings">
+          <AppField
+            v-bind="ctrl.fields.default_bridge_account_id"
+            :editor-attrs="{ options: ctrl.accountOptions.value }"
+          />
+          <AppField
+            v-bind="ctrl.fields.pr_payable_account_id"
+            :editor-attrs="{ options: ctrl.accountOptions.value }"
+          />
+        </FieldGroup>
+      </AppTemplate>
     </div>
   </div>
 </template>

@@ -28,8 +28,8 @@ export function useAccountController(id: string) {
   // Command Execution
   base.registerCommand('deactivate', {
     execute: async () => {
+      // TODO: Wire to account deactivation application service
       console.log('Deactivating account', id)
-      // Call actual application service to deactivate here.
     },
     isPending: computed(() => false),
   })

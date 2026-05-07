@@ -1,3 +1,4 @@
+import { computed } from 'vue'
 import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -45,8 +46,8 @@ export function useLedgerSettings() {
 
   return {
     settings,
-    isLoading: isFetching || isUpdating,
-    error: fetchError || updateError,
+    isLoading: computed(() => isFetching.value || isUpdating.value),
+    error: computed(() => fetchError.value || updateError.value),
     updateSettings,
   }
 }

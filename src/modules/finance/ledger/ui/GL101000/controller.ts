@@ -74,12 +74,9 @@ export function useLedgerSettingsController() {
     statePolicy: GL101000_POLICY,
   })
 
-  base.registerCommand('save', {
-    execute: async () => {
-      void form.handleSubmit()
-    },
-    isPending: isLoading,
-  })
+  const handleSave = async () => {
+    void form.handleSubmit()
+  }
 
   const fields = {
     default_bridge_account_id: useField(base, GL101000_FIELDS.default_bridge_account_id),
@@ -98,6 +95,6 @@ export function useLedgerSettingsController() {
     ...base,
     fields,
     accountOptions,
-    form,
+    handleSave,
   }
 }
