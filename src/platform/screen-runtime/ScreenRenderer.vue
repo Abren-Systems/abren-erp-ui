@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { computed, provide, shallowRef, watch } from 'vue'
+import {
+  computed,
+  provide,
+  shallowRef,
+  watch,
+  effectScope,
+  getCurrentInstance,
+  onScopeDispose,
+} from 'vue'
+import type { EffectScope } from 'vue'
 import { useRoute } from 'vue-router'
 import { screenRegistry } from './screen-registry'
 import { AppSidePanel } from '@/shared/components/workspace'
@@ -28,21 +37,45 @@ const screen = computed(
 // Platform-Owned Controller Lifecycle
 const controllerRef = shallowRef<ScreenController<unknown, string> | null>(null)
 
+const instance = getCurrentInstance()!
+let controllerScope: EffectScope | null = null
+
 watch(
   () => [screen.value?.id, route.params, route.query],
   () => {
+    // Clean up previous controller's effects
+    if (controllerScope) {
+      controllerScope.stop()
+      controllerScope = null
+    }
+
     if (screen.value?.controller) {
       const ctx: ScreenContext = {
         params: route.params,
         query: route.query,
       }
-      controllerRef.value = screen.value.controller(ctx)
+
+      controllerScope = effectScope()
+
+      // Provide application injection context (for vue-query's useQueryClient)
+      // Provide effect scope (to prevent memory leaks from useQuery)
+      instance.appContext.app.runWithContext(() => {
+        controllerScope!.run(() => {
+          controllerRef.value = screen.value!.controller(ctx)
+        })
+      })
     } else {
       controllerRef.value = null
     }
   },
   { immediate: true, deep: true },
 )
+
+onScopeDispose(() => {
+  if (controllerScope) {
+    controllerScope.stop()
+  }
+})
 
 provide(ScreenControllerKey, controllerRef)
 

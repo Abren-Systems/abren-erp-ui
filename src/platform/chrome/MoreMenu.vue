@@ -11,6 +11,7 @@
 import { ref, computed } from 'vue'
 import { AppButton } from '@/shared/components/primitives'
 import { MoreHorizontal } from 'lucide-vue-next'
+import { onClickOutside } from '@vueuse/core'
 import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
 import type { CommandProjection } from '../screen-runtime/screen-model.types'
@@ -82,10 +83,13 @@ function toggleMenu() {
 function closeMenu() {
   isOpen.value = false
 }
+
+const menuRef = ref<HTMLElement | null>(null)
+onClickOutside(menuRef, closeMenu)
 </script>
 
 <template>
-  <div class="more-menu" v-click-outside="closeMenu">
+  <div class="more-menu" ref="menuRef">
     <AppButton
       variant="outline"
       size="sm"
