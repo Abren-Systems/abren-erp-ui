@@ -16,6 +16,7 @@ import {
 } from '@/shared/components/field-system'
 import { AppButton } from '@/shared/components/primitives'
 import { DataGrid } from '@/shared/components/data-grid'
+import { AuditReasonDialog } from '@/shared/components/dialog'
 import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { paymentRequestLineColumns } from './grids/lines.grid'
 import { usePaymentRequestEntry } from './controller'
@@ -127,5 +128,26 @@ const ctrl = usePaymentRequestEntry(props.id)
         </div>
       </div>
     </template>
+
+    <!-- Dialogs -->
+    <AuditReasonDialog
+      v-model:open="ctrl.isRejectDialogOpen.value"
+      v-model="ctrl.auditReason.value"
+      title="Reject Payment Request"
+      description="Please provide a reason for rejecting this payment request. This will be visible in the audit trail."
+      confirm-label="Reject Request"
+      placeholder="e.g., Missing documentation, Incorrect amount..."
+      @confirm="ctrl.handleRejectConfirm"
+    />
+
+    <AuditReasonDialog
+      v-model:open="ctrl.isCancelDialogOpen.value"
+      v-model="ctrl.auditReason.value"
+      title="Cancel Payment Request"
+      description="Are you sure you want to cancel this request? Please provide a reason for the record."
+      confirm-label="Cancel Request"
+      placeholder="e.g., Requested in error, Duplicate submission..."
+      @confirm="ctrl.handleCancelConfirm"
+    />
   </div>
 </template>

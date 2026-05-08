@@ -69,6 +69,14 @@ export function usePaymentRequestEntry(id: string) {
   Object.assign(base, { form })
 
   // ── Workflow Action Executors ──
+  // ── UI State ──
+  const activeTab = ref('Line Details')
+  const isTraceOpen = ref(false)
+  const isRejectDialogOpen = ref(false)
+  const isCancelDialogOpen = ref(false)
+  const auditReason = ref('')
+
+  // ── Workflow Action Executors ──
   const { approve, isPending: isApproving } = useApprovePaymentRequest(id as PaymentRequestId)
   const { reject, isPending: isRejecting } = useRejectPaymentRequest(id as PaymentRequestId)
   const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(id as PaymentRequestId)
@@ -82,7 +90,10 @@ export function usePaymentRequestEntry(id: string) {
   })
   base.registerCommand('approve', { execute: async () => void approve(), isPending: isApproving })
   base.registerCommand('reject', {
-    execute: async () => void reject('Rejected via Focus Screen'),
+    execute: async () => {
+      auditReason.value = ''
+      isRejectDialogOpen.value = true
+    },
     isPending: isRejecting,
   })
   base.registerCommand('authorize', {
@@ -90,13 +101,24 @@ export function usePaymentRequestEntry(id: string) {
     isPending: isAuthorizing,
   })
   base.registerCommand('cancel', {
-    execute: async () => void cancel('Cancelled via Focus Screen'),
+    execute: async () => {
+      auditReason.value = ''
+      isCancelDialogOpen.value = true
+    },
     isPending: isCancelling,
   })
 
-  // ── UI State ──
-  const activeTab = ref('Line Details')
-  const isTraceOpen = ref(false)
+  const handleRejectConfirm = async () => {
+    if (!auditReason.value.trim()) return
+    await reject(auditReason.value)
+    isRejectDialogOpen.value = false
+  }
+
+  const handleCancelConfirm = async () => {
+    if (!auditReason.value.trim()) return
+    await cancel(auditReason.value)
+    isCancelDialogOpen.value = false
+  }
 
   // ── Domain Derived State ──
   const isDraft = computed(() => isNew.value || activeEntity.value?.status === 'DRAFT')
@@ -169,6 +191,9 @@ export function usePaymentRequestEntry(id: string) {
     // UI state
     activeTab,
     isTraceOpen,
+    isRejectDialogOpen,
+    isCancelDialogOpen,
+    auditReason,
 
     // Domain derived
     isDraft,
@@ -186,6 +211,8 @@ export function usePaymentRequestEntry(id: string) {
 
     // Handlers
     handleCreate,
+    handleRejectConfirm,
+    handleCancelConfirm,
 
     // Navigation
     router,

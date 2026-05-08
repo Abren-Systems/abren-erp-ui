@@ -1,8 +1,10 @@
+import { toast } from 'vue-sonner'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { type MaybeRefOrGetter, toValue } from 'vue'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
+import type { ApiError } from '@/shared/api/http-client'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import type { PaymentRequest } from '../domain/ap.types'
 
@@ -31,13 +33,21 @@ export function useSubmitPaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) 
       return await apAdapter.submitRequest(unwrappedId)
     },
     {
-      onSuccess: () => {
+      onSuccess: (data: PaymentRequest) => {
         const unwrappedId = toValue(id)
+        toast.success('Payment Request Submitted', {
+          description: `Request ${data.requestNumber} has been submitted for approval.`,
+        })
         void queryClient.invalidateQueries({
           queryKey: apKeys.paymentRequest(unwrappedId),
         })
         void queryClient.invalidateQueries({
           queryKey: apKeys.paymentRequests(),
+        })
+      },
+      onError: (err: ApiError) => {
+        toast.error('Submission Failed', {
+          description: err.message || 'An unexpected error occurred.',
         })
       },
     },

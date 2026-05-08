@@ -1,3 +1,4 @@
+import { toast } from 'vue-sonner'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
@@ -80,12 +81,20 @@ export function useCreatePaymentRequest() {
     },
     {
       onSuccess: (result: PaymentRequest) => {
+        toast.success('Payment Request Created', {
+          description: `Request ${result.requestNumber} has been successfully registered.`,
+        })
         void queryClient.invalidateQueries({
           queryKey: apKeys.paymentRequests(),
         })
         void router.push({
           name: 'PaymentRequestDetail',
           params: { id: result.id },
+        })
+      },
+      onError: (err: ApiError) => {
+        toast.error('Creation Failed', {
+          description: err.message || 'An unexpected error occurred.',
         })
       },
     },

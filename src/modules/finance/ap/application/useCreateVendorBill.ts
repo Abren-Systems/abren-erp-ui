@@ -1,3 +1,4 @@
+import { toast } from 'vue-sonner'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
@@ -73,10 +74,18 @@ export function useCreateVendorBill() {
     },
     {
       onSuccess: (result: VendorBill) => {
+        toast.success('Vendor Bill Registered', {
+          description: `Bill ${result.billNumber} has been successfully registered.`,
+        })
         void queryClient.invalidateQueries({ queryKey: apKeys.vendorBills() })
         void router.push({
           name: 'VendorBillDetail',
           params: { id: result.id },
+        })
+      },
+      onError: (err: ApiError) => {
+        toast.error('Registration Failed', {
+          description: err.message || 'An unexpected error occurred.',
         })
       },
     },

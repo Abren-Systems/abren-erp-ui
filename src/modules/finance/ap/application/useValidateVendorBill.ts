@@ -1,9 +1,11 @@
+import { toast } from 'vue-sonner'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import type { VendorBillId } from '@/shared/types/brand.types'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 import type { VendorBill } from '../domain/ap.types'
+import type { ApiError } from '@/shared/api/http-client'
 
 /**
  * Use Case: Validate a Vendor Bill.
@@ -25,9 +27,17 @@ export function useValidateVendorBill(id: VendorBillId) {
       return await apAdapter.validateBill(id)
     },
     {
-      onSuccess: () => {
+      onSuccess: (data: VendorBill) => {
+        toast.success('Vendor Bill Validated', {
+          description: `Bill ${data.billNumber} has been validated for payment.`,
+        })
         void queryClient.invalidateQueries({ queryKey: apKeys.vendorBill(id) })
         void queryClient.invalidateQueries({ queryKey: apKeys.vendorBills() })
+      },
+      onError: (err: ApiError) => {
+        toast.error('Validation Failed', {
+          description: err.message || 'An unexpected error occurred.',
+        })
       },
     },
   )

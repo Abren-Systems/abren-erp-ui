@@ -1,3 +1,4 @@
+import { toast } from 'vue-sonner'
 import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { type MaybeRefOrGetter, toValue } from 'vue'
@@ -30,13 +31,21 @@ export function useAuthorizePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId
       return await apAdapter.authorizeRequest(unwrappedId)
     },
     {
-      onSuccess: () => {
+      onSuccess: (data: PaymentRequest) => {
         const unwrappedId = toValue(id)
+        toast.success('Payment Authorized', {
+          description: `Request ${data.requestNumber} has been authorized for payment.`,
+        })
         void queryClient.invalidateQueries({
           queryKey: apKeys.paymentRequest(unwrappedId),
         })
         void queryClient.invalidateQueries({
           queryKey: apKeys.paymentRequests(),
+        })
+      },
+      onError: (err: ApiError) => {
+        toast.error('Authorization Failed', {
+          description: err.message || 'An unexpected error occurred.',
         })
       },
     },

@@ -1,3 +1,4 @@
+import { toast } from 'vue-sonner'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import type { Ref } from 'vue'
 import { toValue } from 'vue'
@@ -6,13 +7,10 @@ import { apKeys } from './query-keys'
 import { toId } from '@/shared/types/brand.types'
 import type { VendorBillId } from '@/shared/types/brand.types'
 import type { ApiError } from '@/shared/api/http-client'
-
-const useToasts = () => ({ addToast: (msg: unknown) => console.log('Toast:', msg) })
 import type { VendorBill } from '../domain/ap.types'
 
 export function useRejectVendorBill(id: string | Ref<string>) {
   const queryClient = useQueryClient()
-  const { addToast } = useToasts()
 
   const mutation = useMutation({
     mutationFn: (reason: string) => apAdapter.rejectBill(toValue(id), reason),
@@ -22,17 +20,13 @@ export function useRejectVendorBill(id: string | Ref<string>) {
       // Invalidate list to fresh state
       void queryClient.invalidateQueries({ queryKey: apKeys.vendorBills() })
 
-      addToast({
-        title: 'Vendor Bill Rejected',
-        description: 'The bill has been successfully rejected.',
-        variant: 'default',
+      toast.success('Vendor Bill Rejected', {
+        description: `Bill ${updatedBill.billNumber} has been successfully rejected.`,
       })
     },
     onError: (err: ApiError) => {
-      addToast({
-        title: 'Rejection Failed',
-        description: err.message || 'Could not reject the vendor bill.',
-        variant: 'destructive',
+      toast.error('Rejection Failed', {
+        description: err.message || 'An unexpected error occurred.',
       })
     },
   })
