@@ -3,10 +3,10 @@ import { Toaster } from 'vue-sonner'
 </script>
 
 <template>
-  <Toaster 
-    position="top-right" 
-    rich-colors 
-    close-button 
+  <Toaster
+    position="top-right"
+    rich-colors
+    close-button
     expand
     :toast-options="{
       style: {

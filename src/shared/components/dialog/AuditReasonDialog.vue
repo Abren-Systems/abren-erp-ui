@@ -27,9 +27,12 @@ const emit = defineEmits<{
 
 const internalReason = ref(props.modelValue)
 
-watch(() => props.modelValue, (newVal) => {
-  internalReason.value = newVal
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    internalReason.value = newVal
+  },
+)
 
 const handleConfirm = () => {
   if (!internalReason.value.trim()) return
@@ -51,7 +54,7 @@ const handleCancel = () => {
           {{ description }}
         </DialogDescription>
       </DialogHeader>
-      
+
       <div class="grid gap-4 py-4">
         <textarea
           v-model="internalReason"
