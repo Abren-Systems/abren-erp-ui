@@ -4,9 +4,9 @@ import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
-import { workflowColumns } from '../grids/workflow.grid'
+import { workflowColumns } from './grids/workflow.grid'
 
-import WorkflowActionDialog from '../components/WorkflowActionDialog.vue'
+import WorkflowActionDialog from './components/WorkflowActionDialog.vue'
 
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>

@@ -39,17 +39,6 @@ const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @
 
       <!-- 2. Form Toolbar -->
 
-      <!-- Create Mode Toolbar -->
-      <div
-        v-else
-        class="flex items-center gap-2 px-6 py-2 border-b border-[var(--color-neutral-200)] bg-white"
-      >
-        <AppButton variant="secondary" @click="ctrl.saveDraft"> Save Draft </AppButton>
-        <AppButton variant="primary" :disabled="ctrl.isCreating.value" @click="ctrl.handleCreate">
-          Create Request
-        </AppButton>
-      </div>
-
       <!-- 3. Summary Area -->
       <div class="px-6 py-5">
         <AppTemplate :template="ctrl.screen.layout.summaryTemplate">

@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { Plus, RefreshCcw } from 'lucide-vue-next'
-import { fiscalPeriodColumns } from '../../grids/fiscal-period.grid'
+import { fiscalPeriodColumns } from '../grids/fiscal-period.grid'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import FiscalPeriodCreateDrawer from './sidepanels/FiscalPeriodCreateDrawer.vue'
 

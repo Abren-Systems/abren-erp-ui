@@ -9,7 +9,7 @@
  */
 import { inject, computed } from 'vue'
 import { StickyNote, Paperclip, Mail, Settings } from 'lucide-vue-next'
-import { ScreenControllerKey } from '../screen-runtime/screen-controller.types'
+import { ScreenControllerKey } from '../screen-runtime'
 
 const ctrl = inject(ScreenControllerKey, null)
 
