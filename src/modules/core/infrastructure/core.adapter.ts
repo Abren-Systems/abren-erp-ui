@@ -3,11 +3,11 @@ import { UserSchema, RoleSchema, PermissionSchema } from './api.schemas'
 import type {
   UserDTO,
   RoleDTO,
-  PermissionDTO,
-  RoleCreateDTO,
-  UserCreateDTO,
-  UserRoleAssignmentDTO,
+  CreateRoleDTO,
+  CreateUserDTO,
+  AssignRoleDTO,
   TenantSettingDTO,
+  PermissionDTO,
 } from './api.types'
 import { z } from 'zod'
 
@@ -38,19 +38,16 @@ export const coreAdapter = {
     return z.array(PermissionSchema).parse(data) as PermissionDTO[]
   },
 
-  async createRole(dto: RoleCreateDTO): Promise<{ role_id: string }> {
+  async createRole(dto: CreateRoleDTO): Promise<{ role_id: string }> {
     const data = await apiPost<unknown>('/core/roles', dto)
     return z.object({ role_id: z.string().uuid() }).parse(data)
   },
 
-  async assignRole(dto: UserRoleAssignmentDTO): Promise<void> {
-    // Note: apiPost for void typically doesn't need parse check if status is 204
-    return apiPost<void>(`/core/users/${dto.user_id}/roles`, {
-      role_id: dto.role_id,
-    })
+  async assignRole(userId: string, dto: AssignRoleDTO): Promise<void> {
+    return apiPost<void>(`/core/users/${userId}/roles`, dto)
   },
 
-  async createUser(dto: UserCreateDTO): Promise<UserDTO> {
+  async createUser(dto: CreateUserDTO): Promise<UserDTO> {
     const data = await apiPost<unknown>('/core/users', dto)
     return UserSchema.parse(data) as UserDTO
   },

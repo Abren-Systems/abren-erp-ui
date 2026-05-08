@@ -66,7 +66,7 @@ export function useUsersController() {
   base.registerCommand('executeAssign', {
     execute: async () => {
       if (!selectedUser.value || !assignRoleId.value) return
-      await assignRole({ user_id: selectedUser.value.id, role_id: assignRoleId.value })
+      await assignRole({ userId: selectedUser.value.id, roleId: assignRoleId.value })
       isAssignmentOpen.value = false
     },
     isPending: isAssigning,

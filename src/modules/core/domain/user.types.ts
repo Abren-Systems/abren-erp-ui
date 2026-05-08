@@ -22,5 +22,4 @@ export interface User {
   email: string
   status: UserStatus
   roles: UserRoleAssignment[]
-  lastLoginAt: Date | null
 }

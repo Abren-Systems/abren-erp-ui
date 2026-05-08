@@ -1,7 +1,7 @@
 import { toId } from '@/shared/types/brand.types'
 import type { TenantId, UserId, RoleId } from '@/shared/types/brand.types'
 import type { UserDTO, RoleDTO, UserRoleDTO } from './api.types'
-import type { User, Role, UserRoleAssignment } from '../domain/user.types'
+import type { User, Role, UserRoleAssignment, UserStatus } from '../domain/user.types'
 
 /**
  * Identity Mapper
@@ -31,9 +31,8 @@ export class IdentityMapper {
       id: toId<UserId>(dto.id),
       tenantId: toId<TenantId>(dto.tenant_id),
       email: dto.email,
-      status: dto.status,
+      status: dto.status as UserStatus,
       roles: (dto.roles ?? []).map((r) => this.toUserRoleAssignment(r)),
-      lastLoginAt: dto.last_login_at ? new Date(dto.last_login_at) : null,
     }
   }
 }

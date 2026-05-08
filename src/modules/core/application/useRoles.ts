@@ -3,7 +3,7 @@ import { coreAdapter } from '../infrastructure/core.adapter'
 import { IdentityMapper } from '../infrastructure/mappers'
 import { coreKeys } from './query-keys'
 import type { Role } from '../domain/user.types'
-import type { RoleCreateDTO } from '../infrastructure/api.types'
+import type { CreateRoleDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: Manage Roles and Permissions
@@ -34,7 +34,7 @@ export function useRoles() {
   })
 
   const { mutateAsync: createRole, isPending: isCreating } = useMutation({
-    mutationFn: async (payload: RoleCreateDTO) => {
+    mutationFn: async (payload: CreateRoleDTO) => {
       await coreAdapter.createRole(payload)
     },
     onSuccess: () => {
