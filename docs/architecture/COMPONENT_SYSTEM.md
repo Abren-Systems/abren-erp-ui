@@ -90,13 +90,13 @@ Repeatable screen structure compositions that implement [Acumatica Form Anatomy]
 
 Governs all data display and layout inside the Working Area. See [Field System Architecture](../FIELD_SYSTEM.md).
 
-| Component     | Acumatica Part        | Purpose                                               | Status      |
-| ------------- | --------------------- | ----------------------------------------------------- | ----------- |
-| `AppField`    | `PXField`             | Semantic data renderer via Field System               | ✅ Built    |
-| `AppFieldset` | `qp-fieldset`         | CSS Grid layout authority (140px baseline)            | ✅ Built    |
-| `AppTemplate` | `qp-template`         | Named screen template for Acumatica-style slot widths | ⚠️ Planning |
-| `AppTabs`     | Part 4: Tabs          | Personalizable visibility toggle for data strata      | ✅ Built    |
-| `DataGrid`    | Part 5/6: Details/Row | Tabular rendering with preset-driven logic            | ✅ Built    |
+| Component     | Acumatica Part        | Purpose                                               | Status   |
+| ------------- | --------------------- | ----------------------------------------------------- | -------- |
+| `AppField`    | `PXField`             | Semantic data renderer via Field System               | ✅ Built |
+| `AppFieldset` | `qp-fieldset`         | CSS Grid layout authority (140px baseline)            | ✅ Built |
+| `AppTemplate` | `qp-template`         | Named screen template for Acumatica-style slot widths | ✅ Built |
+| `AppTabs`     | Part 4: Tabs          | Personalizable visibility toggle for data strata      | ✅ Built |
+| `DataGrid`    | Part 5/6: Details/Row | Tabular rendering with preset-driven logic            | ✅ Built |
 
 ---
 
