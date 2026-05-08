@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DataGrid } from '@/shared/components/data-grid'
-import { FormTitleBar, FormToolbar } from '@/platform/chrome'
+import { ListTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
 import { journalEntryColumns } from './grids/journal-entry.grid'
@@ -11,14 +11,7 @@ const ctrl = useJournalEntriesListController()
 
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
-    <FormTitleBar :form-title="ctrl.screen.titleKey" />
-
-    <FormToolbar
-      :model="ctrl.model.value"
-      :executors="ctrl.commands.value"
-      :is-pending="ctrl.isPending.value"
-      :is-new="false"
-    />
+    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
 
     <div class="flex-1 p-8 min-h-0">
       <DataGrid

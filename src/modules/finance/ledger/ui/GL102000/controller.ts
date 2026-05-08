@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import {
   useScreenController,
   LIST_SCREEN_POLICY,
@@ -26,13 +26,28 @@ export function useFiscalPeriodsController() {
     statePolicy: LIST_SCREEN_POLICY,
   })
 
-  // GL102000 Create Action handled via FiscalPeriodCreateDrawer
-  // We can formalize it via command if needed, but it's currently local UI state.
+  const isCreateOpen = ref(false)
+
+  base.registerCommand('create', {
+    execute: async () => {
+      isCreateOpen.value = true
+    },
+    isPending: computed(() => false),
+  })
+
+  base.registerCommand('refresh', {
+    execute: async () => {
+      // In a real implementation this would refetch
+      console.log('Refresh fiscal periods')
+    },
+    isPending: isLoading,
+  })
 
   return {
     ...base,
     periods,
     isLoading,
     gridState,
+    isCreateOpen,
   }
 }

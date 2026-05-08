@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
+import { ListTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
-import { Plus } from 'lucide-vue-next'
+import { Plus, RefreshCcw } from 'lucide-vue-next'
 import { fiscalPeriodColumns } from '../../grids/fiscal-period.grid'
 import { usePermissions } from '@/shared/auth/usePermissions'
-import FiscalPeriodCreateDrawer from '../components/FiscalPeriodCreateDrawer.vue'
+import FiscalPeriodCreateDrawer from './sidepanels/FiscalPeriodCreateDrawer.vue'
 import { useFiscalPeriodsController } from './controller'
 
 /**
@@ -17,33 +18,11 @@ import { useFiscalPeriodsController } from './controller'
 
 const ctrl = useFiscalPeriodsController()
 const { hasPermission } = usePermissions()
-
-const isCreateOpen = ref(false)
 </script>
 
 <template>
   <div class="flex h-full flex-col bg-[var(--app-canvas)]">
-    <div
-      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
-    >
-      <div class="flex items-center gap-4">
-        <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
-          <Calendar class="h-6 w-6 text-[var(--color-primary-600)]" />
-        </div>
-        <div>
-          <h1 class="m-0 text-xl font-bold tracking-tight text-[var(--color-neutral-900)]">
-            Fiscal Periods
-          </h1>
-          <p class="mt-1 text-sm text-[var(--color-neutral-500)]">
-            Define and lock financial periods for ledger integrity.
-          </p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <!-- Actions moved to Grid Toolbar -->
-      </div>
-    </div>
+    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
 
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
@@ -57,10 +36,16 @@ const isCreateOpen = ref(false)
         placeholder="Search periods..."
       >
         <template #toolbar>
+          <AppButton variant="stealth" @click="ctrl.commands.value['refresh']?.execute()">
+            <template #start>
+              <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
+            </template>
+            Refresh
+          </AppButton>
           <AppButton
             v-if="hasPermission('ledger:manage_accounts')"
             variant="primary"
-            @click="isCreateOpen = true"
+            @click="ctrl.commands.value['create']?.execute()"
           >
             <template #start>
               <Plus :size="14" />
@@ -71,6 +56,6 @@ const isCreateOpen = ref(false)
       </DataGrid>
     </div>
 
-    <FiscalPeriodCreateDrawer v-model:open="isCreateOpen" />
+    <FiscalPeriodCreateDrawer v-model:open="ctrl.isCreateOpen.value" />
   </div>
 </template>

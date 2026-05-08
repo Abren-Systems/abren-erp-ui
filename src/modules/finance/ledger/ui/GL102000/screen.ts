@@ -1,6 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { GL102000_COMMANDS_LIST } from './commands'
 
 /**
  * GL102000 - Fiscal Periods
@@ -28,7 +29,7 @@ export const GL102000: ScreenDefinition = {
       queryKey: ['finance', 'ledger', 'fiscal-periods'] as const,
     },
   },
-  commands: [],
+  commands: GL102000_COMMANDS_LIST,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,
