@@ -32,7 +32,7 @@ export const CR102000: ScreenDefinition = {
   primaryView: 'settings',
 
   route: {
-    path: '/tenants',
+    path: 'tenants',
     name: 'CoreTenants',
   },
 

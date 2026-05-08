@@ -32,7 +32,7 @@ export const CR101000: ScreenDefinition = {
   primaryView: 'roles',
 
   route: {
-    path: '/roles',
+    path: 'roles',
     name: 'CoreRoles',
   },
 

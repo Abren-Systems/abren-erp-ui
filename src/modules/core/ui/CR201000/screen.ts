@@ -32,7 +32,7 @@ export const CR201000: ScreenDefinition = {
   primaryView: 'users',
 
   route: {
-    path: '/users',
+    path: 'users',
     name: 'CoreUsers',
   },
 

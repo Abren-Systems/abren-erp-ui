@@ -17,7 +17,7 @@ export const WF301000: ScreenDefinition = {
   titleKey: 'Workflow Inbox',
   primaryView: 'inbox',
   route: {
-    path: '/workflows/inbox',
+    path: 'inbox',
     name: 'WorkflowInbox',
   },
   permissions: [{ key: 'workflows.inbox.view', description: 'View workflow inbox' }],
