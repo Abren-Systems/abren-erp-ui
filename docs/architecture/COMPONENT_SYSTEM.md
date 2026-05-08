@@ -77,23 +77,26 @@ Repeatable screen structure compositions that implement [Acumatica Form Anatomy]
 | -------------------- | ------------------------- | -------------------------------------------------------- | ------------ |
 | `FormTitleBar`       | Part 1: Form Title Bar    | Full chrome: back nav, record title, services            | ✅ Built     |
 | `ListTitleBar`       | Part 1: List Title Bar    | Minimal chrome for lists/workspaces: title, actions slot | ✅ Built     |
-| `FormToolbar`        | Part 2: Form Toolbar      | Standard buttons + Expected Next + More Menu             | ❌ Not built |
-| `MoreMenu`           | Part 2: More Menu         | Categorized commands, favorites, expected next indicator | ❌ Not built |
-| `RecordServicesMenu` | Part 1: Title Bar buttons | Notes, Files, Activities, Settings                       | ❌ Not built |
+| `FormToolbar`        | Part 2: Form Toolbar      | Standard buttons + Expected Next + More Menu             | ✅ Built     |
+| `MoreMenu`           | Part 2: More Menu         | Categorized commands, favorites, expected next indicator | ✅ Built     |
+| `RecordServicesMenu` | Part 1: Title Bar buttons | Notes, Files, Activities, Settings                       | ⚠️ Planning  |
 | `WorkspacePanel`     | Workspace overlay         | Categorized links to forms/reports/dashboards            | ❌ Not built |
 | `EmptyState`         | —                         | Empty record/list placeholder                            | ✅ Built     |
+
+> [!WARNING]
+> **PageHeader is banned from Screen Runtime.** `PageHeader` is strictly a workspace-level component. It must never be used as screen chrome. List screens must use `ListTitleBar`. Form screens must use `FormTitleBar`.
 
 ### 2.3 Field System Layer (Working Area)
 
 Governs all data display and layout inside the Working Area. See [Field System Architecture](../FIELD_SYSTEM.md).
 
-| Component     | Acumatica Part        | Purpose                                               | Status       |
-| ------------- | --------------------- | ----------------------------------------------------- | ------------ |
-| `AppField`    | `PXField`             | Semantic data renderer via Field System               | ✅ Built     |
-| `AppFieldset` | `qp-fieldset`         | CSS Grid layout authority (140px baseline)            | ✅ Built     |
-| `AppTemplate` | `qp-template`         | Named screen template for Acumatica-style slot widths | ❌ Not built |
-| `AppTabs`     | Part 4: Tabs          | Personalizable visibility toggle for data strata      | ✅ Built     |
-| `DataGrid`    | Part 5/6: Details/Row | Tabular rendering with preset-driven logic            | ✅ Built     |
+| Component     | Acumatica Part        | Purpose                                               | Status      |
+| ------------- | --------------------- | ----------------------------------------------------- | ----------- |
+| `AppField`    | `PXField`             | Semantic data renderer via Field System               | ✅ Built    |
+| `AppFieldset` | `qp-fieldset`         | CSS Grid layout authority (140px baseline)            | ✅ Built    |
+| `AppTemplate` | `qp-template`         | Named screen template for Acumatica-style slot widths | ⚠️ Planning |
+| `AppTabs`     | Part 4: Tabs          | Personalizable visibility toggle for data strata      | ✅ Built    |
+| `DataGrid`    | Part 5/6: Details/Row | Tabular rendering with preset-driven logic            | ✅ Built    |
 
 ---
 

@@ -51,7 +51,7 @@ The frontend is organized by Acumatica-style archetypes encoded in the **Screen 
 | `10`      | **Setup**        | `setup`       | Configuration and module preferences      | `AP101000` |
 | `20`      | **Maintenance**  | `maintenance` | Master data management (Vendors, Items)   | `AP201000` |
 | `30`      | **Data Entry**   | `dataEntry`   | Transactional document entry (Bills, JEs) | `AP301000` |
-| `PL`      | **Primary List** | `inquiry`     | Paired list/inquiry for data entry forms  | `AP3010PL` |
+| `PL`      | **Primary List** | `primaryList` | Paired list/inquiry for data entry forms  | `AP3010PL` |
 | `40`      | **Inquiry**      | `inquiry`     | Read-only analytical grids                | `AP401000` |
 | `50`      | **Processing**   | `processing`  | Bulk processing screens (deferred)        | `AP501000` |
 | `60`      | **Report**       | `report`      | Formatted printable reports               | `AP601000` |
@@ -90,15 +90,15 @@ The Working Area chrome is **not hand-coded per screen** — the platform select
 
 The ScreenRenderer assembles chrome based on the `ScreenKind` declared in the screen definition:
 
-| Chrome Component      | Setup | Maintenance | Data Entry | Inquiry / PL | Processing | Dashboard |
-| --------------------- | ----- | ----------- | ---------- | ------------ | ---------- | --------- |
-| **FormTitleBar**      | ✅    | ✅          | ✅         | —            | —          | —         |
-| **ListTitleBar**      | —     | —           | —          | ✅           | ✅         | ✅        |
-| **FormToolbar**       | ✅    | ✅          | ✅         | —            | —          | —         |
-| **FormBanner**        | ✅    | ✅          | ✅         | —            | —          | —         |
-| **Record Navigation** | —     | ✅          | ✅         | —            | —          | —         |
-| **Record Services**   | —     | ✅          | ✅         | —            | —          | —         |
-| **Side Panel**        | —     | Optional    | Optional   | Optional     | —          | —         |
+| Chrome Component      | Setup | Maintenance | Data Entry | Primary List | Inquiry  | Processing | Dashboard |
+| --------------------- | ----- | ----------- | ---------- | ------------ | -------- | ---------- | --------- |
+| **FormTitleBar**      | ✅    | ✅          | ✅         | —            | —        | —          | —         |
+| **ListTitleBar**      | —     | —           | —          | ✅           | ✅       | ✅         | ✅        |
+| **FormToolbar**       | ✅    | ✅          | ✅         | —            | —        | —          | —         |
+| **FormBanner**        | ✅    | ✅          | ✅         | —            | —        | —          | —         |
+| **Record Navigation** | —     | ✅          | ✅         | —            | —        | —          | —         |
+| **Record Services**   | —     | ✅          | ✅         | —            | —        | —          | —         |
+| **Side Panel**        | —     | Optional    | Optional   | Optional     | Optional | —          | —         |
 
 > [!IMPORTANT]
 > **FormTitleBar ≠ ListTitleBar.** `FormTitleBar` renders back navigation, a record title (e.g., "PR-0042"), and record-level service buttons (Notes, Files, Activities, Settings). `ListTitleBar` renders only the screen title — no back button, no record context, no service strip. List screens are top-level workspace destinations, not drill-down targets.

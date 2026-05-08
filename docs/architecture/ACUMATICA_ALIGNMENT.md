@@ -150,14 +150,15 @@ Main Menu click → Center Area enters WORKSPACE VIEW (tiles/links)
 
 Each form kind has a distinct layout contract, toolbar behavior, and data flow. This is the grammar of the system — it is **NOT** optional.
 
-| #   | Kind            | Acumatica Term    | Layout Contract                                            | Abren `ScreenKind` | Area Code |
-| --- | --------------- | ----------------- | ---------------------------------------------------------- | ------------------ | --------- |
-| 1   | **Setup**       | Preferences       | Single form, no header-detail, minimal toolbar             | `setup`            | `10`      |
-| 2   | **Maintenance** | Master Data       | Single-record form with tabs, no line grid                 | `maintenance`      | `20`      |
-| 3   | **Data Entry**  | Transaction Entry | Header + Detail Grid with summary, tabs, line items        | `dataEntry`        | `30`      |
-| 4   | **Inquiry**     | Generic Inquiry   | Full-width grid with filters, side panel for context       | `inquiry`          | `40`      |
-| 5   | **Processing**  | Batch Processing  | Grid with `Selected` checkbox, Process/Process All buttons | `processing`       | `50`      |
-| 6   | **Report**      | Report            | Parameter form + ready-to-print rendered output            | `report`           | `60`      |
+| #   | Kind             | Acumatica Term    | Layout Contract                                            | Abren `ScreenKind` | Area Code |
+| --- | ---------------- | ----------------- | ---------------------------------------------------------- | ------------------ | --------- |
+| 1   | **Setup**        | Preferences       | Single form, no header-detail, minimal toolbar             | `setup`            | `10`      |
+| 2   | **Maintenance**  | Master Data       | Single-record form with tabs, no line grid                 | `maintenance`      | `20`      |
+| 3   | **Data Entry**   | Transaction Entry | Header + Detail Grid with summary, tabs, line items        | `dataEntry`        | `30`      |
+| 4   | **Primary List** | Primary List / GI | Full-width grid paired with a data entry form              | `primaryList`      | `PL`      |
+| 5   | **Inquiry**      | Generic Inquiry   | Full-width grid for analytical read-only data              | `inquiry`          | `40`      |
+| 6   | **Processing**   | Batch Processing  | Grid with `Selected` checkbox, Process/Process All buttons | `processing`       | `50`      |
+| 7   | **Report**       | Report            | Parameter form + ready-to-print rendered output            | `report`           | `60`      |
 
 In addition to forms, the Working Area can display:
 
@@ -211,26 +212,26 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 
 #### Accounts Payable (AP)
 
-| Screen ID  | Form Kind  | Title                 | Acumatica Equivalent | Status    |
-| ---------- | ---------- | --------------------- | -------------------- | --------- |
-| `AP301000` | Data Entry | Payment Request Entry | AP301000             | ✅ Built  |
-| `AP3010PL` | Inquiry    | Payment Requests List | AP3010PL             | ✅ Built  |
-| `AP302000` | Data Entry | Vendor Bill Entry     | AP301000 (Bills)     | ❌ Legacy |
+| Screen ID  | Form Kind    | Title                 | Acumatica Equivalent | Status    |
+| ---------- | ------------ | --------------------- | -------------------- | --------- |
+| `AP301000` | Data Entry   | Payment Request Entry | AP301000             | ✅ Built  |
+| `AP3010PL` | Primary List | Payment Requests List | AP3010PL             | ✅ Built  |
+| `AP302000` | Data Entry   | Vendor Bill Entry     | AP301000 (Bills)     | ❌ Legacy |
 
 #### General Ledger (GL)
 
 > [!WARNING]
 > **Screen ID Alignment Issue**: Our current `GL101000` (Ledger Settings) maps to Acumatica's `GL102000` (General Ledger Preferences), and our current `GL102000` (Fiscal Periods) conflates functionality that Acumatica splits across `GL101000` (Financial Year) + `GL201000` (Master Financial Calendar) + `GL503000` (Manage Financial Periods). A Screen ID realignment is documented in [FISCAL_CALENDAR_DESIGN.md](FISCAL_CALENDAR_DESIGN.md) and will be addressed as a dedicated domain redesign initiative.
 
-| Screen ID  | Form Kind   | Title                      | Acumatica Equivalent | Status                          |
-| ---------- | ----------- | -------------------------- | -------------------- | ------------------------------- |
-| `GL101000` | Setup       | Ledger Settings            | GL102000 (GL Prefs)  | ⚠️ Needs normalization          |
-| `GL102000` | Setup       | Fiscal Periods             | GL101000 + GL201000  | ⚠️ **Domain redesign required** |
-| `GL201000` | Maintenance | Chart of Accounts (Detail) | GL201500 (CoA)       | ⚠️ Needs normalization          |
-| `GL2010PL` | Inquiry     | Chart of Accounts (List)   | GL2010PL             | ⚠️ Needs normalization          |
-| `GL301000` | Data Entry  | Journal Entry              | GL301000             | ⚠️ Needs normalization          |
-| `GL3010PL` | Inquiry     | Journal Entries List       | GL3010PL             | ⚠️ Needs normalization          |
-| `GL503000` | Processing  | Manage Financial Periods   | GL503000             | 📋 Future                       |
+| Screen ID  | Form Kind    | Title                      | Acumatica Equivalent | Status                          |
+| ---------- | ------------ | -------------------------- | -------------------- | ------------------------------- |
+| `GL101000` | Setup        | Ledger Settings            | GL102000 (GL Prefs)  | ⚠️ Needs normalization          |
+| `GL102000` | Setup        | Fiscal Periods             | GL101000 + GL201000  | ⚠️ **Domain redesign required** |
+| `GL201000` | Maintenance  | Chart of Accounts (Detail) | GL201500 (CoA)       | ⚠️ Needs normalization          |
+| `GL2010PL` | Primary List | Chart of Accounts (List)   | GL2010PL             | ⚠️ Needs normalization          |
+| `GL301000` | Data Entry   | Journal Entry              | GL301000             | ⚠️ Needs normalization          |
+| `GL3010PL` | Primary List | Journal Entries List       | GL3010PL             | ⚠️ Needs normalization          |
+| `GL503000` | Processing   | Manage Financial Periods   | GL503000             | 📋 Future                       |
 
 #### Banking (CA)
 
@@ -263,6 +264,9 @@ The PL form is the **Workspace's link target** — clicking a Workspace menu ite
 ---
 
 ## 5. Form Anatomy (6 Basic Parts)
+
+Acumatica defines 6 macro-layout templates for forms: **Form**, **Grid**, **Tab**, **FormTab**, **FormGrid**, and **TabGrid**.
+Abren's `ScreenRenderer` dynamically composes these architectures based on the `ScreenKind` and declared `views`.
 
 Every form in the Working Area has 6 basic parts. This structure is mandatory.
 
