@@ -5,7 +5,6 @@ import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
 import { adjustmentColumns } from './grids/adjustment.grid'
-import { useAdjustmentsListController } from './controller'
 
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>

@@ -5,7 +5,6 @@ import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { Plus, MapPin, ListFilter, RefreshCcw } from 'lucide-vue-next'
 import { stockColumns } from './grids/stock-item.grid'
-import { useStockItemsListController } from './controller'
 
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>

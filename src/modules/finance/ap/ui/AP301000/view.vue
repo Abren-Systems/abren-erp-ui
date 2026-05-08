@@ -21,7 +21,6 @@ import { AppButton } from '@/shared/components/primitives'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AuditReasonDialog } from '@/shared/components/dialog'
 import { paymentRequestLineColumns } from './grids/lines.grid'
-import { usePaymentRequestEntry } from './controller'
 
 const props = defineProps<{ id: string }>()
 

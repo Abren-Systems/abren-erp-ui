@@ -3,7 +3,6 @@ import { ScreenControllerKey } from '@/platform/screen-runtime'
 import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
-import { useTenantSettingsController, type TenantSetting } from './controller'
 
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 

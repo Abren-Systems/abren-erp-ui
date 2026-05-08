@@ -5,7 +5,6 @@ import { inject } from 'vue'
 import { AppField, FieldGroup, AppTabs } from '@/shared/components/field-system'
 import { DataGrid } from '@/shared/components/data-grid'
 import { journalLineColumns } from './grids/lines.grid'
-import { useJournalEntryController } from './controller'
 
 const props = defineProps<{ id: string }>()
 

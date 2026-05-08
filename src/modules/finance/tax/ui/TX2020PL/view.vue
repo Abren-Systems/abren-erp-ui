@@ -5,7 +5,6 @@ import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
 import { taxRuleColumns } from './grids/tax-rule.grid'
-import { useTaxRulesListController } from './controller'
 
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>

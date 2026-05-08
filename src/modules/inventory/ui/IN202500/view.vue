@@ -3,7 +3,6 @@ import { AppTemplate } from '@/platform/chrome'
 import { ScreenControllerKey } from '@/platform/screen-runtime'
 import { inject } from 'vue'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { useStockItemController } from './controller'
 
 const props = defineProps<{ id: string }>()
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any

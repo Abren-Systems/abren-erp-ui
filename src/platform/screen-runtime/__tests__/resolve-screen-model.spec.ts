@@ -102,4 +102,22 @@ describe('resolveScreenModel', () => {
     expect(model.ui.actions.primary).toHaveLength(1) // Only 'save' remains (standard commands are usually visible)
     expect(model.ui.actions.secondary).toHaveLength(0)
   })
+
+  it('[SBI-01] should produce a 100% JSON-serializable model with no reactive refs or functions', () => {
+    const model = resolveScreenModel({
+      screenId: 'AP301000',
+      commands: mockCommands,
+      domainState: 'DRAFT',
+      availableActions: ['RELEASE'],
+      statePolicy: mockPolicy,
+    })
+
+    const stringified = JSON.stringify(model)
+    const parsed = JSON.parse(stringified)
+
+    // The parsed model must perfectly deep-equal the original model.
+    // If the original model contained functions, undefined, Symbols, or proxies,
+    // JSON serialization would drop/alter them and the assertion would fail.
+    expect(parsed).toEqual(model)
+  })
 })

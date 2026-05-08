@@ -1,4 +1,4 @@
-import { computed, ref, h } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   useScreenController,
@@ -6,7 +6,6 @@ import {
   listScreenDomainState,
 } from '@/platform/screen-runtime'
 import { usePermissions } from '@/shared/auth/usePermissions'
-import type { Table, Row } from '@tanstack/vue-table'
 import { usePaymentRequests } from '../../application/usePaymentRequests'
 import type { PaymentRequest } from '../../domain/ap.types'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
@@ -14,10 +13,8 @@ import { useUsers } from '@/modules/core/application/useUsers'
 import type { User } from '@/modules/core/domain/user.types'
 import { Money } from '@/shared/domain/money'
 import { useDataGrid } from '@/shared/components/data-grid'
-import { SelectionCell } from '@/shared/components/data-grid'
-import { AppButton } from '@/shared/components/primitives'
-import { CheckCircle, XCircle, Plus, History } from 'lucide-vue-next'
-import { paymentRequestColumns } from './grids/primary.grid'
+import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
+import { createPaymentRequestColumns } from './grids/primary.grid'
 import { PAYMENT_REQUEST_STATUS_OPTIONS, PAYMENT_REQUEST_FILTER_PRESETS } from '../AP301000/fields'
 import { AP3010PL } from './screen'
 
@@ -130,69 +127,6 @@ export function usePaymentRequestList() {
     return Object.keys(gridState.rowSelection.value) as PaymentRequestId[]
   })
 
-  // ── Grid Columns ──
-  const columns = [
-    {
-      id: 'select',
-      header: ({ table }: { table: Table<PaymentRequest> }) =>
-        h(SelectionCell, {
-          checked: table.getIsAllPageRowsSelected(),
-          indeterminate: table.getIsSomePageRowsSelected(),
-          'onUpdate:checked': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
-        }),
-      cell: ({ row }: { row: Row<PaymentRequest> }) =>
-        h(SelectionCell, {
-          checked: row.getIsSelected(),
-          'onUpdate:checked': (value: boolean) => row.toggleSelected(!!value),
-        }),
-      size: 40,
-    },
-    ...paymentRequestColumns,
-    {
-      id: 'action_required',
-      header: 'ACTION REQUIRED?',
-      cell: ({ row }: { row: Row<PaymentRequest> }) => {
-        const action = (
-          row.original as PaymentRequest & {
-            actionRequired?: { label: string; icon: typeof CheckCircle; color: string }
-          }
-        ).actionRequired
-        if (!action) return null
-        return h('div', { class: ['flex items-center gap-1.5 font-medium', action.color] }, [
-          h(action.icon, { size: 14 }),
-          h('span', { class: 'text-[11px]' }, action.label),
-        ])
-      },
-      size: 160,
-    },
-    {
-      id: 'actions',
-      header: '',
-      cell: ({ row }: { row: Row<PaymentRequest> }) =>
-        h(
-          'div',
-          { class: 'flex justify-end pr-2' },
-          h(
-            AppButton,
-            {
-              variant: 'stealth',
-              size: 'sm',
-              class: [
-                'trace-action-btn',
-                traceTarget.value?.id === row.original.id && isTraceOpen.value ? 'is-active' : '',
-              ],
-              onClick: (e: Event) => {
-                e.stopPropagation()
-                handleTrace(row.original)
-              },
-            },
-            () => h(History, { size: 14 }),
-          ),
-        ),
-      size: 60,
-    },
-  ]
-
   // ── Handlers ──
   function handleTrace(pr: PaymentRequest) {
     if (traceTarget.value?.id === pr.id && isTraceOpen.value) {
@@ -202,6 +136,13 @@ export function usePaymentRequestList() {
     traceTarget.value = pr
     isTraceOpen.value = true
   }
+
+  // ── Grid Columns ──
+  const columns = createPaymentRequestColumns({
+    handleTrace,
+    isTraceOpen,
+    traceTarget: traceTarget as unknown as Ref<PaymentRequest | null>,
+  })
 
   const handleRowClick = (row: unknown) => {
     void router.push({

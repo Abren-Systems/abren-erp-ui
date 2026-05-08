@@ -1,6 +1,8 @@
-import { h } from 'vue'
-import type { ColumnDef } from '@tanstack/vue-table'
-import { MoneyCell, DateCell } from '@/shared/components/data-grid'
+import { h, type Ref, type Component } from 'vue'
+import type { ColumnDef, Row, Table } from '@tanstack/vue-table'
+import { MoneyCell, DateCell, SelectionCell } from '@/shared/components/data-grid'
+import { AppButton } from '@/shared/components/primitives'
+import { History } from 'lucide-vue-next'
 import type { PaymentRequest } from '../../../domain/ap.types'
 
 /**
@@ -25,77 +27,144 @@ const STATUS_DOT: Record<string, string> = {
   CANCELLED: 'bg-neutral-600',
 }
 
-export const paymentRequestColumns: ColumnDef<PaymentRequest>[] = [
-  {
-    accessorKey: 'requestNumber',
-    header: 'Ref',
-    size: 100,
-    cell: ({ row }) =>
-      h(
-        'code',
-        {
-          class:
-            'px-2 py-0.5 rounded bg-neutral-100 text-[10px] text-neutral-600 font-bold font-mono tracking-tight border border-neutral-200',
-        },
-        row.original.requestNumber.toUpperCase(),
-      ),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    size: 110,
-    cell: ({ row }) => {
-      const status = row.original.status
-      const label = status.charAt(0) + status.slice(1).toLowerCase()
-      return h('div', { class: 'flex items-center gap-1.5' }, [
-        h('span', {
-          class: `h-1.5 w-1.5 rounded-full ${STATUS_DOT[status] ?? 'bg-neutral-300'}`,
+export function createPaymentRequestColumns(context: {
+  handleTrace: (pr: PaymentRequest) => void
+  isTraceOpen: Ref<boolean>
+  traceTarget: Ref<PaymentRequest | null>
+}): ColumnDef<PaymentRequest>[] {
+  return [
+    {
+      id: 'select',
+      header: ({ table }: { table: Table<PaymentRequest> }) =>
+        h(SelectionCell, {
+          checked: table.getIsAllPageRowsSelected(),
+          indeterminate: table.getIsSomePageRowsSelected(),
+          'onUpdate:checked': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
         }),
-        h('span', { class: 'text-xs font-semibold text-neutral-700' }, label),
-      ])
+      cell: ({ row }: { row: Row<PaymentRequest> }) =>
+        h(SelectionCell, {
+          checked: row.getIsSelected(),
+          'onUpdate:checked': (value: boolean) => row.toggleSelected(!!value),
+        }),
+      size: 40,
     },
-  },
-  {
-    accessorKey: 'beneficiaryId',
-    header: 'Beneficiary',
-    cell: ({ row }) => {
-      const name =
-        (row.original as PaymentRequest & { beneficiaryName?: string }).beneficiaryName ??
-        row.original.beneficiaryId.slice(0, 8)
-      return h(
-        'span',
-        {
-          class: 'text-sm text-neutral-700 font-medium truncate block max-w-[180px]',
-          title: name,
-        },
-        name,
-      )
+    {
+      accessorKey: 'requestNumber',
+      header: 'Ref',
+      size: 100,
+      cell: ({ row }) =>
+        h(
+          'code',
+          {
+            class:
+              'px-2 py-0.5 rounded bg-neutral-100 text-[10px] text-neutral-600 font-bold font-mono tracking-tight border border-neutral-200',
+          },
+          row.original.requestNumber.toUpperCase(),
+        ),
     },
-  },
-  {
-    accessorKey: 'totalAmount',
-    header: () => h('span', { class: 'w-full text-right block' }, 'Amount'),
-    size: 130,
-    cell: ({ row }) => h(MoneyCell, { amount: row.original.totalAmount }),
-  },
-  {
-    accessorKey: 'submittedAt',
-    header: () => h('span', { class: 'w-full text-center block' }, 'Submitted'),
-    size: 100,
-    cell: ({ row }) => h(DateCell, { date: row.original.submittedAt, class: 'text-center block' }),
-  },
-  {
-    accessorKey: 'requesterId',
-    header: 'Requested By',
-    cell: ({ row }) => {
-      const name =
-        (row.original as PaymentRequest & { requesterName?: string }).requesterName ??
-        row.original.requesterId.slice(0, 8)
-      return h(
-        'span',
-        { class: 'text-neutral-500 text-xs truncate block max-w-[150px]', title: name },
-        name,
-      )
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      size: 110,
+      cell: ({ row }) => {
+        const status = row.original.status
+        const label = status.charAt(0) + status.slice(1).toLowerCase()
+        return h('div', { class: 'flex items-center gap-1.5' }, [
+          h('span', {
+            class: `h-1.5 w-1.5 rounded-full ${STATUS_DOT[status] ?? 'bg-neutral-300'}`,
+          }),
+          h('span', { class: 'text-xs font-semibold text-neutral-700' }, label),
+        ])
+      },
     },
-  },
-]
+    {
+      accessorKey: 'beneficiaryId',
+      header: 'Beneficiary',
+      cell: ({ row }) => {
+        const name =
+          (row.original as PaymentRequest & { beneficiaryName?: string }).beneficiaryName ??
+          row.original.beneficiaryId.slice(0, 8)
+        return h(
+          'span',
+          {
+            class: 'text-sm text-neutral-700 font-medium truncate block max-w-[180px]',
+            title: name,
+          },
+          name,
+        )
+      },
+    },
+    {
+      accessorKey: 'totalAmount',
+      header: () => h('span', { class: 'w-full text-right block' }, 'Amount'),
+      size: 130,
+      cell: ({ row }) => h(MoneyCell, { amount: row.original.totalAmount }),
+    },
+    {
+      accessorKey: 'submittedAt',
+      header: () => h('span', { class: 'w-full text-center block' }, 'Submitted'),
+      size: 100,
+      cell: ({ row }) =>
+        h(DateCell, { date: row.original.submittedAt, class: 'text-center block' }),
+    },
+    {
+      accessorKey: 'requesterId',
+      header: 'Requested By',
+      cell: ({ row }) => {
+        const name =
+          (row.original as PaymentRequest & { requesterName?: string }).requesterName ??
+          row.original.requesterId.slice(0, 8)
+        return h(
+          'span',
+          { class: 'text-neutral-500 text-xs truncate block max-w-[150px]', title: name },
+          name,
+        )
+      },
+    },
+    {
+      id: 'action_required',
+      header: 'ACTION REQUIRED?',
+      cell: ({ row }: { row: Row<PaymentRequest> }) => {
+        const action = (
+          row.original as PaymentRequest & {
+            actionRequired?: { label: string; icon: Component; color: string }
+          }
+        ).actionRequired
+        if (!action) return null
+        return h('div', { class: ['flex items-center gap-1.5 font-medium', action.color] }, [
+          h(action.icon, { size: 14 }),
+          h('span', { class: 'text-[11px]' }, action.label),
+        ])
+      },
+      size: 160,
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }: { row: Row<PaymentRequest> }) =>
+        h(
+          'div',
+          { class: 'flex justify-end pr-2' },
+          h(
+            AppButton,
+            {
+              variant: 'stealth',
+              size: 'sm',
+              class: [
+                'trace-action-btn',
+                context.traceTarget.value?.id === row.original.id && context.isTraceOpen.value
+                  ? 'is-active'
+                  : '',
+              ],
+              onClick: (e: Event) => {
+                e.stopPropagation()
+                context.handleTrace(row.original)
+              },
+            },
+            () => h(History, { size: 14 }),
+          ),
+        ),
+      size: 60,
+    },
+  ]
+}

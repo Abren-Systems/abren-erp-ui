@@ -6,7 +6,6 @@ import { AppButton } from '@/shared/components/primitives'
 import { AppField } from '@/shared/components/field-system'
 import { AppDialog } from '@/shared/components/workspace'
 import { roleColumns } from './grids/role.grid'
-import { useRolesController } from './controller'
 
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>

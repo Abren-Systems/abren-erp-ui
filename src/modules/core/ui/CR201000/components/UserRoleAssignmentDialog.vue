@@ -9,7 +9,6 @@ import {
 } from '@/shared/components/dialog'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { UserCog } from 'lucide-vue-next'
-import type { UsersController } from '../controller'
 
 const props = defineProps<{
   open: boolean

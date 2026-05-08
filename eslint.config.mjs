@@ -230,4 +230,32 @@ export default tseslint.config(
       ],
     },
   },
+  /**
+   * 6. RUNTIME CONSTITUTION INVARIANTS (ESLint Mirror)
+   *
+   * Mirrors DRI-01 and DRI-03 from the arch-guard to provide
+   * immediate IDE feedback in view files.
+   */
+  {
+    files: ['src/modules/**/ui/**/view.vue', 'src/modules/**/ui/**/*Dialog.vue'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['*/controller', './controller', '../controller'],
+              message:
+                '[DRI-01] Views must NOT import controllers directly. Use inject(ScreenControllerKey).',
+            },
+            {
+              group: ['*/shared/components/workspace'],
+              importNames: ['PageHeader', 'ListTitleBar', 'FormTitleBar', 'FormToolbar'],
+              message: '[DRI-03] Views must NOT render chrome. ScreenRenderer owns the chrome.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 )

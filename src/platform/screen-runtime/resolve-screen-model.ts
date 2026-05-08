@@ -31,6 +31,8 @@ export function resolveScreenModel<TState extends string, TFieldKey extends stri
     fileCount: number
     hasActivities: boolean
   }
+  projectionId?: string
+  timestamp?: number
 }): ScreenModel {
   const { screenId, commands, domainState, availableActions, statePolicy } = input
 
@@ -97,8 +99,8 @@ export function resolveScreenModel<TState extends string, TFieldKey extends stri
     version: 1,
     meta: {
       screenId,
-      projectionId: crypto.randomUUID(),
-      timestamp: Date.now(),
+      projectionId: input.projectionId ?? 'deterministic-id',
+      timestamp: input.timestamp ?? 0,
     },
     domain: {
       backend: {

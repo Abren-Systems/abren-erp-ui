@@ -6,7 +6,7 @@ import { AppField, FieldGroup, AppTabs } from '@/shared/components/field-system'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AuditReasonDialog } from '@/shared/components/dialog'
 import { vendorBillLineColumns } from './grids/lines.grid'
-import { useVendorBillController } from './controller'
+
 import { AppButton } from '@/shared/components/primitives'
 import { Plus } from 'lucide-vue-next'
 

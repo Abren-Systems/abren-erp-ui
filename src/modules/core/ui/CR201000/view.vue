@@ -6,7 +6,6 @@ import { AppButton, AppInput } from '@/shared/components/primitives'
 import { AppField } from '@/shared/components/field-system'
 import { AppDialog } from '@/shared/components/workspace'
 import { userColumns } from './grids/user.grid'
-import { useUsersController } from './controller'
 
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>

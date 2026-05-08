@@ -190,6 +190,8 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
         fileCount: 0,
         hasActivities: false,
       },
+      projectionId: crypto.randomUUID(),
+      timestamp: Date.now(),
     })
   })
 

@@ -3,7 +3,6 @@ import { AppTemplate } from '@/platform/chrome'
 import { ScreenControllerKey } from '@/platform/screen-runtime'
 import { inject } from 'vue'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { useAccountController } from './controller'
 
 const props = defineProps<{ id: string }>()
 

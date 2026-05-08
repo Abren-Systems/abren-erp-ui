@@ -4,7 +4,6 @@ import { inject } from 'vue'
 import { AppButton } from '@/shared/components/primitives'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
 import { Plus, Trash2 } from 'lucide-vue-next'
-import { useAdjustmentController } from './controller'
 
 const props = defineProps<{ id: string }>()
 const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any

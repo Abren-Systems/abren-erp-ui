@@ -3,7 +3,7 @@ import { AppTemplate } from '@/platform/chrome'
 import { ScreenControllerKey } from '@/platform/screen-runtime'
 import { inject } from 'vue'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { useBankAccountController } from './controller'
+
 import { AppButton, AppInput, AppSelect } from '@/shared/components/primitives'
 
 const props = defineProps<{ id: string }>()

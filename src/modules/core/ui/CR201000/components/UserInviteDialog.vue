@@ -9,7 +9,6 @@ import {
 } from '@/shared/components/dialog'
 import { AppButton, AppInput } from '@/shared/components/primitives'
 import { UserPlus, AlertCircle } from 'lucide-vue-next'
-import type { UsersController } from '../controller'
 
 const props = defineProps<{
   open: boolean

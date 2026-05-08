@@ -9,7 +9,6 @@ import {
 } from '@/shared/components/dialog'
 import { AppButton, AppInput } from '@/shared/components/primitives'
 import { ShieldAlert, ShieldCheck } from 'lucide-vue-next'
-import type { RolesController } from '../controller'
 
 const props = defineProps<{
   open: boolean

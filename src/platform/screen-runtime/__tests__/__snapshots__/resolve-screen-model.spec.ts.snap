@@ -20,9 +20,9 @@ exports[`resolveScreenModel > should resolve a valid model for DRAFT state 1`] =
     },
   },
   "meta": {
-    "projectionId": "00000000-0000-0000-0000-000000000000",
+    "projectionId": "deterministic-id",
     "screenId": "AP301000",
-    "timestamp": 1715068800000,
+    "timestamp": 0,
   },
   "ui": {
     "actions": {
@@ -92,9 +92,9 @@ exports[`resolveScreenModel > should resolve a valid model for RELEASED state 1`
     },
   },
   "meta": {
-    "projectionId": "00000000-0000-0000-0000-000000000000",
+    "projectionId": "deterministic-id",
     "screenId": "AP301000",
-    "timestamp": 1715068800000,
+    "timestamp": 0,
   },
   "ui": {
     "actions": {

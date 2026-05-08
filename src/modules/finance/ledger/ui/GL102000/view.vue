@@ -8,7 +8,6 @@ import { Plus, RefreshCcw } from 'lucide-vue-next'
 import { fiscalPeriodColumns } from '../../grids/fiscal-period.grid'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import FiscalPeriodCreateDrawer from './sidepanels/FiscalPeriodCreateDrawer.vue'
-import { useFiscalPeriodsController } from './controller'
 
 /**
  * Stage 1: Queue — Fiscal Periods List Page.
