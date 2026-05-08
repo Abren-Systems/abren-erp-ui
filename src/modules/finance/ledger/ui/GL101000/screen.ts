@@ -16,7 +16,7 @@ export const GL101000: ScreenDefinition = {
   titleKey: 'Ledger Settings',
   primaryView: 'preferences',
   route: {
-    path: '/finance/ledger/settings',
+    path: 'settings',
     name: 'LedgerSettings',
   },
   permissions: [{ key: 'finance.ledger.settings.view', description: 'View ledger settings' }],

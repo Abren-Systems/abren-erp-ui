@@ -15,8 +15,8 @@ export const GL102000: ScreenDefinition = {
   titleKey: 'Fiscal Periods',
   primaryView: 'periods',
   route: {
-    path: '/finance/ledger/fiscal-periods',
-    name: 'FiscalPeriods',
+    path: 'fiscal-periods',
+    name: 'LedgerFiscalPeriods',
   },
   permissions: [{ key: 'finance.ledger.fiscalPeriods.view', description: 'View fiscal periods' }],
   layout: {
