@@ -41,6 +41,9 @@ export interface StateBehavior<TFieldKey extends string = string> {
   /** Is the record editable in this state? */
   readonly editable: boolean
 
+  /** Can the record be deleted in this state? */
+  readonly deletable?: boolean
+
   /** Optional banner to display at the top of the form in this state */
   readonly banner?: BannerPolicy
 

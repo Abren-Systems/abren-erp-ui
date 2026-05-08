@@ -185,6 +185,11 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
       domainState: domain.value,
       availableActions,
       statePolicy,
+      services: {
+        hasNotes: false,
+        fileCount: 0,
+        hasActivities: false,
+      },
     })
   })
 

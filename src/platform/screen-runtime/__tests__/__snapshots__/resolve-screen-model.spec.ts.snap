@@ -10,7 +10,13 @@ exports[`resolveScreenModel > should resolve a valid model for DRAFT state 1`] =
       "status": "DRAFT",
     },
     "capabilities": {
+      "canDelete": true,
       "canEdit": true,
+    },
+    "services": {
+      "fileCount": 0,
+      "hasActivities": false,
+      "hasNotes": false,
     },
   },
   "meta": {
@@ -36,7 +42,7 @@ exports[`resolveScreenModel > should resolve a valid model for DRAFT state 1`] =
           "command": {
             "displayOnMainToolbar": true,
             "key": "save",
-            "kind": "primary",
+            "kind": "local",
             "labelKey": "Save",
             "variant": "primary",
           },
@@ -76,7 +82,13 @@ exports[`resolveScreenModel > should resolve a valid model for RELEASED state 1`
       "status": "RELEASED",
     },
     "capabilities": {
+      "canDelete": false,
       "canEdit": false,
+    },
+    "services": {
+      "fileCount": 0,
+      "hasActivities": false,
+      "hasNotes": false,
     },
   },
   "meta": {
@@ -92,7 +104,7 @@ exports[`resolveScreenModel > should resolve a valid model for RELEASED state 1`
           "command": {
             "displayOnMainToolbar": true,
             "key": "save",
-            "kind": "primary",
+            "kind": "local",
             "labelKey": "Save",
             "variant": "primary",
           },

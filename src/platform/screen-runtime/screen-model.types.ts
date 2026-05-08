@@ -37,7 +37,13 @@ export interface ScreenModel {
     }
     readonly capabilities: {
       readonly canEdit: boolean
-      // future: canCreate, canDelete, etc. derived from backend metadata/permissions
+      readonly canDelete: boolean
+      // future: canCreate, etc. derived from backend metadata/permissions
+    }
+    readonly services: {
+      readonly hasNotes: boolean
+      readonly fileCount: number
+      readonly hasActivities: boolean
     }
   }
 

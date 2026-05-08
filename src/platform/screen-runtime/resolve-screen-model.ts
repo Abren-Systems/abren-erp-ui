@@ -26,12 +26,21 @@ export function resolveScreenModel<TState extends string, TFieldKey extends stri
   domainState: TState
   availableActions: readonly string[]
   statePolicy: ScreenStatePolicy<TState, TFieldKey>
+  services?: {
+    hasNotes: boolean
+    fileCount: number
+    hasActivities: boolean
+  }
 }): ScreenModel {
   const { screenId, commands, domainState, availableActions, statePolicy } = input
 
   // ── 1. Domain Constraints (backend-derived truth) ──
   const behavior = statePolicy.states[domainState]
   const canEdit = behavior?.editable ?? false
+  const canDelete = behavior?.deletable ?? false
+
+  // ── 1.5 Record Services (API boundary) ──
+  const { hasNotes = false, fileCount = 0, hasActivities = false } = input.services ?? {}
 
   // ── 2. UI: Chrome ──
   const banner = behavior?.banner
@@ -98,6 +107,12 @@ export function resolveScreenModel<TState extends string, TFieldKey extends stri
       },
       capabilities: {
         canEdit,
+        canDelete,
+      },
+      services: {
+        hasNotes,
+        fileCount,
+        hasActivities,
       },
     },
     ui: {

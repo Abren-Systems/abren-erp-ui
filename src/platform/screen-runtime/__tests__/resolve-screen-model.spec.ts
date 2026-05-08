@@ -14,7 +14,7 @@ describe('resolveScreenModel', () => {
       key: 'save',
       labelKey: 'Save',
       displayOnMainToolbar: true,
-      kind: 'workflow',
+      kind: 'local',
       variant: 'primary',
     },
     {
@@ -37,6 +37,7 @@ describe('resolveScreenModel', () => {
     states: {
       DRAFT: {
         editable: true,
+        deletable: true,
         fields: {
           vendorId: { required: true },
           totalAmount: { readonly: true },
@@ -65,6 +66,8 @@ describe('resolveScreenModel', () => {
 
     // Explicit assertions for critical paths
     expect(model.domain.capabilities.canEdit).toBe(true)
+    expect(model.domain.capabilities.canDelete).toBe(true)
+    expect(model.domain.services.fileCount).toBe(0) // Default if undefined
     expect(model.ui.actions.expectedNext?.command.key).toBe('RELEASE')
     expect(model.ui.fields.overrides.vendorId.required).toBe(true)
   })
@@ -81,6 +84,7 @@ describe('resolveScreenModel', () => {
     expect(model).toMatchSnapshot()
 
     expect(model.domain.capabilities.canEdit).toBe(false)
+    expect(model.domain.capabilities.canDelete).toBe(false)
     expect(model.ui.chrome.banner?.variant).toBe('info')
     expect(model.ui.actions.expectedNext).toBeUndefined()
   })
