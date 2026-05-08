@@ -7,8 +7,9 @@ import {
   effectScope,
   getCurrentInstance,
   onScopeDispose,
+  defineComponent,
 } from 'vue'
-import type { EffectScope } from 'vue'
+import type { EffectScope, PropType } from 'vue'
 import { useRoute } from 'vue-router'
 import { screenRegistry } from './screen-registry'
 import { AppSidePanel } from '@/shared/components/workspace'
@@ -37,45 +38,50 @@ const screen = computed(
 // Platform-Owned Controller Lifecycle
 const controllerRef = shallowRef<ScreenController<unknown, string> | null>(null)
 
-const instance = getCurrentInstance()!
-let controllerScope: EffectScope | null = null
-
-watch(
-  () => [screen.value?.id, route.params, route.query],
-  () => {
-    // Clean up previous controller's effects
-    if (controllerScope) {
-      controllerScope.stop()
-      controllerScope = null
-    }
-
-    if (screen.value?.controller) {
-      const ctx: ScreenContext = {
-        params: route.params,
-        query: route.query,
-      }
-
-      controllerScope = effectScope()
-
-      // Provide application injection context (for vue-query's useQueryClient)
-      // Provide effect scope (to prevent memory leaks from useQuery)
-      instance.appContext.app.runWithContext(() => {
-        controllerScope!.run(() => {
-          controllerRef.value = screen.value!.controller(ctx)
-        })
-      })
-    } else {
-      controllerRef.value = null
-    }
+// The ControllerHost is a renderless component that exists solely to provide
+// a "legit" setup() context for the screen controller. This allows the controller
+// to safely use inject() (required by useQuery, useRouter, etc.) without
+// injection context violations.
+const ControllerHost = defineComponent({
+  name: 'ControllerHost',
+  props: {
+    screen: {
+      type: Object as PropType<ScreenDefinition>,
+      required: true,
+    },
+    ctx: {
+      type: Object as PropType<ScreenContext>,
+      required: true,
+    },
   },
-  { immediate: true, deep: true },
-)
+  emits: {
+    ready: (controller: ScreenController<unknown, string>) => true,
+  },
+  setup(props, { emit }) {
+    const scope = effectScope()
+    let controller: ScreenController<unknown, string> | null = null
 
-onScopeDispose(() => {
-  if (controllerScope) {
-    controllerScope.stop()
-  }
+    scope.run(() => {
+      // Now we are inside a real setup() of a mounted component!
+      controller = props.screen.controller(props.ctx)
+    })
+
+    if (controller) {
+      emit('ready', controller)
+    }
+
+    onScopeDispose(() => {
+      scope.stop()
+    })
+
+    return () => null // Renderless
+  },
 })
+
+const screenCtx = computed<ScreenContext>(() => ({
+  params: route.params,
+  query: route.query,
+}))
 
 provide(ScreenControllerKey, controllerRef)
 
@@ -94,6 +100,19 @@ const sidePanelContract = computed(() => {
 
 <template>
   <div v-if="screen" class="flex w-full h-full relative overflow-hidden bg-[var(--app-canvas)]">
+    <!-- 
+      Host component that initializes the controller in a proper setup() context.
+      Changing the key ensures the old controller is stopped and a new one is started
+      whenever we navigate between different screens or records.
+    -->
+    <ControllerHost
+      v-if="screen.controller"
+      :key="route.fullPath"
+      :screen="screen"
+      :ctx="screenCtx"
+      @ready="(c) => (controllerRef = c)"
+    />
+
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
       <!-- Loading State (Before Controller Resolves) -->
       <div v-if="!controllerRef" class="flex-1 p-8 text-neutral-500">Loading...</div>
