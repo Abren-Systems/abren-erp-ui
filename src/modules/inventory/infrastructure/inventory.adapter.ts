@@ -5,7 +5,7 @@ import type {
   StockLevelDTO,
   BatchDTO,
   SerialNumberDTO,
-  AdjustmentCreateDTO,
+  CreateAdjustmentDTO,
   AdjustmentDTO,
 } from './api.types'
 import {
@@ -63,7 +63,7 @@ export const inventoryAdapter = {
     return raw.map((item) => SerialNumberSchema.parse(item))
   },
 
-  async postAdjustment(dto: AdjustmentCreateDTO): Promise<AdjustmentDTO> {
+  async postAdjustment(dto: CreateAdjustmentDTO): Promise<AdjustmentDTO> {
     const raw = await apiPost<unknown>('/inventory/adjustments', dto)
     return AdjustmentSchema.parse(raw) as unknown as AdjustmentDTO
   },

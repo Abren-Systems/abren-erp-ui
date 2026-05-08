@@ -2,7 +2,7 @@ import { apiGet, apiPost } from '@/shared/api/http-client'
 import { PendingApprovalSchema } from './api.schemas'
 import { WorkflowMapper } from './mappers'
 import type { PendingApproval } from '../domain/workflows.types'
-import type { ApprovalActionDTO, ApprovalPolicyCreateDTO } from './api.types'
+import type { CreateApprovalActionDTO, CreateApprovalPolicyDTO } from './api.types'
 
 const BASE = '/workflows'
 
@@ -27,14 +27,14 @@ export const workflowsAdapter = {
   /**
    * Submits a decision (Approve/Reject) for a specific workflow instance.
    */
-  async submitDecision(instanceId: string, action: ApprovalActionDTO): Promise<void> {
+  async submitDecision(instanceId: string, action: CreateApprovalActionDTO): Promise<void> {
     await apiPost(`${BASE}/approvals/${instanceId}/actions`, action)
   },
 
   /**
    * Creates a new workflow routing policy.
    */
-  async createPolicy(policy: ApprovalPolicyCreateDTO): Promise<void> {
+  async createPolicy(policy: CreateApprovalPolicyDTO): Promise<void> {
     await apiPost(`${BASE}/state/policies`, policy)
   },
 }

@@ -2,9 +2,9 @@ import { type Ref, computed } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { inventoryKeys } from './query-keys'
-import type { AdjustmentCreateDTO } from '../infrastructure/api.types'
+import type { CreateAdjustmentDTO } from '../infrastructure/api.types'
 
-export type { AdjustmentCreateDTO }
+export type { CreateAdjustmentDTO }
 
 /**
  * Use Case: Create Inventory Adjustment
@@ -20,7 +20,7 @@ export function useInventoryAdjustment() {
     isPending,
     error,
   } = useMutation({
-    mutationFn: async (payload: AdjustmentCreateDTO) => {
+    mutationFn: async (payload: CreateAdjustmentDTO) => {
       const response = await inventoryAdapter.postAdjustment(payload)
       return response
     },

@@ -4,7 +4,7 @@ import { useScreenController } from '@/platform/screen-runtime'
 import {
   useAdjustment,
   useInventoryAdjustment,
-  type AdjustmentCreateDTO,
+  type CreateAdjustmentDTO,
 } from '../../application/useInventoryAdjustment'
 import { useWarehouses } from '../../application/useWarehouses'
 import { IN303000 } from './screen'
@@ -60,7 +60,7 @@ export function useAdjustmentController(id: string) {
           warehouse_id: value.warehouse_id,
           reason: value.reason,
           lines: value.lines,
-        } as AdjustmentCreateDTO)
+        } as CreateAdjustmentDTO)
         void router.push({ name: 'inventory.stock' })
       }
     },
