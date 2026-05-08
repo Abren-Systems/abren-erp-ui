@@ -14,10 +14,10 @@ import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { JournalEntry, JournalEntryLine } from '../domain/journal-entry.types'
 import type { FiscalPeriod, FiscalPeriodStatus } from '../domain/fiscal-period.types'
 
-type AccountDTO = components['schemas']['AccountDTO']
-type JournalEntryDTO = components['schemas']['JournalEntryDTO']
-type JournalLineDTO = components['schemas']['JournalLineDTO']
-type FiscalPeriodDTO = components['schemas']['FiscalPeriodDTO']
+type AccountDTO = components['schemas']['AccountRead']
+type JournalEntryDTO = components['schemas']['JournalEntryRead']
+type JournalLineDTO = components['schemas']['JournalLineRead']
+type FiscalPeriodDTO = components['schemas']['FiscalPeriodRead']
 
 /**
  * Ledger Mapper-as-Factory.
@@ -55,7 +55,7 @@ export class LedgerMapper {
    * @returns A validated JournalEntryLine domain model.
    */
   private static mapJournalLine(dto: JournalLineDTO): JournalEntryLine {
-    const currency = (dto.currency_code as Currency) || Currency.ETB
+    const currency = (dto.currency as Currency) || Currency.ETB
 
     return {
       id: CommonMapper.toBrandedId<JournalLineId>(dto.id),

@@ -1,11 +1,11 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
 import type {
-  CalculateTaxRequest,
+  CalculateTaxDTO,
   TaxRuleDTO,
   TaxCalculationResultDTO,
-  TaxRuleCreateDTO,
+  CreateTaxRuleDTO,
   TaxGroupDTO,
-  TaxGroupCreateDTO,
+  CreateTaxGroupDTO,
 } from './api.types'
 import { TaxRuleSchema, TaxCalculationResponseSchema, TaxGroupSchema } from './api.schemas'
 import { TaxMapper } from './mappers'
@@ -34,7 +34,7 @@ export const TaxAdapter = {
   /**
    * Submits a sandbox calculation payload to preview tax amounts.
    */
-  async calculatePreviewTax(payload: CalculateTaxRequest): Promise<TaxCalculationResult> {
+  async calculatePreviewTax(payload: CalculateTaxDTO): Promise<TaxCalculationResult> {
     const response = await apiPost<TaxCalculationResultDTO>('/finance/tax/calculate', payload)
     const dto = TaxCalculationResponseSchema.parse(response) as TaxCalculationResultDTO
     return TaxMapper.toCalculationResult(dto)
@@ -43,7 +43,7 @@ export const TaxAdapter = {
   /**
    * Registers a new tax rule via the backend.
    */
-  async createTaxRule(dto: TaxRuleCreateDTO): Promise<TaxRule> {
+  async createTaxRule(dto: CreateTaxRuleDTO): Promise<TaxRule> {
     const response = await apiPost<TaxRuleDTO>('/finance/tax/rules', dto)
     const parsedDto = TaxRuleSchema.parse(response) as TaxRuleDTO
     return TaxMapper.toTaxRule(parsedDto)
@@ -61,7 +61,7 @@ export const TaxAdapter = {
   /**
    * Registers a new tax group via the backend.
    */
-  async createTaxGroup(dto: TaxGroupCreateDTO): Promise<TaxGroup> {
+  async createTaxGroup(dto: CreateTaxGroupDTO): Promise<TaxGroup> {
     const response = await apiPost<TaxGroupDTO>('/finance/tax/groups', dto)
     const parsedDto = TaxGroupSchema.parse(response) as TaxGroupDTO
     return TaxMapper.toTaxGroup(parsedDto)

@@ -5,10 +5,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../infrastructure/ledger.adapter'
 import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
-import type { components } from '@/shared/api/generated.types'
-
-type LedgerSettingsDTO = components['schemas']['LedgerSettingsDTO']
-type UpdateLedgerSettingsDTO = components['schemas']['UpdateLedgerSettingsDTO']
+import type { LedgerSettingsDTO, UpdateLedgerSettingsDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: Manage Global Ledger Settings.

@@ -3,9 +3,9 @@ import { TaxAdapter } from '../infrastructure/tax.adapter'
 import type { TaxRule, TaxGroup } from '../domain/tax.types'
 import type { TaxRuleId, TaxGroupId } from '@/shared/types/brand.types'
 import type {
-  CalculateTaxRequest,
-  TaxRuleCreateDTO,
-  TaxGroupCreateDTO,
+  CalculateTaxDTO,
+  CreateTaxRuleDTO,
+  CreateTaxGroupDTO,
 } from '../infrastructure/api.types'
 import { type Ref, computed } from 'vue'
 
@@ -47,7 +47,7 @@ export function useTaxRule(ruleId: Ref<TaxRuleId | null>) {
 export function useCreateTaxRule() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (dto: TaxRuleCreateDTO) => TaxAdapter.createTaxRule(dto),
+    mutationFn: (dto: CreateTaxRuleDTO) => TaxAdapter.createTaxRule(dto),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: taxKeys.rules() })
     },
@@ -84,14 +84,14 @@ export function useTaxGroup(groupId: Ref<TaxGroupId | null>) {
 export function useCreateTaxGroup() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (dto: TaxGroupCreateDTO) => TaxAdapter.createTaxGroup(dto),
+    mutationFn: (dto: CreateTaxGroupDTO) => TaxAdapter.createTaxGroup(dto),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: taxKeys.groups() })
     },
   })
 }
 
-export function useTaxSimulation(payloadRef: Ref<CalculateTaxRequest | null>) {
+export function useTaxSimulation(payloadRef: Ref<CalculateTaxDTO | null>) {
   return useQuery({
     queryKey: [...taxKeys.all, 'simulate', payloadRef],
     queryFn: () => TaxAdapter.calculatePreviewTax(payloadRef.value!),

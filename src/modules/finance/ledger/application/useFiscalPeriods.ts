@@ -5,10 +5,8 @@ import { ledgerAdapter } from '../infrastructure/ledger.adapter'
 import { ledgerKeys } from './query-keys'
 import { LedgerMapper } from '../infrastructure/mappers'
 import type { FiscalPeriod } from '../domain/fiscal-period.types'
-import type { components } from '@/shared/api/generated.types'
 import type { ApiError } from '@/shared/api/http-client'
-
-type CreateFiscalPeriodDTO = components['schemas']['CreateFiscalPeriodDTO']
+import type { CreateFiscalPeriodDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: Manage Fiscal Periods.

@@ -1,15 +1,15 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
 import type {
   AccountDTO,
-  AccountCreateDTO,
-  AccountRenameDTO,
+  CreateAccountDTO,
+  RenameAccountDTO,
   JournalEntryDTO,
-  JournalEntryCreateDTO,
-  JournalEntryVoidDTO,
+  CreateJournalEntryDTO,
+  VoidJournalEntryDTO,
   FiscalPeriodDTO,
-  FiscalPeriodCreateDTO,
+  CreateFiscalPeriodDTO,
   LedgerSettingsDTO,
-  LedgerSettingsUpdateDTO,
+  UpdateLedgerSettingsDTO,
 } from './api.types'
 import {
   AccountSchema,
@@ -41,7 +41,7 @@ export const ledgerAdapter = {
    * @param data - The account creation data.
    * @returns A promise resolving to the validated AccountDTO.
    */
-  async createAccount(data: AccountCreateDTO): Promise<AccountDTO> {
+  async createAccount(data: CreateAccountDTO): Promise<AccountDTO> {
     const raw = await apiPost<AccountDTO>('/finance/ledger/accounts', data)
     return AccountSchema.parse(raw)
   },
@@ -64,7 +64,7 @@ export const ledgerAdapter = {
    * @param data - The rename payload.
    * @returns A promise resolving to the validated AccountDTO.
    */
-  async renameAccount(accountId: string, data: AccountRenameDTO): Promise<AccountDTO> {
+  async renameAccount(accountId: string, data: RenameAccountDTO): Promise<AccountDTO> {
     const raw = await apiPost<AccountDTO>(`/finance/ledger/accounts/${accountId}/rename`, data)
     return AccountSchema.parse(raw)
   },
@@ -96,7 +96,7 @@ export const ledgerAdapter = {
    * @param data - The raw journal entry creation data.
    * @returns A promise resolving to the validated JournalEntryDTO.
    */
-  async createJournalEntry(data: JournalEntryCreateDTO): Promise<JournalEntryDTO> {
+  async createJournalEntry(data: CreateJournalEntryDTO): Promise<JournalEntryDTO> {
     const raw = await apiPost<JournalEntryDTO>('/finance/ledger/journal-entries', data)
     return JournalEntrySchema.parse(raw)
   },
@@ -119,7 +119,7 @@ export const ledgerAdapter = {
    * @param data - The void payload containing the reason.
    * @returns A promise resolving to the validated JournalEntryDTO.
    */
-  async voidJournalEntry(entryId: string, data: JournalEntryVoidDTO): Promise<JournalEntryDTO> {
+  async voidJournalEntry(entryId: string, data: VoidJournalEntryDTO): Promise<JournalEntryDTO> {
     const raw = await apiPost<JournalEntryDTO>(
       `/finance/ledger/journal-entries/${entryId}/void`,
       data,
@@ -143,7 +143,7 @@ export const ledgerAdapter = {
    * @param data - The raw fiscal period creation data.
    * @returns A promise resolving to the validated FiscalPeriodDTO.
    */
-  async createFiscalPeriod(data: FiscalPeriodCreateDTO): Promise<FiscalPeriodDTO> {
+  async createFiscalPeriod(data: CreateFiscalPeriodDTO): Promise<FiscalPeriodDTO> {
     const raw = await apiPost<FiscalPeriodDTO>('/finance/ledger/fiscal-periods', data)
     return FiscalPeriodSchema.parse(raw)
   },
@@ -164,7 +164,7 @@ export const ledgerAdapter = {
    * @param data - The configuration update data (PATCH).
    * @returns A promise resolving to the validated LedgerSettingsDTO.
    */
-  async updateLedgerSettings(data: LedgerSettingsUpdateDTO): Promise<LedgerSettingsDTO> {
+  async updateLedgerSettings(data: UpdateLedgerSettingsDTO): Promise<LedgerSettingsDTO> {
     const raw = await apiPost<LedgerSettingsDTO>('/finance/ledger/settings', data, {
       method: 'PATCH',
     })

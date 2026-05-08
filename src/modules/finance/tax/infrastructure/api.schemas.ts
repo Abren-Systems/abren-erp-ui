@@ -20,8 +20,9 @@ export const TaxGroupSchema = z.object({
 })
 
 export const TaxCalculationResponseSchema = z.object({
-  net: z.coerce.string(),
+  amount: z.coerce.string(),
   tax: z.coerce.string(),
-  gross: z.coerce.string(),
+  total: z.coerce.string(),
   currency: z.string(),
+  breakdown: z.record(z.string()).optional(),
 })

@@ -2,7 +2,7 @@ import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
 import { apAdapter } from '../infrastructure/ap.adapter'
-import type { VendorBillCreateDTO } from '../infrastructure/api.types'
+import type { CreateVendorBillDTO } from '../infrastructure/api.types'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
 import { apKeys } from './query-keys'
@@ -55,7 +55,7 @@ export function useCreateVendorBill() {
     error,
   } = useApiMutation<VendorBill, ApiError, VendorBillFormValues>(
     async (values: VendorBillFormValues) => {
-      const dto: VendorBillCreateDTO = {
+      const dto: CreateVendorBillDTO = {
         vendor_id: values.vendorId,
         vendor_invoice_number: values.vendorInvoiceNumber,
         issue_date: values.issueDate,

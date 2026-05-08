@@ -38,12 +38,10 @@ export class TaxMapper {
   }
 
   static toCalculationResult(dto: TaxCalculationResultDTO): TaxCalculationResult {
-    const result: TaxCalculationResult = {
-      net: CommonMapper.toMoney(dto.net, dto.currency),
+    return {
+      net: CommonMapper.toMoney(dto.amount, dto.currency),
       tax: CommonMapper.toMoney(dto.tax, dto.currency),
-      gross: CommonMapper.toMoney(dto.gross, dto.currency),
+      gross: CommonMapper.toMoney(dto.total, dto.currency),
     }
-
-    return result
   }
 }

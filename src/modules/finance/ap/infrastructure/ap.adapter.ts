@@ -1,9 +1,9 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
 import { PaymentRequestSchema, PaymentRequestStatsSchema, VendorBillSchema } from './api.schemas'
 import type {
-  PaymentRequestCreateDTO,
-  PaymentRequestRejectDTO,
-  VendorBillCreateDTO,
+  CreatePaymentRequestDTO,
+  RejectPaymentRequestDTO,
+  CreateVendorBillDTO,
 } from './api.types'
 import { APMapper } from './mappers'
 import type { PaymentRequest, PaymentRequestStats, VendorBill } from '../domain/ap.types'
@@ -57,7 +57,7 @@ export const apAdapter = {
   /**
    * Creates a new Payment Request.
    */
-  async createRequest(dto: PaymentRequestCreateDTO): Promise<PaymentRequest> {
+  async createRequest(dto: CreatePaymentRequestDTO): Promise<PaymentRequest> {
     const raw = await apiPost<unknown>(REQUESTS_BASE, dto)
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
@@ -81,7 +81,7 @@ export const apAdapter = {
   /**
    * Rejects a submitted Payment Request with a reason.
    */
-  async rejectRequest(id: string, dto: PaymentRequestRejectDTO): Promise<PaymentRequest> {
+  async rejectRequest(id: string, dto: RejectPaymentRequestDTO): Promise<PaymentRequest> {
     const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/reject`, dto)
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
@@ -139,7 +139,7 @@ export const apAdapter = {
   /**
    * Creates a new Vendor Bill.
    */
-  async createBill(dto: VendorBillCreateDTO): Promise<VendorBill> {
+  async createBill(dto: CreateVendorBillDTO): Promise<VendorBill> {
     const raw = await apiPost<unknown>(BILLS_BASE, dto)
     return APMapper.toVendorBill(VendorBillSchema.parse(raw))
   },

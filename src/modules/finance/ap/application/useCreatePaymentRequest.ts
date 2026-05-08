@@ -4,8 +4,8 @@ import { useRouter } from 'vue-router'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import type { PaymentRequest } from '../domain/ap.types'
 import type {
-  PaymentRequestCreateDTO,
-  PaymentRequestLineCreateDTO,
+  CreatePaymentRequestDTO,
+  CreatePaymentRequestLineDTO,
 } from '../infrastructure/api.types'
 import { computed, ref } from 'vue'
 import { useForm } from '@tanstack/vue-form'
@@ -59,7 +59,7 @@ export function useCreatePaymentRequest() {
     error,
   } = useApiMutation<PaymentRequest, ApiError, PaymentRequestFormValues>(
     async (values: PaymentRequestFormValues) => {
-      const mappedLines: PaymentRequestLineCreateDTO[] = values.lines.map((l) => ({
+      const mappedLines: CreatePaymentRequestLineDTO[] = values.lines.map((l) => ({
         description: l.description,
         amount: String(l.amount),
         account_id: l.accountId || null,
@@ -67,14 +67,14 @@ export function useCreatePaymentRequest() {
         tax_amount: l.taxAmount != null ? String(l.taxAmount) : null,
       }))
 
-      const dto: PaymentRequestCreateDTO = {
+      const dto: CreatePaymentRequestDTO = {
         beneficiary_id: values.beneficiaryId,
         currency: values.currency,
         justification: values.justification,
         bank_account_id: values.bankAccountId || null,
         target_liability_account_id: values.targetLiabilityAccountId || null,
         lines: mappedLines,
-      } as PaymentRequestCreateDTO
+      }
 
       return await apAdapter.createRequest(dto)
     },

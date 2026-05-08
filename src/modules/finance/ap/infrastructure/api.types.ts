@@ -22,23 +22,23 @@ export type PaymentRequestStatus =
 export type PaymentRequestStatusDTO = PaymentRequestStatus
 export type PaymentRequestLineDTO = z.infer<typeof PaymentRequestLineSchema>
 export type PaymentRequestDTO = z.infer<typeof PaymentRequestSchema>
-export interface PaymentRequestLineCreateDTO {
+export interface CreatePaymentRequestLineDTO {
   description: string
   amount: string
   account_id?: string | null
   category_id?: string | null
   tax_amount?: string | null
 }
-export interface PaymentRequestCreateDTO {
+export interface CreatePaymentRequestDTO {
   beneficiary_id: string
   justification: string
-  lines: PaymentRequestLineCreateDTO[]
+  lines: CreatePaymentRequestLineDTO[]
   currency: string
   bank_account_id?: string | null
   target_liability_account_id?: string | null
 }
-export type PaymentRequestAuthorizeDTO = void
-export interface PaymentRequestRejectDTO {
+export type AuthorizePaymentRequestDTO = void
+export interface RejectPaymentRequestDTO {
   reason: string
 }
 export type PaymentRequestStatsDTO = z.infer<typeof PaymentRequestStatsSchema>
@@ -48,19 +48,19 @@ export type PaymentRequestStatsDTO = z.infer<typeof PaymentRequestStatsSchema>
 export type VendorBillLineDTO = z.infer<typeof VendorBillLineSchema>
 export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID' | 'VOIDED'
 export type VendorBillDTO = z.infer<typeof VendorBillSchema>
-export interface VendorBillLineCreateDTO {
+export interface CreateVendorBillLineDTO {
   description: string
   amount: number
   account_id?: string | null
   category_id?: string | null
   tax_rule_id?: string | null
 }
-export interface VendorBillCreateDTO {
+export interface CreateVendorBillDTO {
   vendor_id: string
   vendor_invoice_number: string
   issue_date: string
   due_date?: string | null
   currency: string
   justification: string
-  lines: VendorBillLineCreateDTO[]
+  lines: CreateVendorBillLineDTO[]
 }

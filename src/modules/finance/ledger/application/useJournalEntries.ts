@@ -6,9 +6,7 @@ import { LedgerMapper } from '../infrastructure/mappers'
 import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../domain/journal-entry.types'
-import type { components } from '@/shared/api/generated.types'
-
-type CreateJournalEntryDTO = components['schemas']['CreateJournalEntryDTO']
+import type { CreateJournalEntryDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: Manage Journal Entries.
