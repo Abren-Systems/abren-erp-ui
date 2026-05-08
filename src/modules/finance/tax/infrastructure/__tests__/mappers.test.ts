@@ -28,9 +28,9 @@ describe('TaxMapper', () => {
   describe('toCalculationResult', () => {
     it('should map TaxCalculationResponse to TaxCalculationResult', () => {
       const dto: TaxCalculationResponse = {
-        net: '100.00',
+        amount: '100.00',
         tax: '15.00',
-        gross: '115.00',
+        total: '115.00',
         currency: 'ETB',
       } as unknown as TaxCalculationResponse
 
