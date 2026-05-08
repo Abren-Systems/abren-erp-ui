@@ -1,6 +1,7 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { WF301000_COMMANDS } from './commands'
 
 /**
  * WF301000 - Workflow Inbox
@@ -30,7 +31,7 @@ export const WF301000: ScreenDefinition = {
       queryKey: ['workflows', 'inbox'] as const,
     },
   },
-  commands: [],
+  commands: Object.values(WF301000_COMMANDS),
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,

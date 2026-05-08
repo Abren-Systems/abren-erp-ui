@@ -8,7 +8,6 @@ import { useWorkflowInboxController } from './controller'
 import WorkflowActionDialog from '../components/WorkflowActionDialog.vue'
 
 const ctrl = useWorkflowInboxController()
-
 </script>
 
 <template>
@@ -31,7 +30,15 @@ const ctrl = useWorkflowInboxController()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="stealth" @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'refresh') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'refresh'))?.command?.execute()">
+          <AppButton
+            variant="stealth"
+            @click="
+              (
+                ctrl.model.value.ui.actions.primary.find((a) => a.command.key === 'refresh') ||
+                ctrl.model.value.ui.actions.secondary.find((a) => a.command.key === 'refresh')
+              )?.command?.execute()
+            "
+          >
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
             </template>
@@ -46,8 +53,20 @@ const ctrl = useWorkflowInboxController()
       :instance-id="ctrl.selectedTask.value.id"
       :target-state="ctrl.selectedTask.value.targetState || ''"
       :is-open="ctrl.isDialogOpen.value"
+      :is-pending="ctrl.isSubmitting.value"
       @close="ctrl.isDialogOpen.value = false"
-      @success="ctrl.handleSuccess"
+      @approve="
+        (comments) =>
+          ctrl.model.value.ui.actions.primary
+            .find((a) => a.command.key === 'approve')
+            ?.command?.execute(comments)
+      "
+      @reject="
+        (comments) =>
+          ctrl.model.value.ui.actions.secondary
+            .find((a) => a.command.key === 'reject')
+            ?.command?.execute(comments)
+      "
     />
   </div>
 </template>

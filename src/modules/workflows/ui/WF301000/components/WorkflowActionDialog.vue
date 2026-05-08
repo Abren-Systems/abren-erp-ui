@@ -1,31 +1,28 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { AppButton, AppInput, AppBadge } from '@/shared/components/primitives'
-import { ShieldCheck, MessageSquare, X, Check, AlertTriangle } from 'lucide-vue-next'
-import { useApprovalAction } from '../../application/useApprovalAction'
+import { ref } from 'vue'
+import { AppButton, AppInput } from '@/shared/components/primitives'
+import { ShieldCheck, AlertTriangle, Check } from 'lucide-vue-next'
 
 const props = defineProps<{
   instanceId: string
   targetState: string
   isOpen: boolean
+  isPending: boolean
 }>()
 
-const emit = defineEmits(['close', 'success'])
+const emit = defineEmits<{
+  close: []
+  approve: [comments: string]
+  reject: [comments: string]
+}>()
 
-const { mutateAsync: submitAction, isPending } = useApprovalAction()
 const comments = ref('')
 
-async function handleAction(action: 'APPROVE' | 'REJECT') {
-  try {
-    await submitAction({
-      instanceId: props.instanceId,
-      action,
-      comments: comments.value,
-    })
-    emit('success')
-    emit('close')
-  } catch (e) {
-    console.error('Failed to submit approval', e)
+function handleAction(action: 'APPROVE' | 'REJECT') {
+  if (action === 'APPROVE') {
+    emit('approve', comments.value)
+  } else {
+    emit('reject', comments.value)
   }
 }
 </script>

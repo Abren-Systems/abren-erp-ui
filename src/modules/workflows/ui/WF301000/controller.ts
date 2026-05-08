@@ -6,12 +6,14 @@ import {
   listScreenDomainState,
 } from '@/platform/screen-runtime'
 import { usePendingApprovals } from '../../application/usePendingApprovals'
+import { useApprovalAction } from '../../application/useApprovalAction'
 import { WF301000 } from './screen'
 import type { PendingApproval } from '../../domain/workflows.types'
 
 export function useWorkflowInboxController() {
   const gridState = useDataGrid()
   const { tasks, isLoading, error, refresh } = usePendingApprovals()
+  const { mutateAsync: submitAction, isPending: isSubmitting } = useApprovalAction()
 
   const base = useScreenController<PendingApproval[], 'VIEW'>({
     screen: WF301000,
@@ -33,6 +35,27 @@ export function useWorkflowInboxController() {
     isPending: isLoading,
   })
 
+  // We register business actions as formal commands on the controller
+  base.registerCommand('approve', {
+    execute: async (...args: unknown[]) => {
+      const comments = (args[0] as string) || ''
+      if (!selectedTask.value) return
+      await submitAction({ instanceId: selectedTask.value.id, action: 'APPROVE', comments })
+      handleSuccess()
+    },
+    isPending: isSubmitting,
+  })
+
+  base.registerCommand('reject', {
+    execute: async (...args: unknown[]) => {
+      const comments = (args[0] as string) || ''
+      if (!selectedTask.value) return
+      await submitAction({ instanceId: selectedTask.value.id, action: 'REJECT', comments })
+      handleSuccess()
+    },
+    isPending: isSubmitting,
+  })
+
   const selectedTask = ref<PendingApproval | null>(null)
   const isDialogOpen = ref(false)
 
@@ -52,8 +75,9 @@ export function useWorkflowInboxController() {
     tasks,
     selectedTask,
     isDialogOpen,
+    isSubmitting,
     handleRowClick,
     handleSuccess,
     gridState,
-}
+  }
 }
