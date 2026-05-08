@@ -15,7 +15,13 @@ const ctrl = useWarehouseController(props.id)
       back-route="inventory.warehouses"
     />
 
-    <FormToolbar @save="ctrl.handleSave" />
+    <FormToolbar
+      :model="ctrl.model.value"
+      :executors="ctrl.commands.value"
+      :is-pending="ctrl.isPending.value"
+      :is-new="ctrl.isNew.value"
+      @save="ctrl.handleSave"
+    />
 
     <div v-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
       Loading warehouse...

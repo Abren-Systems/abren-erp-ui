@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DataGrid } from '@/shared/components/data-grid'
-import { PageHeader } from '@/shared/components/workspace'
+import { ListTitleBar } from '@/platform/chrome'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { Plus, MapPin, ListFilter, RefreshCcw } from 'lucide-vue-next'
 import { stockColumns } from './grids/stock-item.grid'
@@ -11,40 +11,7 @@ const ctrl = useStockItemsListController()
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <PageHeader
-      :title="ctrl.screen.titleKey"
-      description="Monitor your exact inventory valuations and batch locations."
-      icon="Package"
-      plain
-    >
-      <template #actions>
-        <div class="flex items-center gap-3">
-          <div
-            class="flex items-center gap-2 bg-[var(--color-neutral-50)] px-3 py-1.5 rounded-sm border border-[var(--color-neutral-200)]"
-          >
-            <MapPin :size="14" class="text-[var(--color-neutral-400)]" />
-            <AppSelect
-              v-model="ctrl.selectedWarehouseId.value"
-              class="min-w-[200px]"
-              :options="
-                ctrl.warehouses.value?.map((wh) => ({
-                  label: `${wh.name} (${wh.code})`,
-                  value: wh.id,
-                })) ?? []
-              "
-              placeholder="Select Location"
-            />
-          </div>
-
-          <AppButton variant="primary" size="sm" @click="ctrl.handleCreateAdjustment">
-            <template #start>
-              <Plus :size="14" />
-            </template>
-            Post Adjustment
-          </AppButton>
-        </div>
-      </template>
-    </PageHeader>
+    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
 
     <div class="flex-1 p-8 min-h-0">
       <div
@@ -53,7 +20,7 @@ const ctrl = useStockItemsListController()
       >
         <ListFilter :size="48" class="mb-4 opacity-10" />
         <p class="text-sm font-medium">Select a warehouse location to view current stock.</p>
-        <p class="text-xs mt-1 opacity-60">Use the location filter in the header to proceed.</p>
+        <p class="text-xs mt-1 opacity-60">Use the location filter in the toolbar to proceed.</p>
       </div>
 
       <DataGrid
@@ -71,11 +38,36 @@ const ctrl = useStockItemsListController()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
+          <div
+            class="flex items-center gap-2 bg-[var(--color-neutral-50)] px-3 py-1.5 rounded-sm border border-[var(--color-neutral-200)]"
+          >
+            <MapPin :size="14" class="text-[var(--color-neutral-400)]" />
+            <AppSelect
+              v-model="ctrl.selectedWarehouseId.value"
+              class="min-w-[200px]"
+              :options="
+                ctrl.warehouses.value?.map((wh) => ({
+                  label: `${wh.name} (${wh.code})`,
+                  value: wh.id,
+                })) ?? []
+              "
+              placeholder="Select Location"
+            />
+          </div>
           <AppButton variant="stealth" @click="ctrl.refresh()">
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
             </template>
             Refresh
+          </AppButton>
+        </template>
+
+        <template #toolbar-controls>
+          <AppButton variant="primary" size="sm" @click="ctrl.handleCreateAdjustment">
+            <template #start>
+              <Plus :size="14" />
+            </template>
+            Post Adjustment
           </AppButton>
         </template>
       </DataGrid>

@@ -17,7 +17,13 @@ const ctrl = useStockItemController(props.id)
       back-route="inventory.stock"
     />
 
-    <FormToolbar @save="ctrl.handleSave" />
+    <FormToolbar
+      :model="ctrl.model.value"
+      :executors="ctrl.commands.value"
+      :is-pending="ctrl.isPending.value"
+      :is-new="ctrl.isNew.value"
+      @save="ctrl.handleSave"
+    />
 
     <div v-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
       Loading stock item...

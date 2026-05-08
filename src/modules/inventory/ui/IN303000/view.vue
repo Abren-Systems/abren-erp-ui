@@ -22,7 +22,13 @@ const valuationOptions = [
       back-route="inventory.adjustments"
     />
 
-    <FormToolbar @save="ctrl.handlePost" />
+    <FormToolbar
+      :model="ctrl.model.value"
+      :executors="ctrl.commands.value"
+      :is-pending="ctrl.isPending.value"
+      :is-new="ctrl.isNew.value"
+      @save="ctrl.handlePost"
+    />
 
     <div v-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
       Loading adjustment...
