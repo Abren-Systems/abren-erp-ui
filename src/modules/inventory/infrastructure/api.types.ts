@@ -6,22 +6,22 @@ import type { components } from '@/shared/api/generated.types'
 
 type Schemas = components['schemas']
 
-export type WarehouseDTO = Schemas['WarehouseDTO']
+export type WarehouseDTO = Schemas['WarehouseSchema']
 
 // TrackingMode is a string enum from backend
 export type TrackingMode = 'NONE' | 'BATCH' | 'SERIAL'
 
-export type ItemDTO = Schemas['ItemDTO']
+export type ItemDTO = Schemas['ItemSchema']
 
-export type StockLevelDTO = Schemas['StockLevelDTO']
+export type StockLevelDTO = Schemas['StockLevelSchema']
 
-export type BatchDTO = Schemas['BatchDTO']
+export type BatchDTO = Schemas['BatchSchema']
 
-export type SerialNumberDTO = Schemas['SerialNumberDTO']
+export type SerialNumberDTO = Schemas['SerialNumberSchema']
 
-export type AdjustmentLineDTO = Schemas['CreateAdjustmentLineDTO']
+export type AdjustmentLineDTO = Schemas['AdjustmentLineSchema']
 
-export type AdjustmentCreateDTO = Schemas['CreateAdjustmentDTO']
+export type CreateAdjustmentDTO = Schemas['AdjustmentCreateSchema']
 
 export type AdjustmentDTO = {
   id: string

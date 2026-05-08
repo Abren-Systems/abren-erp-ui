@@ -1,53 +1,19 @@
-/**
- * Core Identity & RBAC API DTOs
- */
+import type { components } from '@/shared/api/generated.types'
 
-export interface PermissionDTO {
-  resource: string
-  action: string
-  code: string // e.g. "inventory:write", "ap:approve"
-}
+type Schemas = components['schemas']
 
-export interface RoleDTO {
-  id: string
-  tenant_id: string
-  name: string
-  description?: string
-  is_system?: boolean
-  permissions: string[] // List of permission codes
-}
+export type RoleDTO = Schemas['RoleSchema']
 
-export interface UserRoleDTO {
-  role_id: string
-  name: string
-}
+export type UserRoleDTO = Schemas['UserRoleSchema']
 
-export interface UserDTO {
-  id: string
-  tenant_id: string
-  email: string
-  status: 'ACTIVE' | 'INACTIVE' | 'PENDING'
-  roles: UserRoleDTO[]
-  last_login_at?: string | null
-}
+export type UserDTO = Schemas['UserSchema']
 
-export interface RoleCreateDTO {
-  name: string
-  description?: string
-  permissions: string[]
-}
+export type PermissionDTO = Schemas['PermissionSchema']
 
-export interface UserRoleAssignmentDTO {
-  user_id: string
-  role_id: string
-}
+export type CreateRoleDTO = Schemas['CreateRoleRequest']
 
-export interface UserCreateDTO {
-  email: string
-  password: string
-}
+export type AssignRoleDTO = Schemas['AssignRoleRequest']
 
-export interface TenantSettingDTO {
-  key: string
-  value: string | null
-}
+export type CreateUserDTO = Schemas['CreateUserRequest']
+
+export type TenantSettingDTO = Schemas['TenantSettingSchema']
