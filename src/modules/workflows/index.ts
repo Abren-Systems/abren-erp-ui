@@ -14,11 +14,11 @@ export const workflowsModule: PlatformEngine = {
       icon: 'inbox',
       permissions: ['workflows:view'],
     },
-    {
-      label: 'States',
-      route: 'workflows.states',
-      icon: 'git-branch',
-      permissions: ['workflows:view'],
-    },
+    // {
+    //   label: 'States',
+    //   route: 'workflows.states',
+    //   icon: 'git-branch',
+    //   permissions: ['workflows:view'],
+    // },
   ],
 }
