@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AppField, FieldGroup, AppTabs } from '@/shared/components/field-system'
 import { DataGrid } from '@/shared/components/data-grid'
+import { AuditReasonDialog } from '@/shared/components/dialog'
 import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { vendorBillLineColumns } from './grids/lines.grid'
 import { useVendorBillController } from './controller'
@@ -101,5 +102,15 @@ const ctrl = useVendorBillController(props.id)
         </div>
       </template>
     </template>
+
+    <!-- Dialogs -->
+    <AuditReasonDialog
+      v-model:open="ctrl.isRejectDialogOpen.value"
+      v-model="ctrl.auditReason.value"
+      title="Reject/Void Vendor Bill"
+      description="Please provide a reason for voiding this vendor bill. This will be recorded in the audit trail."
+      confirm-label="Void Bill"
+      @confirm="ctrl.handleRejectConfirm"
+    />
   </div>
 </template>

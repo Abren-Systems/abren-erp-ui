@@ -47,6 +47,12 @@ export function useVendorBillController(id: string) {
   // Attach form to base so useField can find it for new records
   Object.assign(base, { form })
 
+  // UI state
+  const currentLines = computed(() => bill.value?.lines || [])
+  const activeTab = ref('Expense Lines')
+  const isRejectDialogOpen = ref(false)
+  const auditReason = ref('')
+
   // Commands
   base.registerCommand('validate', {
     execute: async () => void validate(),
@@ -54,9 +60,18 @@ export function useVendorBillController(id: string) {
   })
 
   base.registerCommand('reject', {
-    execute: async () => void reject('Voided via Data Entry screen'),
+    execute: async () => {
+      auditReason.value = ''
+      isRejectDialogOpen.value = true
+    },
     isPending: isRejecting,
   })
+
+  const handleRejectConfirm = async () => {
+    if (!auditReason.value.trim()) return
+    await reject(auditReason.value)
+    isRejectDialogOpen.value = false
+  }
 
   base.registerCommand('create_pr', {
     execute: async () => void router.push({ name: 'PaymentRequestsList' }),
@@ -75,14 +90,14 @@ export function useVendorBillController(id: string) {
     totalAmount: useField(base, AP302000_FIELDS.totalAmount),
   }
 
-  const currentLines = computed(() => bill.value?.lines || [])
-  const activeTab = ref('Expense Lines')
-
   return {
     ...base,
     fields,
     currentLines,
     activeTab,
+    isRejectDialogOpen,
+    auditReason,
+    handleRejectConfirm,
     form,
     isCreating,
     router,
