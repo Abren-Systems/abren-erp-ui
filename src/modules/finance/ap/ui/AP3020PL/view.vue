@@ -28,7 +28,15 @@ const ctrl = useVendorBillsListController()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="stealth" size="sm" @click="ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'refresh')?.command.execute()">
+          <AppButton
+            variant="stealth"
+            size="sm"
+            @click="
+              ctrl.model.value.ui.actions.secondary
+                .find((a) => a.command.id === 'refresh')
+                ?.command.execute()
+            "
+          >
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
             </template>
@@ -37,7 +45,15 @@ const ctrl = useVendorBillsListController()
         </template>
 
         <template #toolbar-controls>
-          <AppButton variant="primary" size="sm" @click="ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'create')?.command.execute()">
+          <AppButton
+            variant="primary"
+            size="sm"
+            @click="
+              ctrl.model.value.ui.actions.primary
+                .find((a) => a.command.id === 'create')
+                ?.command.execute()
+            "
+          >
             <template #start><Plus :size="14" /></template>
             New Bill
           </AppButton>

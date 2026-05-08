@@ -52,5 +52,5 @@ export function useTaxRulesListController() {
     handleCreate,
     refresh: refetch,
     gridState,
-}
+  }
 }

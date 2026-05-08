@@ -52,5 +52,5 @@ export function useTaxGroupsListController() {
     handleCreate,
     refresh: refetch,
     gridState,
-}
+  }
 }

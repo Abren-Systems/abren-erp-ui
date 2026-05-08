@@ -1,7 +1,18 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { resolveScreenRoutes } from '@/platform/screen-runtime/screen-route-resolver'
+import { resolveScreenRoutes } from '@/platform/screen-runtime'
+import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
 import { coreScreens } from './screens'
+import { coreWorkspace } from './workspace'
 
-const routes: RouteRecordRaw[] = [...resolveScreenRoutes(coreScreens)]
+export default [
+  // --- Workspace (State A) ---
+  {
+    path: '',
+    name: 'core-workspace',
+    component: WorkspaceView,
+    props: { workspace: coreWorkspace },
+  },
 
-export default routes
+  // --- Screens (State B) ---
+  ...resolveScreenRoutes(coreScreens),
+] satisfies RouteRecordRaw[]

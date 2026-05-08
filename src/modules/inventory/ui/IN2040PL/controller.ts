@@ -48,5 +48,5 @@ export function useWarehousesListController() {
     handleCreate,
     handleRowClick,
     gridState,
-}
+  }
 }

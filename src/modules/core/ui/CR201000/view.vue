@@ -8,7 +8,6 @@ import { userColumns } from './grids/user.grid'
 import { useUsersController } from './controller'
 
 const ctrl = useUsersController()
-
 </script>
 
 <template>
@@ -29,7 +28,16 @@ const ctrl = useUsersController()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="primary" size="sm" @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'invite') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'invite'))?.command?.execute()">
+          <AppButton
+            variant="primary"
+            size="sm"
+            @click="
+              (
+                ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'invite') ||
+                ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'invite')
+              )?.command?.execute()
+            "
+          >
             Invite User
           </AppButton>
         </template>
@@ -64,8 +72,18 @@ const ctrl = useUsersController()
         <AppButton variant="ghost" @click="ctrl.isInviteOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeInvite') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeInvite'))?.command?.isPending.value"
-          @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeInvite') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeInvite'))?.command?.execute()"
+          :loading="
+            (
+              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeInvite') ||
+              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeInvite')
+            )?.command?.isPending.value
+          "
+          @click="
+            (
+              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeInvite') ||
+              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeInvite')
+            )?.command?.execute()
+          "
         >
           Send Invite
         </AppButton>
@@ -98,8 +116,18 @@ const ctrl = useUsersController()
         <AppButton variant="ghost" @click="ctrl.isAssignmentOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeAssign') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeAssign'))?.command?.isPending.value"
-          @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeAssign') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeAssign'))?.command?.execute()"
+          :loading="
+            (
+              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeAssign') ||
+              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeAssign')
+            )?.command?.isPending.value
+          "
+          @click="
+            (
+              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeAssign') ||
+              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeAssign')
+            )?.command?.execute()
+          "
         >
           Update Role
         </AppButton>

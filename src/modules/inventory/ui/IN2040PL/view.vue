@@ -7,7 +7,6 @@ import { warehouseColumns } from './grids/warehouse.grid'
 import { useWarehousesListController } from './controller'
 
 const ctrl = useWarehousesListController()
-
 </script>
 
 <template>

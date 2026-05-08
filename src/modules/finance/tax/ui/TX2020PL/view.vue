@@ -7,7 +7,6 @@ import { taxRuleColumns } from './grids/tax-rule.grid'
 import { useTaxRulesListController } from './controller'
 
 const ctrl = useTaxRulesListController()
-
 </script>
 
 <template>

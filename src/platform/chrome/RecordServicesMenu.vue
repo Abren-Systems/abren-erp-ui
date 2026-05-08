@@ -22,20 +22,10 @@ import { StickyNote, Paperclip, Mail, Settings } from 'lucide-vue-next'
     <button class="record-services__btn" title="Files" disabled aria-label="Attach files">
       <Paperclip :size="16" />
     </button>
-    <button
-      class="record-services__btn"
-      title="Activities"
-      disabled
-      aria-label="Activities"
-    >
+    <button class="record-services__btn" title="Activities" disabled aria-label="Activities">
       <Mail :size="16" />
     </button>
-    <button
-      class="record-services__btn"
-      title="Settings"
-      disabled
-      aria-label="Form settings"
-    >
+    <button class="record-services__btn" title="Settings" disabled aria-label="Form settings">
       <Settings :size="16" />
     </button>
   </div>

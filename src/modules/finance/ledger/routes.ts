@@ -1,51 +1,18 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { resolveScreenRoutes } from '@/platform/screen-runtime'
+import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
+import { ledgerScreens } from './screens'
+import { ledgerWorkspace } from './workspace'
 
-const routes: RouteRecordRaw[] = [
-  // ── Chart of Accounts ────────────────────────────────────────
+export default [
+  // --- Workspace (State A) ---
   {
-    path: 'coa',
-    name: 'LedgerCoa',
-    component: () => import('./ui/GL2010PL/view.vue'),
-    meta: { permission: 'ledger:view' },
-  },
-  {
-    path: 'coa/:id',
-    name: 'LedgerCoaDetail',
-    component: () => import('./ui/GL201000/view.vue'),
-    meta: { permission: 'ledger:view' },
-    props: true,
+    path: '',
+    name: 'ledger-workspace',
+    component: WorkspaceView,
+    props: { workspace: ledgerWorkspace },
   },
 
-  // ── Journal Entries ──────────────────────────────────────────
-  {
-    path: 'journals',
-    name: 'LedgerJournals',
-    component: () => import('./ui/GL3010PL/view.vue'),
-    meta: { permission: 'ledger:view' },
-  },
-  {
-    path: 'journals/:id',
-    name: 'LedgerJournalDetail',
-    component: () => import('./ui/GL301000/view.vue'),
-    meta: { permission: 'ledger:view' },
-    props: true,
-  },
-
-  // ── Fiscal Periods ───────────────────────────────────────────
-  {
-    path: 'fiscal-periods',
-    name: 'LedgerFiscalPeriods',
-    component: () => import('./ui/fiscal-periods/pages/FiscalPeriodsListPage.vue'),
-    meta: { permission: 'ledger:view' },
-  },
-
-  // ── Settings ─────────────────────────────────────────────────
-  {
-    path: 'settings',
-    name: 'LedgerSettings',
-    component: () => import('./ui/settings/pages/LedgerSettingsPage.vue'),
-    meta: { permission: 'ledger:manage_accounts' },
-  },
-]
-
-export default routes
+  // --- Screens (State B) ---
+  ...resolveScreenRoutes(ledgerScreens),
+] satisfies RouteRecordRaw[]

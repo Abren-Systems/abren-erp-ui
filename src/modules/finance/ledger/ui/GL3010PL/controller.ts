@@ -40,5 +40,5 @@ export function useJournalEntriesListController() {
     refresh,
     handleRowClick,
     gridState,
-}
+  }
 }

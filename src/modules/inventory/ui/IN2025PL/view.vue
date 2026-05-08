@@ -7,7 +7,6 @@ import { stockColumns } from './grids/stock-item.grid'
 import { useStockItemsListController } from './controller'
 
 const ctrl = useStockItemsListController()
-
 </script>
 
 <template>

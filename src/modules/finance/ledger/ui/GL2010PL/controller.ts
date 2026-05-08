@@ -39,5 +39,5 @@ export function useAccountListController() {
     refresh: refetch,
     handleRowClick,
     gridState,
-}
+  }
 }

@@ -6,7 +6,6 @@ import { useTenantSettingsController, type TenantSetting } from './controller'
 
 const ctrl = useTenantSettingsController()
 
-
 const settingColumns = [
   {
     accessorKey: 'key',
@@ -41,7 +40,12 @@ const settingColumns = [
           <AppButton
             variant="primary"
             size="sm"
-            @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'bulkEdit') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'bulkEdit'))?.command?.execute()"
+            @click="
+              (
+                ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'bulkEdit') ||
+                ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'bulkEdit')
+              )?.command?.execute()
+            "
           >
             Edit Settings
           </AppButton>

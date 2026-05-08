@@ -7,7 +7,6 @@ import { accountColumns } from './grids/bank-account.grid'
 import { useBankAccountsListController } from './controller'
 
 const ctrl = useBankAccountsListController()
-
 </script>
 
 <template>

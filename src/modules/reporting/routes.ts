@@ -1,15 +1,25 @@
 import type { RouteRecordRaw } from 'vue-router'
+import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
 import CashflowDashboard from './ui/CashflowDashboard.vue'
+import { reportingWorkspace } from './workspace'
 
 export const reportingRoutes: RouteRecordRaw[] = [
+  // --- Workspace (State A) ---
   {
-    path: '/business/reporting',
+    path: '',
+    name: 'reporting-workspace',
+    component: WorkspaceView,
+    props: { workspace: reportingWorkspace },
+  },
+
+  // --- Screens (State B) ---
+  {
+    path: 'dashboard',
     name: 'reporting.dashboard',
     component: CashflowDashboard,
     meta: {
       title: 'Reporting Dashboard',
-      requiresAuth: true,
-      module: 'reporting',
+      permissions: ['reporting:view'],
     },
   },
 ]

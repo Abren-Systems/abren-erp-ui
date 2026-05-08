@@ -7,7 +7,6 @@ import { journalEntryColumns } from './grids/journal-entry.grid'
 import { useJournalEntriesListController } from './controller'
 
 const ctrl = useJournalEntriesListController()
-
 </script>
 
 <template>

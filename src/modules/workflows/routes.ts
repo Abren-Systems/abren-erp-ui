@@ -1,24 +1,18 @@
-import { h } from 'vue'
+import type { RouteRecordRaw } from 'vue-router'
+import { resolveScreenRoutes } from '@/platform/screen-runtime'
+import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
+import { workflowScreens } from './screens'
+import { workflowWorkspace } from './workspace'
 
 export default [
+  // --- Workspace (State A) ---
   {
-    path: 'inbox',
-    name: 'workflows.inbox',
-    component: () => import('./ui/pages/WorkflowInboxPage.vue'),
-    meta: { title: 'Workflow Inbox', permissions: ['workflows:read'] },
+    path: '',
+    name: 'workflows-workspace',
+    component: WorkspaceView,
+    props: { workspace: workflowWorkspace },
   },
-  {
-    path: 'states',
-    name: 'workflows.states',
-    component: () =>
-      Promise.resolve({
-        render: () =>
-          h(
-            'div',
-            { class: 'p-8 text-center text-neutral-500 font-medium' },
-            'Workflows States (Stub)',
-          ),
-      }),
-    meta: { title: 'Workflows States', permissions: ['workflows:read'] },
-  },
-]
+
+  // --- Screens (State B) ---
+  ...resolveScreenRoutes(workflowScreens),
+] satisfies RouteRecordRaw[]

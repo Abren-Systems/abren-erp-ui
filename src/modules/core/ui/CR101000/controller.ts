@@ -86,5 +86,5 @@ export function useRolesController() {
     togglePermission,
     handleRowClick,
     gridState,
-}
+  }
 }

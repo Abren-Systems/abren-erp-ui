@@ -7,7 +7,6 @@ import { taxGroupColumns } from './grids/tax-group.grid'
 import { useTaxGroupsListController } from './controller'
 
 const ctrl = useTaxGroupsListController()
-
 </script>
 
 <template>

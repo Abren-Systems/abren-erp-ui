@@ -52,15 +52,8 @@ function navigateToLink(link: NavigationLinkContract) {
         :title="category.labelKey"
       >
         <ul class="workspace-category-list">
-          <li
-            v-for="link in category.links"
-            :key="link.id"
-            class="workspace-category-list__item"
-          >
-            <button
-              class="workspace-category-list__link"
-              @click="navigateToLink(link)"
-            >
+          <li v-for="link in category.links" :key="link.id" class="workspace-category-list__item">
+            <button class="workspace-category-list__link" @click="navigateToLink(link)">
               {{ link.labelKey }}
             </button>
             <div class="workspace-category-list__affordance" title="Add to favorites">
@@ -143,7 +136,9 @@ function navigateToLink(link: NavigationLinkContract) {
 .workspace-category-list__affordance {
   color: var(--color-neutral-300);
   opacity: 0;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
   cursor: pointer;
 }
 

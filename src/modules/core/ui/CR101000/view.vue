@@ -8,7 +8,6 @@ import { roleColumns } from './grids/role.grid'
 import { useRolesController } from './controller'
 
 const ctrl = useRolesController()
-
 </script>
 
 <template>
@@ -29,7 +28,16 @@ const ctrl = useRolesController()
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <AppButton variant="primary" size="sm" @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'create') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'create'))?.command?.execute()">
+          <AppButton
+            variant="primary"
+            size="sm"
+            @click="
+              (
+                ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'create') ||
+                ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'create')
+              )?.command?.execute()
+            "
+          >
             Add Role
           </AppButton>
         </template>
@@ -86,8 +94,18 @@ const ctrl = useRolesController()
         <AppButton variant="ghost" @click="ctrl.isCreateOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeCreate') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeCreate'))?.command?.isPending.value"
-          @click="(ctrl.model.value.ui.actions.primary.find(a => a.command.id === 'executeCreate') || ctrl.model.value.ui.actions.secondary.find(a => a.command.id === 'executeCreate'))?.command?.execute()"
+          :loading="
+            (
+              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeCreate') ||
+              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeCreate')
+            )?.command?.isPending.value
+          "
+          @click="
+            (
+              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeCreate') ||
+              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeCreate')
+            )?.command?.execute()
+          "
         >
           Create Role
         </AppButton>

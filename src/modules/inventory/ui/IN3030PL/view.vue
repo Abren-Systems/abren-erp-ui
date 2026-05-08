@@ -7,7 +7,6 @@ import { adjustmentColumns } from './grids/adjustment.grid'
 import { useAdjustmentsListController } from './controller'
 
 const ctrl = useAdjustmentsListController()
-
 </script>
 
 <template>

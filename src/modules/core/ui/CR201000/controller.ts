@@ -100,5 +100,5 @@ export function useUsersController() {
     isRolesPending,
     handleRowClick,
     gridState,
-}
+  }
 }

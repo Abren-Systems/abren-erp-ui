@@ -48,5 +48,5 @@ export function useAdjustmentsListController() {
     handleCreate,
     handleRowClick,
     gridState,
-}
+  }
 }

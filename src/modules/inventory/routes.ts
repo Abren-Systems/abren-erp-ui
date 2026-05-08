@@ -1,9 +1,18 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { resolveScreenRoutes } from '@/platform/screen-runtime'
+import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
 import { inventoryScreens } from './screens'
+import { inventoryWorkspace } from './workspace'
 
-/**
- * Standard Acumatica-style screen routes
- * Discovers and mounts all ScreenDefinition objects registered in screens.ts
- */
-export const inventoryRoutes: RouteRecordRaw[] = resolveScreenRoutes(inventoryScreens)
+export const inventoryRoutes: RouteRecordRaw[] = [
+  // --- Workspace (State A) ---
+  {
+    path: '',
+    name: 'inventory-workspace',
+    component: WorkspaceView,
+    props: { workspace: inventoryWorkspace },
+  },
+
+  // --- Screens (State B) ---
+  ...resolveScreenRoutes(inventoryScreens),
+]
