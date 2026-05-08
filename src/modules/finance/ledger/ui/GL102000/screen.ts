@@ -1,3 +1,4 @@
+import { useFiscalPeriodsController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
@@ -9,6 +10,7 @@ import { GL102000_COMMANDS_LIST } from './commands'
 export const GL102000: ScreenDefinition = {
   id: 'GL102000' as ScreenId,
   moduleId: 'ledger' as ModuleId,
+  controller: () => useFiscalPeriodsController(),
   kind: 'maintenance',
   titleKey: 'Fiscal Periods',
   primaryView: 'periods',

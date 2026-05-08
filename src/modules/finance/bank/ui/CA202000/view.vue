@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { AppTemplate } from '@/platform/chrome'
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { useBankAccountController } from './controller'
 import { AppButton, AppInput, AppSelect } from '@/shared/components/primitives'
 
 const props = defineProps<{ id: string }>()
-const ctrl = useBankAccountController(props.id)
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
 const currencyOptions = [
   { label: 'ETB', value: 'ETB' },
@@ -22,26 +24,7 @@ const statusOptions = [
 
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
-    <div v-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
-      Loading bank account...
-    </div>
-
-    <template v-else>
-      <FormTitleBar
-        :form-title="ctrl.screen.titleKey"
-        :record-title="ctrl.isNew.value ? 'New Bank Account' : ctrl.entity.value?.accountName"
-        back-route="finance.bank.accounts"
-      />
-
-      <FormToolbar
-        v-if="!ctrl.isNew.value"
-        :commands="ctrl.screen.commands"
-        :domain-state="String(ctrl.state.domain)"
-        :executors="ctrl.commands.value"
-        :is-pending="ctrl.isPending.value"
-        :is-new="ctrl.isNew.value"
-      />
-
+    <template>
       <template v-if="!ctrl.isNew.value">
         <div class="px-6 py-5">
           <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
@@ -61,7 +44,7 @@ const statusOptions = [
         </div>
       </template>
 
-      <template v-else>
+      <template>
         <div class="flex-1 overflow-y-auto p-6 bg-white">
           <div class="max-w-md space-y-4">
             <AppInput v-model="ctrl.form.value.accountName" label="Account Name" required />

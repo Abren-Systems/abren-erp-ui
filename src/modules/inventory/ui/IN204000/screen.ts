@@ -1,3 +1,4 @@
+import { useWarehouseController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
@@ -5,6 +6,7 @@ import type { ModuleId } from '@/shared/types/brand.types'
 export const IN204000: ScreenDefinition = {
   id: 'IN204000' as ScreenId,
   moduleId: 'inventory' as ModuleId,
+  controller: (ctx) => useWarehouseController(ctx.params['id'] as string),
   kind: 'setup',
   titleKey: 'Warehouse',
   primaryView: 'warehouse',

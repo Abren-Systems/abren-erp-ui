@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { AppButton } from '@/shared/components/primitives'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { Plus, Trash2 } from 'lucide-vue-next'
 import { useAdjustmentController } from './controller'
 
 const props = defineProps<{ id: string }>()
-const ctrl = useAdjustmentController(props.id)
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
 const valuationOptions = [
   { label: 'WAC Auto', value: 'auto' },
@@ -16,25 +17,7 @@ const valuationOptions = [
 
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
-    <FormTitleBar
-      :form-title="ctrl.screen.titleKey"
-      :record-title="ctrl.isNew.value ? 'New Adjustment' : ctrl.entity.value?.id.slice(0, 8)"
-      back-route="inventory.adjustments"
-    />
-
-    <FormToolbar
-      :model="ctrl.model.value"
-      :executors="ctrl.commands.value"
-      :is-pending="ctrl.isPending.value"
-      :is-new="ctrl.isNew.value"
-      @save="ctrl.handlePost"
-    />
-
-    <div v-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
-      Loading adjustment...
-    </div>
-
-    <template v-else>
+    <template>
       <div class="flex-1 overflow-y-auto p-8">
         <div class="max-w-4xl mx-auto space-y-6">
           <!-- General Info -->

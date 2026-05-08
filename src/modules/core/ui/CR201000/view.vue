@@ -1,19 +1,18 @@
 <script setup lang="ts">
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
-import { ListTitleBar } from '@/platform/chrome'
 import { AppButton, AppInput } from '@/shared/components/primitives'
 import { AppField } from '@/shared/components/field-system'
 import { AppDialog } from '@/shared/components/workspace'
 import { userColumns } from './grids/user.grid'
 import { useUsersController } from './controller'
 
-const ctrl = useUsersController()
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>
   <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
-    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
-
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
         v-model:sorting="ctrl.gridState.sorting"

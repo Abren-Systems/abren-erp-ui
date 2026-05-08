@@ -1,3 +1,4 @@
+import { usePaymentRequestList } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { AP_MODULE_ID, apScreenId } from '../../constants'
 import { AP3010PL_COMMANDS_LIST } from './commands'
@@ -5,13 +6,14 @@ import { AP3010PL_COMMANDS_LIST } from './commands'
 /**
  * AP3010PL — Payment Requests Workspace (List)
  *
- * Acumatica screen kind: workspace
+ * Acumatica screen kind: primaryList
  * Dense list scanning with saved filters and navigation to AP301000.
  * Current render target: view.vue
  */
 export const AP3010PL: ScreenDefinition = {
   id: apScreenId('AP3010PL'),
   moduleId: AP_MODULE_ID,
+  controller: () => usePaymentRequestList(),
   kind: 'primaryList',
   titleKey: 'ap.paymentRequests.list.title',
   primaryView: 'paymentRequests',

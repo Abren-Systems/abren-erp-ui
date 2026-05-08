@@ -1,3 +1,4 @@
+import { useWorkflowInboxController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
@@ -11,6 +12,7 @@ import { WF301000_COMMANDS } from './commands'
 export const WF301000: ScreenDefinition = {
   id: 'WF301000' as ScreenId,
   moduleId: 'workflows' as ModuleId,
+  controller: () => useWorkflowInboxController(),
   kind: 'processing', // Modeled as processing/workboard dispatcher
   titleKey: 'Workflow Inbox',
   primaryView: 'inbox',

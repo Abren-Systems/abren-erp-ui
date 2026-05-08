@@ -1,3 +1,4 @@
+import { usePaymentRequestEntry } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { AP_MODULE_ID, apScreenId } from '../../constants'
 import { AP301000_COMMANDS } from './commands'
@@ -12,6 +13,7 @@ import { AP301000_COMMANDS } from './commands'
 export const AP301000: ScreenDefinition = {
   id: apScreenId('AP301000'),
   moduleId: AP_MODULE_ID,
+  controller: (ctx) => usePaymentRequestEntry(ctx.params['id'] as string),
   kind: 'dataEntry',
   titleKey: 'Payment Requests',
   primaryView: 'paymentRequest',

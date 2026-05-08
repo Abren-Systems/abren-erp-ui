@@ -1,3 +1,4 @@
+import { useAdjustmentsListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
@@ -5,7 +6,8 @@ import type { ModuleId } from '@/shared/types/brand.types'
 export const IN3030PL: ScreenDefinition = {
   id: 'IN3030PL' as ScreenId,
   moduleId: 'inventory' as ModuleId,
-  kind: 'inquiry',
+  controller: () => useAdjustmentsListController(),
+  kind: 'primaryList',
   titleKey: 'Adjustments',
   primaryView: 'adjustments',
   route: {

@@ -1,18 +1,17 @@
 <script setup lang="ts">
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
-import { ListTitleBar } from '@/platform/chrome'
 import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { Plus, MapPin, ListFilter, RefreshCcw } from 'lucide-vue-next'
 import { stockColumns } from './grids/stock-item.grid'
 import { useStockItemsListController } from './controller'
 
-const ctrl = useStockItemsListController()
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
-
     <div class="flex-1 p-8 min-h-0">
       <div
         v-if="!ctrl.selectedWarehouseId.value"

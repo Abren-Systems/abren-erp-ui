@@ -1,3 +1,4 @@
+import { useJournalEntriesListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import { GL3010PL_COMMANDS } from './commands'
@@ -6,7 +7,8 @@ import type { ModuleId } from '@/shared/types/brand.types'
 export const GL3010PL: ScreenDefinition = {
   id: 'GL3010PL' as ScreenId,
   moduleId: 'ledger' as ModuleId,
-  kind: 'inquiry',
+  controller: () => useJournalEntriesListController(),
+  kind: 'primaryList',
   titleKey: 'Journal Entries List',
   primaryView: 'journalEntries',
   route: {

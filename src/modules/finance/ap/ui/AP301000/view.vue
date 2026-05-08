@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { AppTemplate } from '@/platform/chrome'
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 /**
  * AP301000 — Payment Request Data Entry View
  *
@@ -17,49 +20,25 @@ import {
 import { AppButton } from '@/shared/components/primitives'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AuditReasonDialog } from '@/shared/components/dialog'
-import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { paymentRequestLineColumns } from './grids/lines.grid'
 import { usePaymentRequestEntry } from './controller'
 
 const props = defineProps<{ id: string }>()
 
-const ctrl = usePaymentRequestEntry(props.id)
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
     <!-- Error State -->
-    <div v-if="ctrl.error.value" class="p-8">
-      <AppFieldset title="Error Loading Request" variant="neutral" :columns="1">
-        <AppField field="error" label="Error" :value="String(ctrl.error.value)" type="text" />
-      </AppFieldset>
-    </div>
 
     <!-- Loading State -->
-    <div v-else-if="ctrl.isLoading.value && !ctrl.entity.value && !ctrl.isNew.value" class="p-8">
-      <AppFieldset title="Loading" variant="neutral" :columns="1">
-        <AppField field="status" label="Status" value="Loading details..." type="text" />
-      </AppFieldset>
-    </div>
 
     <!-- Main Content -->
-    <template v-else>
+    <template>
       <!-- 1. Form Title Bar -->
-      <FormTitleBar
-        :form-title="ctrl.screen.titleKey"
-        :record-title="ctrl.isNew.value ? undefined : ctrl.entity.value?.requestNumber"
-        back-route="PaymentRequestsList"
-      />
 
       <!-- 2. Form Toolbar -->
-      <FormToolbar
-        v-if="!ctrl.isNew.value"
-        :commands="ctrl.screen.commands"
-        :domain-state="String(ctrl.state.domain)"
-        :executors="ctrl.commands.value"
-        :is-pending="ctrl.isPending.value"
-        :is-new="ctrl.isNew.value"
-      />
 
       <!-- Create Mode Toolbar -->
       <div

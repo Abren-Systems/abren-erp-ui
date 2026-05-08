@@ -1,3 +1,4 @@
+import { useAccountListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
@@ -6,7 +7,8 @@ import { GL2010PL_COMMANDS } from './commands'
 export const GL2010PL: ScreenDefinition = {
   id: 'GL2010PL' as ScreenId,
   moduleId: 'ledger' as ModuleId,
-  kind: 'inquiry',
+  controller: () => useAccountListController(),
+  kind: 'primaryList',
   titleKey: 'Chart of Accounts List',
   primaryView: 'accounts',
   route: {

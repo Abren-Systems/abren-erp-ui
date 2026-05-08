@@ -1,38 +1,23 @@
 <script setup lang="ts">
+import { AppTemplate } from '@/platform/chrome'
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { AppField, FieldGroup, AppTabs } from '@/shared/components/field-system'
 import { DataGrid } from '@/shared/components/data-grid'
-import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { journalLineColumns } from './grids/lines.grid'
 import { useJournalEntryController } from './controller'
 
 const props = defineProps<{ id: string }>()
 
-const ctrl = useJournalEntryController(props.id)
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
     <!-- Loading State -->
-    <div v-if="ctrl.isLoading.value && !ctrl.entity.value" class="p-8">
-      Loading journal entry details...
-    </div>
 
     <!-- Main Content -->
-    <template v-else>
-      <FormTitleBar
-        :form-title="ctrl.screen.titleKey"
-        :record-title="ctrl.entity.value?.entryNumber"
-        back-route="LedgerJournals"
-      />
-
-      <FormToolbar
-        v-if="!ctrl.isNew.value"
-        :model="ctrl.model.value"
-        :executors="ctrl.commands.value"
-        :is-pending="ctrl.isPending.value"
-        :is-new="ctrl.isNew.value"
-      />
-
+    <template>
       <!-- Summary Area -->
       <div class="px-6 py-5">
         <AppTemplate :template="ctrl.screen.layout.summaryTemplate">

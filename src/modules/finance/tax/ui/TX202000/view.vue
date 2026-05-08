@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { AppTemplate } from '@/platform/chrome'
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { useTaxRuleController } from './controller'
 
 const props = defineProps<{ id: string }>()
-const ctrl = useTaxRuleController(props.id)
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
 const taxTypeOptions = [
   { label: 'Value Added Tax (VAT)', value: 'VAT' },
@@ -21,20 +23,8 @@ const directionOptions = [
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
     <!-- Header -->
-    <FormTitleBar
-      :form-title="ctrl.screen.titleKey"
-      :record-title="ctrl.isNew.value ? undefined : ctrl.model.value.ui.title"
-      back-route="finance.tax.rules"
-    />
 
     <!-- Toolbar -->
-    <FormToolbar
-      :model="ctrl.model.value"
-      :executors="ctrl.commands.value"
-      :is-pending="ctrl.isPending.value"
-      :is-new="ctrl.isNew.value"
-      @save="ctrl.handleSave"
-    />
 
     <!-- Main Content -->
     <div class="px-6 py-5 overflow-y-auto">

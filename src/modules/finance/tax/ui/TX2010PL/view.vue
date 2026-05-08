@@ -1,26 +1,20 @@
 <script setup lang="ts">
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
-import { FormTitleBar, FormToolbar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
 import { taxGroupColumns } from './grids/tax-group.grid'
 import { useTaxGroupsListController } from './controller'
 
-const ctrl = useTaxGroupsListController()
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <!-- Header -->
-    <FormTitleBar :form-title="ctrl.screen.titleKey" />
 
     <!-- Toolbar -->
-    <FormToolbar
-      :model="ctrl.model.value"
-      :executors="ctrl.commands.value"
-      :is-pending="ctrl.isPending.value"
-      :is-new="false"
-    />
 
     <!-- Main Content -->
     <div class="flex-1 p-8 min-h-0 overflow-y-auto">

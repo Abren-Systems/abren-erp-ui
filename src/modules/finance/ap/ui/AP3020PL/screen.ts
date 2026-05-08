@@ -1,3 +1,4 @@
+import { useVendorBillsListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
@@ -6,7 +7,8 @@ import { AP3020PL_COMMANDS_LIST } from './commands'
 export const AP3020PL: ScreenDefinition = {
   id: 'AP3020PL' as ScreenId,
   moduleId: 'ap' as ModuleId,
-  kind: 'inquiry',
+  controller: () => useVendorBillsListController(),
+  kind: 'primaryList',
   titleKey: 'Vendor Bills',
   primaryView: 'bills',
   route: {

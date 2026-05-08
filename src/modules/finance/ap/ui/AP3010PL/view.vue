@@ -1,19 +1,18 @@
 <script setup lang="ts">
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { DataGrid, DataGridFilterSelector, DataGridFooter } from '@/shared/components/data-grid'
-import { ListTitleBar } from '@/platform/chrome'
 import { AppButton } from '@/shared/components/primitives'
 import { ListFilter, Plus, RefreshCcw } from 'lucide-vue-next'
 import PaymentRequestBulkActionBar from './BulkActionBar.vue'
 import PaymentRequestFilterPane from './FilterPane.vue'
 import { usePaymentRequestList } from './controller'
 
-const ctrl = usePaymentRequestList()
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>
   <div class="flex h-full flex-col bg-[var(--color-neutral-50)]">
-    <ListTitleBar :screen-title="ctrl.screen.titleKey" />
-
     <div class="min-h-0 flex-1 p-8">
       <DataGrid
         v-model:sorting="ctrl.gridState.sorting"

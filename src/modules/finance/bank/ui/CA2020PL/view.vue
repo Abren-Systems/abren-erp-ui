@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
 import { PageHeader } from '@/shared/components/workspace'
 import { AppButton } from '@/shared/components/primitives'
@@ -6,27 +8,11 @@ import { Plus, RefreshCcw } from 'lucide-vue-next'
 import { accountColumns } from './grids/bank-account.grid'
 import { useBankAccountsListController } from './controller'
 
-const ctrl = useBankAccountsListController()
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <PageHeader
-      :title="ctrl.screen.titleKey"
-      description="Manage enterprise bank accounts and balances."
-      icon="Landmark"
-      plain
-    >
-      <template #actions>
-        <AppButton variant="primary" size="sm" @click="ctrl.handleCreate">
-          <template #start>
-            <Plus :size="14" />
-          </template>
-          New Account
-        </AppButton>
-      </template>
-    </PageHeader>
-
     <div class="flex-1 p-8 min-h-0">
       <DataGrid
         v-model:sorting="ctrl.gridState.sorting"

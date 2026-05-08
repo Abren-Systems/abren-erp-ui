@@ -1,3 +1,4 @@
+import { useTaxRulesListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
@@ -6,7 +7,8 @@ import { TX2020PL_COMMANDS } from './commands'
 export const TX2020PL: ScreenDefinition = {
   id: 'TX2020PL' as ScreenId,
   moduleId: 'tax' as ModuleId,
-  kind: 'inquiry',
+  controller: () => useTaxRulesListController(),
+  kind: 'primaryList',
   titleKey: 'Tax Rules',
   primaryView: 'rules',
   route: {

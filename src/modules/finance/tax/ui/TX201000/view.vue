@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { AppTemplate } from '@/platform/chrome'
+import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { inject } from 'vue'
 import { AppField, FieldGroup } from '@/shared/components/field-system'
-import { FormTitleBar, FormToolbar, AppTemplate } from '@/platform/chrome'
 import { useTaxGroupController } from './controller'
 import { AppButton, AppSelect, AppBadge } from '@/shared/components/primitives'
 import { Plus, X } from 'lucide-vue-next'
 
 const props = defineProps<{ id: string }>()
-const ctrl = useTaxGroupController(props.id)
+const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
 const methodOptions = [
   { label: 'Simple (Sum of rates)', value: 'SIMPLE' },
@@ -17,20 +19,8 @@ const methodOptions = [
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
     <!-- Header -->
-    <FormTitleBar
-      :form-title="ctrl.screen.titleKey"
-      :record-title="ctrl.isNew.value ? undefined : ctrl.model.value.ui.title"
-      back-route="finance.tax.groups"
-    />
 
     <!-- Toolbar -->
-    <FormToolbar
-      :model="ctrl.model.value"
-      :executors="ctrl.commands.value"
-      :is-pending="ctrl.isPending.value"
-      :is-new="ctrl.isNew.value"
-      @save="ctrl.handleSave"
-    />
 
     <!-- Main Content -->
     <div class="px-6 py-5 overflow-y-auto">

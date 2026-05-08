@@ -1,3 +1,4 @@
+import { useVendorBillController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { AP302000_COMMANDS } from './commands'
 
@@ -7,6 +8,7 @@ import type { ModuleId } from '@/shared/types/brand.types'
 export const AP302000: ScreenDefinition = {
   id: 'AP302000' as ScreenId,
   moduleId: 'ap' as ModuleId,
+  controller: (ctx) => useVendorBillController(ctx.params['id'] as string),
   kind: 'dataEntry',
   titleKey: 'Vendor Bills',
   primaryView: 'bill',
