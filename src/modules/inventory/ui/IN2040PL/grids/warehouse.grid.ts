@@ -2,7 +2,7 @@ import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { Warehouse } from '../../../domain/inventory.types'
 import { AppBadge } from '@/shared/components/primitives'
-import TraceabilityBadge from '../../components/TraceabilityBadge.vue'
+import TraceabilityBadge from '@/shared/ui/inventory/TraceabilityBadge.vue'
 
 export const warehouseColumns: ColumnDef<Warehouse>[] = [
   {

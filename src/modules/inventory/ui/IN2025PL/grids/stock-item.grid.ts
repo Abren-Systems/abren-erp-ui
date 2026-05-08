@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { StockItem } from '../../../domain/inventory.types'
-import TraceabilityBadge from '../../components/TraceabilityBadge.vue'
+import TraceabilityBadge from '@/shared/ui/inventory/TraceabilityBadge.vue'
 
 export const stockColumns: ColumnDef<StockItem>[] = [
   {
