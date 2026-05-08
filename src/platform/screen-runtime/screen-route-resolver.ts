@@ -4,12 +4,8 @@ import type { ScreenDefinition } from './screen-definition.types'
 /**
  * Generates a Vue Router route from a ScreenDefinition.
  *
- * During the migration period, screens declare a `renderTarget` — a lazy
- * component import pointing to their existing SFC page. The generated route
- * uses this as the component, preserving full backward compatibility.
- *
- * Once the ScreenRenderer is built (Phase 4), renderTarget becomes optional
- * and the route will point to a generic ScreenRenderer component instead.
+ * The generated route uses the ScreenRenderer component,
+ * which takes full ownership of chrome and controller lifecycle.
  */
 function screenToRoute(screen: ScreenDefinition): RouteRecordRaw {
   const route = screen.route

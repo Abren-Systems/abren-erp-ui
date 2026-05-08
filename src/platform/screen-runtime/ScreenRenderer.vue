@@ -2,8 +2,9 @@
 import { computed, provide, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { screenRegistry } from './screen-registry'
-import { AppSidePanel, PageHeader } from '@/shared/components/workspace'
+import { AppSidePanel } from '@/shared/components/workspace'
 import { AppButton } from '@/shared/components/primitives'
+import ListTitleBar from '@/platform/chrome/ListTitleBar.vue'
 import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
 import FormToolbar from '@/platform/chrome/FormToolbar.vue'
 import FormBanner from '@/platform/chrome/FormBanner.vue'
@@ -61,12 +62,31 @@ const sidePanelContract = computed(() => {
 <template>
   <div v-if="screen" class="flex w-full h-full relative overflow-hidden bg-[var(--app-canvas)]">
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
+      <!-- Loading State (Before Controller Resolves) -->
+      <div v-if="!controllerRef" class="flex-1 p-8 text-neutral-500">Loading...</div>
+
+      <!-- Error State (From Controller) -->
+      <div v-else-if="controllerRef.error.value" class="flex-1 p-8 text-danger-500">
+        <h2 class="text-lg font-bold">Error</h2>
+        <p>{{ controllerRef.error.value }}</p>
+      </div>
+
+      <!-- Loading State (From Controller) -->
+      <div
+        v-else-if="
+          controllerRef.isLoading.value && !controllerRef.entity.value && !controllerRef.isNew.value
+        "
+        class="flex-1 p-8 text-neutral-500"
+      >
+        Loading data...
+      </div>
+
       <!-- Platform Chrome controlled by ScreenKind -->
-      <template v-if="controllerRef.value">
-        <!-- Inquiry & Lists get the generic PageHeader -->
-        <PageHeader
+      <template v-else>
+        <!-- Inquiry & Lists get ListTitleBar -->
+        <ListTitleBar
           v-if="['inquiry', 'primaryList', 'dashboard'].includes(screen.kind)"
-          :title="screen.titleKey"
+          :screen-title="screen.titleKey"
         >
           <template #actions>
             <AppButton
@@ -74,26 +94,38 @@ const sidePanelContract = computed(() => {
               :key="cmd.key"
               :variant="cmd.variant === 'primary' ? 'primary' : 'outline'"
               size="sm"
-              @click="controllerRef.value.commands.value[cmd.key]?.execute()"
+              @click="controllerRef.value?.commands.value[cmd.key]?.execute()"
             >
               {{ cmd.labelKey }}
             </AppButton>
           </template>
-        </PageHeader>
-        <!-- Data Entry & Master Data get the dense Form Toolbar -->
+        </ListTitleBar>
+        <!-- Data Entry & Master Data get FormTitleBar & FormToolbar -->
         <template
           v-else-if="['dataEntry', 'maintenance', 'setup', 'processing'].includes(screen.kind)"
         >
-          <FormTitleBar :title="screen.titleKey" />
+          <FormTitleBar
+            :form-title="screen.titleKey"
+            :record-title="
+              controllerRef.isNew.value
+                ? undefined
+                : controllerRef.entity.value?.requestNumber ||
+                  controllerRef.entity.value?.documentNumber ||
+                  controllerRef.entity.value?.id
+            "
+            :back-route="screen.pairedListRoute"
+          />
           <FormToolbar
-            :model="controllerRef.value.model.value"
-            :executors="controllerRef.value.commands.value"
-            :is-pending="controllerRef.value.isPending?.value ?? false"
-            :is-new="controllerRef.value.isNew?.value ?? false"
+            :model="controllerRef.model.value"
+            :executors="controllerRef.commands.value"
+            :is-pending="controllerRef.isPending?.value ?? false"
+            :is-new="controllerRef.isNew?.value ?? false"
+            @save="controllerRef.commands.value['save']?.execute()"
+            @cancel="controllerRef.commands.value['cancel']?.execute()"
           />
           <FormBanner
-            v-if="controllerRef.value.model.value.ui.chrome.banner"
-            :banner="controllerRef.value.model.value.ui.chrome.banner"
+            v-if="controllerRef.model.value.ui.chrome.banner"
+            :banner="controllerRef.model.value.ui.chrome.banner"
           />
         </template>
       </template>

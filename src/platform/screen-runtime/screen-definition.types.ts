@@ -42,7 +42,7 @@ export interface ScreenLayoutDefinition {
   /** The primary column template for the summary/header area */
   readonly summaryTemplate: LayoutTemplate
   /** The render target component — allows compatibility with existing SFCs during migration */
-  readonly renderTarget?: () => Promise<Component> | Component
+  readonly renderTarget: () => Promise<Component> | Component
   /** The contextual right-pane side panel contract */
   readonly sidePanel?: SidePanelContract
 }
@@ -104,8 +104,8 @@ export interface ScreenDefinition<
   /** The module that owns this screen */
   readonly moduleId: ModuleId
 
-  /** Optional during migration. The platform uses this to instantiate the controller. */
-  readonly controller?: (ctx: ScreenContext) => ScreenController<unknown, string>
+  /** The platform uses this to instantiate the controller. */
+  readonly controller: (ctx: ScreenContext) => ScreenController<unknown, string>
 
   /** Acumatica-style screen taxonomy */
   readonly kind: ScreenKind
@@ -118,6 +118,9 @@ export interface ScreenDefinition<
 
   /** Route binding for Vue Router */
   readonly route: ScreenRoute
+
+  /** Optional paired list route for back navigation from form screens */
+  readonly pairedListRoute?: string
 
   /** Required permissions to access this screen */
   readonly permissions: readonly ScreenPermission[]
