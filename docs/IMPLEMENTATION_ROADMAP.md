@@ -139,18 +139,18 @@ To prevent layout drift, the following screens serve as the **immutable referenc
 
 ### 5.6 Inventory
 
-| Capability          | Status | Notes                                                 |
-| ------------------- | ------ | ----------------------------------------------------- |
-| Stock Items — List  | ✅     | `StockItemsListPage.vue`                              |
-| Warehouses — List   | ✅     | `WarehousesListPage.vue`                              |
-| Adjustment — Create | ✅     | `AdjustmentCreatePage.vue`                            |
-| ⚠ Legacy pattern    | 🔨     | Uses `pages/` structure; requires Screen ID migration |
+| Capability           | Status | Notes                                                          |
+| -------------------- | ------ | -------------------------------------------------------------- |
+| Stock Items — List   | ✅     | `IN2025PL/view.vue` — ListTitleBar + DataGrid toolbar          |
+| Warehouses — List    | ✅     | `IN2040PL/view.vue` — ListTitleBar                             |
+| Adjustment — Create  | ✅     | `IN303000/view.vue` — FormToolbar fully wired                  |
+| ✅ Screen ID pattern | ✅     | All screens migrated to `ui/{ScreenID}/` + chrome standardized |
 
 ### 5.7 Workflows
 
-| Capability     | Status | Notes                                            |
-| -------------- | ------ | ------------------------------------------------ |
-| Workflow Inbox | ✅     | `WorkflowInboxPage.vue` + `WorkflowActionDialog` |
+| Capability     | Status | Notes                                                             |
+| -------------- | ------ | ----------------------------------------------------------------- |
+| Workflow Inbox | ✅     | `WF301000/view.vue` — State machine hardened, controller commands |
 
 ### 5.8 Reporting
 
@@ -180,7 +180,7 @@ The UI will not add new modules (e.g., Procurement) until the supporting seams (
 | ----------------------------------------------- | -------- | -------------------------------------------- |
 | Regenerate types from live API                  | **P0**   | Drift risk — `openapi-typescript` installed  |
 | Install toast library (`vue-sonner` or equiv)   | **P1**   | Not installed; feedback loops incomplete     |
-| Ledger — migrate to `ui/{ScreenID}/` pattern    | **P1**   | Currently uses legacy `pages/components/`    |
-| Inventory — migrate to `ui/{ScreenID}/` pattern | **P1**   | Currently uses legacy `pages/` structure     |
+| Ledger — migrate to `ui/{ScreenID}/` pattern    | **P1**   | ✅ Done — Chrome standardized                |
+| Inventory — migrate to `ui/{ScreenID}/` pattern | **P1**   | ✅ Done — Chrome standardized                |
 | Replace inline styles in CoA grid               | **P2**   | Blueprint violation                          |
 | Vendor Bills — complete action wiring           | **P2**   | Validate/Reject UI exists, mutations pending |
