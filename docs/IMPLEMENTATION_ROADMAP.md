@@ -97,7 +97,7 @@ To prevent layout drift, the following screens serve as the **immutable referenc
 | Identity — Users/Roles List | ✅     | `UsersPage.vue`, `RolesListPage.vue` live    |
 | Tenant Context              | ✅     | Hydration working on reload                  |
 | Workboard                   | ✅     | `WorkboardPage.vue` with stats, queue, trace |
-| Dashboard Stat Cards        | 🔨     | Implemented but hardcoded; needs API data    |
+| Dashboard Stat Cards        | ✅     | `CashflowDashboard` wired via `useCashflow`  |
 | User Profile Management     | 📋     | Planned                                      |
 
 ### 5.2 Financial Engine — Ledger
@@ -121,7 +121,7 @@ To prevent layout drift, the following screens serve as the **immutable referenc
 | Payment Requests — Bulk Actions | ✅     | `AP3010PL/bulk-actions.vue`                                     |
 | Vendor Bills — List             | ✅     | `VendorBillsListPage.vue`                                       |
 | Vendor Bills — Focus            | ✅     | `VendorBillFocus.vue`                                           |
-| Vendor Bills — Validate/Reject  | 🔨     | UI exists; full action wiring 📋                                |
+| Vendor Bills — Validate/Reject  | ✅     | Full action wiring completed via AP adapter                     |
 
 ### 5.4 Financial Engine — Tax
 
@@ -176,11 +176,11 @@ The UI will not add new modules (e.g., Procurement) until the supporting seams (
 
 ## 7. Cleanup & Technical Debt
 
-| Task                                            | Priority | Status                                       |
-| ----------------------------------------------- | -------- | -------------------------------------------- |
-| Regenerate types from live API                  | **P0**   | Drift risk — `openapi-typescript` installed  |
-| Install toast library (`vue-sonner` or equiv)   | **P1**   | Not installed; feedback loops incomplete     |
-| Ledger — migrate to `ui/{ScreenID}/` pattern    | **P1**   | ✅ Done — Chrome standardized                |
-| Inventory — migrate to `ui/{ScreenID}/` pattern | **P1**   | ✅ Done — Chrome standardized                |
-| Replace inline styles in CoA grid               | **P2**   | Blueprint violation                          |
-| Vendor Bills — complete action wiring           | **P2**   | Validate/Reject UI exists, mutations pending |
+| Task                                            | Priority | Status                                              |
+| ----------------------------------------------- | -------- | --------------------------------------------------- |
+| Regenerate types from live API                  | **P0**   | ✅ Done — No drift detected                         |
+| Install toast library (`vue-sonner` or equiv)   | **P1**   | ✅ Done — `vue-sonner` installed & active           |
+| Ledger — migrate to `ui/{ScreenID}/` pattern    | **P1**   | ✅ Done — Chrome standardized                       |
+| Inventory — migrate to `ui/{ScreenID}/` pattern | **P1**   | ✅ Done — Chrome standardized                       |
+| Replace inline styles in CoA grid               | **P2**   | ✅ Done — Cleared during `ui/{ScreenID}/` migration |
+| Vendor Bills — complete action wiring           | **P2**   | ✅ Done — Validated/Reject actions fully wired      |
