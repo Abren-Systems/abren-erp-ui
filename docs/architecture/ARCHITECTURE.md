@@ -31,7 +31,7 @@ Conceptually, the architecture is organized into four distinct layers of authori
 
 ### 1.3 The Five Pillars of Deterministic Execution
 
-The architecture is built upon five foundational patterns that shift the UI from "framework-guided application development" to a **"runtime-governed enterprise execution architecture"**. 
+The architecture is built upon five foundational patterns that shift the UI from "framework-guided application development" to a **"runtime-governed enterprise execution architecture"**.
 
 Our absolute foundational doctrine is: **The UI does not decide truth. The runtime derives truth.**
 
@@ -42,6 +42,7 @@ Our absolute foundational doctrine is: **The UI does not decide truth. The runti
 5. **Immutable Projection Thinking**: Projections are treated as derived immutable truth, not mutable working state. This dramatically improves predictability and replayability.
 
 #### Tier 2 & Tier 3 Trajectories (Target Evolution)
+
 - **Ports & Adapters (Hexagonal Influence)**: Infrastructure remains replaceable plugins (Vue is an adapter, API is an adapter), preventing framework lock-in.
 - **Policy-Based Architecture**: Moving from hardcoded component rules to interpreted policies (fields, visibility, editing).
 - **Event-Driven Mutation Pipelines**: Explicit business actions (`ReleaseInvoice`, `ApproveDocument`) instead of random reactive mutations.
@@ -183,12 +184,12 @@ We also strictly forbid cross-module imports natively using relative blockers:
 
 Every layer must explicitly define what it may own, derive, mutate, and what it must never know. This matrix prevents architectural drift.
 
-| Layer | Responsibility | Forbidden |
-| :--- | :--- | :--- |
-| **Vue Component** | Rendering and transient interaction | Making business decisions, orchestrating commands |
+| Layer                 | Responsibility                             | Forbidden                                            |
+| :-------------------- | :----------------------------------------- | :--------------------------------------------------- |
+| **Vue Component**     | Rendering and transient interaction        | Making business decisions, orchestrating commands    |
 | **Projection Engine** | Compiling derived UI truth (`ScreenModel`) | Executing side-effects, interacting with persistence |
-| **Controller** | Orchestration, grid authority, workflows | Rendering logic, DOM manipulation, HTML/CSS |
-| **Domain Runtime** | Managing business invariants and state | DOM awareness, Framework-specific primitives |
+| **Controller**        | Orchestration, grid authority, workflows   | Rendering logic, DOM manipulation, HTML/CSS          |
+| **Domain Runtime**    | Managing business invariants and state     | DOM awareness, Framework-specific primitives         |
 
 ### 2.5 Component Sizing and Separation of Concerns
 
@@ -676,20 +677,20 @@ The UI is strictly **stateless and tenant-scoped**. It relies on the backend to 
 
 ## 11. Anti-Pattern Catalog (Banned List)
 
-| Anti-Pattern                         | Why It Fails                            | Alternative                                |
-| ------------------------------------ | --------------------------------------- | ------------------------------------------ |
-| **Component-Centric Architecture**   | Components become business authorities instead of rendering surfaces | Components render `ScreenModel` strictly |
-| **Composable-Centric Logic**         | Dissolves ERP semantics into scattered reactive fragments | Centralized Controller/Policy classes |
-| **Heavy Classical MVVM**             | Duplicates our deterministic projection pipeline unnecessarily | `ScreenModel` projection |
-| **Framework-Driven State**           | Vue APIs dictate the app instead of runtime contracts | The UI does not decide truth; the runtime derives truth. |
-| **Redux-Style Global Mutations**     | Detached from explicit ERP workflows and localized constraints | CQRS-Lite with Controller action dispatch |
-| **Raw API types in components**      | Backend DTO change breaks 50 components | Mapper → ViewModel pattern                 |
-| **Cross-module store imports**       | Creates invisible dependency graphs     | Event Bus or Core types                    |
-| **Business logic in templates**      | Untestable, duplicated across views     | Controllers and Projections                |
-| **Global CSS classes**               | Styling conflicts across modules        | Scoped styles + design tokens              |
-| **`any` types**                      | Defeats TypeScript's entire purpose     | Strict mode, branded types                 |
-| **Direct Axios calls in components** | Untestable, no error interception       | Module-scoped API client                   |
-| **SFC God-Component**                | Page files >400 lines, unmaintainable   | Extract action bars, panes, and dialogs    |
+| Anti-Pattern                         | Why It Fails                                                         | Alternative                                              |
+| ------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Component-Centric Architecture**   | Components become business authorities instead of rendering surfaces | Components render `ScreenModel` strictly                 |
+| **Composable-Centric Logic**         | Dissolves ERP semantics into scattered reactive fragments            | Centralized Controller/Policy classes                    |
+| **Heavy Classical MVVM**             | Duplicates our deterministic projection pipeline unnecessarily       | `ScreenModel` projection                                 |
+| **Framework-Driven State**           | Vue APIs dictate the app instead of runtime contracts                | The UI does not decide truth; the runtime derives truth. |
+| **Redux-Style Global Mutations**     | Detached from explicit ERP workflows and localized constraints       | CQRS-Lite with Controller action dispatch                |
+| **Raw API types in components**      | Backend DTO change breaks 50 components                              | Mapper → ViewModel pattern                               |
+| **Cross-module store imports**       | Creates invisible dependency graphs                                  | Event Bus or Core types                                  |
+| **Business logic in templates**      | Untestable, duplicated across views                                  | Controllers and Projections                              |
+| **Global CSS classes**               | Styling conflicts across modules                                     | Scoped styles + design tokens                            |
+| **`any` types**                      | Defeats TypeScript's entire purpose                                  | Strict mode, branded types                               |
+| **Direct Axios calls in components** | Untestable, no error interception                                    | Module-scoped API client                                 |
+| **SFC God-Component**                | Page files >400 lines, unmaintainable                                | Extract action bars, panes, and dialogs                  |
 
 ---
 
