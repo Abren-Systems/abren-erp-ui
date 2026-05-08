@@ -7,25 +7,62 @@
  * This component formalizes these as explicit platform services rather than
  * random module buttons.
  */
+import { inject, computed } from 'vue'
 import { StickyNote, Paperclip, Mail, Settings } from 'lucide-vue-next'
+import { ScreenControllerKey } from '../screen-runtime/screen-controller.types'
 
-// These will eventually receive the active `ScreenModel` or record ID
-// to resolve whether they have data (e.g., a badge showing "3 Files").
-// For Phase 1, they are structurally formalized but disabled.
+const ctrl = inject(ScreenControllerKey, null)
+
+const services = computed(() => {
+  return (
+    ctrl?.value?.model.value.domain.services ?? {
+      hasNotes: false,
+      fileCount: 0,
+      hasActivities: false,
+    }
+  )
+})
+
+const isNew = computed(() => ctrl?.value?.isNew.value ?? true)
+const isSettingsEnabled = computed(() => !isNew.value)
 </script>
 
 <template>
   <div class="record-services">
-    <button class="record-services__btn" title="Notes" disabled aria-label="Notes">
+    <button
+      class="record-services__btn"
+      title="Notes"
+      :disabled="isNew"
+      aria-label="Notes"
+      :class="{ 'has-data': services.hasNotes }"
+    >
       <StickyNote :size="16" />
     </button>
-    <button class="record-services__btn" title="Files" disabled aria-label="Attach files">
+    <button
+      class="record-services__btn"
+      title="Files"
+      :disabled="isNew"
+      aria-label="Attach files"
+      :class="{ 'has-data': services.fileCount > 0 }"
+    >
       <Paperclip :size="16" />
+      <span v-if="services.fileCount > 0" class="badge">{{ services.fileCount }}</span>
     </button>
-    <button class="record-services__btn" title="Activities" disabled aria-label="Activities">
+    <button
+      class="record-services__btn"
+      title="Activities"
+      :disabled="isNew"
+      aria-label="Activities"
+      :class="{ 'has-data': services.hasActivities }"
+    >
       <Mail :size="16" />
     </button>
-    <button class="record-services__btn" title="Settings" disabled aria-label="Form settings">
+    <button
+      class="record-services__btn"
+      title="Settings"
+      :disabled="!isSettingsEnabled"
+      aria-label="Form settings"
+    >
       <Settings :size="16" />
     </button>
   </div>
@@ -50,6 +87,7 @@ import { StickyNote, Paperclip, Mail, Settings } from 'lucide-vue-next'
   color: var(--color-neutral-400);
   cursor: not-allowed;
   transition: all 0.15s ease;
+  position: relative;
 }
 
 .record-services__btn:not(:disabled) {
@@ -60,5 +98,22 @@ import { StickyNote, Paperclip, Mail, Settings } from 'lucide-vue-next'
 .record-services__btn:not(:disabled):hover {
   background: var(--color-neutral-100);
   color: var(--color-neutral-900);
+}
+
+.record-services__btn.has-data {
+  color: var(--color-primary-600);
+}
+
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--color-primary-600);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0 0.25rem;
+  border-radius: 9999px;
+  line-height: 1.2;
 }
 </style>
