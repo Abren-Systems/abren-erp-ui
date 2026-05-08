@@ -26,7 +26,7 @@ export function useApprovePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>)
     mutateAsync: approve,
     isPending,
     error,
-  } = useApiMutation<PaymentRequest>(
+  } = useApiMutation<PaymentRequest, ApiError, void>(
     async (_: void) => {
       const unwrappedId = toValue(id)
       if (!unwrappedId) throw new Error('Missing Payment Request ID')
