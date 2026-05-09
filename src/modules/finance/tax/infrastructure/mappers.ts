@@ -39,9 +39,9 @@ export class TaxMapper {
 
   static toCalculationResult(dto: TaxCalculationResultDTO): TaxCalculationResult {
     return {
-      net: CommonMapper.toMoney(dto.amount, dto.currency),
+      net: CommonMapper.toMoney(dto.net, dto.currency),
       tax: CommonMapper.toMoney(dto.tax, dto.currency),
-      gross: CommonMapper.toMoney(dto.total, dto.currency),
+      gross: CommonMapper.toMoney(dto.gross, dto.currency),
     }
   }
 }

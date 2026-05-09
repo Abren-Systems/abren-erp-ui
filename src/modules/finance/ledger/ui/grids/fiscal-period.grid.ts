@@ -1,4 +1,4 @@
-import type { FiscalPeriod } from '../../domain/fiscal-period.types'
+import type { FiscalPeriod } from '../../domain/fiscal-calendar.types'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
 import { DateCell, BadgeCell } from '@/shared/components/data-grid'

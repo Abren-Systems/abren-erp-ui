@@ -1,22 +1,22 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { FiscalPeriod } from '../../domain/fiscal-period.types'
+import type { FiscalYear } from '../../domain/fiscal-calendar.types'
 
-export const GL102000_Create_Fields = {
-  name: {
-    key: 'name',
-    label: 'Period Name',
+export const GL102000_Generate_Fields = {
+  year: {
+    key: 'year',
+    label: 'Fiscal Year',
     type: 'text',
-  } as FieldDefinition<FiscalPeriod, string>,
+  } as FieldDefinition<FiscalYear, string>,
 
   startDate: {
     key: 'startDate',
     label: 'Start Date',
     type: 'date',
-  } as FieldDefinition<FiscalPeriod, Date>,
+  } as FieldDefinition<FiscalYear, Date>,
 
   endDate: {
     key: 'endDate',
     label: 'End Date',
     type: 'date',
-  } as FieldDefinition<FiscalPeriod, Date>,
+  } as FieldDefinition<FiscalYear, Date>,
 } as const

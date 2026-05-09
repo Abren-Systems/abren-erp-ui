@@ -7,7 +7,8 @@ import type {
   CreateJournalEntryDTO,
   VoidJournalEntryDTO,
   FiscalPeriodDTO,
-  CreateFiscalPeriodDTO,
+  FiscalYearDTO,
+  GenerateFiscalYearDTO,
   LedgerSettingsDTO,
   UpdateLedgerSettingsDTO,
 } from './api.types'
@@ -15,6 +16,7 @@ import {
   AccountSchema,
   JournalEntrySchema,
   FiscalPeriodSchema,
+  FiscalYearSchema,
   LedgerSettingsSchema,
 } from './api.schemas'
 
@@ -128,6 +130,16 @@ export const ledgerAdapter = {
   },
 
   /**
+   * Fetches the list of all fiscal years.
+   *
+   * @returns A promise resolving to an array of validated FiscalYearDTOs.
+   */
+  async getFiscalYears(): Promise<FiscalYearDTO[]> {
+    const raw = (await apiGet<FiscalYearDTO[]>('/finance/ledger/fiscal-years')) as unknown[]
+    return raw.map((item) => FiscalYearSchema.parse(item))
+  },
+
+  /**
    * Fetches the list of all fiscal periods.
    *
    * @returns A promise resolving to an array of validated FiscalPeriodDTOs.
@@ -138,14 +150,14 @@ export const ledgerAdapter = {
   },
 
   /**
-   * Creates a new fiscal period.
+   * Generates a new fiscal year with its constituent periods.
    *
-   * @param data - The raw fiscal period creation data.
-   * @returns A promise resolving to the validated FiscalPeriodDTO.
+   * @param data - The fiscal year generation data.
+   * @returns A promise resolving to the validated FiscalYearDTO.
    */
-  async createFiscalPeriod(data: CreateFiscalPeriodDTO): Promise<FiscalPeriodDTO> {
-    const raw = await apiPost<FiscalPeriodDTO>('/finance/ledger/fiscal-periods', data)
-    return FiscalPeriodSchema.parse(raw)
+  async generateFiscalYear(data: GenerateFiscalYearDTO): Promise<FiscalYearDTO> {
+    const raw = await apiPost<FiscalYearDTO>('/finance/ledger/fiscal-years', data)
+    return FiscalYearSchema.parse(raw)
   },
 
   /**

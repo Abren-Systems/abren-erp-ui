@@ -1,23 +1,25 @@
 import type { components } from '@/shared/api/generated.types'
 import { type Account, AccountType } from '../domain/account.types'
-import {
-  type AccountId,
-  type JournalEntryId,
-  type FiscalPeriodId,
-  type JournalLineId,
-  type UserId,
-  type ValueDate,
-  type CurrencyCode,
+import type {
+  AccountId,
+  JournalEntryId,
+  FiscalPeriodId,
+  FiscalYearId,
+  JournalLineId,
+  UserId,
+  ValueDate,
+  CurrencyCode,
 } from '@/shared/types/brand.types'
 import { Currency, Money } from '@/shared/domain/money'
 import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { JournalEntry, JournalEntryLine } from '../domain/journal-entry.types'
-import type { FiscalPeriod, FiscalPeriodStatus } from '../domain/fiscal-period.types'
+import type { FiscalPeriod, FiscalPeriodStatus, FiscalYear } from '../domain/fiscal-calendar.types'
 
-type AccountDTO = components['schemas']['AccountRead']
-type JournalEntryDTO = components['schemas']['JournalEntryRead']
-type JournalLineDTO = components['schemas']['JournalLineRead']
-type FiscalPeriodDTO = components['schemas']['FiscalPeriodRead']
+type AccountDTO = components['schemas']['AccountDTO']
+type JournalEntryDTO = components['schemas']['JournalEntryDTO']
+type JournalLineDTO = components['schemas']['JournalLineDTO']
+type FiscalPeriodDTO = components['schemas']['FiscalPeriodDTO']
+type FiscalYearDTO = components['schemas']['FiscalYearDTO']
 
 /**
  * Ledger Mapper-as-Factory.
@@ -55,7 +57,7 @@ export class LedgerMapper {
    * @returns A validated JournalEntryLine domain model.
    */
   private static mapJournalLine(dto: JournalLineDTO): JournalEntryLine {
-    const currency = (dto.currency as Currency) || Currency.ETB
+    const currency = (dto.currency_code as Currency) || Currency.ETB
 
     return {
       id: CommonMapper.toBrandedId<JournalLineId>(dto.id),
@@ -106,11 +108,29 @@ export class LedgerMapper {
   static toFiscalPeriod(dto: FiscalPeriodDTO): FiscalPeriod {
     return {
       id: CommonMapper.toBrandedId<FiscalPeriodId>(dto.id),
+      fiscalYearId: CommonMapper.toBrandedId<FiscalYearId>(dto.fiscal_year_id),
       name: dto.name,
       startDate: CommonMapper.toDate(dto.start_date) as unknown as ValueDate,
       endDate: CommonMapper.toDate(dto.end_date) as unknown as ValueDate,
       status: dto.status as FiscalPeriodStatus,
       isAdjustmentPeriod: false,
+      createdAt: dto.created_at || new Date().toISOString(),
+    }
+  }
+
+  /**
+   * Transforms a raw API Fiscal Year DTO into a Domain Model.
+   *
+   * @param dto - The raw fiscal year data from the API.
+   * @returns A clean FiscalYear domain model.
+   */
+  static toFiscalYear(dto: FiscalYearDTO): FiscalYear {
+    return {
+      id: CommonMapper.toBrandedId<FiscalYearId>(dto.id),
+      year: dto.year,
+      startDate: CommonMapper.toDate(dto.start_date) as unknown as ValueDate,
+      endDate: CommonMapper.toDate(dto.end_date) as unknown as ValueDate,
+      periods: (dto.periods || []).map((p: FiscalPeriodDTO) => this.toFiscalPeriod(p)),
       createdAt: dto.created_at || new Date().toISOString(),
     }
   }

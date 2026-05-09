@@ -23,6 +23,7 @@ export type AccountId = Brand<string, 'AccountId'>
 export type JournalEntryId = Brand<string, 'JournalEntryId'>
 export type JournalLineId = Brand<string, 'JournalLineId'>
 export type FiscalPeriodId = Brand<string, 'FiscalPeriodId'>
+export type FiscalYearId = Brand<string, 'FiscalYearId'>
 export type PaymentRequestId = Brand<string, 'PaymentRequestId'>
 export type PaymentRequestLineId = Brand<string, 'PaymentRequestLineId'>
 export type VendorBillId = Brand<string, 'VendorBillId'>

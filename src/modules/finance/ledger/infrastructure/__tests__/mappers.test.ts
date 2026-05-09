@@ -3,15 +3,16 @@ import { LedgerMapper } from '../mappers'
 import { Currency } from '../../../../../shared/domain/money'
 import type { components } from '../../../../../shared/api/generated.types'
 
-type AccountDTO = components['schemas']['AccountRead']
-type JournalEntryDTO = components['schemas']['JournalEntryRead']
-type FiscalPeriodDTO = components['schemas']['FiscalPeriodRead']
+type AccountDTO = components['schemas']['AccountDTO']
+type JournalEntryDTO = components['schemas']['JournalEntryDTO']
+type FiscalPeriodDTO = components['schemas']['FiscalPeriodDTO']
 
 describe('LedgerMapper', () => {
   describe('toAccount', () => {
     it('should map AccountDTO to Account model', () => {
       const dto: AccountDTO = {
         id: 'acc-1',
+        tenant_id: 'tenant-1',
         code: 1010,
         name: 'Cash in Bank',
         account_type: 'ASSET',
@@ -37,11 +38,12 @@ describe('LedgerMapper', () => {
     it('should map JournalEntryDTO to JournalEntry model', () => {
       const dto: JournalEntryDTO = {
         id: 'je-1',
+        tenant_id: 'tenant-1',
         entry_number: 'JE-2026-001',
         status: 'POSTED',
         date: '2026-04-01',
         description: 'Monthly payroll',
-        base_currency: 'ETB',
+        base_currency_code: 'ETB',
         lines: [
           {
             id: 'line-1',
@@ -55,8 +57,14 @@ describe('LedgerMapper', () => {
             base_amount: '1000.00',
             exchange_rate: '1.0',
             is_debit: true,
-            currency: 'ETB',
+            currency_code: 'ETB',
             description: 'Salaries',
+            document_id: null,
+            exchange_rate_source: null,
+            exchange_rate_ref: null,
+            exchange_rate_date: null,
+            fx_gain_loss: null,
+            intercompany_tenant_id: null,
           },
           {
             id: 'line-2',
@@ -70,11 +78,19 @@ describe('LedgerMapper', () => {
             base_amount: '1000.00',
             exchange_rate: '1.0',
             is_debit: false,
-            currency: 'ETB',
+            currency_code: 'ETB',
             description: 'Cash',
+            document_id: null,
+            exchange_rate_source: null,
+            exchange_rate_ref: null,
+            exchange_rate_date: null,
+            fx_gain_loss: null,
+            intercompany_tenant_id: null,
           },
         ],
         created_at: '2026-04-01T08:00:00Z',
+        posted_by: null,
+        posted_at: null,
       }
 
       const model = LedgerMapper.toJournalEntry(dto)
@@ -91,12 +107,13 @@ describe('LedgerMapper', () => {
     it('should handle missing lines with empty array', () => {
       const dto = {
         id: 'je-2',
+        tenant_id: 'tenant-1',
         entry_number: 'JE-002',
         status: 'DRAFT',
         date: '2026-04-02',
         description: 'Empty entry',
-        lines: [] as components['schemas']['JournalLineRead'][],
-        base_currency: 'ETB',
+        lines: [] as components['schemas']['JournalLineDTO'][],
+        base_currency_code: 'ETB',
         posted_by: null,
         posted_at: null,
         created_at: null,
@@ -111,6 +128,8 @@ describe('LedgerMapper', () => {
     it('should map FiscalPeriodRead to FiscalPeriod model', () => {
       const dto: FiscalPeriodDTO = {
         id: 'fp-1',
+        tenant_id: 'tenant-1',
+        fiscal_year_id: 'fy-1',
         name: 'April 2026',
         start_date: '2026-04-01',
         end_date: '2026-04-30',

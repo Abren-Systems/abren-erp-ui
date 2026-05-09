@@ -6,11 +6,11 @@ export type Schemas = components['schemas']
 
 // --- Approval DTOs ---
 
-export type PendingApprovalDTO = Schemas['PendingApprovalResponse']
-export type CreateApprovalActionDTO = Schemas['ApprovalActionCreate']
-export type CreateApprovalStepDTO = Schemas['ApprovalStepCreate']
-export type CreateApprovalPolicyDTO = Schemas['ApprovalPolicyCreate']
+export type PendingApprovalDTO = Schemas['PendingApprovalDTO']
+export type CreateApprovalActionDTO = Schemas['CreateApprovalActionRequest']
+export type CreateApprovalStepDTO = Schemas['CreateApprovalStepRequest']
+export type CreateApprovalPolicyDTO = Schemas['CreateApprovalPolicyRequest']
 
 // --- Template DTOs ---
 
-export type WorkflowTemplateDTO = Schemas['WorkflowTemplateRead']
+export type WorkflowTemplateDTO = Schemas['WorkflowTemplateDTO']

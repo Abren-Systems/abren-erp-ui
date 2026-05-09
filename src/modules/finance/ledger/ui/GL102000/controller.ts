@@ -1,24 +1,41 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   useScreenController,
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
 import { useDataGrid } from '@/shared/components/data-grid'
-import { useFiscalPeriods } from '../../application/useFiscalPeriods'
+import { useFiscalCalendar } from '../../application/useFiscalCalendar'
 import { GL102000 } from './screen'
 
-import type { FiscalPeriod } from '../../domain/fiscal-period.types'
-import { GL102000_Create_Fields } from './fields'
+import type { FiscalYear } from '../../domain/fiscal-calendar.types'
+import { GL102000_Generate_Fields } from './fields'
 
 export function useFiscalPeriodsController() {
-  const { periods, isLoading, error, createPeriod } = useFiscalPeriods()
+  const { years, isLoading, error, generateYear } = useFiscalCalendar()
   const gridState = useDataGrid()
 
-  const base = useScreenController<FiscalPeriod[], 'VIEW'>({
+  // Master selection
+  const selectedYearId = ref<string | null>(null)
+  const selectedYear = computed(
+    () => years.value?.find((y) => y.id === selectedYearId.value) || null,
+  )
+
+  // Auto-select first year if none selected
+  watch(
+    years,
+    (newYears) => {
+      if (newYears?.length && !selectedYearId.value && newYears[0]) {
+        selectedYearId.value = newYears[0].id
+      }
+    },
+    { immediate: true },
+  )
+
+  const base = useScreenController<FiscalYear[], 'VIEW'>({
     screen: GL102000,
     dataSource: {
-      entity: periods,
+      entity: years,
       isLoading,
       error,
     },
@@ -27,64 +44,66 @@ export function useFiscalPeriodsController() {
     statePolicy: LIST_SCREEN_POLICY,
   })
 
-  const isCreateOpen = ref(false)
+  const isGenerateOpen = ref(false)
 
-  // Fields
-  const createName = ref('')
-  const createStartDate = ref<string>('')
-  const createEndDate = ref<string>('')
+  // Fields for generation
+  const genYear = ref('')
+  const genStartDate = ref<string>('')
+  const genEndDate = ref<string>('')
 
   base.registerCommand('create', {
     execute: async () => {
-      createName.value = ''
-      createStartDate.value = ''
-      createEndDate.value = ''
-      isCreateOpen.value = true
+      const nextYear = new Date().getFullYear()
+      genYear.value = String(nextYear)
+      genStartDate.value = `${nextYear}-01-01`
+      genEndDate.value = `${nextYear}-12-31`
+      isGenerateOpen.value = true
     },
     isPending: computed(() => false),
   })
 
-  const isCreateValid = computed(() => {
-    return createName.value.trim().length > 0 && !!createStartDate.value && !!createEndDate.value
+  const isGenerateValid = computed(() => {
+    return genYear.value.trim().length === 4 && !!genStartDate.value && !!genEndDate.value
   })
 
-  base.registerCommand('executeCreate', {
+  base.registerCommand('executeGenerate', {
     execute: async () => {
-      if (!isCreateValid.value) return
+      if (!isGenerateValid.value) return
       try {
-        await createPeriod({
-          name: createName.value,
-          start_date: createStartDate.value,
-          end_date: createEndDate.value,
+        await generateYear({
+          year: genYear.value,
+          start_date: genStartDate.value,
+          end_date: genEndDate.value,
         })
-        isCreateOpen.value = false
+        isGenerateOpen.value = false
       } catch {
         // Error Contract handles field errors
       }
     },
-    isPending: isLoading, // Or a separate isCreating flag if useFiscalPeriods had one
+    isPending: isLoading,
   })
 
   base.registerCommand('refresh', {
     execute: async () => {
-      // In a real implementation this would refetch
-      console.log('Refresh fiscal periods')
+      // DataSource refresh logic
     },
     isPending: isLoading,
   })
 
   return {
     ...base,
-    periods,
+    years,
+    selectedYear,
+    selectedYearId,
     isLoading,
     gridState,
-    isCreateOpen,
+    isGenerateOpen,
     fields: {
-      createName,
-      createStartDate,
-      createEndDate,
-      registry: GL102000_Create_Fields,
+      genYear,
+      genStartDate,
+      genEndDate,
+      registry: GL102000_Generate_Fields,
     },
-    isCreateValid,
+    isGenerateValid,
   }
 }
