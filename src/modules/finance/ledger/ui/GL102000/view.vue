@@ -1,8 +1,5 @@
 <script setup lang="ts">
-// arch-guard-disable PII-02
 import { useScreenControllerContext } from '@/platform/screen-runtime'
-import { inject } from 'vue'
-import { ref } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { Plus, RefreshCcw } from 'lucide-vue-next'
