@@ -2,7 +2,7 @@ import { computed, type ComputedRef } from 'vue'
 import type { FieldDefinition } from '../field-definition.types'
 import type { ScreenController } from '@/platform/screen-runtime/screen-controller.types'
 import type { ScreenStateMachine } from '@/platform/screen-runtime/state-machine.types'
-import { debugBus } from '@/platform/debug/debug-bus'
+import { transitionRecorder } from '@/platform/debug/transition-recorder'
 import type { FieldType } from '@/shared/components/field-system/registry'
 
 export interface FieldBinding<TValue = unknown> {
@@ -80,7 +80,6 @@ export function useField<TEntity, TValue>(
     if (isReadonly.value) return // Block mutation if State Machine forbids it
 
     const fieldKey = definition.key
-    const previousValue = value.value
 
     // Route 1: Controller implements setFieldValue directly (explicit mutation adapter)
     if ('setFieldValue' in controller) {
@@ -106,11 +105,12 @@ export function useField<TEntity, TValue>(
     }
 
     // Emit debug event for successful mutations
-    debugBus.emit(controller.screen.id, 'field_mutation', {
-      field: String(fieldKey),
-      previousValue,
-      newValue,
-    })
+    transitionRecorder.recordTransition(
+      { type: 'mutation', source: `AppField(${String(fieldKey)})` },
+      { [String(fieldKey)]: newValue },
+      [],
+      controller.model.value.version,
+    )
   }
 
   return {

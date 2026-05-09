@@ -1,5 +1,3 @@
-import type { Component } from 'vue'
-
 export interface FormatterContext {
   locale: string
   tenantId: string
@@ -24,6 +22,8 @@ export interface ExportFormatter {
 /**
  * Operational behavior mapping for semantics.
  * Defines the executable authority for a semantic kind.
+ *
+ * MUST be framework-independent. No Vue imports.
  */
 export interface SemanticRuntime {
   /** Synchronous formatting of the primitive value into a display string */
@@ -32,11 +32,11 @@ export interface SemanticRuntime {
   /** Synchronous parsing of user input back to the primitive value */
   parser?: Parser
 
-  /** The Vue component used to render this semantic in read-only mode */
-  displayRenderer: Component
+  /** The rendering key used to map to a read-only presentation component */
+  displayRendererKey: string
 
-  /** The Vue component used to render this semantic in edit mode */
-  editorRenderer?: Component
+  /** The rendering key used to map to an edit mode presentation component */
+  editorRendererKey?: string
 
   /** Operators available for filtering in grids */
   filterOperators?: FilterOperator[]

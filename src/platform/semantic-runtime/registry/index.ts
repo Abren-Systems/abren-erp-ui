@@ -1,4 +1,3 @@
-import { defineAsyncComponent } from 'vue'
 import { SemanticKind } from '../contracts'
 import type { SemanticRuntime } from '../runtimes'
 import { SemanticPolicies } from '../policies'
@@ -27,27 +26,18 @@ export const semanticRegistry: Record<SemanticKind, SemanticRuntime> = {
       const parsed = parseFloat(value.toString().replace(/[^0-9.-]+/g, ''))
       return isNaN(parsed) ? null : parsed
     },
-    // Fallback to text input if no specialized Money editor exists yet
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
-    editorRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
+    editorRendererKey: 'AppInput',
   },
 
   [SemanticKind.Status]: {
     formatter: (value) =>
       value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value),
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/badge/AppBadge.vue'),
-    ),
+    displayRendererKey: 'AppBadge',
   },
 
   [SemanticKind.LedgerAccount]: {
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
   },
 
   [SemanticKind.Quantity]: {
@@ -60,39 +50,28 @@ export const semanticRegistry: Record<SemanticKind, SemanticRuntime> = {
           : String(value)
         : num.toFixed(SemanticPolicies[SemanticKind.Quantity].precision || 4)
     },
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
   },
 
   [SemanticKind.Currency]: {
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
   },
 
   [SemanticKind.Vendor]: {
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
   },
 
   [SemanticKind.Email]: {
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
   },
 
   [SemanticKind.Phone]: {
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
   },
 
   [SemanticKind.Date]: {
     formatter: (value) => {
       if (!value) return ''
-      // Simplified date formatter
       try {
         const d = new Date(value as string | number | Date)
         return d.toLocaleDateString()
@@ -100,9 +79,7 @@ export const semanticRegistry: Record<SemanticKind, SemanticRuntime> = {
         return typeof value === 'object' ? JSON.stringify(value) : String(value)
       }
     },
-    displayRenderer: defineAsyncComponent(
-      () => import('@/shared/components/primitives/input/AppInput.vue'),
-    ),
+    displayRendererKey: 'AppInput',
   },
 }
 

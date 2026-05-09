@@ -4,7 +4,7 @@ import type { ScreenData, ControllerCommand, ScreenController } from './screen-c
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { ScreenStatePolicy } from './screen-state-policy.types'
 import { resolveScreenModel } from './resolve-screen-model'
-import { debugBus } from '../debug/debug-bus'
+import { transitionRecorder } from '../debug/transition-recorder'
 
 // ── Screen Controller Options ─────────────────────────────
 // Passed by the screen-specific controller to configure data loading.
@@ -156,21 +156,32 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     const wrappedCommand: ControllerCommand = {
       isPending: command.isPending,
       execute: async (...args: unknown[]) => {
-        debugBus.emit(screen.id, 'command_start', { commandId: id, args })
+        transitionRecorder.recordTransition(
+          { type: 'command', source: `Command(${id})` },
+          { status: 'start', args },
+          [],
+          model.value?.version ?? 0,
+        )
         try {
           await command.execute(...args)
-          debugBus.emit(screen.id, 'command_end', { commandId: id })
+          transitionRecorder.recordTransition(
+            { type: 'command', source: `Command(${id})` },
+            { status: 'end' },
+            [],
+            model.value?.version ?? 0,
+          )
         } catch (error) {
-          debugBus.emit(screen.id, 'command_error', {
-            commandId: id,
-            error: error instanceof Error ? error.message : String(error),
-          })
+          transitionRecorder.recordTransition(
+            { type: 'command', source: `Command(${id})` },
+            { status: 'error', error: error instanceof Error ? error.message : String(error) },
+            [],
+            model.value?.version ?? 0,
+          )
           throw error
         }
       },
     }
     commands.value[id] = wrappedCommand
-    debugBus.emit(screen.id, 'command_registered', { commandId: id })
   }
 
   // ── Aggregate Pending State ──
@@ -201,10 +212,16 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   watch(
     () => model.value,
     (m) => {
-      debugBus.emit(screen.id, 'model_resolved', {
-        canEdit: m.domain.capabilities.canEdit,
-        status: m.domain.backend.status,
-        primaryActions: m.ui.actions.primary.length,
+      // In a real system, we'd diff `m` against the previous model and emit a patch.
+      // For now, we take a checkpoint.
+      transitionRecorder.recordCheckpoint({
+        projectionId: m.meta.projectionId,
+        projectionType: 'screen',
+        schemaVersion: 1,
+        runtimeVersion: '1.0.0',
+        entityId: (dataSource.entity.value as { id?: string } | null)?.id,
+        timestamp: m.meta.timestamp,
+        payload: m,
       })
     },
     { immediate: true },

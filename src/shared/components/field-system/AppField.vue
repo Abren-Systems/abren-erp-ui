@@ -15,6 +15,8 @@ import { resolveField, type FieldContext } from './registry'
 import type { PrimitiveType } from '@/platform/component-contracts'
 import { SemanticKind } from '@/platform/semantic-runtime/contracts'
 import { resolveSemantic } from '@/platform/semantic-runtime/registry'
+import { renderingRuntime } from '@/platform/chrome/renderers/RenderingRuntime'
+import { defineAsyncComponent } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -88,9 +90,19 @@ const statusVariant = computed(() => {
 
 const resolvedEditor = computed(() => {
   // Explicit override > Semantic > ControlType
-  // TODO: Add explicit override prop later if needed
-  if (semanticRuntime.value?.editorRenderer) return semanticRuntime.value.editorRenderer
+  if (semanticRuntime.value?.editorRendererKey) {
+    const loader = renderingRuntime.getLoader(semanticRuntime.value.editorRendererKey)
+    if (loader) return defineAsyncComponent(loader)
+  }
   return definition.value.editor
+})
+
+const resolvedDisplay = computed(() => {
+  if (semanticRuntime.value?.displayRendererKey) {
+    const loader = renderingRuntime.getLoader(semanticRuntime.value.displayRendererKey)
+    if (loader) return defineAsyncComponent(loader)
+  }
+  return undefined
 })
 
 /** Merge static registry defaults with runtime screen-level overrides. Screen wins on conflict. */
@@ -125,8 +137,8 @@ const mergedEditorProps = computed(() => ({
 
     <!-- READ: Semantic Display Renderer -->
     <component
-      v-else-if="semanticRuntime?.displayRenderer"
-      :is="semanticRuntime.displayRenderer"
+      v-else-if="resolvedDisplay"
+      :is="resolvedDisplay"
       :value="value"
       :display-value="displayValue"
       :is-empty="isEmpty"

@@ -7,6 +7,15 @@ import { router } from './app/router'
 
 import './assets/main.css'
 
+import { renderingRuntime } from './platform/chrome/renderers/RenderingRuntime'
+
+renderingRuntime.configure({
+  rendererMappings: {
+    AppInput: () => import('@/shared/components/primitives/input/AppInput.vue'),
+    AppBadge: () => import('@/shared/components/primitives/badge/AppBadge.vue'),
+  },
+})
+
 const app = createApp(App)
 
 // ── State Management ──────────────────────────────────
