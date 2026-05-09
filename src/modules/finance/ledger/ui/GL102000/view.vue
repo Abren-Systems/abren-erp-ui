@@ -29,7 +29,7 @@ const { hasPermission } = usePermissions()
           Fiscal Years
         </h2>
         <AppButton
-          v-if="hasPermission('ledger:manage_accounts')"
+          v-if="hasPermission('ledger:manage_fiscal_years')"
           variant="stealth"
           size="sm"
           @click="ctrl.commands.value['create']?.execute()"
