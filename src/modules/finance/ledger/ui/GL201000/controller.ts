@@ -1,50 +1,109 @@
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
-import { useLedgerAccounts } from '../../application/useLedgerAccounts'
+import { computed, ref, watch } from 'vue'
+import {
+  useScreenController,
+  LIST_SCREEN_POLICY,
+  listScreenDomainState,
+} from '@/platform/screen-runtime'
+import { useDataGrid } from '@/shared/components/data-grid'
+import { useFiscalCalendar } from '../../application/useFiscalCalendar'
 import { GL201000 } from './screen'
-import { GL201000_FIELDS } from './fields'
-import { GL201000_POLICY, type AccountStatus } from './policy'
-import { useField } from '@/platform/field-system/bindings/useField'
-import type { Account } from '../../domain/account.types'
 
-export function useAccountController(id: string) {
-  const router = useRouter()
-  const isNew = computed(() => id === 'new')
+import type { FiscalYear } from '../../domain/fiscal-calendar.types'
+import { GL201000_Generate_Fields } from './fields'
 
-  // We are grabbing accounts from the list cache.
-  // In a real app we would have a specific detail query.
-  const { accounts, isPending: isLoading } = useLedgerAccounts()
-  const account = computed(() => accounts.value?.find((a) => a.id === id) ?? null)
+export function useFiscalPeriodsController() {
+  const { years, isLoading, error, generateYear } = useFiscalCalendar()
+  const gridState = useDataGrid()
 
-  const base = useScreenController<Account, AccountStatus>({
+  // Master selection
+  const selectedYearId = ref<string | null>(null)
+  const selectedYear = computed(
+    () => years.value?.find((y) => y.id === selectedYearId.value) || null,
+  )
+
+  // Auto-select first year if none selected
+  watch(
+    years,
+    (newYears) => {
+      if (newYears?.length && !selectedYearId.value && newYears[0]) {
+        selectedYearId.value = newYears[0].id
+      }
+    },
+    { immediate: true },
+  )
+
+  const base = useScreenController<FiscalYear[], 'VIEW'>({
     screen: GL201000,
-    dataSource: { entity: account, isLoading, error: ref(null) },
-    isNew,
-    getDomainState: (ent) => (ent.isActive ? 'ACTIVE' : 'INACTIVE'),
-    statePolicy: GL201000_POLICY,
+    dataSource: {
+      entity: years,
+      isLoading,
+      error,
+    },
+    isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
   })
 
-  // Command Execution
-  base.registerCommand('deactivate', {
+  const isGenerateOpen = ref(false)
+
+  // Fields for generation
+  const genYear = ref('')
+  const genStartDate = ref<string>('')
+  const genEndDate = ref<string>('')
+
+  base.registerCommand('create', {
     execute: async () => {
-      // TODO: Wire to account deactivation application service
-      console.log('Deactivating account', id)
+      const nextYear = new Date().getFullYear()
+      genYear.value = String(nextYear)
+      genStartDate.value = `${nextYear}-01-01`
+      genEndDate.value = `${nextYear}-12-31`
+      isGenerateOpen.value = true
     },
     isPending: computed(() => false),
   })
 
-  const fields = {
-    code: useField(base, GL201000_FIELDS.code),
-    name: useField(base, GL201000_FIELDS.name),
-    type: useField(base, GL201000_FIELDS.type),
-    isActive: useField(base, GL201000_FIELDS.isActive),
-    currency: useField(base, GL201000_FIELDS.currency),
-  }
+  const isGenerateValid = computed(() => {
+    return genYear.value.trim().length === 4 && !!genStartDate.value && !!genEndDate.value
+  })
+
+  base.registerCommand('executeGenerate', {
+    execute: async () => {
+      if (!isGenerateValid.value) return
+      try {
+        await generateYear({
+          year: genYear.value,
+          start_date: genStartDate.value,
+          end_date: genEndDate.value,
+        })
+        isGenerateOpen.value = false
+      } catch {
+        // Error Contract handles field errors
+      }
+    },
+    isPending: isLoading,
+  })
+
+  base.registerCommand('refresh', {
+    execute: async () => {
+      // DataSource refresh logic
+    },
+    isPending: isLoading,
+  })
 
   return {
     ...base,
-    fields,
-    router,
+    years,
+    selectedYear,
+    selectedYearId,
+    isLoading,
+    gridState,
+    isGenerateOpen,
+    fields: {
+      genYear,
+      genStartDate,
+      genEndDate,
+      registry: GL201000_Generate_Fields,
+    },
+    isGenerateValid,
   }
 }

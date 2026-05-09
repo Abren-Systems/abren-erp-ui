@@ -7,7 +7,7 @@ import {
   listScreenDomainState,
 } from '@/platform/screen-runtime'
 import { useLedgerAccounts } from '../../application/useLedgerAccounts'
-import { GL2010PL } from './screen'
+import { GL2025PL } from './screen'
 
 export function useAccountListController() {
   const gridState = useDataGrid()
@@ -15,7 +15,7 @@ export function useAccountListController() {
   const { accounts, isPending, error, refetch } = useLedgerAccounts()
 
   const base = useScreenController({
-    screen: GL2010PL,
+    screen: GL2025PL,
     dataSource: { entity: computed(() => null), isLoading: isPending, error },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,

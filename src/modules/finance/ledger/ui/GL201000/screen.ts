@@ -1,47 +1,46 @@
-import { GL201000_COMMANDS } from './commands'
-import type { ScreenDefinition } from '@/platform/screen-runtime'
 import type { ModuleId } from '@/shared/types/brand.types'
-import { useAccountController } from './controller'
+import { useFiscalPeriodsController } from './controller'
+import { GL201000_COMMANDS_LIST } from './commands'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
+import type { ScreenDefinition } from '@/platform/screen-runtime'
 
+/**
+ * GL201000 - Master Financial Calendar
+ */
 export const GL201000: ScreenDefinition = {
   id: createScreenId('GL201000'),
   moduleId: 'ledger' as ModuleId,
-  controller: (ctx) => useAccountController(ctx.params['id'] as string),
+  controller: () => useFiscalPeriodsController(),
   kind: 'maintenance',
-  titleKey: 'Chart of Accounts',
-  primaryView: 'account',
+  titleKey: 'Master Financial Calendar',
+  primaryView: 'periods',
   route: {
-    path: 'accounts/:id',
-    name: 'LedgerCoaDetail',
+    path: 'fiscal-calendar',
+    name: 'LedgerFiscalCalendar',
   },
-  permissions: [{ key: 'ledger:manage_accounts' }],
-  views: {
-    account: {
-      name: 'account',
-      kind: 'single',
-      containerName: 'AccountRecord',
-      queryKey: ['ledger', 'accounts', 'detail'] as const,
-    },
-  },
+  permissions: [{ key: 'finance.ledger.fiscalPeriods.view', description: 'View fiscal periods' }],
   layout: {
-    summaryTemplate: '1-1',
+    summaryTemplate: '1',
     renderTarget: () => import('./view.vue') as never,
-    sidePanel: {
-      tabs: [],
-      defaultCollapsed: true,
+  },
+  views: {
+    periods: {
+      name: 'periods',
+      kind: 'collection',
+      containerName: 'FiscalPeriods',
+      queryKey: ['finance', 'ledger', 'fiscal-periods'] as const,
     },
   },
-  commands: GL201000_COMMANDS,
+  commands: GL201000_COMMANDS_LIST,
   personalization: {
     allowTabPersonalization: false,
-    allowGridPersonalization: false,
+    allowGridPersonalization: true,
     allowFilterSaving: false,
     allowSectionPersonalization: false,
   },
   test: {
-    containerName: 'GL201000',
-    viewNames: [],
-    actionNames: [],
+    containerName: 'FiscalPeriodsScreen',
+    viewNames: ['PeriodsGrid'],
+    actionNames: ['GeneratePeriods'],
   },
 }

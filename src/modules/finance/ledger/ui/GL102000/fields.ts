@@ -1,22 +1,23 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { FiscalYear } from '../../domain/fiscal-calendar.types'
 
-export const GL102000_Generate_Fields = {
-  year: {
-    key: 'year',
-    label: 'Fiscal Year',
-    type: 'text',
-  } as FieldDefinition<FiscalYear, string>,
+/** Matches the form-projection entity shape used in the controller */
+interface LedgerSettingsFormEntity {
+  default_bridge_account_id: string
+  pr_payable_account_id: string
+}
 
-  startDate: {
-    key: 'startDate',
-    label: 'Start Date',
-    type: 'date',
-  } as FieldDefinition<FiscalYear, Date>,
+export const GL102000_FIELDS = {
+  default_bridge_account_id: {
+    key: 'default_bridge_account_id',
+    label: 'Default Bridge Account',
+    type: 'selector',
+    description: 'Used for temporary holding during multi-step reconciliations.',
+  } as FieldDefinition<LedgerSettingsFormEntity, string>,
 
-  endDate: {
-    key: 'endDate',
-    label: 'End Date',
-    type: 'date',
-  } as FieldDefinition<FiscalYear, Date>,
+  pr_payable_account_id: {
+    key: 'pr_payable_account_id',
+    label: 'PR Payable Account',
+    type: 'selector',
+    description: 'Default liability account for Payment Request accruals.',
+  } as FieldDefinition<LedgerSettingsFormEntity, string>,
 } as const

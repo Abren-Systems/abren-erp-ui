@@ -1,17 +1,20 @@
-import type { ScreenCommand } from '@/platform/commands'
+import type { ScreenCommand } from '@/platform/commands/command.types'
 
-/**
- * GL201000 — Chart of Accounts Screen Commands
- */
-export const GL201000_COMMANDS: readonly ScreenCommand[] = [
-  {
-    key: 'deactivate',
-    labelKey: 'Deactivate Account',
-    variant: 'danger',
-    categoryKey: 'processing',
-    displayOnMainToolbar: false,
-    requiresConfirmation: true,
-    confirmationMessageKey:
-      'Are you sure you want to deactivate this account? It will no longer be available for new transactions.',
+export const GL201000_COMMANDS: Record<string, ScreenCommand> = {
+  refresh: {
+    key: 'refresh',
+    labelKey: 'Refresh',
+    variant: 'neutral',
+    displayOnMainToolbar: true,
+    kind: 'utility',
   },
-]
+  create: {
+    key: 'create',
+    labelKey: 'New Period',
+    variant: 'primary',
+    displayOnMainToolbar: true,
+    kind: 'local',
+  },
+}
+
+export const GL201000_COMMANDS_LIST = Object.values(GL201000_COMMANDS)

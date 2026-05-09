@@ -2,10 +2,10 @@ import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
 import { useAccountListController } from './controller'
-import { GL2010PL_COMMANDS } from './commands'
+import { GL2025PL_COMMANDS } from './commands'
 
-export const GL2010PL: ScreenDefinition = {
-  id: createScreenId('GL2010PL'),
+export const GL2025PL: ScreenDefinition = {
+  id: createScreenId('GL2025PL'),
   moduleId: 'ledger' as ModuleId,
   controller: () => useAccountListController(),
   kind: 'primaryList',
@@ -32,7 +32,7 @@ export const GL2010PL: ScreenDefinition = {
       defaultCollapsed: true,
     },
   },
-  commands: GL2010PL_COMMANDS,
+  commands: GL2025PL_COMMANDS,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,
@@ -40,7 +40,7 @@ export const GL2010PL: ScreenDefinition = {
     allowSectionPersonalization: false,
   },
   test: {
-    containerName: 'GL2010PL',
+    containerName: 'GL2025PL',
     viewNames: [],
     actionNames: [],
   },

@@ -12,7 +12,7 @@ export const GL101000: ScreenDefinition = {
   moduleId: 'ledger' as ModuleId,
   controller: () => useLedgerSettingsController(),
   kind: 'setup',
-  titleKey: 'Ledger Settings',
+  titleKey: 'GL Preferences',
   primaryView: 'preferences',
   route: {
     path: 'settings',

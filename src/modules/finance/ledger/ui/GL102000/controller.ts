@@ -1,109 +1,101 @@
-import { computed, ref, watch } from 'vue'
-import {
-  useScreenController,
-  LIST_SCREEN_POLICY,
-  listScreenDomainState,
-} from '@/platform/screen-runtime'
-import { useDataGrid } from '@/shared/components/data-grid'
-import { useFiscalCalendar } from '../../application/useFiscalCalendar'
+import { computed, watch } from 'vue'
+import { useScreenController } from '@/platform/screen-runtime'
+import { useLedgerSettings } from '../../application/useLedgerSettings'
+import { useLedgerAccounts } from '../../application/useLedgerAccounts'
 import { GL102000 } from './screen'
+import { GL102000_POLICY, type LedgerSettingsStatus } from './policy'
+import { GL102000_FIELDS } from './fields'
+import { useField } from '@/platform/field-system/bindings/useField'
+import { useForm } from '@tanstack/vue-form'
+import { z } from 'zod'
 
-import type { FiscalYear } from '../../domain/fiscal-calendar.types'
-import { GL102000_Generate_Fields } from './fields'
+const ledgerSettingsSchema = z.object({
+  default_bridge_account_id: z.string().min(1, 'Required'),
+  pr_payable_account_id: z.string().min(1, 'Required'),
+})
 
-export function useFiscalPeriodsController() {
-  const { years, isLoading, error, generateYear } = useFiscalCalendar()
-  const gridState = useDataGrid()
+type LedgerSettingsFormValues = z.infer<typeof ledgerSettingsSchema>
 
-  // Master selection
-  const selectedYearId = ref<string | null>(null)
-  const selectedYear = computed(
-    () => years.value?.find((y) => y.id === selectedYearId.value) || null,
-  )
+/** Form-projection entity shape passed to the screen controller */
+type LedgerSettingsFormEntity = LedgerSettingsFormValues
 
-  // Auto-select first year if none selected
+export function useLedgerSettingsController() {
+  const { settings, isLoading, error, updateSettings } = useLedgerSettings()
+  const { accounts, isPending: isAccountsLoading } = useLedgerAccounts()
+
+  const form = useForm({
+    defaultValues: {
+      default_bridge_account_id: '',
+      pr_payable_account_id: '',
+    } as LedgerSettingsFormValues,
+    validators: {
+      onChange: ledgerSettingsSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await updateSettings({
+        default_bridge_account_id: value.default_bridge_account_id || null,
+        pr_payable_account_id: value.pr_payable_account_id || null,
+      })
+    },
+  })
+
+  // Sync server state to form state
   watch(
-    years,
-    (newYears) => {
-      if (newYears?.length && !selectedYearId.value && newYears[0]) {
-        selectedYearId.value = newYears[0].id
+    settings,
+    (newVal) => {
+      if (newVal) {
+        form.setFieldValue('default_bridge_account_id', newVal.default_bridge_account_id || '')
+        form.setFieldValue('pr_payable_account_id', newVal.pr_payable_account_id || '')
       }
     },
     { immediate: true },
   )
 
-  const base = useScreenController<FiscalYear[], 'VIEW'>({
+  const activeEntity = computed<LedgerSettingsFormEntity | null>(() => {
+    return { ...form.state.values }
+  })
+
+  const base = useScreenController<LedgerSettingsFormEntity, LedgerSettingsStatus>({
     screen: GL102000,
     dataSource: {
-      entity: years,
-      isLoading,
+      entity: activeEntity,
+      isLoading: computed(() => isLoading.value || isAccountsLoading.value),
       error,
     },
     isNew: computed(() => false),
-    getDomainState: listScreenDomainState,
-    statePolicy: LIST_SCREEN_POLICY,
-  })
-
-  const isGenerateOpen = ref(false)
-
-  // Fields for generation
-  const genYear = ref('')
-  const genStartDate = ref<string>('')
-  const genEndDate = ref<string>('')
-
-  base.registerCommand('create', {
-    execute: async () => {
-      const nextYear = new Date().getFullYear()
-      genYear.value = String(nextYear)
-      genStartDate.value = `${nextYear}-01-01`
-      genEndDate.value = `${nextYear}-12-31`
-      isGenerateOpen.value = true
-    },
-    isPending: computed(() => false),
-  })
-
-  const isGenerateValid = computed(() => {
-    return genYear.value.trim().length === 4 && !!genStartDate.value && !!genEndDate.value
-  })
-
-  base.registerCommand('executeGenerate', {
-    execute: async () => {
-      if (!isGenerateValid.value) return
-      try {
-        await generateYear({
-          year: genYear.value,
-          start_date: genStartDate.value,
-          end_date: genEndDate.value,
-        })
-        isGenerateOpen.value = false
-      } catch {
-        // Error Contract handles field errors
+    getDomainState: () => {
+      if (!isAccountsLoading.value && accounts.value?.length === 0) {
+        return 'MISSING_PREREQUISITES'
       }
+      return 'OPEN'
     },
-    isPending: isLoading,
+    statePolicy: GL102000_POLICY,
   })
 
-  base.registerCommand('refresh', {
-    execute: async () => {
-      // DataSource refresh logic
-    },
-    isPending: isLoading,
-  })
+  // Attach form to base so useField can find it
+  Object.assign(base, { form })
+
+  const handleSave = async () => {
+    void form.handleSubmit()
+  }
+
+  const fields = {
+    default_bridge_account_id: useField(base, GL102000_FIELDS.default_bridge_account_id),
+    pr_payable_account_id: useField(base, GL102000_FIELDS.pr_payable_account_id),
+  }
+
+  const accountOptions = computed(
+    () =>
+      accounts.value?.map((acc) => ({
+        label: `${acc.code} - ${acc.name}`,
+        value: acc.id,
+      })) || [],
+  )
 
   return {
     ...base,
-    years,
-    selectedYear,
-    selectedYearId,
-    isLoading,
-    gridState,
-    isGenerateOpen,
-    fields: {
-      genYear,
-      genStartDate,
-      genEndDate,
-      registry: GL102000_Generate_Fields,
-    },
-    isGenerateValid,
+    fields,
+    accountOptions,
+    handleSave,
   }
 }

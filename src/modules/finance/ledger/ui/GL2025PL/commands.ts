@@ -1,6 +1,6 @@
 import type { ScreenCommand } from '@/platform/commands'
 
-export const GL2010PL_COMMANDS: readonly ScreenCommand[] = [
+export const GL2025PL_COMMANDS: readonly ScreenCommand[] = [
   {
     key: 'create',
     kind: 'utility',
