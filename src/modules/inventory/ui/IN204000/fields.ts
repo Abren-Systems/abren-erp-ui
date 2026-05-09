@@ -6,13 +6,11 @@ export const IN204000_FIELDS = {
     key: 'code',
     label: 'Warehouse Code',
     type: 'text',
-    required: () => true,
   },
   name: {
     key: 'name',
     label: 'Name',
     type: 'text',
-    required: () => true,
   },
   isQuarantine: {
     key: 'isQuarantine',

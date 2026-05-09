@@ -38,49 +38,41 @@ export const AP301000_FIELDS = {
     key: 'requesterId',
     label: 'Requester',
     type: 'text', // using text as a fallback since type: 'id' might not be in FieldRenderType, but let's use 'text' or add 'selector'
-    readonly: () => true, // System generated
   } as FieldDefinition<PaymentRequest, string>,
 
   beneficiaryId: {
     key: 'beneficiaryId',
     label: 'Beneficiary',
     type: 'selector',
-    readonly: (state) => !state.isEditable,
-    required: () => true,
   } as FieldDefinition<PaymentRequest, string>,
 
   status: {
     key: 'status',
     label: 'Status',
     type: 'text',
-    readonly: () => true,
   } as FieldDefinition<PaymentRequest, string>,
 
   submittedAt: {
     key: 'submittedAt',
     label: 'Submitted On',
     type: 'date',
-    readonly: () => true,
   } as FieldDefinition<PaymentRequest, string>,
 
   justification: {
     key: 'justification',
     label: 'Justification',
     type: 'textarea',
-    readonly: (state) => !state.isEditable,
   } as FieldDefinition<PaymentRequest, string>,
 
   currency: {
     key: 'currency',
     label: 'Currency',
     type: 'selector',
-    readonly: (state) => !state.isEditable,
   } as FieldDefinition<PaymentRequest, string>,
 
   totalAmount: {
     key: 'totalAmount',
     label: 'Order Total',
     type: 'amount',
-    readonly: () => true, // Calculated from lines
   } as FieldDefinition<PaymentRequest, number>,
 } as const

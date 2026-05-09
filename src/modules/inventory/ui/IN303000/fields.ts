@@ -6,12 +6,10 @@ export const IN303000_FIELDS = {
     key: 'warehouse_id',
     label: 'Warehouse',
     type: 'selector',
-    required: () => true,
   },
   reason: {
     key: 'reason',
     label: 'Reason for Adjustment',
     type: 'text',
-    required: () => true,
   },
 } satisfies Record<string, FieldDefinition<AdjustmentDTO>>

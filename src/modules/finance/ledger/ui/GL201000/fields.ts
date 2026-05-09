@@ -6,19 +6,16 @@ export const GL201000_FIELDS = {
     key: 'code',
     label: 'Account Code',
     type: 'text',
-    required: () => true,
   },
   name: {
     key: 'name',
     label: 'Name',
     type: 'text',
-    required: () => true,
   },
   type: {
     key: 'type',
     label: 'Type',
     type: 'text',
-    required: () => true,
   },
   isActive: {
     key: 'isActive',

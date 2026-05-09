@@ -9,19 +9,16 @@ export const GL301000_FIELDS = {
     key: 'entryNumber',
     label: 'Entry Number',
     type: 'text',
-    readonly: () => true,
   },
   status: {
     key: 'status',
     label: 'Status',
     type: 'text',
-    readonly: () => true,
   },
   entryDate: {
     key: 'entryDate',
     label: 'Entry Date',
     type: 'date',
-    required: () => true,
   },
   description: {
     key: 'description',

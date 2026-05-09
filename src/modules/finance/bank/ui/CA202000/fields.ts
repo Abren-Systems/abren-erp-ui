@@ -6,25 +6,21 @@ export const CA202000_FIELDS = {
     key: 'accountName',
     label: 'Account Name',
     type: 'text',
-    required: () => true,
   },
   accountNumber: {
     key: 'accountNumber',
     label: 'Account Number',
     type: 'text',
-    required: () => true,
   },
   bankName: {
     key: 'bankName',
     label: 'Bank Name',
     type: 'text',
-    required: () => true,
   },
   currency: {
     key: 'currency',
     label: 'Currency',
     type: 'selector',
-    required: () => true,
   },
   isDefault: {
     key: 'isDefault',

@@ -14,14 +14,12 @@ export const TX201000_FIELDS = {
     key: 'name',
     label: 'Group Name',
     type: 'text',
-    required: () => true,
   } as FieldDefinition<TaxGroupFormEntity, string>,
 
   method: {
     key: 'method',
     label: 'Calculation Method',
     type: 'selector',
-    required: () => true,
   } as FieldDefinition<TaxGroupFormEntity, string>,
 
   isActive: {
