@@ -14,7 +14,7 @@ import { MoreHorizontal } from 'lucide-vue-next'
 import { onClickOutside } from '@vueuse/core'
 import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
-import type { CommandProjection } from '../screen-runtime/screen-model.types'
+import type { CommandProjection } from '../screen-runtime/screen-projection.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
 
 const props = defineProps<{

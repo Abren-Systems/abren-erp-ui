@@ -3,7 +3,7 @@ import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { ScreenStatePolicy } from './screen-state-policy.types'
-import { resolveScreenModel } from './resolve-screen-model'
+import { resolveScreenProjection } from './resolve-screen-model'
 import { transitionRecorder } from '../debug/transition-recorder'
 
 // ── Screen Controller Options ─────────────────────────────
@@ -205,7 +205,7 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   const model = computed(() => {
     const ent = dataSource.entity.value as Record<string, unknown> | null
     const availableActions = (ent?.['availableActions'] || []) as readonly string[]
-    return resolveScreenModel({
+    return resolveScreenProjection({
       screenId: screen.id,
       commands: screen.commands,
       domainState: domain.value,

@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { useScreenController } from '@/platform/screen-runtime/useScreenController'
 import { transitionRecorder } from '@/platform/debug/transition-recorder'
-import { AR301000 } from './definition'
+import { AR301000 } from './screen'
 import { ARInvoiceStatePolicy } from './state-policy'
 import type { ARInvoice, ARDocumentStatus, ARInvoiceLine } from '../../domain/invoice.schema'
 

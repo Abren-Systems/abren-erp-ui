@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { WorkspaceModel } from '@/platform/navigation-runtime/workspace-model'
+import type { WorkspaceProjection } from '@/platform/navigation-runtime/workspace-projection'
 
 defineProps<{
   /**
    * Pure projection model.
    * The renderer has zero business logic and does not access router state.
    */
-  model: WorkspaceModel
+  model: WorkspaceProjection
 }>()
 
 const emit = defineEmits<{

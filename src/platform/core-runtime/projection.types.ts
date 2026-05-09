@@ -52,6 +52,6 @@ export interface ProjectionEnvelope<T> {
   /** Optional tracking identity for specific entity records being projected */
   entityId?: string
 
-  /** The actual projection model (e.g., ScreenModel, WorkspaceModel) */
+  /** The actual projection model (e.g., ScreenProjection, WorkspaceProjection) */
   payload: T
 }

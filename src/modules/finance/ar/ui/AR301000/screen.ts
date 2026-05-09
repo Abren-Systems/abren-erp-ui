@@ -29,7 +29,7 @@ export const AR301000: ScreenDefinition = {
   },
   layout: {
     summaryTemplate: '1-1',
-    renderTarget: () => import('./AR301000.vue') as never,
+    renderTarget: () => import('./view.vue') as never,
   },
   personalization: {
     allowTabPersonalization: true,

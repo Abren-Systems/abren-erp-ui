@@ -5,18 +5,22 @@ import type {
   WorkspaceCategoryDefinition,
   WorkspaceLinkDefinition,
 } from './workspace-definition'
-import type { WorkspaceModel, WorkspaceTileModel, WorkspaceCategoryModel } from './workspace-model'
+import type {
+  WorkspaceProjection,
+  WorkspaceTileProjection,
+  WorkspaceCategoryProjection,
+} from './workspace-projection'
 
 /**
  * NAI-04: Workspace projection resolution must be synchronous and deterministic.
  * Pure projection function.
  */
-export function resolveWorkspaceModel(
+export function resolveWorkspaceProjection(
   definition: WorkspaceDefinition,
   context: WorkspaceRuntimeContext,
-): WorkspaceModel {
+): WorkspaceProjection {
   // Filter tiles based on visibility rules
-  const tiles: WorkspaceTileModel[] = definition.tiles
+  const tiles: WorkspaceTileProjection[] = definition.tiles
     .filter((t) => isTileVisible(t, context))
     .map((t) => ({
       id: t.id,
@@ -26,7 +30,7 @@ export function resolveWorkspaceModel(
     }))
 
   // Filter categories and their links
-  const categories: WorkspaceCategoryModel[] = []
+  const categories: WorkspaceCategoryProjection[] = []
 
   for (const cat of definition.categories) {
     if (!isCategoryVisible(cat, context)) continue

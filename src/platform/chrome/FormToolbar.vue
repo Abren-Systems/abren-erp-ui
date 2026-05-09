@@ -18,12 +18,12 @@ import { Save, X, ChevronFirst, ChevronLeft, ChevronRight, ChevronLast } from 'l
 import MoreMenu from './MoreMenu.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
-import type { ScreenModel, CommandProjection } from '../screen-runtime/screen-model.types'
+import type { ScreenProjection, CommandProjection } from '../screen-runtime/screen-projection.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
 
 const props = defineProps<{
   /** The unified screen model — single deterministic rendering contract */
-  model: ScreenModel
+  model: ScreenProjection
   /** Registered command executors from the controller */
   executors: Record<string, ControllerCommand>
   /** Whether any command is currently executing */

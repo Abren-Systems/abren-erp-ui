@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { resolveScreenModel } from '../resolve-screen-model'
+import { resolveScreenProjection } from '../resolve-screen-model'
 import type { ScreenCommand } from '../../commands/command.types'
 import type { ScreenStatePolicy } from '../screen-state-policy.types'
 
@@ -8,7 +8,7 @@ vi.spyOn(crypto, 'randomUUID').mockReturnValue('00000000-0000-0000-0000-00000000
 // Mock Date.now for deterministic snapshots
 vi.spyOn(Date, 'now').mockReturnValue(1715068800000)
 
-describe('resolveScreenModel', () => {
+describe('resolveScreenProjection', () => {
   const mockCommands: ScreenCommand[] = [
     {
       key: 'save',
@@ -54,7 +54,7 @@ describe('resolveScreenModel', () => {
   }
 
   it('should resolve a valid model for DRAFT state', () => {
-    const model = resolveScreenModel({
+    const model = resolveScreenProjection({
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'DRAFT',
@@ -73,7 +73,7 @@ describe('resolveScreenModel', () => {
   })
 
   it('should resolve a valid model for RELEASED state', () => {
-    const model = resolveScreenModel({
+    const model = resolveScreenProjection({
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'RELEASED',
@@ -90,7 +90,7 @@ describe('resolveScreenModel', () => {
   })
 
   it('should filter out hidden commands in the projection', () => {
-    const model = resolveScreenModel({
+    const model = resolveScreenProjection({
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'RELEASED',
@@ -104,7 +104,7 @@ describe('resolveScreenModel', () => {
   })
 
   it('[SBI-01] should produce a 100% JSON-serializable model with no reactive refs or functions', () => {
-    const model = resolveScreenModel({
+    const model = resolveScreenProjection({
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'DRAFT',

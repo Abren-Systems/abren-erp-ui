@@ -5,14 +5,14 @@ import type {
   FieldStateOverride,
   SectionStateOverride,
 } from './screen-state-policy.types'
-import type { ScreenModel, CommandProjection } from './screen-model.types'
+import type { ScreenProjection, CommandProjection } from './screen-projection.types'
 
 /**
- * resolveScreenModel
+ * resolveScreenProjection
  *
  * The single pure function that produces the entire deterministic rendering
  * contract for a screen. Composes domain constraint interpretation and
- * UI presentation derivation into one serializable ScreenModel.
+ * UI presentation derivation into one serializable ScreenProjection.
  *
  * Rules:
  * - No Vue reactivity (no refs, no computed, no watchers)
@@ -20,7 +20,7 @@ import type { ScreenModel, CommandProjection } from './screen-model.types'
  * - 100% JSON-serializable output (zero functions)
  * - Fully testable via snapshot assertions
  */
-export function resolveScreenModel<TState extends string, TFieldKey extends string>(input: {
+export function resolveScreenProjection<TState extends string, TFieldKey extends string>(input: {
   screenId: string
   commands: readonly ScreenCommand[]
   domainState: TState
@@ -34,7 +34,7 @@ export function resolveScreenModel<TState extends string, TFieldKey extends stri
   projectionId?: string
   timestamp?: number
   grids?: Record<string, unknown>
-}): ScreenModel {
+}): ScreenProjection {
   const { screenId, commands, domainState, availableActions, statePolicy } = input
 
   // ── 1. Domain Constraints (backend-derived truth) ──

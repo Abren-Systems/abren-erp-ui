@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ScreenController } from '@/platform/screen-runtime/screen-controller.types'
-import type { CommandProjection } from '@/platform/screen-runtime/screen-model.types'
+import type { CommandProjection } from '@/platform/screen-runtime/screen-projection.types'
 import type { ScreenCommand } from '@/platform/commands/command.types'
 
 export interface CommandBinding {

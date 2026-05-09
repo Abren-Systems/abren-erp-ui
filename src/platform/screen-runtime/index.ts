@@ -28,8 +28,8 @@ export type {
   StateBehavior,
   FieldStateOverride,
 } from './screen-state-policy.types'
-export type { ScreenModel, CommandProjection } from './screen-model.types'
-export { resolveScreenModel } from './resolve-screen-model'
+export type { ScreenProjection, CommandProjection } from './screen-projection.types'
+export { resolveScreenProjection } from './resolve-screen-model'
 export {
   LIST_SCREEN_POLICY,
   listScreenDomainState,

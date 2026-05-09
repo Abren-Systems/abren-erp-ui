@@ -14,14 +14,14 @@ export interface CommandProjection {
 }
 
 /**
- * ScreenModel
+ * ScreenProjection
  *
  * The single deterministic rendering contract for a screen.
- * It is produced by a pure function mapping the Controller's state + metadata -> Screen Model.
+ * It is produced by a pure function mapping the Controller's state + metadata -> Screen Projection.
  *
  * 100% JSON-serializable, zero functions.
  */
-export interface ScreenModel {
+export interface ScreenProjection {
   readonly version: 1
   readonly meta: {
     readonly screenId: string

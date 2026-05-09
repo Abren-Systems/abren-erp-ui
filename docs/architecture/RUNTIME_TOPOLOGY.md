@@ -75,6 +75,7 @@ graph TD
 4.  **Projection Runtime**: The deterministic state layer.
     - **CONTRACT**: Payloads MUST be JSON-serializable (no classes, closures, or refs).
     - **IMMUTABILITY**: Projections are point-in-time snapshots.
+    - **ONTOLOGY**: This layer produces `ScreenProjection` and `WorkspaceProjection`.
 5.  **Semantic Runtime**: Derives canonical meaning (formatting, precision, policy traces).
     - **NON-MUTATION**: Derives instructions from projections but MUST NOT mutate the projection state itself.
 6.  **Rendering Runtime**: The DI boundary mapping abstract `rendererKey` strings to Vue components.
@@ -111,3 +112,4 @@ graph LR
 1.  **Timestamp Non-Authority**: Runtime timestamps (performance.now, Date.now) are **observational metadata only**. They MUST NOT participate in projection resolution, policy evaluation, or state transition logic.
 2.  **Sequential Revision**: Every projection lineage MUST have a monotonically increasing `projectionRevision`.
 3.  **Patch Totality**: Transitions MUST represent the total delta from the previous state via formal patch operations (`replace`, `remove`, `append`, `move`, `insert`, `truncate`).
+4.  **Projection Symmetry**: All state exposed to the rendering runtime MUST be derived from the projection.

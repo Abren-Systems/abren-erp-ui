@@ -25,7 +25,7 @@ export interface ScreenData<T = unknown> {
 }
 
 import type { ScreenDefinition } from './screen-definition.types'
-import type { ScreenModel } from './screen-model.types'
+import type { ScreenProjection } from './screen-projection.types'
 
 export interface ControllerCommand {
   /** Execute this command */
@@ -52,7 +52,7 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
   readonly state: ScreenStateMachine<TDomain>
 
   /** The unified screen model — single deterministic rendering contract */
-  readonly model: ComputedRef<ScreenModel>
+  readonly model: ComputedRef<ScreenProjection>
 
   /** Whether the data source is loading */
   readonly isLoading: Ref<boolean>

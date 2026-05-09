@@ -16,6 +16,8 @@ export const DRI01: Rule = {
 
     for (const importDecl of importDeclarations) {
       const moduleSpecifier = importDecl.getModuleSpecifierValue()
+      if (importDecl.isTypeOnly()) continue
+
       if (moduleSpecifier.includes('./controller') || moduleSpecifier.includes('../controller')) {
         context.report({
           code: 'DRI-01',
