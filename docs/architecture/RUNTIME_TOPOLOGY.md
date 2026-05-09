@@ -31,19 +31,18 @@ graph TD
         D_S[ScreenDefinition]
     end
 
-    subgraph "3. Pure Resolution Engine"
+    subgraph "3. Projection Resolution Pipeline"
         R[Resolvers]
+        Sem[Semantic Resolution]
+        Cap[Capability Resolution]
+        Proj[Projection Emission]
+
+        R --> Sem
+        Sem --> Cap
+        Cap --> Proj
     end
 
-    subgraph "4. Deterministic Projection"
-        P[Projection Runtime]
-    end
-
-    subgraph "5. Canonical Meaning"
-        Sem[Semantic Runtime]
-    end
-
-    subgraph "6. Presentation Boundary"
+    subgraph "4. Presentation Boundary"
         Ren[Rendering Runtime]
         Pres[Presentation Layer]
     end
@@ -53,33 +52,25 @@ graph TD
     CR -- Mutation --> R
     D --> R
 
-    R --> P
-    P --> Sem
-
-    Sem --> Ren
+    Proj --> Ren
     Ren --> Pres
 
     style "2. Static Authority (Contracts)" fill:#1a472a,stroke:#2d6a4f,color:#fff
-    style "4. Deterministic Projection" fill:#1b3a4b,stroke:#3d5a80,color:#fff
-    style "5. Canonical Meaning" fill:#3d2b1f,stroke:#6b4226,color:#fff
-    style "6. Presentation Boundary" fill:#2d3a3a,stroke:#556b6b,color:#fff
+    style "3. Projection Resolution Pipeline" fill:#1b3a4b,stroke:#3d5a80,color:#fff
+    style "4. Presentation Boundary" fill:#2d3a3a,stroke:#556b6b,color:#fff
 ```
 
 ### Layer Constraints
 
 1.  **Definitions**: Purely declarative. Cannot import Vue, cannot have state.
 2.  **Command Runtime**: Orchestrates mutations. Must result in a discrete state change that triggers Resolver re-evaluation.
-3.  **Resolvers**: Pure synchronous derivation functions.
-    - **BAN**: No network requests, no `setTimeout`, no Vue reactivity.
-    - **PURITY**: MUST NOT mutate external state or registries.
-4.  **Projection Runtime**: The deterministic state layer.
+3.  **Projection Resolution Pipeline**: The deterministic state + meaning layer.
     - **CONTRACT**: Payloads MUST be JSON-serializable (no classes, closures, or refs).
-    - **IMMUTABILITY**: Projections are point-in-time snapshots.
-    - **ONTOLOGY**: This layer produces `ScreenProjection` and `WorkspaceProjection`.
-5.  **Semantic Runtime**: Derives canonical meaning (formatting, precision, policy traces).
-    - **NON-MUTATION**: Derives instructions from projections but MUST NOT mutate the projection state itself.
-6.  **Rendering Runtime**: The DI boundary mapping abstract `rendererKey` strings to Vue components.
-7.  **Presentation Layer**:
+    - **IMMUTABILITY**: Projections are point-in-time snapshots of the _entire_ world (state + semantics + capabilities).
+    - **SEMANTIC AUTHORITY**: Projections are "Born Semantic." Canonical meaning (precision, formatting, visibility) is resolved _during_ projection, not rendering.
+    - **PURITY**: Resolvers MUST NOT mutate external state or registries.
+4.  **Rendering Runtime**: The DI boundary mapping abstract `rendererKey` strings to Vue components.
+5.  **Presentation Layer**:
     - **ROLE**: May manage ephemeral UI state (hover, focus, local toggle), but MUST NOT perform business, semantic, workflow, or policy resolution.
 
 ---
