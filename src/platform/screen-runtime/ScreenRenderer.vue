@@ -12,7 +12,7 @@ import {
 import type { EffectScope, PropType } from 'vue'
 import { useRoute } from 'vue-router'
 import { screenRegistry } from './screen-registry'
-import { AppSidePanel } from '@/shared/components/workspace'
+import AppSidePane from '@/shared/components/AppSidePane.vue'
 import { AppButton } from '@/shared/components/primitives'
 import ListTitleBar from '@/platform/chrome/ListTitleBar.vue'
 import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
@@ -198,7 +198,7 @@ const sidePanelContract = computed(() => {
     </div>
 
     <!-- Platform Side Panel -->
-    <AppSidePanel v-if="sidePanelContract" :contract="sidePanelContract" />
+    <AppSidePane v-if="sidePanelContract" :contract="sidePanelContract" />
   </div>
   <div v-else class="flex items-center justify-center h-full text-danger-500 font-medium">
     Screen Definition Not Found: {{ screenId }}

@@ -144,6 +144,22 @@ Main Menu click → Center Area enters WORKSPACE VIEW (tiles/links)
 
 > **Business Date is critical for a financial ERP.** All transaction records use the Business Date as their default date — not `new Date()`. This is a user-overridable system concept.
 
+### Workspace Anatomy (Center Area State A)
+
+The Workspace is a navigation-centric view that appears when a module is selected in the Main Menu. It consists of the following elements:
+
+| Element                  | Purpose                                                                         | Abren Status      |
+| ------------------------ | ------------------------------------------------------------------------------- | ----------------- |
+| **Module Title**         | Large header with the module name (e.g., "Finance").                            | ❌ WorkspacePanel |
+| **Add to Favorites**     | Star icon next to title to pin/unpin the module workspace.                      | ❌ WorkspacePanel |
+| **Workspace Search**     | Local search input to filter links within the current workspace.                | ❌ WorkspacePanel |
+| **Show All Toggle**      | Toggle between "Quick Links" (curated) and "All Items" (full module menu).      | ❌ WorkspacePanel |
+| **Workspace Tiles**      | Large, iconic buttons for high-frequency entry points (e.g., "New Invoice").    | ❌ WorkspacePanel |
+| **Workspace Categories** | Vertical columns of links grouped by functional category (e.g., "Maintenance"). | ❌ WorkspacePanel |
+
+> [!IMPORTANT]
+> **No Dashboards in Workspaces.** In the Modern UI, Workspaces are for navigation. Business metrics (KPIs, Charts) belong in **Dashboards** (State B content kind), not in the Workspace View.
+
 ---
 
 ## 3. Form Kinds (What Appears in the Working Area)

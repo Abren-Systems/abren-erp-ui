@@ -80,11 +80,13 @@ Repeatable screen structure compositions that implement [Acumatica Form Anatomy]
 | `FormToolbar`        | Part 2: Form Toolbar      | Standard buttons + Expected Next + More Menu             | ✅ Built     |
 | `MoreMenu`           | Part 2: More Menu         | Categorized commands, favorites, expected next indicator | ✅ Built     |
 | `RecordServicesMenu` | Part 1: Title Bar buttons | Notes, Files, Activities, Settings                       | ⚠️ Planning  |
-| `WorkspacePanel`     | Workspace overlay         | Categorized links to forms/reports/dashboards            | ❌ Not built |
+| `WorkspaceTitleBar`  | Workspace Title Bar       | Module title, favorite star, local search, Show All      | ❌ Not built |
+| `WorkspaceTiles`     | Workspace Tiles           | Grid of large visual entry points                        | ❌ Not built |
+| `WorkspaceLinks`     | Workspace Link Categories | Categorized columns of functional links                  | ❌ Not built |
 | `EmptyState`         | —                         | Empty record/list placeholder                            | ✅ Built     |
 
-> [!WARNING]
-> **PageHeader is banned from Screen Runtime.** `PageHeader` is strictly a workspace-level component. It must never be used as screen chrome. List screens must use `ListTitleBar`. Form screens must use `FormTitleBar`.
+> [!IMPORTANT]
+> **Page Chrome is non-negotiable.** List screens must use `ListTitleBar`. Form screens must use `FormTitleBar`. Module landing pages (State A) use the `Workspace*` component family. Dashboards use a dedicated widget grid.
 
 ### 2.3 Field System Layer (Working Area)
 
