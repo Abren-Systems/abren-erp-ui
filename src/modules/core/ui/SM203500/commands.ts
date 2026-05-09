@@ -1,9 +1,9 @@
 import type { ScreenCommand } from '@/platform/commands/command.types'
 
 /**
- * CR102000 Command Registry
+ * SM203500 Command Registry
  */
-export const CR102000_COMMANDS: Record<string, ScreenCommand> = {
+export const SM203500_COMMANDS: Record<string, ScreenCommand> = {
   bulkEdit: {
     key: 'bulkEdit',
     labelKey: 'Edit Settings',
@@ -12,4 +12,4 @@ export const CR102000_COMMANDS: Record<string, ScreenCommand> = {
   },
 }
 
-export const CR102000_COMMANDS_LIST = Object.values(CR102000_COMMANDS)
+export const SM203500_COMMANDS_LIST = Object.values(SM203500_COMMANDS)

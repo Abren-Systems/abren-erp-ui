@@ -1,9 +1,9 @@
 import type { ScreenCommand } from '@/platform/commands/command.types'
 
 /**
- * CR101000 Command Registry
+ * SM201100 Command Registry
  */
-export const CR101000_COMMANDS: Record<string, ScreenCommand> = {
+export const SM201100_COMMANDS: Record<string, ScreenCommand> = {
   create: {
     key: 'create',
     labelKey: 'Add Role',
@@ -17,4 +17,4 @@ export const CR101000_COMMANDS: Record<string, ScreenCommand> = {
   },
 }
 
-export const CR101000_COMMANDS_LIST = Object.values(CR101000_COMMANDS)
+export const SM201100_COMMANDS_LIST = Object.values(SM201100_COMMANDS)

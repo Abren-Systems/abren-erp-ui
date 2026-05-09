@@ -2,23 +2,21 @@ import { useWorkflowInboxController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
-import { WF301000_COMMANDS } from './commands'
+import { EP503010_COMMANDS } from './commands'
 
 /**
- * WF301000 - Workflow Inbox
- * Architecture Note: This is a cross-cutting action dispatcher.
- * It is NOT a standard domain state owner.
+ * EP503010 - Approvals
  */
-export const WF301000: ScreenDefinition = {
-  id: createScreenId('WF301000'),
+export const EP503010: ScreenDefinition = {
+  id: createScreenId('EP503010'),
   moduleId: 'workflows' as ModuleId,
   controller: () => useWorkflowInboxController(),
-  kind: 'processing', // Modeled as processing/workboard dispatcher
-  titleKey: 'Workflow Inbox',
+  kind: 'processing',
+  titleKey: 'Approvals',
   primaryView: 'inbox',
   route: {
-    path: 'inbox',
-    name: 'workflows.inbox',
+    path: 'approvals',
+    name: 'EPApprovals',
   },
   permissions: [{ key: 'workflows.inbox.view', description: 'View workflow inbox' }],
   layout: {
@@ -33,7 +31,7 @@ export const WF301000: ScreenDefinition = {
       queryKey: ['workflows', 'inbox'] as const,
     },
   },
-  commands: Object.values(WF301000_COMMANDS),
+  commands: Object.values(EP503010_COMMANDS),
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,

@@ -5,7 +5,7 @@ import {
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
-import { CR201000 } from './screen'
+import { SM201010 } from './screen'
 import { useUsers } from '../../application/useUsers'
 import { useRoles } from '../../application/useRoles'
 import type { User } from '../../domain/user.types'
@@ -16,7 +16,7 @@ export function useUsersController() {
   const { roles, isRolesPending } = useRoles()
 
   const base = useScreenController<{ users: User[] }, 'VIEW'>({
-    screen: CR201000,
+    screen: SM201010,
     dataSource: {
       entity: computed(() => ({ users: users.value || [] })),
       isLoading: isPending,

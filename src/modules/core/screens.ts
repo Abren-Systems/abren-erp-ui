@@ -1,5 +1,5 @@
-import { CR201000 } from './ui/CR201000/screen'
-import { CR101000 } from './ui/CR101000/screen'
-import { CR102000 } from './ui/CR102000/screen'
+import { SM201010 } from './ui/SM201010/screen'
+import { SM201100 } from './ui/SM201100/screen'
+import { SM203500 } from './ui/SM203500/screen'
 
-export const coreScreens = [CR201000, CR101000, CR102000]
+export const coreScreens = [SM201010, SM201100, SM203500]

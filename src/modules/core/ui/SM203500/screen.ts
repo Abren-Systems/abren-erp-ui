@@ -1,12 +1,12 @@
 import type { ModuleId } from '@/shared/types/brand.types'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import { CR102000_COMMANDS_LIST } from './commands'
+import { SM203500_COMMANDS_LIST } from './commands'
 import { useTenantSettingsController } from './controller'
 
-export const CR102000: ScreenDefinition = {
-  id: createScreenId('CR102000'),
-  titleKey: 'core.CR102000.title',
+export const SM203500: ScreenDefinition = {
+  id: createScreenId('SM203500'),
+  titleKey: 'Companies',
   kind: 'setup',
   moduleId: 'core' as ModuleId,
 
@@ -33,7 +33,7 @@ export const CR102000: ScreenDefinition = {
 
   route: {
     path: 'tenants',
-    name: 'CoreTenants',
+    name: 'SMCompanies',
   },
 
   layout: {
@@ -41,7 +41,7 @@ export const CR102000: ScreenDefinition = {
     renderTarget: () => import('./view.vue'),
   },
 
-  commands: CR102000_COMMANDS_LIST,
+  commands: SM203500_COMMANDS_LIST,
 
   personalization: {
     allowTabPersonalization: false,

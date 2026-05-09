@@ -1,4 +1,4 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import { WF301000 } from './ui/WF301000/screen'
+import { EP503010 } from './ui/EP503010/screen'
 
-export const workflowScreens: readonly ScreenDefinition[] = [WF301000]
+export const workflowScreens: readonly ScreenDefinition[] = [EP503010]

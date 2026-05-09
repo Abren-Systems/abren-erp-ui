@@ -1,12 +1,12 @@
 import { useRolesController } from './controller'
-import { CR101000_COMMANDS_LIST } from './commands'
+import { SM201100_COMMANDS_LIST } from './commands'
 import type { ModuleId } from '@/shared/types/brand.types'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 
-export const CR101000: ScreenDefinition = {
-  id: createScreenId('CR101000'),
-  titleKey: 'core.CR101000.title',
+export const SM201100: ScreenDefinition = {
+  id: createScreenId('SM201100'),
+  titleKey: 'User Roles',
   kind: 'setup',
   moduleId: 'core' as ModuleId,
 
@@ -33,7 +33,7 @@ export const CR101000: ScreenDefinition = {
 
   route: {
     path: 'roles',
-    name: 'CoreRoles',
+    name: 'SMRoles',
   },
 
   layout: {
@@ -41,7 +41,7 @@ export const CR101000: ScreenDefinition = {
     renderTarget: () => import('./view.vue'),
   },
 
-  commands: CR101000_COMMANDS_LIST,
+  commands: SM201100_COMMANDS_LIST,
 
   personalization: {
     allowTabPersonalization: false,

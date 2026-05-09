@@ -9,8 +9,8 @@ export const workflowsModule: PlatformEngine = {
   permissions: ['workflows:view', 'workflows:approve'],
   menuItems: [
     {
-      label: 'Inbox',
-      route: 'workflows.inbox',
+      label: 'Approvals',
+      route: 'EPApprovals',
       icon: 'inbox',
       permissions: ['workflows:view'],
     },

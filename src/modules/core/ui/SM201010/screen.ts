@@ -1,13 +1,13 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
-import { CR201000_COMMANDS_LIST } from './commands'
+import { SM201010_COMMANDS_LIST } from './commands'
 import { useUsersController } from './controller'
 
-export const CR201000: ScreenDefinition = {
-  id: createScreenId('CR201000'),
-  titleKey: 'core.CR201000.title',
-  kind: 'setup',
+export const SM201010: ScreenDefinition = {
+  id: createScreenId('SM201010'),
+  titleKey: 'Users',
+  kind: 'maintenance',
   moduleId: 'core' as ModuleId,
 
   controller: () => useUsersController(),
@@ -33,7 +33,7 @@ export const CR201000: ScreenDefinition = {
 
   route: {
     path: 'users',
-    name: 'CoreUsers',
+    name: 'SMUsers',
   },
 
   layout: {
@@ -41,7 +41,7 @@ export const CR201000: ScreenDefinition = {
     renderTarget: () => import('./view.vue'),
   },
 
-  commands: CR201000_COMMANDS_LIST,
+  commands: SM201010_COMMANDS_LIST,
 
   personalization: {
     allowTabPersonalization: false,

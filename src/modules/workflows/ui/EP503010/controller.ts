@@ -7,7 +7,7 @@ import {
 } from '@/platform/screen-runtime'
 import { usePendingApprovals } from '../../application/usePendingApprovals'
 import { useApprovalAction } from '../../application/useApprovalAction'
-import { WF301000 } from './screen'
+import { EP503010 } from './screen'
 import type { PendingApproval } from '../../domain/workflows.types'
 
 export function useWorkflowInboxController() {
@@ -16,7 +16,7 @@ export function useWorkflowInboxController() {
   const { mutateAsync: submitAction, isPending: isSubmitting } = useApprovalAction()
 
   const base = useScreenController<PendingApproval[], 'VIEW'>({
-    screen: WF301000,
+    screen: EP503010,
     dataSource: {
       entity: tasks,
       isLoading,
