@@ -7,9 +7,12 @@ import { h } from 'vue'
 const props = defineProps<{
   lines: ARInvoiceLine[]
   readonly: boolean
-  onUpdate: (index: number, patch: Partial<ARInvoiceLine>) => void
-  onRemove: (index: number) => void
-  onAdd: () => void
+}>()
+
+const emit = defineEmits<{
+  (e: 'update', index: number, patch: Partial<ARInvoiceLine>): void
+  (e: 'remove', index: number): void
+  (e: 'add'): void
 }>()
 
 const columnHelper = createColumnHelper<ARInvoiceLine>()
@@ -24,7 +27,7 @@ const columns = [
             class: 'grid-input',
             value: info.getValue(),
             onInput: (e: Event) =>
-              props.onUpdate(info.row.index, { description: (e.target as HTMLInputElement).value }),
+              emit('update', info.row.index, { description: (e.target as HTMLInputElement).value }),
           }),
   }),
   columnHelper.accessor('quantity', {
@@ -37,7 +40,7 @@ const columns = [
             class: 'grid-input text-right',
             value: info.getValue(),
             onInput: (e: Event) =>
-              props.onUpdate(info.row.index, {
+              emit('update', info.row.index, {
                 quantity: Number((e.target as HTMLInputElement).value),
               }),
           }),
@@ -52,14 +55,17 @@ const columns = [
             class: 'grid-input text-right',
             value: info.getValue(),
             onInput: (e: Event) =>
-              props.onUpdate(info.row.index, {
+              emit('update', info.row.index, {
                 unitPrice: Number((e.target as HTMLInputElement).value),
               }),
           }),
   }),
   columnHelper.accessor('amount', {
     header: 'Amount',
-    cell: (info) => info.getValue().toLocaleString(undefined, { minimumFractionDigits: 2 }),
+    cell: (info) =>
+      info.getValue()
+        ? info.getValue().toLocaleString(undefined, { minimumFractionDigits: 2 })
+        : '0.00',
   }),
   columnHelper.display({
     id: 'actions',
@@ -69,7 +75,7 @@ const columns = [
         'button',
         {
           class: 'btn-icon-danger',
-          onClick: () => props.onRemove(info.row.index),
+          onClick: () => emit('remove', info.row.index),
         },
         [h(Trash2, { class: 'w-4 h-4' })],
       ),
@@ -88,7 +94,7 @@ const table = useVueTable({
 <template>
   <div class="grid-container">
     <div class="grid-toolbar" v-if="!readonly">
-      <button class="btn-secondary btn-sm flex items-center gap-2" @click="onAdd">
+      <button class="btn-secondary btn-sm flex items-center gap-2" @click="emit('add')">
         <Plus class="w-4 h-4" />
         Add Line
       </button>

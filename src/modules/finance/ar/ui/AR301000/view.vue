@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { inject } from 'vue'
-import { ScreenControllerKey } from '@/platform/screen-runtime/injection-keys'
+import { useScreenControllerContext } from '@/platform/screen-runtime'
 import type { useARInvoiceController } from './controller'
-import { useField } from '@/platform/field-system/bindings/useField'
 import AppTemplate from '@/platform/chrome/AppTemplate.vue'
 import AppFieldset from '@/shared/components/field-system/AppFieldset.vue'
 import AppField from '@/shared/components/field-system/AppField.vue'
@@ -16,33 +14,22 @@ const props = defineProps<{
 /**
  * AUTHORITATIVE INJECTION
  *
- * We no longer instantiate the controller here. We 'inject' it from
- * the ScreenRenderer (Stage C). This satisfies EOI-01.
+ * Safely injects the controller and automatically unwraps the ref,
+ * enforcing the ScreenRenderer boundary constraint.
  */
-const controller = inject(ScreenControllerKey) as ReturnType<typeof useARInvoiceController>
-
-if (!controller) {
-  throw new Error('[AR301000] Controller not provided by platform.')
-}
-
-// ── Field Bindings ──
-const customerId = useField(controller, { key: 'customerId', type: 'text', label: 'Customer ID' })
-const docDate = useField(controller, { key: 'date', type: 'date', label: 'Date' })
-const currency = useField(controller, { key: 'currencyId', type: 'text', label: 'Currency' })
-const amount = useField(controller, { key: 'docAmount', type: 'number', label: 'Total Amount' })
-const status = useField(controller, { key: 'status', type: 'text', label: 'Status' })
+const ctrl = useScreenControllerContext<ReturnType<typeof useARInvoiceController>>()
 </script>
 
 <template>
-  <AppTemplate :controller="controller">
+  <AppTemplate :controller="ctrl">
     <template #header>
       <AppFieldset title="Document Summary">
         <div class="header-grid">
-          <AppField v-bind="status" :semantic="SemanticKind.Status" />
-          <AppField v-bind="customerId" />
-          <AppField v-bind="docDate" />
-          <AppField v-bind="currency" />
-          <AppField v-bind="amount" :semantic="SemanticKind.Money" />
+          <AppField v-bind="ctrl.fields.status" :semantic="SemanticKind.Status" />
+          <AppField v-bind="ctrl.fields.customerId" />
+          <AppField v-bind="ctrl.fields.date" />
+          <AppField v-bind="ctrl.fields.currencyId" />
+          <AppField v-bind="ctrl.fields.docAmount" :semantic="SemanticKind.Money" />
         </div>
       </AppFieldset>
     </template>
@@ -50,32 +37,39 @@ const status = useField(controller, { key: 'status', type: 'text', label: 'Statu
     <template #default>
       <div class="ar-invoice-content">
         <AppFieldset title="Details">
+          <!-- 
+            GRID RENDERER
+            Strictly consumes state from the deterministic projection `ctrl.model.value.ui.grids.state`
+            and dispatches intents back to the controller via Vue emits.
+          -->
           <ARInvoiceGrid
-            :lines="controller.dataSource.entity.value.lines"
-            :readonly="controller.isReleased.value"
-            @update="controller.updateLine"
-            @remove="controller.removeLine"
-            @add="controller.addLine"
+            :lines="ctrl.model.value.ui.grids.state.lines as any[]"
+            :readonly="!ctrl.model.value.domain.capabilities.canEdit"
+            @update="ctrl.updateLine"
+            @remove="ctrl.removeLine"
+            @add="ctrl.addLine"
           />
         </AppFieldset>
 
         <div class="totals-section">
           <div class="totals-card">
+            <!-- 
+              SEMANTIC AGGREGATES
+              Also consumed purely from the projection grids state to maintain
+              topological purity (View only reads Projection).
+            -->
             <div class="total-row">
               <span>Subtotal:</span>
-              <span class="font-mono">{{
-                controller.totals.value.subtotal.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                })
-              }}</span>
+              <span class="font-mono">
+                <!-- Using basic formatting here, ideally handled by a semantic component -->
+                {{ (ctrl.model.value.ui.grids.state.totals as any).subtotal }}
+              </span>
             </div>
             <div class="total-row grand-total">
               <span>Total:</span>
-              <span class="font-mono">{{
-                controller.totals.value.total.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                })
-              }}</span>
+              <span class="font-mono">
+                {{ (ctrl.model.value.ui.grids.state.totals as any).total }}
+              </span>
             </div>
           </div>
         </div>

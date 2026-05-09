@@ -1,4 +1,4 @@
-import type { ScreenDefinition, ScreenController } from '@/platform/screen-runtime'
+import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
 import { useARInvoiceController } from './controller'
@@ -9,11 +9,7 @@ export const AR301000: ScreenDefinition = {
   kind: 'dataEntry',
   titleKey: 'Invoices and Memos',
   primaryView: 'invoice',
-  controller: (ctx) =>
-    useARInvoiceController(ctx.params['id'] as string) as unknown as ScreenController<
-      unknown,
-      string
-    >,
+  controller: (ctx) => useARInvoiceController(ctx.params['id'] as string),
   route: {
     path: 'invoice/:id?',
     name: 'ARInvoice',
