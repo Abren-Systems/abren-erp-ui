@@ -20,6 +20,14 @@ export function useAccountListController() {
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,
+    grids: computed(() => ({
+      primary: {
+        data: accounts.value || [],
+        columns: [], // We'll add this later if needed
+        selection: gridState.rowSelection.value,
+        filters: {},
+      },
+    })),
   })
 
   function handleRowClick(row: { id: string }) {

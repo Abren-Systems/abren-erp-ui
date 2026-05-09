@@ -46,7 +46,6 @@ const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @
             <AppField v-bind="ctrl.fields.requesterId" />
             <AppField
               v-bind="ctrl.fields.beneficiaryId"
-              :mode="ctrl.state.isEditable ? 'edit' : 'read'"
               :editor-attrs="{ options: ctrl.userOptions.value }"
             />
             <AppField
@@ -58,16 +57,12 @@ const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @
 
           <FieldGroup>
             <AppField v-bind="ctrl.fields.submittedAt" />
-            <AppField
-              v-bind="ctrl.fields.justification"
-              :mode="ctrl.state.isEditable ? 'edit' : 'read'"
-            />
+            <AppField v-bind="ctrl.fields.justification" />
           </FieldGroup>
 
           <FieldGroup>
             <AppField
               v-bind="ctrl.fields.currency"
-              :mode="ctrl.state.isEditable ? 'edit' : 'read'"
               :editor-attrs="{ options: ctrl.currencyOptions.value }"
             />
             <AppField v-bind="ctrl.fields.totalAmount" />

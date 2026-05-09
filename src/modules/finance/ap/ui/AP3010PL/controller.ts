@@ -13,43 +13,16 @@ import { useUsers } from '@/modules/core/application/useUsers'
 import type { User } from '@/modules/core/domain/user.types'
 import { Money } from '@/shared/domain/money'
 import { useDataGrid } from '@/shared/components/data-grid'
-import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
 import { createPaymentRequestColumns } from './grids/primary.grid'
 import { PAYMENT_REQUEST_STATUS_OPTIONS, PAYMENT_REQUEST_FILTER_PRESETS } from '../AP301000/fields'
 import { AP3010PL } from './screen'
+import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
 
 export function usePaymentRequestList() {
   const router = useRouter()
   const { hasPermission } = usePermissions()
   const { requests, isLoading, error, refetch } = usePaymentRequests()
   const { users } = useUsers()
-
-  const base = useScreenController<PaymentRequest[], 'VIEW'>({
-    screen: AP3010PL,
-    dataSource: {
-      entity: requests,
-      isLoading,
-      error,
-    },
-    isNew: computed(() => false),
-    getDomainState: listScreenDomainState,
-    statePolicy: LIST_SCREEN_POLICY,
-  })
-
-  // Register Commands
-  base.registerCommand('create', {
-    execute: async () => {
-      void router.push({ name: 'PaymentRequestDetail', params: { id: 'new' } })
-    },
-    isPending: computed(() => false),
-  })
-
-  base.registerCommand('refresh', {
-    execute: async () => {
-      await refetch()
-    },
-    isPending: isLoading,
-  })
 
   // ── Data Grid State ──
   const gridState = useDataGrid()
@@ -160,6 +133,42 @@ export function usePaymentRequestList() {
   function clearSelection() {
     gridState.rowSelection.value = {}
   }
+
+  const base = useScreenController<PaymentRequest[], 'VIEW'>({
+    screen: AP3010PL,
+    dataSource: {
+      entity: requests,
+      isLoading,
+      error,
+    },
+    isNew: computed(() => false),
+    getDomainState: listScreenDomainState,
+    statePolicy: LIST_SCREEN_POLICY,
+    grids: computed(() => ({
+      primary: {
+        columns,
+        data: filteredRequests.value,
+        selectedCount: selectedCount.value,
+        selection: gridState.rowSelection.value,
+        filters: filterState.value,
+      },
+    })),
+  })
+
+  // Register Commands
+  base.registerCommand('create', {
+    execute: async () => {
+      void router.push({ name: 'PaymentRequestDetail', params: { id: 'new' } })
+    },
+    isPending: computed(() => false),
+  })
+
+  base.registerCommand('refresh', {
+    execute: async () => {
+      await refetch()
+    },
+    isPending: isLoading,
+  })
 
   return {
     ...base,
