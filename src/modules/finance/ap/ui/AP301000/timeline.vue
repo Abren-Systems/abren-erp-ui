@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// arch-guard-disable PII-02
-import { computed } from 'vue'
 import { Clock } from 'lucide-vue-next'
 import { AppBadge } from '@/shared/components/primitives'
 import { BusinessDate } from '@/shared/domain/business-date'
@@ -23,7 +21,7 @@ interface TimelineStep {
   sub: string
 }
 
-const steps = computed(() => {
+function getSteps() {
   const currentStatus = props.request.status
 
   const allSteps: TimelineStep[] = [
@@ -69,7 +67,7 @@ const steps = computed(() => {
     if (s.status === 'AUTHORIZED') return ['AUTHORIZED', 'APPROVED'].includes(currentStatus)
     return false
   })
-})
+}
 
 const getVariant = (stepStatus: string) => {
   const current = props.request.status
@@ -100,7 +98,7 @@ const getVariant = (stepStatus: string) => {
       <!-- Vertical Connector Line -->
       <div class="absolute left-[7px] top-2 bottom-2 w-px bg-neutral-100" aria-hidden="true" />
 
-      <div v-for="(step, index) in steps" :key="index" class="relative pl-7 group">
+      <div v-for="(step, index) in getSteps()" :key="index" class="relative pl-7 group">
         <!-- Timeline Dot -->
         <div
           class="absolute left-0 top-1.5 h-[14px] w-[14px] rounded-full border-2 border-white shadow-sm ring-1 ring-neutral-200 transition-transform group-hover:scale-125"

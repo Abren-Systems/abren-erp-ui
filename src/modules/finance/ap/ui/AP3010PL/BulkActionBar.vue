@@ -1,11 +1,9 @@
 <script setup lang="ts">
-// arch-guard-disable PII-02
-import { ref, computed } from 'vue'
 import { AppButton, AppDialog, AppInput } from '@/shared/components/primitives'
 import { CheckCircle, XCircle, Download } from 'lucide-vue-next'
-import { useBulkPaymentRequestActions } from '../../application/useBulkPaymentRequestActions'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import type { PaymentRequest } from '../../domain/ap.types'
+import { useScreenControllerContext } from '@/platform/screen-runtime'
 
 const props = defineProps<{
   selectedIds: PaymentRequestId[]
@@ -16,47 +14,14 @@ const emit = defineEmits<{
   (e: 'clear-selection'): void
 }>()
 
-const {
-  approveMultiple,
-  rejectMultiple,
-  isPending: isBulkPending,
-  results: bulkResults,
-  computeCounts,
-  successCount,
-  failureCount,
-} = useBulkPaymentRequestActions()
-
-const selectedCount = computed(() => props.selectedIds.length)
-
-const bulkApproveOpen = ref(false)
-const bulkRejectOpen = ref(false)
-const bulkRejectReason = ref('')
-const bulkResultsOpen = ref(false)
+const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
 function handleBulkApprove() {
-  bulkApproveOpen.value = true
+  ctrl.bulkState.approveOpen.value = true
 }
 
 function handleBulkReject() {
-  bulkRejectOpen.value = true
-}
-
-async function confirmBulkApprove() {
-  bulkApproveOpen.value = false
-  const results = await approveMultiple(props.selectedIds)
-  computeCounts(results)
-  bulkResultsOpen.value = true
-  emit('clear-selection')
-}
-
-async function confirmBulkReject() {
-  if (!bulkRejectReason.value) return
-  bulkRejectOpen.value = false
-  const results = await rejectMultiple(props.selectedIds, bulkRejectReason.value)
-  computeCounts(results)
-  bulkRejectReason.value = ''
-  bulkResultsOpen.value = true
-  emit('clear-selection')
+  ctrl.bulkState.rejectOpen.value = true
 }
 
 function handleExport() {
@@ -67,7 +32,7 @@ function handleExport() {
   const csvRows = rows.map((r) => [
     r.requestNumber,
     r.status,
-    r.beneficiaryName ?? r.beneficiaryId,
+    r.beneficiaryId,
     r.currency,
     r.totalAmount.toNumber(),
     r.submittedAt ?? '',
@@ -96,15 +61,15 @@ function handleExport() {
       leave-to-class="opacity-0 translate-y-4"
     >
       <div
-        v-if="selectedCount > 0"
+        v-if="ctrl.selectedCount.value > 0"
         class="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-2xl bg-neutral-900 px-4 py-3 shadow-[0_20px_40px_rgba(15,23,42,0.2)] text-white z-10 border border-neutral-700"
       >
-        <span class="text-sm font-semibold mr-2">{{ selectedCount }} selected</span>
+        <span class="text-sm font-semibold mr-2">{{ ctrl.selectedCount.value }} selected</span>
         <AppButton
           variant="stealth"
           class="text-neutral-100 hover:text-white hover:bg-neutral-800"
           size="sm"
-          :disabled="isBulkPending"
+          :disabled="ctrl.isBulkPending.value"
           @click="handleBulkApprove"
         >
           <template #start><CheckCircle :size="14" /></template>
@@ -114,7 +79,7 @@ function handleExport() {
           variant="stealth"
           class="text-neutral-100 hover:text-white hover:bg-neutral-800"
           size="sm"
-          :disabled="isBulkPending"
+          :disabled="ctrl.isBulkPending.value"
           @click="handleBulkReject"
         >
           <template #start><XCircle :size="14" /></template>
@@ -136,7 +101,7 @@ function handleExport() {
 
     <!-- Bulk Processing Overlay -->
     <div
-      v-if="isBulkPending"
+      v-if="ctrl.isBulkPending.value"
       class="absolute inset-0 bg-white/60 flex items-center justify-center z-20 rounded-xl"
     >
       <div class="flex flex-col items-center gap-3">
@@ -144,69 +109,83 @@ function handleExport() {
           class="h-6 w-6 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"
         />
         <p class="text-sm font-medium text-neutral-700">
-          Processing {{ selectedCount }} individual actions…
+          Processing {{ ctrl.selectedCount.value }} individual actions…
         </p>
       </div>
     </div>
 
     <!-- Bulk Approve Confirmation -->
-    <AppDialog v-model:open="bulkApproveOpen" title="Confirm Individual Approvals" size="sm">
+    <AppDialog
+      v-model:open="ctrl.bulkState.approveOpen.value"
+      title="Confirm Individual Approvals"
+      size="sm"
+    >
       <p class="text-sm text-neutral-600">
-        You are about to process <strong>{{ selectedCount }}</strong> individual approval actions.
-        Each request will be approved separately — there is no combined transaction.
+        You are about to process <strong>{{ ctrl.selectedCount.value }}</strong> individual approval
+        actions. Each request will be approved separately — there is no combined transaction.
       </p>
       <template #footer>
-        <AppButton variant="outline" @click="bulkApproveOpen = false">Cancel</AppButton>
-        <AppButton variant="primary" @click="confirmBulkApprove">Approve All</AppButton>
+        <AppButton variant="outline" @click="ctrl.bulkState.approveOpen.value = false"
+          >Cancel</AppButton
+        >
+        <AppButton variant="primary" @click="ctrl.commands.value['executeBulkApprove']?.execute()"
+          >Approve All</AppButton
+        >
       </template>
     </AppDialog>
 
     <!-- Bulk Reject Confirmation -->
-    <AppDialog v-model:open="bulkRejectOpen" title="Reject Selected Requests" size="sm">
+    <AppDialog
+      v-model:open="ctrl.bulkState.rejectOpen.value"
+      title="Reject Selected Requests"
+      size="sm"
+    >
       <div class="space-y-4">
         <p class="text-sm text-neutral-600">
-          You are about to reject <strong>{{ selectedCount }}</strong> requests individually. Please
-          provide a reason.
+          You are about to reject <strong>{{ ctrl.selectedCount.value }}</strong> requests
+          individually. Please provide a reason.
         </p>
         <AppInput
-          v-model="bulkRejectReason"
+          v-model="ctrl.bulkState.rejectReason.value"
           placeholder="Reason for rejection (required)..."
           required
         />
       </div>
       <template #footer>
-        <AppButton variant="outline" @click="bulkRejectOpen = false">Cancel</AppButton>
+        <AppButton variant="outline" @click="ctrl.bulkState.rejectOpen.value = false"
+          >Cancel</AppButton
+        >
         <AppButton
           variant="primary"
           class="bg-danger-600 hover:bg-danger-700"
-          :disabled="!bulkRejectReason"
-          @click="confirmBulkReject"
+          :disabled="!ctrl.bulkState.rejectReason.value"
+          @click="ctrl.commands.value['executeBulkReject']?.execute()"
           >Reject All</AppButton
         >
       </template>
     </AppDialog>
 
     <!-- Bulk Results -->
-    <AppDialog v-model:open="bulkResultsOpen" title="Action Results" size="sm">
+    <AppDialog v-model:open="ctrl.bulkState.resultsOpen.value" title="Action Results" size="sm">
       <div class="space-y-3">
-        <div v-if="successCount > 0" class="flex items-center gap-2 text-sm">
+        <div v-if="ctrl.bulkSuccessCount.value > 0" class="flex items-center gap-2 text-sm">
           <CheckCircle :size="16" class="text-success-600" />
           <span class="text-neutral-700"
-            ><strong>{{ successCount }}</strong> succeeded</span
+            ><strong>{{ ctrl.bulkSuccessCount.value }}</strong> succeeded</span
           >
         </div>
-        <div v-if="failureCount > 0" class="flex items-center gap-2 text-sm">
+        <div v-if="ctrl.bulkFailureCount.value > 0" class="flex items-center gap-2 text-sm">
           <XCircle :size="16" class="text-danger-600" />
           <span class="text-neutral-700"
-            ><strong>{{ failureCount }}</strong> failed</span
+            ><strong>{{ ctrl.bulkFailureCount.value }}</strong> failed</span
           >
         </div>
-        <div v-if="failureCount > 0" class="space-y-1 mt-3">
+        <div v-if="ctrl.bulkFailureCount.value > 0" class="space-y-1 mt-3">
           <p class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
             Failed Items
           </p>
           <div
-            v-for="result in bulkResults.filter((r) => r.status === 'rejected')"
+            v-for="result in ctrl.bulkResults.value.filter((r: any) => r.status === 'rejected')"
             :key="result.id"
             class="text-xs text-danger-700 bg-danger-50 rounded-lg px-3 py-2"
           >
@@ -215,7 +194,9 @@ function handleExport() {
         </div>
       </div>
       <template #footer>
-        <AppButton variant="primary" @click="bulkResultsOpen = false">Close</AppButton>
+        <AppButton variant="primary" @click="ctrl.bulkState.resultsOpen.value = false"
+          >Close</AppButton
+        >
       </template>
     </AppDialog>
   </div>

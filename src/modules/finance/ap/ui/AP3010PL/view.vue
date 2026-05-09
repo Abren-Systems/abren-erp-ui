@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { useScreenControllerContext } from '@/platform/screen-runtime'
-import { inject } from 'vue'
 import { DataGrid, DataGridFilterSelector, DataGridFooter } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { ListFilter, Plus, RefreshCcw } from 'lucide-vue-next'
 import PaymentRequestBulkActionBar from './BulkActionBar.vue'
-import PaymentRequestFilterPane from './FilterPane.vue'
 
 const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
@@ -76,12 +74,6 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     />
 
     <!-- Sidebars -->
-    <PaymentRequestFilterPane
-      v-model:open="ctrl.isFilterOpen.value"
-      :initial-filters="ctrl.filterState.value"
-      :status-options="ctrl.statusOptions"
-      @apply="ctrl.filterState.value = $event"
-    />
   </div>
 </template>
 

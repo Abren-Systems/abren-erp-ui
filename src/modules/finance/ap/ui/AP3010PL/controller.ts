@@ -7,6 +7,7 @@ import {
 } from '@/platform/screen-runtime'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import { usePaymentRequests } from '../../application/usePaymentRequests'
+import { useBulkPaymentRequestActions } from '../../application/useBulkPaymentRequestActions'
 import type { PaymentRequest } from '../../domain/ap.types'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { useUsers } from '@/modules/core/application/useUsers'
@@ -29,14 +30,26 @@ export function usePaymentRequestList() {
 
   // ── Filter State ──
   const statusFilter = ref('all')
-  const isFilterOpen = ref(false)
-  const filterState = ref({
-    statuses: [] as string[],
-    dateFrom: '',
-    dateTo: '',
-  })
   const filterPresets = PAYMENT_REQUEST_FILTER_PRESETS
   const statusOptions = PAYMENT_REQUEST_STATUS_OPTIONS
+
+  // ── Bulk State ──
+  const {
+    approveMultiple,
+    rejectMultiple,
+    isPending: isBulkPending,
+    results: bulkResults,
+    computeCounts,
+    successCount: bulkSuccessCount,
+    failureCount: bulkFailureCount,
+  } = useBulkPaymentRequestActions()
+
+  const bulkState = {
+    approveOpen: ref(false),
+    rejectOpen: ref(false),
+    rejectReason: ref(''),
+    resultsOpen: ref(false),
+  }
 
   // ── Trace State ──
   const isTraceOpen = ref(false)
@@ -53,10 +66,6 @@ export function usePaymentRequestList() {
       data = data.filter((r) => ['DRAFT', 'REJECTED'].includes(r.status))
     } else if (statusFilter.value === 'in_review') {
       data = data.filter((r) => ['SUBMITTED', 'APPROVED', 'AUTHORIZED'].includes(r.status))
-    }
-
-    if (filterState.value.statuses.length > 0) {
-      data = data.filter((r) => filterState.value.statuses.includes(r.status))
     }
 
     return data.map((r) => {
@@ -126,7 +135,6 @@ export function usePaymentRequestList() {
 
   function clearFilters() {
     statusFilter.value = 'all'
-    filterState.value = { statuses: [], dateFrom: '', dateTo: '' }
     gridState.globalFilter.value = ''
   }
 
@@ -150,7 +158,6 @@ export function usePaymentRequestList() {
         data: filteredRequests.value,
         selectedCount: selectedCount.value,
         selection: gridState.rowSelection.value,
-        filters: filterState.value,
       },
     })),
   })
@@ -170,13 +177,36 @@ export function usePaymentRequestList() {
     isPending: isLoading,
   })
 
+  // Bulk Commands
+  base.registerCommand('executeBulkApprove', {
+    execute: async () => {
+      bulkState.approveOpen.value = false
+      const results = await approveMultiple(selectedIds.value)
+      computeCounts(results)
+      bulkState.resultsOpen.value = true
+      clearSelection()
+    },
+    isPending: isBulkPending,
+  })
+
+  base.registerCommand('executeBulkReject', {
+    execute: async () => {
+      if (!bulkState.rejectReason.value) return
+      bulkState.rejectOpen.value = false
+      const results = await rejectMultiple(selectedIds.value, bulkState.rejectReason.value)
+      computeCounts(results)
+      bulkState.rejectReason.value = ''
+      bulkState.resultsOpen.value = true
+      clearSelection()
+    },
+    isPending: isBulkPending,
+  })
+
   return {
     ...base,
     hasPermission,
     gridState,
     statusFilter,
-    isFilterOpen,
-    filterState,
     filterPresets,
     statusOptions,
     isTraceOpen,
@@ -190,5 +220,10 @@ export function usePaymentRequestList() {
     handleRowClick,
     clearFilters,
     clearSelection,
+    bulkState,
+    bulkResults,
+    bulkSuccessCount,
+    bulkFailureCount,
+    isBulkPending,
   }
 }
