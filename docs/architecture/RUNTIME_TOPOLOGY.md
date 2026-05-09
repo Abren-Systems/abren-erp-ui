@@ -106,3 +106,11 @@ graph LR
 
 - **Passive Subscriber**: The execution pipeline does NOT depend on the Transition Recorder.
 - **Immutable Timeline**: The Transition Recorder records discrete `RuntimeTransition`s (patches) and occasional `ProjectionCheckpoint`s. It never maintains global state like "active screen".
+
+---
+
+## 3. Determinism Rules
+
+1. **Timestamp Non-Authority**: Runtime timestamps (performance.now, Date.now) are **observational metadata only**. They MUST NOT participate in projection resolution, policy evaluation, or state transition logic.
+2. **Sequential Revision**: Every projection lineage MUST have a monotonically increasing `projectionRevision`.
+3. **Patch Totality**: Transitions MUST represent the total delta from the previous state via formal patch operations.

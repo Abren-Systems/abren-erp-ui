@@ -1,4 +1,4 @@
-import type { ProjectionEnvelope } from '../core-runtime/projection.types'
+import type { ProjectionEnvelope, ProjectionPatch } from '../core-runtime/projection.types'
 import type { RuntimeTrace } from './trace.types'
 
 /**
@@ -19,20 +19,32 @@ export interface RuntimeTransition {
   timestamp: number
   trigger: TransitionTrigger
 
-  /** The delta (diff) from the previous projection. We don't store full blobs here. */
-  patch: Record<string, unknown>
+  /**
+   * The formal patch representing the delta from the previous projection.
+   * MUST use path-based semantics for deterministic replay.
+   */
+  patch: ProjectionPatch
 
   traces: RuntimeTrace[]
-  projectionVersion: number
+
+  /** Monotonically increasing revision of the specific projection lineage */
+  projectionRevision: number
 }
 
 export interface ProjectionCheckpoint<T> {
-  version: number
+  revision: number
   timestamp: number
   fullProjection: ProjectionEnvelope<T>
 }
 
 type Subscriber = (transition: RuntimeTransition) => void
+
+/**
+ * Checkpoint Strategy:
+ * - On every Navigation boundary (Screen change)
+ * - Every 50 transitions within the same projection lineage
+ * - On explicit Command completion for high-stakes workflows
+ */
 
 class TransitionRecorderImpl {
   private transitions: RuntimeTransition[] = []
@@ -54,11 +66,11 @@ class TransitionRecorderImpl {
    * Record a full checkpoint. This acts as a base state from which subsequent
    * patches can be applied during a replay.
    */
-  recordCheckpoint<T>(envelope: ProjectionEnvelope<T>) {
+  recordCheckpoint<T>(envelope: ProjectionEnvelope<T>, revision: number) {
     if (!this._enabled) return
 
     const checkpoint: ProjectionCheckpoint<T> = {
-      version: envelope.schemaVersion,
+      revision,
       timestamp: envelope.timestamp,
       fullProjection: envelope,
     }
@@ -71,9 +83,9 @@ class TransitionRecorderImpl {
    */
   recordTransition(
     trigger: TransitionTrigger,
-    patch: Record<string, unknown>,
+    patch: ProjectionPatch,
     traces: RuntimeTrace[],
-    projectionVersion: number,
+    projectionRevision: number,
   ) {
     if (!this._enabled) return
 
@@ -83,12 +95,12 @@ class TransitionRecorderImpl {
       trigger,
       patch,
       traces,
-      projectionVersion,
+      projectionRevision,
     }
 
     this.transitions.push(transition)
 
-    // Bound memory
+    // Bound memory (Circular buffer behavior)
     if (this.transitions.length > 500) {
       this.transitions.shift()
     }

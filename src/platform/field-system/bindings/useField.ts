@@ -107,7 +107,7 @@ export function useField<TEntity, TValue>(
     // Emit debug event for successful mutations
     transitionRecorder.recordTransition(
       { type: 'mutation', source: `AppField(${String(fieldKey)})` },
-      { [String(fieldKey)]: newValue },
+      { operations: [{ op: 'replace', path: String(fieldKey), value: newValue }] },
       [],
       controller.model.value.version,
     )

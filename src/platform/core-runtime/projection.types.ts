@@ -8,6 +8,18 @@
 
 export type ProjectionType = 'workspace' | 'screen' | 'semantic'
 
+export type PatchOp = 'replace' | 'remove' | 'append'
+
+export interface PatchOperation {
+  op: PatchOp
+  path: string
+  value?: unknown
+}
+
+export interface ProjectionPatch {
+  operations: PatchOperation[]
+}
+
 /**
  * A formal identity wrapper around any projection state.
  * Enables exact deterministic replay, patching, and versioning.
@@ -15,6 +27,9 @@ export type ProjectionType = 'workspace' | 'screen' | 'semantic'
 export interface ProjectionEnvelope<T> {
   /** Uniquely identifies this specific projection shape/model */
   projectionId: string
+
+  /** Identifies the unique execution session (multi-tab/replay separation) */
+  runtimeSessionId: string
 
   /** The runtime that owns this projection */
   projectionType: ProjectionType
@@ -31,7 +46,7 @@ export interface ProjectionEnvelope<T> {
    */
   runtimeVersion: string
 
-  /** High-resolution timestamp of projection creation */
+  /** High-resolution timestamp of projection creation (Observation only!) */
   timestamp: number
 
   /** Optional tracking identity for specific entity records being projected */

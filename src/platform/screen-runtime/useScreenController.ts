@@ -158,7 +158,12 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
       execute: async (...args: unknown[]) => {
         transitionRecorder.recordTransition(
           { type: 'command', source: `Command(${id})` },
-          { status: 'start', args },
+          {
+            operations: [
+              { op: 'replace', path: 'status', value: 'start' },
+              { op: 'replace', path: 'args', value: args },
+            ],
+          },
           [],
           model.value?.version ?? 0,
         )
@@ -166,14 +171,23 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
           await command.execute(...args)
           transitionRecorder.recordTransition(
             { type: 'command', source: `Command(${id})` },
-            { status: 'end' },
+            { operations: [{ op: 'replace', path: 'status', value: 'end' }] },
             [],
             model.value?.version ?? 0,
           )
         } catch (error) {
           transitionRecorder.recordTransition(
             { type: 'command', source: `Command(${id})` },
-            { status: 'error', error: error instanceof Error ? error.message : String(error) },
+            {
+              operations: [
+                { op: 'replace', path: 'status', value: 'error' },
+                {
+                  op: 'replace',
+                  path: 'error',
+                  value: error instanceof Error ? error.message : String(error),
+                },
+              ],
+            },
             [],
             model.value?.version ?? 0,
           )
@@ -214,15 +228,19 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     (m) => {
       // In a real system, we'd diff `m` against the previous model and emit a patch.
       // For now, we take a checkpoint.
-      transitionRecorder.recordCheckpoint({
-        projectionId: m.meta.projectionId,
-        projectionType: 'screen',
-        schemaVersion: 1,
-        runtimeVersion: '1.0.0',
-        entityId: (dataSource.entity.value as { id?: string } | null)?.id,
-        timestamp: m.meta.timestamp,
-        payload: m,
-      })
+      transitionRecorder.recordCheckpoint(
+        {
+          projectionId: m.meta.projectionId,
+          runtimeSessionId: 'local-session',
+          projectionType: 'screen',
+          schemaVersion: 1,
+          runtimeVersion: '1.0.0',
+          entityId: (dataSource.entity.value as { id?: string } | null)?.id,
+          timestamp: m.meta.timestamp,
+          payload: m,
+        },
+        m.version,
+      )
     },
     { immediate: true },
   )
