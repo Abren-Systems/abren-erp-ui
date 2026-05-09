@@ -16,6 +16,8 @@ import { ABI_RULES } from './rules/abi/abi'
 import { DPI01_03 } from './rules/dpi/dpi'
 import { DAI_RULES } from './rules/dai/dai'
 import { SNI_RULES } from './rules/sni/sni'
+import { NAI_RULES } from './rules/nai/nai'
+import { SMI_RULES } from './rules/smi/smi'
 
 async function main() {
   const basePath = path.resolve(process.cwd())
@@ -36,6 +38,8 @@ async function main() {
   scanner.registerRule(DPI01_03)
   scanner.registerRule(DAI_RULES)
   scanner.registerRule(SNI_RULES)
+  scanner.registerRule(NAI_RULES)
+  scanner.registerRule(SMI_RULES)
 
   console.log('Running Arch-Guard Constitution Validator...')
   const violations = scanner.scan('src')

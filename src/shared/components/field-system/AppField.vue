@@ -11,7 +11,10 @@
  * @see docs/FIELD_SYSTEM.md
  */
 import { computed } from 'vue'
-import { resolveField, type FieldType, type FieldContext } from './registry'
+import { resolveField, type FieldContext } from './registry'
+import type { PrimitiveType } from '@/platform/component-contracts'
+import { SemanticKind } from '@/platform/semantic-runtime/contracts'
+import { resolveSemantic } from '@/platform/semantic-runtime/registry'
 
 const props = withDefaults(
   defineProps<{
@@ -21,8 +24,10 @@ const props = withDefaults(
     label: string
     /** Raw domain value for read mode. Must NOT be pre-formatted. */
     value?: unknown
-    /** Registry type key. */
-    type: FieldType
+    /** Primitive data type. */
+    type: PrimitiveType
+    /** Business semantic for meaning-driven rendering. */
+    semantic?: SemanticKind
     /** Optional rendering hints for domain-aware display. */
     context?: FieldContext
     /** Label/value density. */
@@ -60,17 +65,32 @@ defineEmits<{
 }>()
 
 const definition = computed(() => resolveField(props.type))
+const semanticRuntime = computed(() =>
+  props.semantic ? resolveSemantic(props.semantic) : undefined,
+)
 
 const isEmpty = computed(() => definition.value.empty(props.value))
 
 const displayValue = computed(() => {
   if (isEmpty.value) return definition.value.emptyDisplay
+  // SMI-03: Semantic Runtime has formatting authority
+  if (semanticRuntime.value?.formatter) {
+    return semanticRuntime.value.formatter(props.value, { locale: 'en-US', tenantId: 'SYSTEM' })
+  }
   return definition.value.format(props.value, props.context)
 })
 
 const statusVariant = computed(() => {
-  if (props.type !== 'status' || isEmpty.value) return undefined
+  if (props.semantic !== SemanticKind.Status || isEmpty.value) return undefined
+  // Fallback variant logic
   return definition.value.variant?.(props.value, props.context)
+})
+
+const resolvedEditor = computed(() => {
+  // Explicit override > Semantic > ControlType
+  // TODO: Add explicit override prop later if needed
+  if (semanticRuntime.value?.editorRenderer) return semanticRuntime.value.editorRenderer
+  return definition.value.editor
 })
 
 /** Merge static registry defaults with runtime screen-level overrides. Screen wins on conflict. */
@@ -89,9 +109,9 @@ const mergedEditorProps = computed(() => ({
     <span class="app-field__label">{{ label }}</span>
 
     <!-- EDIT: delegate to registry-defined bare editor -->
-    <div v-if="mode === 'edit' && definition.editor" class="app-field__control">
+    <div v-if="mode === 'edit' && resolvedEditor" class="app-field__control">
       <component
-        :is="definition.editor"
+        :is="resolvedEditor"
         :model-value="modelValue"
         :error="error"
         :disabled="disabled"
@@ -103,9 +123,19 @@ const mergedEditorProps = computed(() => ({
       />
     </div>
 
-    <!-- READ: status badge -->
+    <!-- READ: Semantic Display Renderer -->
+    <component
+      v-else-if="semanticRuntime?.displayRenderer"
+      :is="semanticRuntime.displayRenderer"
+      :value="value"
+      :display-value="displayValue"
+      :is-empty="isEmpty"
+      :variant="statusVariant"
+    />
+
+    <!-- READ: status badge (legacy fallback) -->
     <span
-      v-else-if="type === 'status' && !isEmpty"
+      v-else-if="semantic === SemanticKind.Status && !isEmpty"
       class="app-field__badge"
       :class="`app-field__badge--${statusVariant}`"
     >

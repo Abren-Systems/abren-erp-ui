@@ -1,8 +1,10 @@
+import type { SemanticKind } from '../semantic-runtime/contracts'
+
 // ── Field Contracts ────────────────────────────────────────────────────────
 // Pure data definitions for form inputs and display values.
 // These contracts govern how `AppField`, `AppInput`, and Cells render.
 
-export type FieldType = 'text' | 'number' | 'money' | 'date' | 'boolean' | 'select' | 'reference' // Lookup to another entity
+export type PrimitiveType = 'string' | 'number' | 'boolean' | 'date'
 
 export interface FieldOptionContract {
   readonly value: string | number
@@ -15,7 +17,8 @@ export interface FieldOptionContract {
  */
 export interface FieldContract {
   readonly id: string
-  readonly type: FieldType
+  readonly type: PrimitiveType
+  readonly semantic?: SemanticKind
   readonly labelKey: string
   readonly required?: boolean
   readonly disabled?: boolean

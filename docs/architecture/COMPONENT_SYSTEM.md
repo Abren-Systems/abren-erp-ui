@@ -57,9 +57,9 @@ Pure visual mechanics. These components are **dumb**—they have no knowledge of
 | `AppDialog`   | Modal dialogs                      | Interaction Model |
 | `AppSidePane` | Contextual overlays (filter/trace) | Layout System     |
 
-### 2.2 Semantic ERP Kernel (`shared/ui/`)
+### 2.2 Canonical Semantic Runtime (`shared/ui/` & `platform/semantic-runtime/`)
 
-Domain-aware components that represent **Canonical ERP Semantics**. They understand business types and workflow states.
+Domain-aware components that represent **Canonical ERP Semantics**. They understand business types and workflow states, governed strictly by the `SemanticContract` and `SemanticRegistry` to prevent formatting and presentation drift.
 
 | Component               | Domain Knowledge                | Used By          |
 | ----------------------- | ------------------------------- | ---------------- |
@@ -73,17 +73,15 @@ Domain-aware components that represent **Canonical ERP Semantics**. They underst
 
 Repeatable screen structure compositions that implement [Acumatica Form Anatomy](ACUMATICA_ALIGNMENT.md#5-form-anatomy-6-basic-parts):
 
-| Component            | Acumatica Part            | Purpose                                                  | Status       |
-| -------------------- | ------------------------- | -------------------------------------------------------- | ------------ |
-| `FormTitleBar`       | Part 1: Form Title Bar    | Full chrome: back nav, record title, services            | ✅ Built     |
-| `ListTitleBar`       | Part 1: List Title Bar    | Minimal chrome for lists/workspaces: title, actions slot | ✅ Built     |
-| `FormToolbar`        | Part 2: Form Toolbar      | Standard buttons + Expected Next + More Menu             | ✅ Built     |
-| `MoreMenu`           | Part 2: More Menu         | Categorized commands, favorites, expected next indicator | ✅ Built     |
-| `RecordServicesMenu` | Part 1: Title Bar buttons | Notes, Files, Activities, Settings                       | ⚠️ Planning  |
-| `WorkspaceTitleBar`  | Workspace Title Bar       | Module title, favorite star, local search, Show All      | ❌ Not built |
-| `WorkspaceTiles`     | Workspace Tiles           | Grid of large visual entry points                        | ❌ Not built |
-| `WorkspaceLinks`     | Workspace Link Categories | Categorized columns of functional links                  | ❌ Not built |
-| `EmptyState`         | —                         | Empty record/list placeholder                            | ✅ Built     |
+| Component            | Acumatica Part            | Purpose                                                  | Status      |
+| -------------------- | ------------------------- | -------------------------------------------------------- | ----------- |
+| `FormTitleBar`       | Part 1: Form Title Bar    | Full chrome: back nav, record title, services            | ✅ Built    |
+| `ListTitleBar`       | Part 1: List Title Bar    | Minimal chrome for lists/workspaces: title, actions slot | ✅ Built    |
+| `FormToolbar`        | Part 2: Form Toolbar      | Standard buttons + Expected Next + More Menu             | ✅ Built    |
+| `MoreMenu`           | Part 2: More Menu         | Categorized commands, favorites, expected next indicator | ✅ Built    |
+| `RecordServicesMenu` | Part 1: Title Bar buttons | Notes, Files, Activities, Settings                       | ⚠️ Planning |
+| `WorkspaceRenderer`  | Workspace View            | Pure renderer for `WorkspaceModel` (State A navigation)  | ✅ Built    |
+| `EmptyState`         | —                         | Empty record/list placeholder                            | ✅ Built    |
 
 > [!IMPORTANT]
 > **Page Chrome is non-negotiable.** List screens must use `ListTitleBar`. Form screens must use `FormTitleBar`. Module landing pages (State A) use the `Workspace*` component family. Dashboards use a dedicated widget grid.
@@ -92,13 +90,13 @@ Repeatable screen structure compositions that implement [Acumatica Form Anatomy]
 
 Governs all data display and layout inside the Working Area. See [Field System Architecture](../FIELD_SYSTEM.md).
 
-| Component     | Acumatica Part        | Purpose                                               | Status   |
-| ------------- | --------------------- | ----------------------------------------------------- | -------- |
-| `AppField`    | `PXField`             | Semantic data renderer via Field System               | ✅ Built |
-| `AppFieldset` | `qp-fieldset`         | CSS Grid layout authority (140px baseline)            | ✅ Built |
-| `AppTemplate` | `qp-template`         | Named screen template for Acumatica-style slot widths | ✅ Built |
-| `AppTabs`     | Part 4: Tabs          | Personalizable visibility toggle for data strata      | ✅ Built |
-| `DataGrid`    | Part 5/6: Details/Row | Tabular rendering with preset-driven logic            | ✅ Built |
+| Component     | Acumatica Part        | Purpose                                                       | Status   |
+| ------------- | --------------------- | ------------------------------------------------------------- | -------- |
+| `AppField`    | `PXField`             | Resolves rendering via `SemanticRuntime` > Primitive fallback | ✅ Built |
+| `AppFieldset` | `qp-fieldset`         | CSS Grid layout authority (140px baseline)                    | ✅ Built |
+| `AppTemplate` | `qp-template`         | Named screen template for Acumatica-style slot widths         | ✅ Built |
+| `AppTabs`     | Part 4: Tabs          | Personalizable visibility toggle for data strata              | ✅ Built |
+| `DataGrid`    | Part 5/6: Details/Row | Tabular rendering with preset-driven logic                    | ✅ Built |
 
 ---
 
@@ -250,9 +248,9 @@ To prevent `shared/ui/` from becoming a dumping ground, we strictly forbid **Wor
 
 ### 8.3 Maturity Roadmap
 
-| Evolution                   | Description                                                                                                   | Status      |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------- |
-| **Deterministic Runtime**   | Screens are pure projections of authoritative state via `resolveScreenModel`.                                 | ✅ Active   |
-| **Capability-Based UI**     | UI elements are controlled by `screen.capabilities` (e.g., `canApprove`) rather than hardcoded module checks. | ✅ Active   |
-| **Semantic Registry**       | Screens declare semantics (e.g., type: 'Money'); runtime automatically resolves the correct renderer.         | 🚧 Planning |
-| **Declarative Composition** | `view.vue` becomes a thin layout shell; field placement and grouping is driven by metadata.                   | 🚧 Planning |
+| Evolution                   | Description                                                                                                               | Status      |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **Deterministic Runtime**   | Screens are pure projections of authoritative state via `resolveScreenModel`.                                             | ✅ Active   |
+| **Capability-Based UI**     | UI elements are controlled by `screen.capabilities` (e.g., `canApprove`) rather than hardcoded module checks.             | ✅ Active   |
+| **Semantic Registry**       | Fields declare semantics (e.g., semantic: 'Money'); runtime automatically resolves formatting, validation, and rendering. | ✅ Active   |
+| **Declarative Composition** | `view.vue` becomes a thin layout shell; field placement and grouping is driven by metadata.                               | 🚧 Planning |

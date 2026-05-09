@@ -89,6 +89,14 @@ The backend's **OpenAPI Specification** is the authoritative contract for the fu
 - The frontend generates its TypeScript types directly from this spec.
 - The **Mapper-as-Factory** (§5) is the specific architectural component responsible for transforming these external DTO shapes into high-integrity Frontend Domain Models.
 
+### 1.9 The Three Deterministic Runtimes [STRATEGIC]
+
+The frontend avoids treating the application as a flat collection of "pages." Instead, it is formally partitioned into three deterministic runtimes:
+
+1. **Navigation Runtime (State A)**: The authoritative environment for Workspaces (e.g., Accounts Payable, General Ledger). It projects `WorkspaceDefinition` and context (permissions, roles) into a `WorkspaceModel`. It has no knowledge of screens.
+2. **Screen Runtime (State B)**: The authoritative environment for Working Areas (Transactional Forms, Lists, Dashboards). It projects `ScreenDefinition` and business state into a `ScreenModel`. It has no knowledge of workspaces.
+3. **Canonical Semantic Runtime**: The authoritative meaning registry. It maps primitive data (e.g., "number") into business semantics (e.g., "Money", "Quantity") via `SemanticContract`, guaranteeing absolute uniformity in formatting, validation, and rendering without component-level overrides.
+
 ---
 
 ## 2. Core Architectural Principles
