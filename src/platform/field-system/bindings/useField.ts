@@ -15,6 +15,7 @@ export interface FieldBinding<TValue = unknown> {
   'onUpdate:modelValue': (newValue: TValue) => void
   error: ComputedRef<string | null>
   type: FieldType
+  mode: ComputedRef<'edit' | 'read'>
 }
 
 /**
@@ -122,5 +123,6 @@ export function useField<TEntity, TValue>(
     'onUpdate:modelValue': onChange,
     error,
     type: definition.type as FieldType,
+    mode: computed(() => (isReadonly.value ? 'read' : 'edit')),
   }
 }

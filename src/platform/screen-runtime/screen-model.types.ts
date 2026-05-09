@@ -64,5 +64,8 @@ export interface ScreenModel {
     readonly fields: {
       readonly overrides: Record<string, FieldStateOverride>
     }
+    readonly grids: {
+      readonly state: Record<string, unknown> // Future: formalize GridProjection interface
+    }
   }
 }

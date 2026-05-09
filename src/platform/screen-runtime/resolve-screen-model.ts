@@ -33,6 +33,7 @@ export function resolveScreenModel<TState extends string, TFieldKey extends stri
   }
   projectionId?: string
   timestamp?: number
+  grids?: Record<string, unknown>
 }): ScreenModel {
   const { screenId, commands, domainState, availableActions, statePolicy } = input
 
@@ -132,6 +133,9 @@ export function resolveScreenModel<TState extends string, TFieldKey extends stri
       },
       fields: {
         overrides: fieldOverrides,
+      },
+      grids: {
+        state: input.grids ?? {},
       },
     },
   }
