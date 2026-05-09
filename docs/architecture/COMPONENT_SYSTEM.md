@@ -251,6 +251,6 @@ To prevent `shared/ui/` from becoming a dumping ground, we strictly forbid **Wor
 | Evolution                   | Description                                                                                                   | Status      |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------- |
 | **Deterministic Runtime**   | Screens are pure projections of authoritative state via `resolveScreenModel`.                                 | ✅ Active   |
-| **Capability-Based UI**     | UI elements are controlled by `screen.capabilities` (e.g., `canApprove`) rather than hardcoded module checks. | 🚧 Planning |
+| **Capability-Based UI**     | UI elements are controlled by `screen.capabilities` (e.g., `canApprove`) rather than hardcoded module checks. | ✅ Active   |
 | **Semantic Registry**       | Screens declare semantics (e.g., type: 'Money'); runtime automatically resolves the correct renderer.         | 🚧 Planning |
 | **Declarative Composition** | `view.vue` becomes a thin layout shell; field placement and grouping is driven by metadata.                   | 🚧 Planning |

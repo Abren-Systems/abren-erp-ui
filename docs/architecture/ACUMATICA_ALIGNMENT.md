@@ -168,16 +168,16 @@ In addition to forms, the Working Area can display:
 
 ### Key Behavioral Differences Between Form Kinds
 
-| Behavior               | Setup             | Maintenance                | Data Entry                                     | Inquiry                  | Processing                |
-| ---------------------- | ----------------- | -------------------------- | ---------------------------------------------- | ------------------------ | ------------------------- |
-| **Chrome (Title Bar)** | FormTitleBar      | FormTitleBar               | FormTitleBar                                   | **ListTitleBar**         | **ListTitleBar**          |
-| **Chrome (Toolbar)**   | FormToolbar       | FormToolbar                | FormToolbar                                    | _None_ (grid toolbar)    | _None_ (grid toolbar)     |
-| Summary/Selection Area | Settings sections | Summary Area (collapsible) | Summary Area (collapsible)                     | Selection Area (filters) | Selection Area (filters)  |
-| Tabs                   | Rarely            | Yes                        | Yes (multiple)                                 | No                       | No                        |
-| Detail Grid            | No                | No                         | **Yes** (line items)                           | **Yes** (results grid)   | **Yes** (selectable grid) |
-| Record Navigation (◁▷) | No                | Yes                        | Yes                                            | No                       | No                        |
-| Record Services        | No                | Yes (Notes/Files)          | Yes (Notes/Files)                              | No                       | No                        |
-| Toolbar commands       | Save, Cancel      | Save, Cancel, Delete, Nav  | Save, Cancel, Delete, Nav, Expected Next, More | Refresh                  | Process, Process All      |
+| Behavior               | Setup             | Maintenance                | Data Entry                                     | Primary List               | Inquiry                  | Processing                |
+| ---------------------- | ----------------- | -------------------------- | ---------------------------------------------- | -------------------------- | ------------------------ | ------------------------- |
+| **Chrome (Title Bar)** | FormTitleBar      | FormTitleBar               | FormTitleBar                                   | **ListTitleBar**           | **ListTitleBar**         | **ListTitleBar**          |
+| **Chrome (Toolbar)**   | FormToolbar       | FormToolbar                | FormToolbar                                    | _None_ (grid toolbar)      | _None_ (grid toolbar)    | _None_ (grid toolbar)     |
+| Summary/Selection Area | Settings sections | Summary Area (collapsible) | Summary Area (collapsible)                     | Selection Area (filters)   | Selection Area (filters) | Selection Area (filters)  |
+| Tabs                   | Rarely            | Yes                        | Yes (multiple)                                 | No                         | No                       | No                        |
+| Detail Grid            | No                | No                         | **Yes** (line items)                           | **Yes** (results grid)     | **Yes** (results grid)   | **Yes** (selectable grid) |
+| Record Navigation (◁▷) | No                | Yes                        | Yes                                            | No                         | No                       | No                        |
+| Record Services        | No                | Yes (Notes/Files)          | Yes (Notes/Files)                              | No                         | No                       | No                        |
+| Toolbar commands       | Save, Cancel      | Save, Cancel, Delete, Nav  | Save, Cancel, Delete, Nav, Expected Next, More | New, Refresh, Filter, Bulk | Refresh                  | Process, Process All      |
 
 > [!IMPORTANT]
 > **Chrome selection is non-negotiable.** List and inquiry screens (`PL` suffix, `inquiry`, `processing`) use `ListTitleBar` — a minimal title-only bar. Form screens (`setup`, `maintenance`, `dataEntry`) use `FormTitleBar` — a full record-context bar with back navigation, record title, and service buttons. See [Screen Runtime §4](SCREEN_RUNTIME.md#4-working-area-chrome-title-bar--toolbar) for rendering rules.
