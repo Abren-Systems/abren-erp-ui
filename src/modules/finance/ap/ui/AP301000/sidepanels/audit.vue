@@ -3,7 +3,7 @@ import { inject, type Ref } from 'vue'
 import { AppFieldset, AppField } from '@/shared/components/field-system'
 import PaymentRequestTimeline from '../timeline.vue'
 import type { PaymentRequest } from '../../../domain/ap.types'
-import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { useScreenControllerContext } from '@/platform/screen-runtime'
 
 /**
  * Trace Panel Content
@@ -13,7 +13,7 @@ import { ScreenControllerKey } from '@/platform/screen-runtime'
  */
 
 // The platform injects the controller into the side panel content
-const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
+const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>

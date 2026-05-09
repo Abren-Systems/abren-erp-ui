@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AppTemplate } from '@/platform/chrome'
-import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { useScreenControllerContext } from '@/platform/screen-runtime'
 import { inject } from 'vue'
 /**
  * AP301000 — Payment Request Data Entry View
@@ -24,7 +24,7 @@ import { paymentRequestLineColumns } from './grids/lines.grid'
 
 const props = defineProps<{ id: string }>()
 
-const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
+const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>

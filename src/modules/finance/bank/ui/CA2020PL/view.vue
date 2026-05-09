@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ScreenControllerKey } from '@/platform/screen-runtime'
+import { useScreenControllerContext } from '@/platform/screen-runtime'
 import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
 
@@ -7,7 +7,7 @@ import { AppButton } from '@/shared/components/primitives'
 import { Plus, RefreshCcw } from 'lucide-vue-next'
 import { accountColumns } from './grids/bank-account.grid'
 
-const ctrl = inject(ScreenControllerKey)!.value! as any // eslint-disable-line @typescript-eslint/no-explicit-any
+const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
 <template>

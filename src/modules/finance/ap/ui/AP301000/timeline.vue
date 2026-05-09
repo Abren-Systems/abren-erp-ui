@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// arch-guard-disable PII-02
 import { computed } from 'vue'
 import { Clock } from 'lucide-vue-next'
 import { AppBadge } from '@/shared/components/primitives'

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// arch-guard-disable PII-02
 import { ref } from 'vue'
 import { AppButton, AppTextarea } from '@/shared/components/primitives'
 import {

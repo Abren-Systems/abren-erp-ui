@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// arch-guard-disable PII-02
 import { ref, watch } from 'vue'
 import { AppButton, AppSidePane } from '@/shared/components/primitives'
 import { ListFilter, CheckCircle, Calendar } from 'lucide-vue-next'

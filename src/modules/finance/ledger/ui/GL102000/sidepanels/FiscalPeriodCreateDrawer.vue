@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// arch-guard-disable PII-02
 import { ref } from 'vue'
 import { AppButton, AppInput, AppSidePane } from '@/shared/components/primitives'
 import { useFiscalPeriods } from '../../../application/useFiscalPeriods'

@@ -18,6 +18,7 @@ import { DAI_RULES } from './rules/dai/dai'
 import { SNI_RULES } from './rules/sni/sni'
 import { NAI_RULES } from './rules/nai/nai'
 import { SMI_RULES } from './rules/smi/smi'
+import { PII01, PII02, PII03 } from './rules/pii/pii'
 
 async function main() {
   const basePath = path.resolve(process.cwd())
@@ -40,6 +41,9 @@ async function main() {
   scanner.registerRule(SNI_RULES)
   scanner.registerRule(NAI_RULES)
   scanner.registerRule(SMI_RULES)
+  scanner.registerRule(PII01)
+  scanner.registerRule(PII02)
+  scanner.registerRule(PII03)
 
   console.log('Running Arch-Guard Constitution Validator...')
   const violations = scanner.scan('src')

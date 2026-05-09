@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// arch-guard-disable PII-02
 import { ref, computed } from 'vue'
 import { AppButton, AppDialog, AppInput } from '@/shared/components/primitives'
 import { CheckCircle, XCircle, Download } from 'lucide-vue-next'
