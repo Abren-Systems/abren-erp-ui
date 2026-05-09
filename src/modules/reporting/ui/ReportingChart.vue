@@ -1,7 +1,4 @@
 <script setup lang="ts">
-// arch-guard-disable PII-02
-import { computed } from 'vue'
-
 interface ChartData {
   date: string
   actual: number
@@ -18,44 +15,44 @@ const svgWidth = 800
 const svgHeight = 300
 const padding = 40
 
-const maxVal = computed(() => {
+const getMaxVal = () => {
   const vals = props.data.flatMap((d) => [d.actual, d.projected])
   return Math.max(...vals, 1) * 1.1
-})
+}
 
 const getX = (index: number) => {
   return padding + (index * (svgWidth - 2 * padding)) / (props.data.length - 1 || 1)
 }
 
 const getY = (val: number) => {
-  return svgHeight - padding - (val / maxVal.value) * (svgHeight - 2 * padding)
+  return svgHeight - padding - (val / getMaxVal()) * (svgHeight - 2 * padding)
 }
 
-const actualPath = computed(() => {
+const getActualPath = () => {
   if (props.data.length === 0) return ''
   return props.data.reduce((path, d, i) => {
     const x = getX(i)
     const y = getY(d.actual)
     return path + (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`)
   }, '')
-})
+}
 
-const projectedPath = computed(() => {
+const getProjectedPath = () => {
   if (props.data.length === 0) return ''
   return props.data.reduce((path, d, i) => {
     const x = getX(i)
     const y = getY(d.projected)
     return path + (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`)
   }, '')
-})
+}
 
-const areaPath = computed(() => {
+const getAreaPath = () => {
   if (props.data.length === 0) return ''
   const firstX = getX(0)
   const lastX = getX(props.data.length - 1)
   const baseline = getY(0)
-  return `${actualPath.value} L ${lastX} ${baseline} L ${firstX} ${baseline} Z`
-})
+  return `${getActualPath()} L ${lastX} ${baseline} L ${firstX} ${baseline} Z`
+}
 </script>
 
 <template>
@@ -105,7 +102,7 @@ const areaPath = computed(() => {
 
         <!-- Projected Path (Dashed) -->
         <path
-          :d="projectedPath"
+          :d="getProjectedPath()"
           fill="none"
           stroke="#cbd5e1"
           stroke-width="2"
@@ -115,14 +112,14 @@ const areaPath = computed(() => {
 
         <!-- Actual Gradient Area -->
         <path
-          :d="areaPath"
+          :d="getAreaPath()"
           fill="url(#areaGradient)"
           class="transition-all duration-1000 ease-in-out"
         />
 
         <!-- Actual Path -->
         <path
-          :d="actualPath"
+          :d="getActualPath()"
           fill="none"
           stroke="#3B82F6"
           stroke-width="4"

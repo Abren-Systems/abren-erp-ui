@@ -5,9 +5,9 @@ import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
 import { workflowColumns } from './grids/workflow.grid'
-
-import WorkflowActionDialog from './components/WorkflowActionDialog.vue'
-
+import { AppDialog, AppInput } from '@/shared/components/primitives'
+import { ShieldCheck, AlertTriangle, Check } from 'lucide-vue-next'
+import { Label } from '@/shared/components/field-system'
 const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
 
@@ -47,25 +47,65 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
       </DataGrid>
     </div>
 
-    <WorkflowActionDialog
-      v-if="ctrl.selectedTask.value"
-      :instance-id="ctrl.selectedTask.value.id"
-      :target-state="ctrl.selectedTask.value.targetState || ''"
-      :is-open="ctrl.isDialogOpen.value"
-      :is-pending="ctrl.isSubmitting.value"
-      @close="ctrl.isDialogOpen.value = false"
-      @approve="
-        (comments) =>
-          ctrl.model.value.ui.actions.primary
-            .find((a) => a.command.key === 'approve')
-            ?.command?.execute(comments)
-      "
-      @reject="
-        (comments) =>
-          ctrl.model.value.ui.actions.secondary
-            .find((a) => a.command.key === 'reject')
-            ?.command?.execute(comments)
-      "
-    />
+    <AppDialog v-model:open="ctrl.isDialogOpen.value" title="Review Transition" size="sm">
+      <div v-if="ctrl.selectedTask.value" class="space-y-4">
+        <div
+          class="flex items-center gap-4 p-4 bg-[var(--color-primary-50)] rounded-md border border-[var(--color-primary-100)]"
+        >
+          <ShieldCheck class="h-5 w-5 text-[var(--color-primary-600)]" />
+          <div>
+            <p
+              class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary-700)]"
+            >
+              Target State
+            </p>
+            <p class="text-sm font-semibold text-[var(--color-primary-900)]">
+              {{ ctrl.selectedTask.value.targetState }}
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <Label
+            class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-neutral-500)]"
+          >
+            Decision Rationale
+          </Label>
+          <AppInput
+            v-model="ctrl.auditReason.value"
+            placeholder="Reason for your decision (Optional)..."
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex gap-2 w-full justify-end">
+          <AppButton
+            variant="outline"
+            @click="ctrl.isDialogOpen.value = false"
+            :disabled="ctrl.isSubmitting.value"
+          >
+            Cancel
+          </AppButton>
+          <AppButton
+            variant="danger"
+            @click="ctrl.commands.value['reject']?.execute()"
+            :disabled="ctrl.isSubmitting.value"
+          >
+            <AlertTriangle :size="14" class="mr-2" />
+            Reject
+          </AppButton>
+          <AppButton
+            variant="primary"
+            @click="ctrl.commands.value['approve']?.execute()"
+            :disabled="ctrl.isSubmitting.value"
+          >
+            <Check :size="14" class="mr-2" />
+            Approve
+          </AppButton>
+        </div>
+      </template>
+    </AppDialog>
   </div>
 </template>

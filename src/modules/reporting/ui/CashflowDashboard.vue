@@ -1,58 +1,11 @@
 <script setup lang="ts">
-// arch-guard-disable PII-02
-import { computed } from 'vue'
-import { useCashflow } from '../application/useCashflow'
 import { BusinessDate } from '@/shared/domain/business-date'
 import ReportingChart from './ReportingChart.vue'
 import { AppButton } from '@/shared/components/primitives'
-import {
-  TrendingUp,
-  TrendingDown,
-  Clock,
-  Wallet,
-  LayoutDashboard,
-  FileDown,
-  Calendar,
-} from 'lucide-vue-next'
+import { LayoutDashboard, FileDown, Calendar } from 'lucide-vue-next'
+import { useCashflowDashboard } from './useCashflowDashboard'
 
-// Date Range (Last 30 days)
-const endDate = BusinessDate.today()
-const startDate = BusinessDate.fromIso(
-  new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]!,
-)
-
-const { entries, stats: cashflowStats } = useCashflow({ startDate, endDate })
-
-const displayStats = computed(() => [
-  {
-    name: 'Total Actual Inflow',
-    value: cashflowStats.value?.totalActualInflow.format() ?? '...',
-    icon: TrendingUp,
-    color: 'text-[var(--color-success-600)]',
-    bg: 'bg-[var(--color-success-50)]',
-  },
-  {
-    name: 'Total Actual Outflow',
-    value: cashflowStats.value?.totalActualOutflow.format() ?? '...',
-    icon: TrendingDown,
-    color: 'text-[var(--color-danger-600)]',
-    bg: 'bg-[var(--color-danger-50)]',
-  },
-  {
-    name: 'Projected Exposure',
-    value: cashflowStats.value?.projectedExposure.format() ?? '...',
-    icon: Clock,
-    color: 'text-[var(--color-warning-600)]',
-    bg: 'bg-[var(--color-warning-50)]',
-  },
-  {
-    name: 'Net Cash Position',
-    value: cashflowStats.value?.netCashPosition.format() ?? '...',
-    icon: Wallet,
-    color: 'text-[var(--color-primary-600)]',
-    bg: 'bg-[var(--color-primary-50)]',
-  },
-])
+const ctrl = useCashflowDashboard()
 </script>
 
 <template>
@@ -90,7 +43,7 @@ const displayStats = computed(() => [
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
-          v-for="stat in displayStats"
+          v-for="stat in ctrl.displayStats.value"
           :key="stat.name"
           class="p-6 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
         >
@@ -118,7 +71,7 @@ const displayStats = computed(() => [
           <ReportingChart
             title="Inflow: Actual vs Committed"
             :data="
-              (entries ?? []).map((d) => ({
+              (ctrl.entries.value ?? []).map((d) => ({
                 date: d.date,
                 actual: d.actualInflow.amount,
                 projected: d.projectedInflow.amount,
@@ -130,7 +83,7 @@ const displayStats = computed(() => [
           <ReportingChart
             title="Outflow: Actual vs Committed"
             :data="
-              (entries ?? []).map((d) => ({
+              (ctrl.entries.value ?? []).map((d) => ({
                 date: d.date,
                 actual: d.actualOutflow.amount,
                 projected: d.projectedOutflow.amount,
@@ -173,7 +126,7 @@ const displayStats = computed(() => [
             </thead>
             <tbody class="divide-y divide-[var(--color-neutral-100)]">
               <tr
-                v-for="row in entries ?? []"
+                v-for="row in ctrl.entries.value ?? []"
                 :key="row.date"
                 class="hover:bg-[var(--color-primary-50)]/30 transition-colors group"
               >
@@ -202,7 +155,7 @@ const displayStats = computed(() => [
                 </td>
               </tr>
               <tr
-                v-if="!entries || entries.length === 0"
+                v-if="!ctrl.entries.value || ctrl.entries.value.length === 0"
                 class="text-center py-12 text-[var(--color-neutral-400)]"
               >
                 <td colspan="5" class="py-12 italic text-xs">

@@ -37,20 +37,26 @@ export function useWorkflowInboxController() {
 
   // We register business actions as formal commands on the controller
   base.registerCommand('approve', {
-    execute: async (...args: unknown[]) => {
-      const comments = (args[0] as string) || ''
+    execute: async () => {
       if (!selectedTask.value) return
-      await submitAction({ instanceId: selectedTask.value.id, action: 'APPROVE', comments })
+      await submitAction({
+        instanceId: selectedTask.value.id,
+        action: 'APPROVE',
+        comments: auditReason.value,
+      })
       handleSuccess()
     },
     isPending: isSubmitting,
   })
 
   base.registerCommand('reject', {
-    execute: async (...args: unknown[]) => {
-      const comments = (args[0] as string) || ''
+    execute: async () => {
       if (!selectedTask.value) return
-      await submitAction({ instanceId: selectedTask.value.id, action: 'REJECT', comments })
+      await submitAction({
+        instanceId: selectedTask.value.id,
+        action: 'REJECT',
+        comments: auditReason.value,
+      })
       handleSuccess()
     },
     isPending: isSubmitting,
@@ -58,6 +64,7 @@ export function useWorkflowInboxController() {
 
   const selectedTask = ref<PendingApproval | null>(null)
   const isDialogOpen = ref(false)
+  const auditReason = ref('')
 
   const handleRowClick = (row: unknown) => {
     selectedTask.value = row as PendingApproval
@@ -68,6 +75,7 @@ export function useWorkflowInboxController() {
     void refresh()
     selectedTask.value = null
     isDialogOpen.value = false
+    auditReason.value = ''
   }
 
   return {
@@ -75,6 +83,7 @@ export function useWorkflowInboxController() {
     tasks,
     selectedTask,
     isDialogOpen,
+    auditReason,
     isSubmitting,
     handleRowClick,
     handleSuccess,
