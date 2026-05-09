@@ -4,8 +4,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: 'invoice/:id?',
     name: 'ARInvoice',
-    component: () => import('./ui/AR301000/AR301000.vue'),
-    props: true,
+    component: () => import('@/platform/screen-runtime/ScreenRenderer.vue'),
+    meta: { screenId: 'AR301000' },
+    props: (route) => ({ id: route.params['id'] }),
   },
 ]
 

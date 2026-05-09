@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { useARInvoiceController } from './controller'
+import { inject } from 'vue'
+import { ScreenControllerKey } from '@/platform/screen-runtime/injection-keys'
+import type { useARInvoiceController } from './controller'
 import { useField } from '@/platform/field-system/bindings/useField'
 import AppTemplate from '@/platform/chrome/AppTemplate.vue'
 import AppFieldset from '@/shared/components/field-system/AppFieldset.vue'
@@ -11,9 +13,24 @@ const props = defineProps<{
   id?: string
 }>()
 
-// EOI-01: In a production 'Native' module, this would be injected by the ScreenRenderer.
-// During simulation, we instantiate it here to bridge the Vue Router gap.
-const controller = useARInvoiceController(props.id)
+/**
+ * AUTHORITATIVE INJECTION
+ *
+ * We no longer instantiate the controller here. We 'inject' it from
+ * the ScreenRenderer (Stage C). This satisfies EOI-01.
+ */
+const controller = inject(ScreenControllerKey) as ReturnType<typeof useARInvoiceController>
+
+if (!controller) {
+  throw new Error('[AR301000] Controller not provided by platform.')
+}
+
+// ── Field Bindings ──
+const customerId = useField(controller, { key: 'customerId', type: 'text', label: 'Customer ID' })
+const docDate = useField(controller, { key: 'date', type: 'date', label: 'Date' })
+const currency = useField(controller, { key: 'currencyId', type: 'text', label: 'Currency' })
+const amount = useField(controller, { key: 'docAmount', type: 'number', label: 'Total Amount' })
+const status = useField(controller, { key: 'status', type: 'text', label: 'Status' })
 </script>
 
 <template>

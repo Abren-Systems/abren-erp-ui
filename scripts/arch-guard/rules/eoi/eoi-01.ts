@@ -8,19 +8,14 @@ export const EOI01: Rule = {
   check(context) {
     const filePath = context.sourceFile.getFilePath()
     const isScreenRenderer = filePath.includes('ScreenRenderer.vue')
-    const baseName = context.sourceFile.getBaseName()
-    const isScreenDef = baseName.endsWith('screen.ts') || baseName.endsWith('definition.ts')
-    const isModuleView =
-      filePath.includes('/src/modules/') && filePath.includes('/ui/') && filePath.endsWith('.vue')
-    const isSimulation = filePath.includes('AR301000.vue')
+    const isScreenDef = filePath.endsWith('screen.ts') || filePath.endsWith('definition.ts')
     const isTest =
       filePath.includes('.test.') || filePath.includes('.spec.') || filePath.includes('/__tests__/')
     const isFactory = filePath.includes('factory') || filePath.includes('testing')
 
     // screen.ts is allowed to reference the controller factory function without calling it,
     // but we allow calling just in case they do anonymous function `() => useXxxController()`
-    if (isScreenRenderer || isTest || isFactory || isScreenDef || isModuleView || isSimulation)
-      return
+    if (isScreenRenderer || isTest || isFactory || isScreenDef) return
 
     const callExpressions = context.sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)
 
