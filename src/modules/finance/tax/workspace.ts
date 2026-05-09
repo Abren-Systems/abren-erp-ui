@@ -1,5 +1,5 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime'
 
 export const taxWorkspace: WorkspaceContract = {
   id: 'tax',
@@ -15,13 +15,13 @@ export const taxWorkspace: WorkspaceContract = {
         {
           id: 'tx2010pl',
           labelKey: 'Tax Zones',
-          screenId: 'TX2010PL' as ScreenId,
+          screenId: createScreenId('TX2010PL'),
           requiredPermissions: ['tax:view'],
         },
         {
           id: 'tx2020pl',
           labelKey: 'Tax Categories',
-          screenId: 'TX2020PL' as ScreenId,
+          screenId: createScreenId('TX2020PL'),
           requiredPermissions: ['tax:view'],
         },
       ],

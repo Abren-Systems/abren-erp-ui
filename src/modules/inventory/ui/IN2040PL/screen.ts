@@ -1,10 +1,10 @@
-import { useWarehousesListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { useWarehousesListController } from './controller'
 
 export const IN2040PL: ScreenDefinition = {
-  id: 'IN2040PL' as ScreenId,
+  id: createScreenId('IN2040PL'),
   moduleId: 'inventory' as ModuleId,
   controller: () => useWarehousesListController(),
   kind: 'primaryList',

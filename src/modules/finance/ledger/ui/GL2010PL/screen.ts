@@ -1,11 +1,11 @@
-import { useAccountListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { useAccountListController } from './controller'
 import { GL2010PL_COMMANDS } from './commands'
 
 export const GL2010PL: ScreenDefinition = {
-  id: 'GL2010PL' as ScreenId,
+  id: createScreenId('GL2010PL'),
   moduleId: 'ledger' as ModuleId,
   controller: () => useAccountListController(),
   kind: 'primaryList',

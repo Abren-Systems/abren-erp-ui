@@ -1,14 +1,14 @@
-import { useFiscalPeriodsController } from './controller'
-import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { useFiscalPeriodsController } from './controller'
 import { GL102000_COMMANDS_LIST } from './commands'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
+import type { ScreenDefinition } from '@/platform/screen-runtime'
 
 /**
  * GL102000 - Fiscal Periods
  */
 export const GL102000: ScreenDefinition = {
-  id: 'GL102000' as ScreenId,
+  id: createScreenId('GL102000'),
   moduleId: 'ledger' as ModuleId,
   controller: () => useFiscalPeriodsController(),
   kind: 'maintenance',

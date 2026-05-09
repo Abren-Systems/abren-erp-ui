@@ -1,5 +1,5 @@
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const reportingWorkspace: WorkspaceContract = {
   id: 'reporting',
@@ -15,7 +15,7 @@ export const reportingWorkspace: WorkspaceContract = {
         {
           id: 'dashboard',
           labelKey: 'Cashflow Insights',
-          screenId: 'dashboard' as unknown as ScreenId, // Legacy bypass
+          screenId: createScreenId('dashboard'), // Legacy bypass
           requiredPermissions: ['reporting:view'],
         },
       ],

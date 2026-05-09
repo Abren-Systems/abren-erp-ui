@@ -1,5 +1,5 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const bankWorkspace: WorkspaceContract = {
   id: 'bank',
@@ -15,7 +15,7 @@ export const bankWorkspace: WorkspaceContract = {
         {
           id: 'ca2020pl',
           labelKey: 'Cash Accounts',
-          screenId: 'CA2020PL' as ScreenId,
+          screenId: createScreenId('CA2020PL'),
           requiredPermissions: ['bank:view'],
         },
       ],

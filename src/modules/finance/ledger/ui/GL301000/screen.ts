@@ -1,12 +1,11 @@
 import { useJournalEntryController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
+import { createScreenId } from '@/platform/screen-runtime'
 import { GL301000_COMMANDS } from './commands'
-
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
 
 export const GL301000: ScreenDefinition = {
-  id: 'GL301000' as ScreenId,
+  id: createScreenId('GL301000'),
   moduleId: 'ledger' as ModuleId,
   controller: (ctx) => useJournalEntryController(ctx.params['id'] as string),
   kind: 'dataEntry',

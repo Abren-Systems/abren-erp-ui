@@ -8,3 +8,7 @@ export type ScreenId = Brand<string, 'ScreenId'>
 
 /** A globally unique identifier for an open screen tab/instance */
 export type ScreenInstanceId = Brand<string, 'ScreenInstanceId'>
+
+export function createScreenId(id: string): ScreenId {
+  return id as ScreenId
+}

@@ -1,10 +1,10 @@
-import { useAdjustmentController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { useAdjustmentController } from './controller'
 
 export const IN303000: ScreenDefinition = {
-  id: 'IN303000' as ScreenId,
+  id: createScreenId('IN303000'),
   moduleId: 'inventory' as ModuleId,
   controller: (ctx) => useAdjustmentController(ctx.params['id'] as string),
   kind: 'dataEntry',

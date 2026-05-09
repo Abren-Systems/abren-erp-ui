@@ -1,11 +1,11 @@
-import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
+import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { CR102000_COMMANDS_LIST } from './commands'
 import { useTenantSettingsController } from './controller'
 
 export const CR102000: ScreenDefinition = {
-  id: 'CR102000' as ScreenId,
+  id: createScreenId('CR102000'),
   titleKey: 'core.CR102000.title',
   kind: 'setup',
   moduleId: 'core' as ModuleId,

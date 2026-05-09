@@ -1,5 +1,5 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const inventoryWorkspace: WorkspaceContract = {
   id: 'inventory',
@@ -15,7 +15,7 @@ export const inventoryWorkspace: WorkspaceContract = {
         {
           id: 'in3030pl',
           labelKey: 'Issues',
-          screenId: 'IN3030PL' as ScreenId,
+          screenId: createScreenId('IN3030PL'),
           requiredPermissions: ['inventory:view'],
         },
       ],
@@ -27,13 +27,13 @@ export const inventoryWorkspace: WorkspaceContract = {
         {
           id: 'in2025pl',
           labelKey: 'Stock Items',
-          screenId: 'IN2025PL' as ScreenId,
+          screenId: createScreenId('IN2025PL'),
           requiredPermissions: ['inventory:view'],
         },
         {
           id: 'in2040pl',
           labelKey: 'Item Classes',
-          screenId: 'IN2040PL' as ScreenId,
+          screenId: createScreenId('IN2040PL'),
           requiredPermissions: ['inventory:view'],
         },
       ],

@@ -1,10 +1,10 @@
-import { useStockItemController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { useStockItemController } from './controller'
 
 export const IN202500: ScreenDefinition = {
-  id: 'IN202500' as ScreenId,
+  id: createScreenId('IN202500'),
   moduleId: 'inventory' as ModuleId,
   controller: (ctx) => useStockItemController(ctx.params['id'] as string),
   kind: 'setup',

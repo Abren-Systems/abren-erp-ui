@@ -1,10 +1,10 @@
 import { useTaxGroupController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime'
 import type { ModuleId } from '@/shared/types/brand.types'
 
 export const TX201000: ScreenDefinition = {
-  id: 'TX201000' as ScreenId,
+  id: createScreenId('TX201000'),
   moduleId: 'tax' as ModuleId,
   controller: (ctx) => useTaxGroupController(ctx.params['id'] as string),
   kind: 'setup',

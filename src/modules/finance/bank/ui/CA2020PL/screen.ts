@@ -1,10 +1,10 @@
-import { useBankAccountsListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { useBankAccountsListController } from './controller'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const CA2020PL: ScreenDefinition = {
-  id: 'CA2020PL' as ScreenId,
+  id: createScreenId('CA2020PL'),
   moduleId: 'bank' as ModuleId,
   controller: () => useBankAccountsListController(),
   kind: 'primaryList',

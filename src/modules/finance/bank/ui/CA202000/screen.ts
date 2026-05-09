@@ -1,11 +1,11 @@
-import { useBankAccountController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
+import { useBankAccountController } from './controller'
 import { CA202000_COMMANDS } from './commands'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const CA202000: ScreenDefinition = {
-  id: 'CA202000' as ScreenId,
+  id: createScreenId('CA202000'),
   moduleId: 'bank' as ModuleId,
   controller: (ctx) => useBankAccountController(ctx.params['id'] as string),
   kind: 'maintenance',

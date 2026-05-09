@@ -1,11 +1,11 @@
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { ModuleId } from '@/shared/types/brand.types'
 import { CR201000_COMMANDS_LIST } from './commands'
 import { useUsersController } from './controller'
 
 export const CR201000: ScreenDefinition = {
-  id: 'CR201000' as ScreenId,
+  id: createScreenId('CR201000'),
   titleKey: 'core.CR201000.title',
   kind: 'setup',
   moduleId: 'core' as ModuleId,

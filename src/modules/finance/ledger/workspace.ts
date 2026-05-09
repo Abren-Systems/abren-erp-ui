@@ -1,5 +1,5 @@
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const ledgerWorkspace: WorkspaceContract = {
   id: 'ledger',
@@ -15,7 +15,7 @@ export const ledgerWorkspace: WorkspaceContract = {
         {
           id: 'gl3010pl',
           labelKey: 'Journal Entries',
-          screenId: 'GL3010PL' as ScreenId,
+          screenId: createScreenId('GL3010PL'),
           requiredPermissions: ['ledger:view'],
         },
       ],
@@ -27,7 +27,7 @@ export const ledgerWorkspace: WorkspaceContract = {
         {
           id: 'gl2010pl',
           labelKey: 'Chart of Accounts',
-          screenId: 'GL2010PL' as ScreenId,
+          screenId: createScreenId('GL2010PL'),
           requiredPermissions: ['ledger:view'],
         },
       ],
@@ -39,13 +39,13 @@ export const ledgerWorkspace: WorkspaceContract = {
         {
           id: 'gl101000',
           labelKey: 'Ledger Settings',
-          screenId: 'GL101000' as ScreenId,
+          screenId: createScreenId('GL101000'),
           requiredPermissions: ['ledger:manage_accounts'],
         },
         {
           id: 'gl102000',
           labelKey: 'Fiscal Periods',
-          screenId: 'GL102000' as ScreenId,
+          screenId: createScreenId('GL102000'),
           requiredPermissions: ['ledger:manage_accounts'],
         },
       ],

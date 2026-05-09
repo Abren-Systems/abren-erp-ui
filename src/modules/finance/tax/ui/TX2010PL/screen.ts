@@ -1,11 +1,11 @@
 import { useTaxGroupsListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime'
 import type { ModuleId } from '@/shared/types/brand.types'
 import { TX2010PL_COMMANDS } from './commands'
 
 export const TX2010PL: ScreenDefinition = {
-  id: 'TX2010PL' as ScreenId,
+  id: createScreenId('TX2010PL'),
   moduleId: 'tax' as ModuleId,
   controller: () => useTaxGroupsListController(),
   kind: 'primaryList',

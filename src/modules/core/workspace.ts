@@ -1,5 +1,5 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import type { ScreenId } from '@/platform/screen-runtime/screen-id.types'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const coreWorkspace: WorkspaceContract = {
   id: 'core',
@@ -15,13 +15,13 @@ export const coreWorkspace: WorkspaceContract = {
         {
           id: 'cr201000',
           labelKey: 'Users',
-          screenId: 'CR201000' as ScreenId,
+          screenId: createScreenId('CR201000'),
           requiredPermissions: ['core:view'],
         },
         {
           id: 'cr101000',
           labelKey: 'Roles',
-          screenId: 'CR101000' as ScreenId,
+          screenId: createScreenId('CR101000'),
           requiredPermissions: ['core:view'],
         },
       ],
@@ -33,7 +33,7 @@ export const coreWorkspace: WorkspaceContract = {
         {
           id: 'cr102000',
           labelKey: 'Tenants',
-          screenId: 'CR102000' as ScreenId,
+          screenId: createScreenId('CR102000'),
           requiredPermissions: ['core:view'],
         },
       ],
