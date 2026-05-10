@@ -13,7 +13,7 @@ export const TX2010PL: ScreenDefinition = {
   primaryView: 'groups',
   route: {
     path: 'groups',
-    name: 'finance.tax.groups',
+    name: 'TaxGroupsList',
   },
   permissions: [{ key: 'finance:tax:view' }],
   views: {

@@ -10,8 +10,8 @@ export const coreModule: PlatformEngine = {
   routes,
   permissions: ['core:view', 'core:user_edit', 'core:role_edit'],
   menuItems: [
-    { label: 'Users', route: 'CoreUsers', icon: 'users' },
-    { label: 'Roles', route: 'CoreRoles', icon: 'shield' },
-    { label: 'Tenants', route: 'CoreTenants', icon: 'building' },
+    { label: 'Users', route: 'SMUsers', icon: 'users' },
+    { label: 'Roles', route: 'SMRoles', icon: 'shield' },
+    { label: 'Tenants', route: 'SMCompanies', icon: 'building' },
   ],
 }

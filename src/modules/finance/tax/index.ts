@@ -1,5 +1,6 @@
 import type { BusinessDomain } from '@/shared/types/module.types'
 import { taxRoutes } from './routes'
+import { taxScreens } from './screens'
 
 /**
  * Tax Module Definition.
@@ -10,16 +11,17 @@ export const taxModule: BusinessDomain = {
   name: 'Taxation',
   category: 'business',
   routes: taxRoutes,
+  screens: taxScreens,
   permissions: ['finance:tax:view'],
   menuItems: [
     {
       label: 'Tax Rules',
-      route: 'finance.tax.rules',
+      route: 'TaxRulesList',
       icon: 'percent',
     },
     {
       label: 'Tax Groups',
-      route: 'finance.tax.groups',
+      route: 'TaxGroupsList',
       icon: 'layout-grid',
     },
   ],

@@ -13,7 +13,7 @@ export const TX2020PL: ScreenDefinition = {
   primaryView: 'rules',
   route: {
     path: 'rules',
-    name: 'finance.tax.rules',
+    name: 'TaxRulesList',
   },
   permissions: [{ key: 'finance:tax:view' }],
   views: {
