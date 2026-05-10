@@ -8,11 +8,8 @@ import { useDataGrid } from '@/shared/components/data-grid'
 import { useFiscalCalendar } from '../../application/useFiscalCalendar'
 import { GL201000 } from './screen'
 
-import type { FiscalYear } from '../../domain/fiscal-calendar.types'
-import { GL201000_Generate_Fields } from './fields'
-
 export function useFiscalPeriodsController() {
-  const { years, isLoading, error, generateYear, refresh } = useFiscalCalendar()
+  const { years, isLoading, error, refresh } = useFiscalCalendar()
   const gridState = useDataGrid()
 
   // Master selection
@@ -32,7 +29,7 @@ export function useFiscalPeriodsController() {
     { immediate: true },
   )
 
-  const base = useScreenController<FiscalYear[], 'VIEW'>({
+  const base = useScreenController<unknown, 'VIEW'>({
     screen: GL201000,
     dataSource: {
       entity: years,
@@ -42,45 +39,6 @@ export function useFiscalPeriodsController() {
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,
-  })
-
-  const isGenerateOpen = ref(false)
-
-  // Fields for generation
-  const genYear = ref('')
-  const genStartDate = ref<string>('')
-  const genEndDate = ref<string>('')
-
-  base.registerCommand('create', {
-    execute: async () => {
-      const nextYear = new Date().getFullYear()
-      genYear.value = String(nextYear)
-      genStartDate.value = `${nextYear}-01-01`
-      genEndDate.value = `${nextYear}-12-31`
-      isGenerateOpen.value = true
-    },
-    isPending: computed(() => false),
-  })
-
-  const isGenerateValid = computed(() => {
-    return genYear.value.trim().length === 4 && !!genStartDate.value && !!genEndDate.value
-  })
-
-  base.registerCommand('executeGenerate', {
-    execute: async () => {
-      if (!isGenerateValid.value) return
-      try {
-        await generateYear({
-          year: genYear.value,
-          start_date: genStartDate.value,
-          end_date: genEndDate.value,
-        })
-        isGenerateOpen.value = false
-      } catch {
-        // Error Contract handles field errors
-      }
-    },
-    isPending: isLoading,
   })
 
   base.registerCommand('refresh', {
@@ -129,14 +87,6 @@ export function useFiscalPeriodsController() {
     selectedYearId,
     isLoading,
     gridState,
-    isGenerateOpen,
-    fields: {
-      genYear,
-      genStartDate,
-      genEndDate,
-      registry: GL201000_Generate_Fields,
-    },
-    isGenerateValid,
     canCloseYear,
     canLockYear,
     closePeriod: handleClosePeriod,

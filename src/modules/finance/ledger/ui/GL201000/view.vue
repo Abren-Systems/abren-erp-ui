@@ -28,14 +28,6 @@ const { hasPermission } = usePermissions()
         <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--app-text-muted)]">
           Fiscal Years
         </h2>
-        <AppButton
-          v-if="hasPermission('ledger:manage_fiscal_years')"
-          variant="stealth"
-          size="sm"
-          @click="ctrl.commands.value['create']?.execute()"
-        >
-          <Plus :size="14" />
-        </AppButton>
       </div>
 
       <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
@@ -86,69 +78,6 @@ const { hasPermission } = usePermissions()
 
     <!-- Right Detail Content -->
     <div class="flex-1 bg-[var(--app-canvas)] overflow-hidden flex flex-col">
-      <!-- Generation Form (Inline Mode) -->
-      <div
-        v-if="ctrl.isGenerateOpen.value"
-        class="flex-1 flex flex-col items-center justify-center p-8 bg-[var(--app-surface-subtle)]/50 overflow-y-auto"
-      >
-        <div
-          class="w-full max-w-md bg-[var(--app-surface)] rounded-xl border border-[var(--app-border)] shadow-xl p-8 flex flex-col gap-8"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3 text-[var(--app-primary)]">
-              <Plus :size="24" />
-              <h2 class="text-xl font-bold">Generate Fiscal Year</h2>
-            </div>
-            <AppButton variant="stealth" size="sm" @click="ctrl.isGenerateOpen.value = false">
-              <X :size="20" />
-            </AppButton>
-          </div>
-
-          <p class="text-sm text-[var(--app-text-muted)] leading-relaxed">
-            Generate a new financial year with 12 standard monthly periods. This action is atomic
-            and will provision the entire calendar year.
-          </p>
-
-          <div class="flex flex-col gap-6">
-            <AppInput
-              v-model="ctrl.fields.genYear.value"
-              label="Fiscal Year (YYYY)"
-              placeholder="e.g. 2026"
-              :field="ctrl.fields.registry.year"
-            />
-            <div class="grid grid-cols-2 gap-4">
-              <AppInput
-                v-model="ctrl.fields.genStartDate.value"
-                label="Start Date"
-                type="date"
-                :field="ctrl.fields.registry.startDate"
-              />
-              <AppInput
-                v-model="ctrl.fields.genEndDate.value"
-                label="End Date"
-                type="date"
-                :field="ctrl.fields.registry.endDate"
-              />
-            </div>
-          </div>
-
-          <div class="flex gap-3 pt-6 border-t border-[var(--app-border)]">
-            <AppButton class="flex-1" variant="outline" @click="ctrl.isGenerateOpen.value = false">
-              Discard
-            </AppButton>
-            <AppButton
-              class="flex-1"
-              variant="primary"
-              :loading="ctrl.isLoading.value"
-              :disabled="!ctrl.isGenerateValid.value"
-              @click="ctrl.commands.value['executeGenerate']?.execute()"
-            >
-              Generate Now
-            </AppButton>
-          </div>
-        </div>
-      </div>
-
       <!-- Fiscal Period Grid -->
       <DataGrid
         v-else-if="ctrl.selectedYear.value"
@@ -172,7 +101,11 @@ const { hasPermission } = usePermissions()
               >
               <BadgeCell
                 :status="ctrl.selectedYear.value.status"
-                :variants="{ OPEN: 'default', CLOSED: 'secondary', LOCKED: 'destructive' }"
+                :variants="{
+                  OPEN: 'default',
+                  CLOSED: 'secondary',
+                  LOCKED: 'destructive',
+                }"
               />
             </div>
 
@@ -208,7 +141,6 @@ const { hasPermission } = usePermissions()
         </template>
       </DataGrid>
 
-      <!-- Empty State -->
       <div v-else class="flex-1 flex flex-col items-center justify-center p-12 text-center">
         <div
           class="h-20 w-20 rounded-full bg-[var(--app-surface-subtle)] flex items-center justify-center mb-6"
@@ -217,12 +149,12 @@ const { hasPermission } = usePermissions()
         </div>
         <h3 class="text-xl font-bold text-[var(--app-text-primary)] mb-2">No Year Selected</h3>
         <p class="text-sm text-[var(--app-text-muted)] max-w-xs mb-8 leading-relaxed">
-          Select a fiscal year from the sidebar to view periods, or generate a new year to get
-          started.
+          Select a fiscal year from the sidebar to view periods, or go to Financial Year setup to
+          generate a new year.
         </p>
-        <AppButton variant="primary" @click="ctrl.isGenerateOpen.value = true">
+        <AppButton variant="primary" :to="{ name: 'LedgerFinancialYear' }">
           <template #start><Plus :size="18" /></template>
-          Generate New Fiscal Year
+          Setup Financial Year
         </AppButton>
       </div>
     </div>
