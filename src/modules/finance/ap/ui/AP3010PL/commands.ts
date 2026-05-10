@@ -6,7 +6,7 @@ import type { ScreenCommand } from '@/platform/commands/command.types'
 export const AP3010PL_COMMANDS: Record<string, ScreenCommand> = {
   create: {
     key: 'create',
-    labelKey: 'New Request',
+    labelKey: 'New Bill',
     variant: 'primary',
     displayOnMainToolbar: true,
   },

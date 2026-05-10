@@ -1,65 +1,44 @@
 import { computed, ref } from 'vue'
-import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { useScreenController } from '@/platform/screen-runtime'
-import type { PaymentRequestId } from '@/shared/types/brand.types'
-import { usePaymentRequest } from '../../application/usePaymentRequest'
-import { useCreatePaymentRequest } from '../../application/useCreatePaymentRequest'
-import { useApprovePaymentRequest } from '../../application/useApprovePaymentRequest'
-import { useRejectPaymentRequest } from '../../application/useRejectPaymentRequest'
-import { useAuthorizePaymentRequest } from '../../application/useAuthorizePaymentRequest'
-import { useCancelPaymentRequest } from '../../application/useCancelPaymentRequest'
-import { useSubmitPaymentRequest } from '../../application/useSubmitPaymentRequest'
-import { useUsers } from '@/modules/core/application/useUsers'
-import { CURRENCY_OPTIONS, AP301000_FIELDS } from './fields'
+import { useRouter } from 'vue-router'
+import { useScreenController, type ScreenStatePolicy } from '@/platform/screen-runtime'
+import { useVendorBill } from '../../application/useVendorBill'
+import { useCreateVendorBill } from '../../application/useCreateVendorBill'
+import { useValidateVendorBill } from '../../application/useValidateVendorBill'
+import { useRejectVendorBill } from '../../application/useRejectVendorBill'
+import { useFormPersistence } from '@/shared/composables/useFormPersistence'
+import { toId } from '@/shared/types/brand.types'
+import type { VendorBillId } from '@/shared/types/brand.types'
 import { AP301000 } from './screen'
-import { AP301000_POLICY } from './policy'
+import { AP301000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings'
-import type { PaymentRequest, PaymentRequestStatus } from '../../domain/ap.types'
+import type { VendorBill, VendorBillStatus } from '../../domain/ap.types'
 
-/**
- * AP301000 — Payment Request Data Entry Controller
- *
- * Extends useScreenController with domain-specific behavior:
- * - Draft creation via TanStack Form
- * - Workflow action dispatch (approve, reject, submit, authorize, cancel)
- * - Navigation guards for unsaved changes
- * - Resolved display names for users
- *
- * This is the single source of behavior for AP301000/view.vue.
- * The view template reads from this controller exclusively.
- *
- * Commands are declared in commands.ts (data objects).
- * Execution handlers are registered here via registerCommand().
- * The FormToolbar reads both to render and dispatch actions.
- */
-export function usePaymentRequestEntry(id: string) {
+const AP301000_POLICY: ScreenStatePolicy<VendorBillStatus> = {
+  states: {
+    DRAFT: { editable: true },
+    VALIDATED: { editable: false },
+    PAID: { editable: false },
+    VOIDED: { editable: false },
+  },
+}
+
+export function useVendorBillController(id: string) {
   const router = useRouter()
   const isNew = computed(() => id === 'new')
+  const billId = toId<VendorBillId>(id)
 
-  // ── Data Sources ──
-  const { request, isLoading, error } = usePaymentRequest(id as PaymentRequestId)
-  const { users } = useUsers()
+  // Data fetching
+  const { bill, isLoading } = useVendorBill(billId)
+  const { validate, isPending: isValidating } = useValidateVendorBill(billId)
+  const { reject, isPending: isRejecting } = useRejectVendorBill(id)
 
-  // ── Creation Form ──
-  const { form, isSubmitting: isCreating, isSaved, saveDraft } = useCreatePaymentRequest()
+  // Creation form
+  const { form, isSubmitting: isCreating } = useCreateVendorBill()
+  useFormPersistence(form, 'abren_draft_vendor_bill')
 
-  // ── Graph Unified Entity ──
-  // The Controller acts as the PXGraph, hiding the difference between a draft and a saved record.
-  const activeEntity = computed<PaymentRequest | null | undefined>(() => {
-    if (isNew.value) {
-      // Cast form state to match the read model shape approximately
-      return {
-        ...(form.state.values as unknown as PaymentRequest),
-        status: 'DRAFT' as PaymentRequestStatus,
-      }
-    }
-    return request.value
-  })
-
-  // ── Platform Base ──
-  const base = useScreenController<PaymentRequest, PaymentRequestStatus>({
+  const base = useScreenController<VendorBill, VendorBillStatus>({
     screen: AP301000,
-    dataSource: { entity: activeEntity, isLoading, error },
+    dataSource: { entity: bill, isLoading, error: ref(null) },
     isNew,
     getDomainState: (entity) => entity.status,
     statePolicy: AP301000_POLICY,
@@ -68,44 +47,24 @@ export function usePaymentRequestEntry(id: string) {
   // Attach form to base so useField can find it for new records
   Object.assign(base, { form })
 
-  // ── Workflow Action Executors ──
-  // ── UI State ──
-  const activeTab = ref('Line Details')
-  const isTraceOpen = ref(false)
+  // UI state
+  const currentLines = computed(() => bill.value?.lines || [])
+  const activeTab = ref('Expense Lines')
   const isRejectDialogOpen = ref(false)
-  const isCancelDialogOpen = ref(false)
   const auditReason = ref('')
 
-  // ── Workflow Action Executors ──
-  const { approve, isPending: isApproving } = useApprovePaymentRequest(id as PaymentRequestId)
-  const { reject, isPending: isRejecting } = useRejectPaymentRequest(id as PaymentRequestId)
-  const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(id as PaymentRequestId)
-  const { cancel, isPending: isCancelling } = useCancelPaymentRequest(id as PaymentRequestId)
-  const { submit, isPending: isSubmittingRequest } = useSubmitPaymentRequest(id as PaymentRequestId)
-
-  // Register command executors — the FormToolbar reads these for dispatch
-  base.registerCommand('submit', {
-    execute: async () => void submit(),
-    isPending: isSubmittingRequest,
+  // Commands
+  base.registerCommand('validate', {
+    execute: async () => void validate(),
+    isPending: isValidating,
   })
-  base.registerCommand('approve', { execute: async () => void approve(), isPending: isApproving })
+
   base.registerCommand('reject', {
     execute: async () => {
       auditReason.value = ''
       isRejectDialogOpen.value = true
     },
     isPending: isRejecting,
-  })
-  base.registerCommand('authorize', {
-    execute: async () => void authorize(),
-    isPending: isAuthorizing,
-  })
-  base.registerCommand('cancel', {
-    execute: async () => {
-      auditReason.value = ''
-      isCancelDialogOpen.value = true
-    },
-    isPending: isCancelling,
   })
 
   const handleRejectConfirm = async () => {
@@ -114,107 +73,33 @@ export function usePaymentRequestEntry(id: string) {
     isRejectDialogOpen.value = false
   }
 
-  const handleCancelConfirm = async () => {
-    if (!auditReason.value.trim()) return
-    await cancel(auditReason.value)
-    isCancelDialogOpen.value = false
-  }
-
-  // ── Domain Derived State ──
-  const isDraft = computed(() => isNew.value || activeEntity.value?.status === 'DRAFT')
-
-  // ── Resolved Display Names ──
-  const requesterEmail = computed(() => {
-    if (isNew.value) return 'Current User'
-    const user = users.value?.find((u) => u.id === activeEntity.value?.requesterId)
-    return user?.email ?? activeEntity.value?.requesterId
+  base.registerCommand('create_pr', {
+    execute: async () => void router.push({ name: 'PaymentRequestsList' }),
+    isPending: computed(() => false),
   })
 
-  const beneficiaryEmail = computed(() => {
-    const targetId = activeEntity.value?.beneficiaryId
-    if (!targetId) return ''
-    const user = users.value?.find((u) => u.id === targetId)
-    return user?.email ?? targetId
-  })
-
-  // ── Grid Data ──
-  const currentLines = computed(() => {
-    return activeEntity.value?.lines || []
-  })
-
-  const userOptions = computed(
-    () => users.value?.map((u) => ({ label: u.email, value: u.id })) || [],
-  )
-  const currencyOptions = computed(() => CURRENCY_OPTIONS)
-
-  // ── Action Dispatch (for creation-mode Save/Create) ──
-  function handleCreate() {
-    void form.handleSubmit()
-  }
-
-  // ── Navigation Guard ──
-  onBeforeRouteLeave((_to, _from, next) => {
-    if (isNew.value && !isSaved.value && !isCreating.value) {
-      const answer = window.confirm(
-        'You have unsaved work. Would you like to leave without saving?',
-      )
-      next(answer)
-    } else {
-      next()
-    }
-  })
-
-  // ── Field Bindings ──────────────────────────────────────
-  // This is where behavioral discipline is enforced.
   const fields = {
-    requesterId: useField(base, AP301000_FIELDS.requesterId),
-    beneficiaryId: useField(base, AP301000_FIELDS.beneficiaryId),
-    status: useField(base, AP301000_FIELDS.status),
-    submittedAt: useField(base, AP301000_FIELDS.submittedAt),
-    justification: useField(base, AP301000_FIELDS.justification),
+    vendorId: useField(base, AP301000_FIELDS.vendorId),
+    billNumber: useField(base, AP301000_FIELDS.billNumber),
+    vendorInvoiceNumber: useField(base, AP301000_FIELDS.vendorInvoiceNumber),
+    issueDate: useField(base, AP301000_FIELDS.issueDate),
+    dueDate: useField(base, AP301000_FIELDS.dueDate),
     currency: useField(base, AP301000_FIELDS.currency),
+    justification: useField(base, AP301000_FIELDS.justification),
+    status: useField(base, AP301000_FIELDS.status),
     totalAmount: useField(base, AP301000_FIELDS.totalAmount),
   }
 
   return {
-    // Platform base (data selectors, state machine, commands)
     ...base,
-
-    // Field Bindings
     fields,
-
-    // Creation form
+    currentLines,
+    activeTab,
+    isRejectDialogOpen,
+    auditReason,
+    handleRejectConfirm,
     form,
     isCreating,
-    saveDraft,
-
-    // UI state
-    activeTab,
-    isTraceOpen,
-    isRejectDialogOpen,
-    isCancelDialogOpen,
-    auditReason,
-
-    // Domain derived
-    isDraft,
-
-    // Resolved names
-    requesterEmail,
-    beneficiaryEmail,
-
-    // Grid
-    currentLines,
-
-    // Options
-    userOptions,
-    currencyOptions,
-
-    // Handlers
-    handleCreate,
-    handleRejectConfirm,
-    handleCancelConfirm,
-
-    // Navigation
     router,
   }
 }

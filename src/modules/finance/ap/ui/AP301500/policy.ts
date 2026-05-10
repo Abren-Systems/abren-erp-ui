@@ -1,7 +1,7 @@
 import type { ScreenStatePolicy } from '@/platform/screen-runtime'
 import type { PaymentRequestStatus } from '../../domain/ap.types'
 
-// ── AP301000 Screen State Policy ──────────────────────────
+// ── AP301500 Screen State Policy ──────────────────────────
 // Declares how the Payment Request Entry screen renders in each domain state.
 // This is the frontend equivalent of Acumatica's WithFieldStates() in the
 // Workflow API — one file, one source of truth.
@@ -19,7 +19,7 @@ type PRFieldKey =
   | 'currency'
   | 'totalAmount'
 
-export const AP301000_POLICY: ScreenStatePolicy<PaymentRequestStatus, PRFieldKey> = {
+export const AP301500_POLICY: ScreenStatePolicy<PaymentRequestStatus, PRFieldKey> = {
   states: {
     DRAFT: {
       editable: true,

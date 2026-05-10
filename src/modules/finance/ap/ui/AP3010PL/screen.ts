@@ -1,49 +1,47 @@
-import { usePaymentRequestList } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import { AP_MODULE_ID, apScreenId } from '../../constants'
+import type { ModuleId } from '@/shared/types/brand.types'
+import { useVendorBillsListController } from './controller'
 import { AP3010PL_COMMANDS_LIST } from './commands'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
-/**
- * AP3010PL — Payment Requests Workspace (List)
- *
- * Acumatica screen kind: primaryList
- * Dense list scanning with saved filters and navigation to AP301000.
- * Current render target: view.vue
- */
 export const AP3010PL: ScreenDefinition = {
-  id: apScreenId('AP3010PL'),
-  moduleId: AP_MODULE_ID,
-  controller: () => usePaymentRequestList(),
+  id: createScreenId('AP3010PL'),
+  moduleId: 'ap' as ModuleId,
+  controller: () => useVendorBillsListController(),
   kind: 'primaryList',
-  titleKey: 'ap.paymentRequests.list.title',
-  primaryView: 'paymentRequests',
+  titleKey: 'Bills and Adjustments',
+  primaryView: 'bills',
   route: {
-    path: 'requests',
-    name: 'PaymentRequestsList',
+    path: 'vendor-bills',
+    name: 'BillsAndAdjustmentsList',
   },
   permissions: [{ key: 'ap:view' }],
   views: {
-    paymentRequests: {
-      name: 'paymentRequests',
+    bills: {
+      name: 'bills',
       kind: 'collection',
-      containerName: 'PaymentRequestsList',
-      queryKey: ['ap', 'payment-requests'] as const,
+      containerName: 'VendorBillsList',
+      queryKey: ['ap', 'vendor-bills', 'list'] as const,
     },
   },
   layout: {
     summaryTemplate: '1',
     renderTarget: () => import('./view.vue') as never,
+    sidePanel: {
+      tabs: [],
+      defaultCollapsed: true,
+    },
   },
   commands: AP3010PL_COMMANDS_LIST,
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,
-    allowFilterSaving: true,
+    allowFilterSaving: false,
     allowSectionPersonalization: false,
   },
   test: {
-    containerName: 'PaymentRequestsList',
-    viewNames: ['paymentRequests'],
-    actionNames: ['create', 'refresh'],
+    containerName: 'AP3010PL',
+    viewNames: [],
+    actionNames: [],
   },
 }

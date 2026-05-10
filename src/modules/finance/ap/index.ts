@@ -10,11 +10,11 @@ export const apModule: BusinessDomain = {
   routes,
   permissions: ['ap:view'], // Consolidates ap:view
   menuItems: [
+    { label: 'Bills and Adjustments', route: 'BillsAndAdjustmentsList', icon: 'file-text' },
     {
       label: 'Payment Requests',
       route: 'PaymentRequestsList',
       icon: 'credit-card',
     },
-    { label: 'Vendor Bills', route: 'VendorBillsList', icon: 'file-text' },
   ],
 }

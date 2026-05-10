@@ -1,78 +1,53 @@
-/**
- * Field metadata and control definitions for Payment Requests.
- *
- * This file serves as the metadata registry for dropdown options,
- * filter presets, and control configurations used by the screen runtime.
- */
-
-import type { FieldOptionContract } from '@/platform/component-contracts'
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { PaymentRequest } from '../../domain/ap.types'
+import type { VendorBill } from '../../domain/ap.types'
 
-export const PAYMENT_REQUEST_STATUS_OPTIONS: readonly FieldOptionContract[] = [
-  { label: 'Draft', value: 'DRAFT' },
-  { label: 'Submitted', value: 'SUBMITTED' },
-  { label: 'Approved', value: 'APPROVED' },
-  { label: 'Authorized', value: 'AUTHORIZED' },
-  { label: 'Rejected', value: 'REJECTED' },
-  { label: 'Cancelled', value: 'CANCELLED' },
-]
-
-export const PAYMENT_REQUEST_FILTER_PRESETS = [
-  { id: 'all', label: 'All Records' },
-  { id: 'needs_attention', label: 'Needs Attention' },
-  { id: 'in_review', label: 'In Review' },
-]
-
-export const CURRENCY_OPTIONS: readonly FieldOptionContract[] = [
-  { label: 'ETB', value: 'ETB' },
-  { label: 'USD', value: 'USD' },
-]
-
-// ── Strict Field Definitions ─────────────────────────────
-// Encapsulates all presentation and state-based rules.
-// The controller owns this logic, and the View simply binds to it.
-
+/**
+ * AP301000 — Field Registry Bindings
+ */
 export const AP301000_FIELDS = {
-  requesterId: {
-    key: 'requesterId',
-    label: 'Requester',
-    type: 'text', // using text as a fallback since type: 'id' might not be in FieldRenderType, but let's use 'text' or add 'selector'
-  } as FieldDefinition<PaymentRequest, string>,
-
-  beneficiaryId: {
-    key: 'beneficiaryId',
-    label: 'Beneficiary',
+  vendorId: {
+    key: 'vendorId',
+    label: 'Vendor',
     type: 'selector',
-  } as FieldDefinition<PaymentRequest, string>,
-
-  status: {
-    key: 'status',
-    label: 'Status',
+  },
+  billNumber: {
+    key: 'billNumber',
+    label: 'Bill Number',
     type: 'text',
-  } as FieldDefinition<PaymentRequest, string>,
-
-  submittedAt: {
-    key: 'submittedAt',
-    label: 'Submitted On',
+  },
+  vendorInvoiceNumber: {
+    key: 'vendorInvoiceNumber',
+    label: 'Vendor Invoice #',
+    type: 'text',
+  },
+  issueDate: {
+    key: 'issueDate',
+    label: 'Issue Date',
     type: 'date',
-  } as FieldDefinition<PaymentRequest, string>,
-
-  justification: {
-    key: 'justification',
-    label: 'Justification',
-    type: 'textarea',
-  } as FieldDefinition<PaymentRequest, string>,
-
+  },
+  dueDate: {
+    key: 'dueDate',
+    label: 'Due Date',
+    type: 'date',
+  },
   currency: {
     key: 'currency',
     label: 'Currency',
     type: 'selector',
-  } as FieldDefinition<PaymentRequest, string>,
-
+  },
+  justification: {
+    key: 'justification',
+    label: 'Justification',
+    type: 'textarea',
+  },
+  status: {
+    key: 'status',
+    label: 'Status',
+    type: 'text',
+  },
   totalAmount: {
     key: 'totalAmount',
-    label: 'Order Total',
+    label: 'Total Amount',
     type: 'amount',
-  } as FieldDefinition<PaymentRequest, number>,
-} as const
+  },
+} satisfies Record<string, FieldDefinition<VendorBill>>

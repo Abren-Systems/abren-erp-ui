@@ -11,15 +11,21 @@ export const inventoryModule: BusinessDomain = {
   screens: inventoryScreens,
   menuItems: [
     {
+      label: 'Stock Items',
+      route: 'inventory.stock',
+      icon: 'box',
+      permissions: ['inventory:view'],
+    },
+    {
       label: 'Warehouses',
       route: 'inventory.warehouses',
       icon: 'warehouse',
       permissions: ['inventory:view'],
     },
     {
-      label: 'Stock Positions',
-      route: 'inventory.stock',
-      icon: 'boxes',
+      label: 'Adjustments',
+      route: 'inventory.adjustments',
+      icon: 'refresh-cw',
       permissions: ['inventory:view'],
     },
   ],

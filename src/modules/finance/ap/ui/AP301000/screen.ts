@@ -1,54 +1,40 @@
-import { usePaymentRequestEntry } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import { AP_MODULE_ID, apScreenId } from '../../constants'
+import type { ModuleId } from '@/shared/types/brand.types'
+import { useVendorBillController } from './controller'
 import { AP301000_COMMANDS } from './commands'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
-/**
- * AP301000 — Payment Request Data Entry (Focus)
- *
- * Acumatica screen kind: dataEntry
- * Transaction creation and editing with summary area, tabs, and line grid.
- * Current render target: view.vue
- */
 export const AP301000: ScreenDefinition = {
-  id: apScreenId('AP301000'),
-  moduleId: AP_MODULE_ID,
-  controller: (ctx) => usePaymentRequestEntry(ctx.params['id'] as string),
+  id: createScreenId('AP301000'),
+  moduleId: 'ap' as ModuleId,
+  controller: (ctx) => useVendorBillController(ctx.params['id'] as string),
   kind: 'dataEntry',
-  titleKey: 'Payment Requests',
-  primaryView: 'paymentRequest',
+  titleKey: 'Bills and Adjustments',
+  primaryView: 'bill',
   route: {
-    path: 'requests/:id',
-    name: 'PaymentRequestDetail',
+    path: 'vendor-bills/:id',
+    name: 'BillsAndAdjustmentsDetail',
   },
   permissions: [{ key: 'ap:view' }],
   views: {
-    paymentRequest: {
-      name: 'paymentRequest',
+    bill: {
+      name: 'bill',
       kind: 'single',
-      containerName: 'PaymentRequestEntry',
-      queryKey: ['ap', 'payment-requests', 'detail'] as const,
+      containerName: 'VendorBillRecord',
+      queryKey: ['ap', 'vendor-bills', 'detail'] as const,
     },
     lines: {
       name: 'lines',
       kind: 'collection',
-      containerName: 'PaymentRequestLines',
-      queryKey: ['ap', 'payment-requests', 'lines'] as const,
+      containerName: 'VendorBillLines',
+      queryKey: ['ap', 'vendor-bills', 'lines'] as const,
     },
   },
   layout: {
-    summaryTemplate: '7-10-7',
+    summaryTemplate: '17-17-14',
     renderTarget: () => import('./view.vue') as never,
     sidePanel: {
-      tabs: [
-        {
-          kind: 'local',
-          id: 'audit',
-          labelKey: 'Trace',
-          icon: 'History',
-          component: () => import('./sidepanels/audit.vue'),
-        },
-      ],
+      tabs: [],
       defaultCollapsed: true,
     },
   },
@@ -57,11 +43,11 @@ export const AP301000: ScreenDefinition = {
     allowTabPersonalization: true,
     allowGridPersonalization: true,
     allowFilterSaving: false,
-    allowSectionPersonalization: true,
+    allowSectionPersonalization: false,
   },
   test: {
-    containerName: 'PaymentRequestEntry',
-    viewNames: ['paymentRequest', 'lines'],
-    actionNames: ['save', 'delete', 'submit', 'approve', 'reject', 'release'],
+    containerName: 'AP301000',
+    viewNames: [],
+    actionNames: [],
   },
 }

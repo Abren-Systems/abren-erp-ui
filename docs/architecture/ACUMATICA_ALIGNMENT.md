@@ -215,39 +215,54 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 
 ### Module Prefixes
 
-| Prefix | Module             | Abren Module Path         |
-| ------ | ------------------ | ------------------------- |
-| `AP`   | Accounts Payable   | `modules/finance/ap/`     |
-| `GL`   | General Ledger     | `modules/finance/ledger/` |
-| `CA`   | Banking            | `modules/finance/bank/`   |
-| `TX`   | Tax                | `modules/finance/tax/`    |
-| `IN`   | Inventory          | `modules/inventory/`      |
-| `CR`   | Core (Users/Roles) | `modules/core/`           |
+| Prefix | Module            | Abren Module Path         |
+| ------ | ----------------- | ------------------------- |
+| `AP`   | Accounts Payable  | `modules/finance/ap/`     |
+| `GL`   | General Ledger    | `modules/finance/ledger/` |
+| `CA`   | Banking           | `modules/finance/bank/`   |
+| `TX`   | Tax               | `modules/finance/tax/`    |
+| `IN`   | Inventory         | `modules/inventory/`      |
+| `SM`   | System Management | `modules/core/`           |
+| `EP`   | Enterprise Portal | `modules/workflows/`      |
 
 ### Planned Screen Registry
 
 #### Accounts Payable (AP)
 
-| Screen ID  | Form Kind    | Title                 | Acumatica Equivalent | Status    |
-| ---------- | ------------ | --------------------- | -------------------- | --------- |
-| `AP301000` | Data Entry   | Payment Request Entry | AP301000             | ✅ Built  |
-| `AP3010PL` | Primary List | Payment Requests List | AP3010PL             | ✅ Built  |
-| `AP302000` | Data Entry   | Vendor Bill Entry     | AP301000 (Bills)     | ❌ Legacy |
+| Screen ID  | Form Kind    | Title                 | Acumatica Equivalent | Status     |
+| ---------- | ------------ | --------------------- | -------------------- | ---------- |
+| `AP301000` | Data Entry   | Bills and Adjustments | AP301000             | ✅ Aligned |
+| `AP3010PL` | Primary List | Bills and Adjustments | AP3010PL             | ✅ Aligned |
+| `AP301500` | Data Entry   | Payment Requests      | (Abren Extension)    | ✅ Aligned |
+| `AP3015PL` | Primary List | Payment Requests List | (Abren Extension)    | ✅ Aligned |
+| `AP302000` | Data Entry   | Checks and Payments   | AP302000             | 📋 Future  |
 
 #### General Ledger (GL)
 
-> [!WARNING]
-> **Screen ID Alignment Issue**: Our current `GL101000` (Ledger Settings) maps to Acumatica's `GL102000` (General Ledger Preferences), and our current `GL102000` (Fiscal Periods) conflates functionality that Acumatica splits across `GL101000` (Financial Year) + `GL201000` (Master Financial Calendar) + `GL503000` (Manage Financial Periods). A Screen ID realignment is documented in [FISCAL_CALENDAR_DESIGN.md](FISCAL_CALENDAR_DESIGN.md) and will be addressed as a dedicated domain redesign initiative.
+| Screen ID  | Form Kind    | Title                      | Acumatica Equivalent | Status     |
+| ---------- | ------------ | -------------------------- | -------------------- | ---------- |
+| `GL101000` | Setup        | Financial Year             | GL101000             | ✅ Aligned |
+| `GL102000` | Setup        | GL Preferences             | GL102000             | ✅ Aligned |
+| `GL201000` | Maintenance  | Master Financial Calendar  | GL201000             | ✅ Aligned |
+| `GL202500` | Maintenance  | Chart of Accounts (Detail) | GL202500             | ✅ Aligned |
+| `GL2025PL` | Primary List | Chart of Accounts (List)   | GL2025PL             | ✅ Aligned |
+| `GL301000` | Data Entry   | Journal Transactions       | GL301000             | ✅ Aligned |
+| `GL3010PL` | Primary List | Journal Transactions List  | GL3010PL             | ✅ Aligned |
+| `GL503000` | Processing   | Manage Financial Periods   | GL503000             | 📋 Future  |
 
-| Screen ID  | Form Kind    | Title                      | Acumatica Equivalent | Status                          |
-| ---------- | ------------ | -------------------------- | -------------------- | ------------------------------- |
-| `GL101000` | Setup        | Ledger Settings            | GL102000 (GL Prefs)  | ⚠️ Needs normalization          |
-| `GL102000` | Setup        | Fiscal Periods             | GL101000 + GL201000  | ⚠️ **Domain redesign required** |
-| `GL201000` | Maintenance  | Chart of Accounts (Detail) | GL201500 (CoA)       | ⚠️ Needs normalization          |
-| `GL2010PL` | Primary List | Chart of Accounts (List)   | GL2010PL             | ⚠️ Needs normalization          |
-| `GL301000` | Data Entry   | Journal Entry              | GL301000             | ⚠️ Needs normalization          |
-| `GL3010PL` | Primary List | Journal Entries List       | GL3010PL             | ⚠️ Needs normalization          |
-| `GL503000` | Processing   | Manage Financial Periods   | GL503000             | 📋 Future                       |
+#### System Management (SM)
+
+| Screen ID  | Form Kind   | Title      | Acumatica Equivalent | Status     |
+| ---------- | ----------- | ---------- | -------------------- | ---------- |
+| `SM201010` | Maintenance | Users      | SM201010             | ✅ Aligned |
+| `SM201100` | Setup       | User Roles | SM201100             | ✅ Aligned |
+| `SM203500` | Maintenance | Companies  | SM203500             | ✅ Aligned |
+
+#### Enterprise Portal (EP)
+
+| Screen ID  | Form Kind  | Title     | Acumatica Equivalent | Status     |
+| ---------- | ---------- | --------- | -------------------- | ---------- |
+| `EP503010` | Processing | Approvals | EP503010             | ✅ Aligned |
 
 #### Banking (CA)
 
@@ -263,17 +278,21 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 
 #### Inventory (IN)
 
-| Screen ID  | Form Kind   | Title                 | Acumatica Equivalent | Status    |
-| ---------- | ----------- | --------------------- | -------------------- | --------- |
-| `IN202000` | Maintenance | Stock Items           | IN202500             | ❌ Legacy |
-| `IN301000` | Data Entry  | Inventory Adjustments | IN301000             | ❌ Legacy |
+| Screen ID  | Form Kind    | Title       | Acumatica Equivalent | Status     |
+| ---------- | ------------ | ----------- | -------------------- | ---------- |
+| `IN202500` | Maintenance  | Stock Items | IN202500             | ✅ Aligned |
+| `IN2025PL` | Primary List | Stock Items | IN2025PL             | ✅ Aligned |
+| `IN204000` | Maintenance  | Warehouses  | IN204000             | ✅ Aligned |
+| `IN2040PL` | Primary List | Warehouses  | IN2040PL             | ✅ Aligned |
+| `IN303000` | Data Entry   | Adjustments | IN303000             | ✅ Aligned |
+| `IN3030PL` | Primary List | Adjustments | IN3030PL             | ✅ Aligned |
 
 ### The `PL` Suffix
 
 `PL` (Primary List) denotes the inquiry/list form **paired** with a data entry form:
 
-- `AP301000` → Payment Request Detail (data entry)
-- `AP3010PL` → Payment Requests List (inquiry grid)
+- `AP301500` → Payment Request Detail (data entry)
+- `AP3015PL` → Payment Requests List (inquiry grid)
 
 The PL form is the **Workspace's link target** — clicking a Workspace menu item opens the PL form, from which the user navigates to the data entry form.
 

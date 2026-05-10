@@ -1,30 +1,27 @@
-import { h } from 'vue'
-import type { Row } from '@tanstack/vue-table'
-import type { PaymentRequestLine } from '../../../domain/ap.types'
-import { MoneyCell } from '@/shared/components/data-grid'
+import { createColumnHelper } from '@tanstack/vue-table'
+import type { VendorBillLine } from '../../../domain/ap.types'
+
+const helper = createColumnHelper<VendorBillLine>()
 
 /**
- * Grid column metadata for the Payment Request Lines collection view.
- * Extracted from the Focus screen for Acumatica alignment.
+ * AP301000 — Expense Lines Grid Definition
  */
-export const paymentRequestLineColumns = [
-  {
-    id: 'index',
-    header: 'LINE #',
-    cell: ({ row }: { row: Row<PaymentRequestLine> }) =>
-      h('span', { class: 'font-mono text-xs text-neutral-500' }, row.index + 1),
-    size: 80,
-  },
-  {
-    id: 'description',
-    header: 'DESCRIPTION',
-    accessorKey: 'description',
-  },
-  {
-    id: 'amount',
-    header: 'AMOUNT',
-    cell: ({ row }: { row: Row<PaymentRequestLine> }) =>
-      h(MoneyCell, { amount: row.original.amount, align: 'right' }),
-    size: 150,
-  },
+export const vendorBillLineColumns = [
+  helper.accessor('description', {
+    header: 'Description',
+    cell: (info) => info.getValue(),
+  }),
+  helper.accessor('amount', {
+    header: 'Amount',
+    cell: (info) => info.getValue().format('en-ET'),
+    meta: { align: 'right' },
+  }),
+  helper.accessor('accountId', {
+    header: 'GL Account',
+    cell: (info) => info.getValue() ?? 'Not assigned',
+  }),
+  helper.accessor('categoryId', {
+    header: 'Category',
+    cell: (info) => info.getValue() ?? 'Not assigned',
+  }),
 ]

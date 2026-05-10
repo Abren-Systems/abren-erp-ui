@@ -8,7 +8,7 @@ export const IN303000: ScreenDefinition = {
   moduleId: 'inventory' as ModuleId,
   controller: (ctx) => useAdjustmentController(ctx.params['id'] as string),
   kind: 'dataEntry',
-  titleKey: 'Post Inventory Adjustment',
+  titleKey: 'Adjustments',
   primaryView: 'adjustment',
   route: {
     path: 'adjustments/:id',

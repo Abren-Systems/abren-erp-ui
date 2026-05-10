@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useScreenControllerContext } from '@/platform/screen-runtime'
-import { DataGrid, DataGridFilterSelector, DataGridFooter } from '@/shared/components/data-grid'
+import { inject } from 'vue'
+import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
-import { ListFilter, Plus, RefreshCcw } from 'lucide-vue-next'
-import PaymentRequestBulkActionBar from './BulkActionBar.vue'
+import { Plus, RefreshCcw } from 'lucide-vue-next'
+import { vendorBillColumns } from './grids/vendor-bill.grid'
 
 const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 </script>
@@ -16,17 +17,24 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         v-model:row-selection="ctrl.gridState.rowSelection"
         v-model:column-visibility="ctrl.gridState.columnVisibility"
         v-model:global-filter="ctrl.gridState.globalFilter"
-        :data="ctrl.filteredRequests.value"
-        :columns="ctrl.columns"
+        :columns="vendorBillColumns"
+        :data="ctrl.bills.value || []"
         :loading="ctrl.isLoading.value"
-        placeholder="Search requests..."
+        placeholder="Search bills..."
+        empty-message="No vendor bills found."
         row-clickable
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar>
-          <DataGridFilterSelector v-model="ctrl.statusFilter.value" :options="ctrl.filterPresets" />
-          <div class="h-4 w-px bg-[var(--color-neutral-200)] mx-1" />
-          <AppButton variant="stealth" size="sm" @click="ctrl.commands.value['refresh']?.execute()">
+          <AppButton
+            variant="stealth"
+            size="sm"
+            @click="
+              ctrl.model.value.ui.actions.secondary
+                .find((a) => a.command.id === 'refresh')
+                ?.command.execute()
+            "
+          >
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
             </template>
@@ -35,63 +43,20 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         </template>
 
         <template #toolbar-controls>
-          <AppButton variant="outline" size="sm" @click="ctrl.isFilterOpen.value = true">
-            <template #start><ListFilter :size="14" /></template>
-            Filter
-          </AppButton>
           <AppButton
-            v-if="ctrl.hasPermission('ap:create')"
             variant="primary"
             size="sm"
-            @click="ctrl.commands.value['create']?.execute()"
+            @click="
+              ctrl.model.value.ui.actions.primary
+                .find((a) => a.command.id === 'create')
+                ?.command.execute()
+            "
           >
             <template #start><Plus :size="14" /></template>
-            New Request
+            New Bill
           </AppButton>
-        </template>
-
-        <template #empty-action>
-          <AppButton variant="outline" size="sm" @click="ctrl.clearFilters">
-            Clear all filters
-          </AppButton>
-        </template>
-
-        <template #footer>
-          <DataGridFooter
-            :total-rows="ctrl.filteredRequests.value.length"
-            :selected-count="ctrl.selectedCount.value"
-            :total-amount-formatted="ctrl.totalFilteredAmount.value.format()"
-          />
         </template>
       </DataGrid>
     </div>
-
-    <!-- Floating Bulk Action Bar & Overlay -->
-    <PaymentRequestBulkActionBar
-      :selected-ids="ctrl.selectedIds.value"
-      :filtered-requests="ctrl.filteredRequests.value"
-      @clear-selection="ctrl.clearSelection"
-    />
-
-    <!-- Sidebars -->
   </div>
 </template>
-
-<style scoped>
-/* Trace Action Visibility Logic */
-:deep(.grid-row) .trace-action-btn {
-  opacity: 0;
-  transition: all 0.2s ease;
-  color: var(--color-neutral-400);
-}
-
-:deep(.grid-row:hover) .trace-action-btn {
-  opacity: 1;
-}
-
-:deep(.grid-row) .trace-action-btn.is-active {
-  opacity: 1 !important;
-  color: var(--color-primary-600);
-  background: var(--color-primary-50);
-}
-</style>

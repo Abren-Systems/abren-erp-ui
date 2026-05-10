@@ -1,69 +1,38 @@
 import type { ScreenCommand } from '@/platform/commands'
 
 /**
- * AP301000 — Payment Request Screen Commands
- *
- * Declarative command definitions. The platform toolbar reads these
- * to determine Expected Next Action, More Menu grouping, and visibility.
- * Execution is handled by the controller's registerCommand() registry.
+ * AP301000 — Vendor Bills Screen Commands
  */
 export const AP301000_COMMANDS: readonly ScreenCommand[] = [
   {
-    key: 'submit',
-    kind: 'workflow',
-    labelKey: 'Submit',
+    key: 'validate',
+    labelKey: 'Validate & Accrue',
     variant: 'primary',
     categoryKey: 'processing',
     displayOnMainToolbar: true,
-    from: ['DRAFT', 'REJECTED'],
-    to: 'SUBMITTED',
-    requiresConfirmation: true,
-    confirmationMessageKey: 'Submit this request for approval?',
-  },
-  {
-    key: 'approve',
-    kind: 'workflow',
-    labelKey: 'Approve',
-    variant: 'primary',
-    categoryKey: 'processing',
-    displayOnMainToolbar: true,
-    from: ['SUBMITTED'],
-    to: 'APPROVED',
-    requiresConfirmation: true,
-    confirmationMessageKey: 'Approve this payment request?',
+    from: ['DRAFT'],
+    to: 'VALIDATED',
+    requiresConfirmation: false,
   },
   {
     key: 'reject',
-    kind: 'workflow',
-    labelKey: 'Reject',
+    labelKey: 'Void draft bill',
     variant: 'danger',
     categoryKey: 'processing',
-    displayOnMainToolbar: true,
-    from: ['SUBMITTED'],
-    to: 'REJECTED',
+    displayOnMainToolbar: false,
+    from: ['DRAFT'],
+    to: 'VOIDED', // Or whatever rejected state maps to
     requiresConfirmation: true,
-    confirmationMessageKey: 'Reject this payment request?',
+    confirmationMessageKey: 'Are you sure you want to void this draft bill?',
   },
   {
-    key: 'authorize',
-    kind: 'workflow',
-    labelKey: 'Authorize',
+    key: 'create_pr',
+    labelKey: 'Create Payment Request',
     variant: 'primary',
     categoryKey: 'processing',
     displayOnMainToolbar: true,
-    from: ['APPROVED'],
-    to: 'AUTHORIZED',
-    requiresConfirmation: true,
-    confirmationMessageKey: 'Authorize this payment?',
-  },
-  {
-    key: 'cancel',
-    kind: 'utility',
-    labelKey: 'Cancel Request',
-    variant: 'danger',
-    categoryKey: 'other',
-    from: ['DRAFT', 'SUBMITTED'],
-    requiresConfirmation: true,
-    confirmationMessageKey: 'Cancel this request permanently?',
+    from: ['VALIDATED'],
+    to: 'VALIDATED', // Doesn't change state, just navigates
+    requiresConfirmation: false,
   },
 ]

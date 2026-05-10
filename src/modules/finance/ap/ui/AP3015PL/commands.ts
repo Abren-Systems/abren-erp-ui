@@ -1,12 +1,12 @@
 import type { ScreenCommand } from '@/platform/commands/command.types'
 
 /**
- * AP3020PL Command Registry
+ * AP3015PL Command Registry
  */
-export const AP3020PL_COMMANDS: Record<string, ScreenCommand> = {
+export const AP3015PL_COMMANDS: Record<string, ScreenCommand> = {
   create: {
     key: 'create',
-    labelKey: 'New Bill',
+    labelKey: 'New Request',
     variant: 'primary',
     displayOnMainToolbar: true,
   },
@@ -19,4 +19,4 @@ export const AP3020PL_COMMANDS: Record<string, ScreenCommand> = {
   },
 }
 
-export const AP3020PL_COMMANDS_LIST = Object.values(AP3020PL_COMMANDS)
+export const AP3015PL_COMMANDS_LIST = Object.values(AP3015PL_COMMANDS)
