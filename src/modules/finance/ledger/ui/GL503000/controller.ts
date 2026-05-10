@@ -1,90 +1,103 @@
 import { computed, ref, watch } from 'vue'
-import {
-  useScreenController,
-  LIST_SCREEN_POLICY,
-  listScreenDomainState,
-} from '@/platform/screen-runtime'
-import { useDataGrid } from '@/shared/composables/useDataGrid'
+import { toast } from 'vue-sonner'
+import { useDataGrid } from '@/shared/components/data-grid'
+import { useScreenController, LIST_SCREEN_POLICY } from '@/platform/screen-runtime'
 import { useFiscalCalendar } from '../../application/useFiscalCalendar'
 import { GL503000 } from './screen'
-import type { FiscalPeriod } from '../../domain/fiscal-calendar.types'
 import { GL503000_FIELDS } from './fields'
+import type { ApiError } from '@/shared/api/http-client'
 
 export type PeriodProcessAction = 'CLOSE' | 'OPEN' | 'LOCK' | 'UNLOCK'
 
 export function useManagePeriodsController() {
-  const { years, isLoading, error, closePeriod, lockPeriod } = useFiscalCalendar()
+  const { years, isLoading, error, closePeriod, openPeriod, lockPeriod, unlockPeriod } =
+    useFiscalCalendar()
   const gridState = useDataGrid()
 
-  // Header State
-  const selectedAction = ref<PeriodProcessAction>('CLOSE')
-  const selectedYearId = ref<string | null>(null)
+  // ── Platform Base ──
+  useScreenController({
+    screen: GL503000,
+    dataSource: {
+      entity: computed(() => null),
+      isLoading,
+      error,
+    },
+    statePolicy: LIST_SCREEN_POLICY,
+    getDomainState: () => 'VIEW',
+  })
 
-  // Auto-select current/latest year
+  // Header State
+  const selectedYearId = ref<string | null>(null)
+  const selectedAction = ref<PeriodProcessAction>('CLOSE')
+  const isProcessing = ref(false)
+
+  // Options
+  const yearOptions = computed(() =>
+    (years.value || []).map((y) => ({
+      label: y.year,
+      value: y.id,
+    })),
+  )
+
+  const actionOptions: { label: string; value: PeriodProcessAction }[] = [
+    { label: 'Close Period', value: 'CLOSE' },
+    { label: 'Open Period', value: 'OPEN' },
+    { label: 'Lock Period', value: 'LOCK' },
+    { label: 'Unlock Period', value: 'UNLOCK' },
+  ]
+
+  // Data
+  const periods = computed(() => {
+    if (!selectedYearId.value || !years.value) return []
+    const year = years.value.find((y) => y.id === selectedYearId.value)
+    return year?.periods || []
+  })
+
+  // Set default year
   watch(
     years,
-    (newYears) => {
-      if (newYears?.length && !selectedYearId.value && newYears[0]) {
-        selectedYearId.value = newYears[0].id
+    (val) => {
+      if (val && val.length > 0 && !selectedYearId.value) {
+        selectedYearId.value = val[0]?.id || null
       }
     },
     { immediate: true },
   )
 
-  const selectedYear = computed(
-    () => years.value?.find((y) => y.id === selectedYearId.value) || null,
-  )
-
-  // Filtered Periods based on Action
-  const filteredPeriods = computed<FiscalPeriod[]>(() => {
-    if (!selectedYear.value) return []
-
-    const allPeriods = selectedYear.value.periods
-
-    return allPeriods.filter((p) => {
-      switch (selectedAction.value) {
-        case 'CLOSE':
-          return p.status === 'OPEN'
-        case 'OPEN':
-          return p.status === 'CLOSED'
-        case 'LOCK':
-          return p.status === 'CLOSED'
-        case 'UNLOCK':
-          return p.status === 'LOCKED'
-        default:
-          return false
-      }
-    })
-  })
-
-  const base = useScreenController<FiscalPeriod[], 'VIEW'>({
-    screen: GL503000,
-    dataSource: {
-      entity: filteredPeriods,
-      isLoading,
-      error,
-    },
-    isNew: computed(() => false),
-    getDomainState: listScreenDomainState,
-    statePolicy: LIST_SCREEN_POLICY,
-  })
-
-  // Processing Logic
-  const isProcessing = ref(false)
-
-  const processSelected = async () => {
+  // Actions
+  async function handleProcess() {
     const selectedIds = Object.keys(gridState.rowSelection.value)
     if (selectedIds.length === 0) return
 
     isProcessing.value = true
+    let successCount = 0
+
     try {
       for (const id of selectedIds) {
-        if (selectedAction.value === 'CLOSE') {
-          await closePeriod(id)
-        } else if (selectedAction.value === 'LOCK') {
-          await lockPeriod(id)
+        try {
+          switch (selectedAction.value) {
+            case 'CLOSE':
+              await closePeriod(id)
+              break
+            case 'OPEN':
+              await openPeriod(id)
+              break
+            case 'LOCK':
+              await lockPeriod(id)
+              break
+            case 'UNLOCK':
+              await unlockPeriod(id)
+              break
+          }
+          successCount++
+        } catch (err) {
+          const apiErr = err as ApiError
+          toast.error(`Failed to ${selectedAction.value.toLowerCase()} period: ${apiErr.message}`)
         }
-        // TODO: Implement OPEN/UNLOCK when backend is ready
+      }
+
+      if (successCount > 0) {
+        toast.success(`Successfully processed ${successCount} periods`)
       }
       gridState.rowSelection.value = {}
     } finally {
@@ -92,30 +105,30 @@ export function useManagePeriodsController() {
     }
   }
 
-  base.registerCommand('process', {
-    execute: processSelected,
-    isPending: computed(() => isProcessing.value || isLoading.value),
-  })
-
-  base.registerCommand('processAll', {
-    execute: async () => {
-      const allIds = filteredPeriods.value.map((p) => p.id)
-      gridState.rowSelection.value = allIds.reduce((acc, id) => ({ ...acc, [id]: true }), {})
-      await processSelected()
-    },
-    isPending: computed(() => isProcessing.value || isLoading.value),
-  })
-
   return {
-    ...base,
-    years,
-    selectedAction,
-    selectedYearId,
-    gridState,
-    fields: {
-      registry: GL503000_FIELDS,
-    },
-    isProcessing,
+    // Screen Policy
+    screen: GL503000,
+    policy: LIST_SCREEN_POLICY,
+    fields: GL503000_FIELDS,
+
+    // State
     isLoading,
+    isProcessing,
+    error,
+    selectedYearId,
+    selectedAction,
+
+    // Data
+    periods,
+    yearOptions,
+    actionOptions,
+
+    // Grid
+    gridState,
+
+    // Actions
+    handleProcess,
   }
 }
+
+export type ManagePeriodsController = ReturnType<typeof useManagePeriodsController>
