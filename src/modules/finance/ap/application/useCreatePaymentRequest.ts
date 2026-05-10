@@ -30,6 +30,7 @@ const paymentRequestSchema = z.object({
         amount: z.coerce.number().positive('Amount must be positive'),
         accountId: z.string(),
         categoryId: z.string(),
+        lineType: z.enum(['GOODS', 'SERVICE']),
         taxAmount: z.coerce.number(),
       }),
     )
@@ -65,6 +66,7 @@ export function useCreatePaymentRequest() {
         amount: String(l.amount),
         account_id: l.accountId || null,
         category_id: l.categoryId || null,
+        line_type: l.lineType,
         tax_amount: l.taxAmount != null ? String(l.taxAmount) : null,
       }))
 
@@ -113,6 +115,7 @@ export function useCreatePaymentRequest() {
           amount: 0,
           accountId: '',
           categoryId: '',
+          lineType: 'GOODS',
           taxAmount: 0,
         },
       ],
@@ -137,7 +140,7 @@ export function useCreatePaymentRequest() {
       if (typeof state.errorMap.onChange === 'string') {
         formErrors = [state.errorMap.onChange]
       } else if (Array.isArray(state.errorMap.onChange)) {
-        formErrors = state.errorMap.onChange.map((e) =>
+        formErrors = (state.errorMap.onChange as unknown[]).map((e) =>
           typeof e === 'string' ? e : (e as { message?: string })?.message || 'Validation error',
         )
       } else {

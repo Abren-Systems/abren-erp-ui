@@ -16,6 +16,11 @@ export const vendorBillLineColumns = [
     cell: (info) => info.getValue().format('en-ET'),
     meta: { align: 'right' },
   }),
+  helper.accessor('lineType', {
+    header: 'Type',
+    cell: (info) => info.getValue(),
+    size: 100,
+  }),
   helper.accessor('accountId', {
     header: 'GL Account',
     cell: (info) => info.getValue() ?? 'Not assigned',
@@ -23,5 +28,10 @@ export const vendorBillLineColumns = [
   helper.accessor('categoryId', {
     header: 'Category',
     cell: (info) => info.getValue() ?? 'Not assigned',
+  }),
+  helper.accessor('whtAmount', {
+    header: 'WHT',
+    cell: (info) => (info.getValue() ? info.getValue()?.format('en-ET') : '—'),
+    meta: { align: 'right' },
   }),
 ]

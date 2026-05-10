@@ -27,6 +27,7 @@ export interface CreatePaymentRequestLineDTO {
   amount: string
   account_id?: string | null
   category_id?: string | null
+  line_type: 'GOODS' | 'SERVICE'
   tax_amount?: string | null
 }
 export interface CreatePaymentRequestDTO {
@@ -51,6 +52,7 @@ export type VendorBillDTO = z.infer<typeof VendorBillSchema>
 export interface CreateVendorBillLineDTO {
   description: string
   amount: number
+  line_type: 'GOODS' | 'SERVICE'
   account_id?: string | null
   category_id?: string | null
   tax_rule_id?: string | null

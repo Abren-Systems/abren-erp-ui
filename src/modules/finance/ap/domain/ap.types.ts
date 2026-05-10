@@ -57,6 +57,7 @@ export interface PaymentRequestLine {
   amount: Money
   accountId: AccountId | null
   categoryId: CategoryId | null
+  lineType: 'GOODS' | 'SERVICE'
   taxAmount: Money | null
 }
 
@@ -96,7 +97,9 @@ export interface VendorBillLine {
   amount: Money
   accountId: AccountId | null
   categoryId: CategoryId | null
+  lineType: 'GOODS' | 'SERVICE'
   journalLineId: JournalLineId | null
+  whtAmount: Money | null
 }
 
 export interface VendorBill {
@@ -110,6 +113,10 @@ export interface VendorBill {
   justification: string
   status: VendorBillStatus
   totalAmount: Money
+  whtTotal: Money
+  netPayable: Money
+  totalPaid: Money
+  totalWithheld: Money
   lines: VendorBillLine[]
 }
 

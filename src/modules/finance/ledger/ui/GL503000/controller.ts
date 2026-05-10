@@ -15,7 +15,7 @@ export function useManagePeriodsController() {
   const gridState = useDataGrid()
 
   // ── Platform Base ──
-  useScreenController({
+  const base = useScreenController({
     screen: GL503000,
     dataSource: {
       entity: computed(() => null),
@@ -23,7 +23,7 @@ export function useManagePeriodsController() {
       error,
     },
     statePolicy: LIST_SCREEN_POLICY,
-    getDomainState: () => 'VIEW',
+    getDomainState: () => 'VIEW' as const,
   })
 
   // Header State
@@ -106,6 +106,7 @@ export function useManagePeriodsController() {
   }
 
   return {
+    ...base,
     // Screen Policy
     screen: GL503000,
     policy: LIST_SCREEN_POLICY,

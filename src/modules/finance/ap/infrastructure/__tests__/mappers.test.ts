@@ -21,6 +21,7 @@ describe('APMapper', () => {
             amount: '1500.00',
             account_id: 'acc-1',
             category_id: 'cat-1',
+            line_type: 'GOODS',
             tax_amount: '150.00',
           },
         ],
@@ -61,7 +62,11 @@ describe('APMapper', () => {
         status: 'VALIDATED',
         net: '200.00',
         tax_total: '0.00',
+        wht_total: '4.00',
         total_amount: '200.00',
+        net_payable: '196.00',
+        total_paid: '0.00',
+        total_withheld: '0.00',
         lines: [
           {
             id: 'line-1',
@@ -69,9 +74,11 @@ describe('APMapper', () => {
             amount: '200.00',
             account_id: 'acc-1',
             category_id: 'cat-1',
+            line_type: 'SERVICE',
             journal_line_id: null,
             tax_rule_id: null,
             tax_amount: '0.00',
+            wht_amount: '0.00',
           },
         ],
       }

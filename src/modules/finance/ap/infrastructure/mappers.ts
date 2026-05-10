@@ -53,6 +53,7 @@ export class APMapper {
       categoryId: lineDto.category_id
         ? CommonMapper.toBrandedId<CategoryId>(lineDto.category_id)
         : null,
+      lineType: (lineDto.line_type as 'GOODS' | 'SERVICE') || 'GOODS',
       taxAmount:
         lineDto.tax_amount != null
           ? CommonMapper.toMoney(lineDto.tax_amount, parentCurrency)
@@ -109,9 +110,11 @@ export class APMapper {
       amount: CommonMapper.toMoney(dto.amount, parentCurrency),
       accountId: dto.account_id ? CommonMapper.toBrandedId<AccountId>(dto.account_id) : null,
       categoryId: dto.category_id ? CommonMapper.toBrandedId<CategoryId>(dto.category_id) : null,
+      lineType: (dto.line_type as 'GOODS' | 'SERVICE') || 'GOODS',
       journalLineId: dto.journal_line_id
         ? CommonMapper.toBrandedId<JournalLineId>(dto.journal_line_id)
         : null,
+      whtAmount: dto.wht_amount ? CommonMapper.toMoney(dto.wht_amount, parentCurrency) : null,
     }
   }
 
@@ -133,6 +136,10 @@ export class APMapper {
       justification: dto.justification ?? '',
       status: dto.status as VendorBillStatus,
       totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
+      whtTotal: CommonMapper.toMoney(dto.wht_total || '0', currency),
+      netPayable: CommonMapper.toMoney(dto.net_payable || '0', currency),
+      totalPaid: CommonMapper.toMoney(dto.total_paid || '0', currency),
+      totalWithheld: CommonMapper.toMoney(dto.total_withheld || '0', currency),
       lines,
     }
   }

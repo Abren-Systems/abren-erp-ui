@@ -25,6 +25,7 @@ const vendorBillSchema = z.object({
       z.object({
         description: z.string().min(1, 'Description is required'),
         amount: z.coerce.number().positive('Amount must be positive'),
+        lineType: z.enum(['GOODS', 'SERVICE']),
         accountId: z.string(),
         categoryId: z.string(),
       }),
@@ -66,6 +67,7 @@ export function useCreateVendorBill() {
         lines: values.lines.map((l) => ({
           description: l.description,
           amount: l.amount,
+          line_type: l.lineType,
           account_id: l.accountId || null,
           category_id: l.categoryId || null,
         })),
@@ -99,7 +101,15 @@ export function useCreateVendorBill() {
       dueDate: new Date().toISOString().split('T')[0] || '',
       currency: 'ETB',
       justification: '',
-      lines: [{ description: '', amount: 0, accountId: '', categoryId: '' }],
+      lines: [
+        {
+          description: '',
+          amount: 0,
+          lineType: 'GOODS' as 'GOODS' | 'SERVICE',
+          accountId: '',
+          categoryId: '',
+        },
+      ],
     } satisfies VendorBillFormValues,
     validators: {
       onChange: vendorBillSchema,

@@ -21,6 +21,12 @@ export const paymentRequestLineColumns = [
     accessorKey: 'description',
   },
   {
+    id: 'lineType',
+    header: 'LINE TYPE',
+    accessorKey: 'lineType',
+    size: 100,
+  },
+  {
     id: 'amount',
     header: 'AMOUNT',
     cell: ({ row }: { row: Row<PaymentRequestLine> }) =>

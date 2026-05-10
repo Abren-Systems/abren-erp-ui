@@ -35,6 +35,14 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
           <AppField v-bind="ctrl.fields.status" :context="{ entity: 'VendorBill' }" />
           <AppField v-bind="ctrl.fields.totalAmount" />
         </FieldGroup>
+        <FieldGroup>
+          <AppField v-bind="ctrl.fields.whtTotal" />
+          <AppField v-bind="ctrl.fields.netPayable" />
+        </FieldGroup>
+        <FieldGroup>
+          <AppField v-bind="ctrl.fields.totalPaid" />
+          <AppField v-bind="ctrl.fields.totalWithheld" />
+        </FieldGroup>
       </AppTemplate>
 
       <div class="mt-4 max-w-3xl">

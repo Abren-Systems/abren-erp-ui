@@ -20,6 +20,7 @@ export const PaymentRequestLineSchema = z.object({
   amount: z.coerce.string(), // Resilient to number vs string Decimal types
   account_id: z.string().uuid().nullable(),
   category_id: z.string().uuid().nullable(),
+  line_type: z.enum(['GOODS', 'SERVICE']).default('GOODS'),
   tax_amount: z.coerce.string().nullable(),
 })
 
@@ -62,9 +63,11 @@ export const VendorBillLineSchema = z.object({
   amount: z.coerce.string(),
   tax_rule_id: z.string().uuid().nullable(),
   tax_amount: z.coerce.string().nullable(),
+  line_type: z.enum(['GOODS', 'SERVICE']).default('GOODS'),
   account_id: z.string().uuid().nullable(),
   category_id: z.string().uuid().nullable(),
   journal_line_id: z.string().uuid().nullable(),
+  wht_amount: z.coerce.string().nullable(),
 })
 
 export const VendorBillSchema = z.object({
@@ -79,6 +82,10 @@ export const VendorBillSchema = z.object({
   status: z.enum(['DRAFT', 'VALIDATED', 'PAID', 'CANCELLED']),
   net: z.coerce.string(),
   tax_total: z.coerce.string(),
+  wht_total: z.coerce.string().default('0'),
   total_amount: z.coerce.string(),
+  net_payable: z.coerce.string().default('0'),
+  total_paid: z.coerce.string().default('0'),
+  total_withheld: z.coerce.string().default('0'),
   lines: z.array(VendorBillLineSchema),
 })
