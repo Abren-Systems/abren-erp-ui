@@ -21,6 +21,18 @@ export const ledgerWorkspace: WorkspaceContract = {
       ],
     },
     {
+      id: 'processes',
+      labelKey: 'Processes',
+      links: [
+        {
+          id: 'gl503000',
+          labelKey: 'Manage Financial Periods',
+          screenId: createScreenId('GL503000'),
+          requiredPermissions: ['ledger:manage_fiscal_periods'],
+        },
+      ],
+    },
+    {
       id: 'profiles',
       labelKey: 'Profiles',
       links: [

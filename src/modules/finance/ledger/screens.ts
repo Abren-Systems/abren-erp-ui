@@ -14,8 +14,9 @@ import { GL101000 } from './ui/GL101000/screen'
 import { GL102000 } from './ui/GL102000/screen'
 import { GL202500 } from './ui/GL202500/screen'
 import { GL2025PL } from './ui/GL2025PL/screen'
+import { GL503000 } from './ui/GL503000/screen'
 
-export { GL301000, GL3010PL, GL201000, GL101000, GL102000, GL202500, GL2025PL }
+export { GL301000, GL3010PL, GL201000, GL101000, GL102000, GL202500, GL2025PL, GL503000 }
 
 /** All screens registered by the Ledger module */
 export const ledgerScreens: readonly ScreenDefinition[] = [
@@ -26,4 +27,5 @@ export const ledgerScreens: readonly ScreenDefinition[] = [
   GL102000,
   GL202500,
   GL2025PL,
+  GL503000,
 ]
