@@ -134,6 +134,7 @@ describe('LedgerMapper', () => {
         start_date: '2026-04-01',
         end_date: '2026-04-30',
         status: 'OPEN',
+        is_adjustment_period: false,
         created_at: '2026-03-31T20:00:00Z',
       }
 
@@ -142,6 +143,7 @@ describe('LedgerMapper', () => {
       expect(model.id).toBe('fp-1')
       expect(model.name).toBe('April 2026')
       expect(model.status).toBe('OPEN')
+      expect(model.isAdjustmentPeriod).toBe(false)
       expect(model.startDate).toBe('2026-04-01')
       expect(model.endDate).toBe('2026-04-30')
     })

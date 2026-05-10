@@ -12,7 +12,7 @@ import type { FiscalYear } from '../../domain/fiscal-calendar.types'
 import { GL201000_Generate_Fields } from './fields'
 
 export function useFiscalPeriodsController() {
-  const { years, isLoading, error, generateYear } = useFiscalCalendar()
+  const { years, isLoading, error, generateYear, refresh } = useFiscalCalendar()
   const gridState = useDataGrid()
 
   // Master selection
@@ -85,10 +85,42 @@ export function useFiscalPeriodsController() {
 
   base.registerCommand('refresh', {
     execute: async () => {
-      // DataSource refresh logic
+      await refresh()
     },
     isPending: isLoading,
   })
+
+  // --- Fiscal Lifecycle Commands ---
+
+  const { closeYear, lockYear, closePeriod, lockPeriod } = useFiscalCalendar()
+
+  const canCloseYear = computed(() => selectedYear.value?.status === 'OPEN')
+  const canLockYear = computed(() => selectedYear.value?.status === 'CLOSED')
+
+  base.registerCommand('closeYear', {
+    execute: async () => {
+      if (!selectedYearId.value || !canCloseYear.value) return
+      await closeYear(selectedYearId.value)
+    },
+    isPending: isLoading,
+  })
+
+  base.registerCommand('lockYear', {
+    execute: async () => {
+      if (!selectedYearId.value || !canLockYear.value) return
+      await lockYear(selectedYearId.value)
+    },
+    isPending: isLoading,
+  })
+
+  // Row-level commands for the grid
+  const handleClosePeriod = async (periodId: string) => {
+    await closePeriod(periodId)
+  }
+
+  const handleLockPeriod = async (periodId: string) => {
+    await lockPeriod(periodId)
+  }
 
   return {
     ...base,
@@ -105,5 +137,9 @@ export function useFiscalPeriodsController() {
       registry: GL201000_Generate_Fields,
     },
     isGenerateValid,
+    canCloseYear,
+    canLockYear,
+    closePeriod: handleClosePeriod,
+    lockPeriod: handleLockPeriod,
   }
 }

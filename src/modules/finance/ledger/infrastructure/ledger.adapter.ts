@@ -182,4 +182,60 @@ export const ledgerAdapter = {
     })
     return LedgerSettingsSchema.parse(raw)
   },
+
+  /**
+   * Closes a financial period.
+   */
+  async closePeriod(periodId: string): Promise<void> {
+    await apiPost(`/finance/ledger/periods/${periodId}/close`)
+  },
+
+  /**
+   * Re-opens a financial period.
+   */
+  async openPeriod(periodId: string): Promise<void> {
+    await apiPost(`/finance/ledger/periods/${periodId}/open`)
+  },
+
+  /**
+   * Locks a financial period.
+   */
+  async lockPeriod(periodId: string): Promise<void> {
+    await apiPost(`/finance/ledger/periods/${periodId}/lock`)
+  },
+
+  /**
+   * Unlocks a financial period.
+   */
+  async unlockPeriod(periodId: string): Promise<void> {
+    await apiPost(`/finance/ledger/periods/${periodId}/unlock`)
+  },
+
+  /**
+   * Closes a financial year.
+   */
+  async closeYear(yearId: string): Promise<void> {
+    await apiPost(`/finance/ledger/fiscal-years/${yearId}/close`)
+  },
+
+  /**
+   * Re-opens a financial year.
+   */
+  async openYear(yearId: string): Promise<void> {
+    await apiPost(`/finance/ledger/fiscal-years/${yearId}/open`)
+  },
+
+  /**
+   * Locks a financial year.
+   */
+  async lockYear(yearId: string): Promise<void> {
+    await apiPost(`/finance/ledger/fiscal-years/${yearId}/lock`)
+  },
+
+  /**
+   * Unlocks a financial year.
+   */
+  async unlockYear(yearId: string): Promise<void> {
+    await apiPost(`/finance/ledger/fiscal-years/${yearId}/unlock`)
+  },
 }

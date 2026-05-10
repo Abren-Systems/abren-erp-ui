@@ -58,5 +58,15 @@ export function useFiscalCalendar() {
     refresh: refreshYears,
     generateYear,
     isGenerating,
+    // Period Actions
+    closePeriod: (id: string) => ledgerAdapter.closePeriod(id).then(() => refreshYears()),
+    openPeriod: (id: string) => ledgerAdapter.openPeriod(id).then(() => refreshYears()),
+    lockPeriod: (id: string) => ledgerAdapter.lockPeriod(id).then(() => refreshYears()),
+    unlockPeriod: (id: string) => ledgerAdapter.unlockPeriod(id).then(() => refreshYears()),
+    // Year Actions
+    closeYear: (id: string) => ledgerAdapter.closeYear(id).then(() => refreshYears()),
+    openYear: (id: string) => ledgerAdapter.openYear(id).then(() => refreshYears()),
+    lockYear: (id: string) => ledgerAdapter.lockYear(id).then(() => refreshYears()),
+    unlockYear: (id: string) => ledgerAdapter.unlockYear(id).then(() => refreshYears()),
   }
 }

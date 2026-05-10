@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useScreenControllerContext } from '@/platform/screen-runtime'
-import { DataGrid } from '@/shared/components/data-grid'
+import { DataGrid, BadgeCell } from '@/shared/components/data-grid'
 import { AppButton, AppInput } from '@/shared/components/primitives'
 import { Plus, RefreshCcw, Calendar, X } from 'lucide-vue-next'
 import { fiscalPeriodColumns } from '../grids/fiscal-period.grid'
@@ -58,7 +58,21 @@ const { hasPermission } = usePermissions()
                 : 'text-[var(--app-text-muted)] group-hover:text-[var(--app-text)]'
             "
           />
-          <span>FY {{ year.year }}</span>
+          <div class="flex flex-col items-start gap-0.5 flex-1 min-w-0">
+            <span class="truncate font-medium">FY {{ year.year }}</span>
+            <span
+              class="text-[9px] font-bold uppercase tracking-tighter"
+              :class="[
+                year.status === 'OPEN'
+                  ? 'text-[var(--app-success)]'
+                  : year.status === 'CLOSED'
+                    ? 'text-[var(--app-text-muted)]'
+                    : 'text-[var(--app-danger)]',
+              ]"
+            >
+              {{ year.status }}
+            </span>
+          </div>
         </button>
 
         <div
@@ -145,10 +159,46 @@ const { hasPermission } = usePermissions()
         :columns="fiscalPeriodColumns"
         :data="ctrl.selectedYear.value?.periods ?? []"
         :loading="ctrl.isLoading.value"
+        :meta="{ closePeriod: ctrl.closePeriod, lockPeriod: ctrl.lockPeriod }"
         placeholder="Search periods..."
         class="flex-1 min-h-0"
       >
         <template #toolbar>
+          <div class="flex items-center gap-4 ml-2 mr-auto">
+            <div class="flex items-center gap-2">
+              <span
+                class="text-[10px] font-bold uppercase tracking-wider text-[var(--app-text-muted)]"
+                >Year Status:</span
+              >
+              <BadgeCell
+                :status="ctrl.selectedYear.value.status"
+                :variants="{ OPEN: 'default', CLOSED: 'secondary', LOCKED: 'destructive' }"
+              />
+            </div>
+
+            <div
+              v-if="hasPermission('ledger:manage_fiscal_years')"
+              class="flex items-center gap-1 border-l border-[var(--app-border)] pl-4"
+            >
+              <AppButton
+                v-if="ctrl.canCloseYear.value"
+                variant="outline"
+                size="sm"
+                @click="ctrl.commands.value['closeYear']?.execute()"
+              >
+                Close Year
+              </AppButton>
+              <AppButton
+                v-if="ctrl.canLockYear.value"
+                variant="outline"
+                size="sm"
+                @click="ctrl.commands.value['lockYear']?.execute()"
+              >
+                Lock Year
+              </AppButton>
+            </div>
+          </div>
+
           <AppButton variant="stealth" @click="ctrl.commands.value['refresh']?.execute()">
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />

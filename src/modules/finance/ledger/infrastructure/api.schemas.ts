@@ -34,7 +34,7 @@ export const JournalEntrySchema = z.object({
   date: z.string(),
   description: z.string(),
   base_currency_code: z.string(),
-  status: z.string(),
+  status: z.enum(['DRAFT', 'POSTED', 'VOIDED']),
   lines: z.array(JournalLineSchema),
   posted_by: z.string().uuid().nullable(),
   posted_at: z.string().nullable(),
@@ -60,7 +60,8 @@ export const FiscalPeriodSchema = z.object({
   name: z.string(),
   start_date: z.string(),
   end_date: z.string(),
-  status: z.string(),
+  status: z.enum(['OPEN', 'CLOSED', 'LOCKED']),
+  is_adjustment_period: z.boolean(),
   created_at: z.string().nullable(),
 })
 
@@ -70,6 +71,7 @@ export const FiscalYearSchema = z.object({
   year: z.string(),
   start_date: z.string(),
   end_date: z.string(),
+  status: z.enum(['OPEN', 'CLOSED', 'LOCKED']),
   periods: z.array(FiscalPeriodSchema),
   created_at: z.string().nullable(),
 })
