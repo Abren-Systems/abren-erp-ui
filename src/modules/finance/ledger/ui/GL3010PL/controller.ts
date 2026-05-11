@@ -17,7 +17,11 @@ export function useJournalEntriesListController() {
   // ── Platform Base ──
   const base = useScreenController({
     screen: GL3010PL,
-    dataSource: { entity: computed(() => null), isLoading, error },
+    dataSource: {
+      entity: computed(() => entries.value?.items ?? []),
+      isLoading,
+      error,
+    },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,

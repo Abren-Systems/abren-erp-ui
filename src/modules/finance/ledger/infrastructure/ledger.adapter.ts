@@ -1,4 +1,5 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
+import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
 import type {
   AccountDTO,
   CreateAccountDTO,
@@ -15,6 +16,7 @@ import type {
 import {
   AccountSchema,
   JournalEntrySchema,
+  JournalEntryListSchema,
   FiscalPeriodSchema,
   FiscalYearSchema,
   LedgerSettingsSchema,
@@ -72,13 +74,16 @@ export const ledgerAdapter = {
   },
 
   /**
-   * Fetches all recorded journal entries.
-   *
-   * @returns A promise resolving to an array of validated JournalEntryDTOs.
+   * Fetches a paginated list of journal entries.
    */
-  async getJournalEntries(): Promise<JournalEntryDTO[]> {
-    const raw = (await apiGet<JournalEntryDTO[]>('/finance/ledger/journal-entries')) as unknown[]
-    return raw.map((item) => JournalEntrySchema.parse(item))
+  async getJournalEntries(query?: ListQuery): Promise<ListResponse<JournalEntryDTO>> {
+    const raw = await apiGet<unknown>('/finance/ledger/journal-entries', { params: query })
+    const parsed = JournalEntryListSchema.parse(raw)
+    return {
+      items: parsed.items,
+      nextCursor: parsed.next_cursor,
+      totalCount: parsed.total_count,
+    }
   },
 
   /**

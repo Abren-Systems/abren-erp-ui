@@ -8,28 +8,34 @@ import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../models/journal-entry.types'
 import type { CreateJournalEntryDTO } from '../infrastructure/api.types'
 
+import type { ListQuery } from '@/shared/domain/pagination'
+
 /**
  * Use Case: Manage Journal Entries.
  *
- * Provides access to the list of journal entries and allows
+ * Provides access to the paginated list of journal entries and allows
  * creating and posting new entries.
  *
+ * @param {ListQuery} [query] - Optional pagination parameters.
  * @returns Reactive journal entries state and management methods.
  * @example
  * const { entries, createEntry, postEntry, isLoading } = useJournalEntries()
  */
-export function useJournalEntries() {
+export function useJournalEntries(query?: ListQuery) {
   const queryClient = useQueryClient()
 
   const {
-    data: entries,
+    data: response,
     isLoading,
     error,
     refetch,
   } = useResourceQuery(
-    ledgerKeys.journalEntries(),
-    () => ledgerAdapter.getJournalEntries(),
-    (dtos) => dtos.map((dto) => LedgerMapper.toJournalEntry(dto)),
+    ledgerKeys.journalEntries(query),
+    () => ledgerAdapter.getJournalEntries(query),
+    (data) => ({
+      ...data,
+      items: data.items.map((dto) => LedgerMapper.toJournalEntry(dto)),
+    }),
   )
 
   const { mutateAsync: createEntry, isPending: isCreating } = useApiMutation<
@@ -64,7 +70,7 @@ export function useJournalEntries() {
   )
 
   return {
-    entries,
+    entries: response,
     isLoading: isLoading || isCreating || isPosting,
     error,
     refresh: refetch,
