@@ -9,7 +9,7 @@ import type {
 } from './api.types'
 import { TaxRuleSchema, TaxCalculationResponseSchema, TaxGroupSchema } from './api.schemas'
 import { TaxMapper } from './mappers'
-import type { TaxRule, TaxCalculationResult, TaxGroup } from '../domain/tax.types'
+import type { TaxRule, TaxCalculationResult, TaxGroup } from '../models/tax.types'
 import { z } from 'zod'
 
 export const TaxAdapter = {

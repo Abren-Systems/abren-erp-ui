@@ -1,4 +1,4 @@
-import type { JournalEntry } from '../../domain/journal-entry.types'
+import type { JournalEntry } from '../../models/journal-entry.types'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
 import { DateCell, BadgeCell } from '@/shared/components/data-grid'

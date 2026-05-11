@@ -1,5 +1,5 @@
 import type { components } from '@/shared/api/generated.types'
-import { type Account, AccountType } from '../domain/account.types'
+import { type Account, AccountType } from '../models/account.types'
 import type {
   AccountId,
   JournalEntryId,
@@ -12,13 +12,13 @@ import type {
 } from '@/shared/types/brand.types'
 import { Currency, Money } from '@/shared/domain/money'
 import { CommonMapper } from '@/shared/infrastructure/mappers'
-import type { JournalEntry, JournalEntryLine } from '../domain/journal-entry.types'
+import type { JournalEntry, JournalEntryLine } from '../models/journal-entry.types'
 import type {
   FiscalPeriod,
   FiscalPeriodStatus,
   FiscalYear,
   FiscalYearStatus,
-} from '../domain/fiscal-calendar.types'
+} from '../models/fiscal-calendar.types'
 
 type AccountDTO = components['schemas']['AccountDTO']
 type JournalEntryDTO = components['schemas']['JournalEntryDTO']

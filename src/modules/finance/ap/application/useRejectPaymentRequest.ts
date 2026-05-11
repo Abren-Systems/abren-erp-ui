@@ -6,7 +6,7 @@ import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
-import type { PaymentRequest } from '../domain/ap.types'
+import type { PaymentRequest } from '../models/ap.types'
 
 /**
  * Use Case: Reject a Payment Request.

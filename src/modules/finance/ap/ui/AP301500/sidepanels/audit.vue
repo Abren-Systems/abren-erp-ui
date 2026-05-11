@@ -2,7 +2,7 @@
 import { inject, type Ref } from 'vue'
 import { AppFieldset, AppField } from '@/shared/components/field-system'
 import PaymentRequestTimeline from '../timeline.vue'
-import type { PaymentRequest } from '../../../domain/ap.types'
+import type { PaymentRequest } from '../../../models/ap.types'
 import { useScreenControllerContext } from '@/platform/screen-runtime'
 
 /**

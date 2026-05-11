@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { CalculationMethod } from '../../domain/tax.types'
+import type { CalculationMethod } from '../../models/tax.types'
 
 /** Matches the form-projection entity shape used in the controller */
 interface TaxGroupFormEntity {

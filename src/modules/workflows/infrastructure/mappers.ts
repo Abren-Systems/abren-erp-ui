@@ -1,6 +1,6 @@
 import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { PendingApprovalDTO } from './api.types'
-import type { PendingApproval } from '../domain/workflows.types'
+import type { PendingApproval } from '../models/workflows.types'
 import type { WorkflowInstanceId, RoleId } from '@/shared/types/brand.types'
 
 /**

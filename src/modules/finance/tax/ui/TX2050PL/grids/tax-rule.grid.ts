@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { TaxRule } from '../../../domain/tax.types'
+import type { TaxRule } from '../../../models/tax.types'
 import { AppBadge } from '@/shared/components/primitives'
 
 export const taxRuleColumns: ColumnDef<TaxRule>[] = [

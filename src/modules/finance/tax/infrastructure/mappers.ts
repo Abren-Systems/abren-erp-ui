@@ -6,7 +6,7 @@ import type {
   TaxGroup,
   TaxDirection,
   CalculationMethod,
-} from '../domain/tax.types'
+} from '../models/tax.types'
 import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { TaxRuleId, AccountId, TaxGroupId } from '@/shared/types/brand.types'
 

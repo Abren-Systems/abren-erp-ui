@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/vue-query'
 import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { InventoryMapper } from '../infrastructure/mappers'
 import { inventoryKeys } from './query-keys'
-import type { Warehouse } from '../domain/inventory.types'
+import type { Warehouse } from '../models/inventory.types'
 import type { WarehouseDTO } from '../infrastructure/api.types'
 
 /**

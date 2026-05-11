@@ -8,7 +8,7 @@ import {
 import { usePendingApprovals } from '../../application/usePendingApprovals'
 import { useApprovalAction } from '../../application/useApprovalAction'
 import { EP503010 } from './screen'
-import type { PendingApproval } from '../../domain/workflows.types'
+import type { PendingApproval } from '../../models/workflows.types'
 
 export function useWorkflowInboxController() {
   const gridState = useDataGrid()

@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { TaxRule } from '../../domain/tax.types'
+import type { TaxRule } from '../../models/tax.types'
 
 export const TX205000_FIELDS = {
   name: {

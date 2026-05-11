@@ -14,7 +14,7 @@ import { CURRENCY_OPTIONS, AP301500_FIELDS } from './fields'
 import { AP301500 } from './screen'
 import { AP301500_POLICY } from './policy'
 import { useField } from '@/platform/field-system/bindings'
-import type { PaymentRequest, PaymentRequestStatus } from '../../domain/ap.types'
+import type { PaymentRequest, PaymentRequestStatus } from '../../models/ap.types'
 
 /**
  * AP301500 — Payment Request Data Entry Controller

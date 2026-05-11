@@ -9,7 +9,7 @@ import { useDataGrid } from '@/shared/components/data-grid'
 import { useVendorBills } from '../../application/useVendorBills'
 import { AP3010PL } from './screen'
 
-import type { VendorBill } from '../../domain/ap.types'
+import type { VendorBill } from '../../models/ap.types'
 
 export function useVendorBillsListController() {
   const router = useRouter()

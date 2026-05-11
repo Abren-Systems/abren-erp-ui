@@ -4,7 +4,7 @@ import type { CashflowQuery } from '../infrastructure/api.types'
 import { reportingKeys } from './query-keys'
 import { ReportingMapper } from '../infrastructure/mappers'
 import { Money, type Currency } from '@/shared/domain/money'
-import type { CashflowStats } from '../domain/reporting.types'
+import type { CashflowStats } from '../models/reporting.types'
 import { computed } from 'vue'
 
 /**

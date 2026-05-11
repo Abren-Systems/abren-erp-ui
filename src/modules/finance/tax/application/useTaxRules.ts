@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { TaxAdapter } from '../infrastructure/tax.adapter'
-import type { TaxRule, TaxGroup } from '../domain/tax.types'
+import type { TaxRule, TaxGroup } from '../models/tax.types'
 import type { TaxRuleId, TaxGroupId } from '@/shared/types/brand.types'
 import type {
   CalculateTaxDTO,

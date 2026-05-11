@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/vue-table'
-import type { User } from '../../../domain/user.types'
+import type { User } from '../../../models/user.types'
 
 const helper = createColumnHelper<User>()
 

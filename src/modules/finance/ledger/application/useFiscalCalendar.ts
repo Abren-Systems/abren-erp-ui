@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../infrastructure/ledger.adapter'
 import { ledgerKeys } from './query-keys'
 import { LedgerMapper } from '../infrastructure/mappers'
-import type { FiscalYear } from '../domain/fiscal-calendar.types'
+import type { FiscalYear } from '../models/fiscal-calendar.types'
 import type { GenerateFiscalYearDTO } from '../infrastructure/api.types'
 import type { ApiError } from '@/shared/api/http-client'
 

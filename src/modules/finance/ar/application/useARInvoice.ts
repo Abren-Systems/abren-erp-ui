@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { ARInvoice, ARInvoiceLine } from '../domain/invoice.schema'
+import type { ARInvoice, ARInvoiceLine } from '../models/invoice.schema'
 
 import { BusinessDate } from '@/shared/domain/business-date'
 

@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { BankAccount } from '../../../domain/bank.types'
+import type { BankAccount } from '../../../models/bank.types'
 import { AppBadge } from '@/shared/components/primitives'
 
 export const accountColumns: ColumnDef<BankAccount>[] = [

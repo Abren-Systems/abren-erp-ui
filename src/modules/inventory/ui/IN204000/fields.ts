@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { Warehouse } from '../../domain/inventory.types'
+import type { Warehouse } from '../../models/inventory.types'
 
 export const IN204000_FIELDS = {
   code: {

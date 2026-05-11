@@ -4,7 +4,7 @@ import { computed } from 'vue'
 import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { InventoryMapper } from '../infrastructure/mappers'
 import { inventoryKeys } from './query-keys'
-import type { StockItem } from '../domain/inventory.types'
+import type { StockItem } from '../models/inventory.types'
 
 /**
  * Use Case: View Stock Positions

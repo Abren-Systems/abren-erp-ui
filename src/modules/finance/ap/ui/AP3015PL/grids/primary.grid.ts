@@ -3,7 +3,7 @@ import type { ColumnDef, Row, Table } from '@tanstack/vue-table'
 import { MoneyCell, DateCell, SelectionCell } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { History } from 'lucide-vue-next'
-import type { PaymentRequest } from '../../../domain/ap.types'
+import type { PaymentRequest } from '../../../models/ap.types'
 
 /**
  * Payment Request Grid Columns.

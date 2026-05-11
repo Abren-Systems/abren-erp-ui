@@ -7,7 +7,7 @@ import { apKeys } from './query-keys'
 import { toId } from '@/shared/types/brand.types'
 import type { VendorBillId } from '@/shared/types/brand.types'
 import type { ApiError } from '@/shared/api/http-client'
-import type { VendorBill } from '../domain/ap.types'
+import type { VendorBill } from '../models/ap.types'
 
 export function useRejectVendorBill(id: string | Ref<string>) {
   const queryClient = useQueryClient()

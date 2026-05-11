@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/vue-table'
-import type { JournalEntry } from '../../../domain/journal-entry.types'
+import type { JournalEntry } from '../../../models/journal-entry.types'
 
 const helper = createColumnHelper<JournalEntry>()
 

@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { FiscalYear } from '../../domain/fiscal-calendar.types'
+import type { FiscalYear } from '../../models/fiscal-calendar.types'
 
 export const GL201000_Generate_Fields = {
   year: {

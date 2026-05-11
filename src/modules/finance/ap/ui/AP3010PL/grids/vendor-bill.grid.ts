@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/vue-table'
-import type { VendorBill } from '../../../domain/ap.types'
+import type { VendorBill } from '../../../models/ap.types'
 
 const helper = createColumnHelper<VendorBill>()
 

@@ -6,7 +6,7 @@ import type {
   CreateVendorBillDTO,
 } from './api.types'
 import { APMapper } from './mappers'
-import type { PaymentRequest, PaymentRequestStats, VendorBill } from '../domain/ap.types'
+import type { PaymentRequest, PaymentRequestStats, VendorBill } from '../models/ap.types'
 import { Money } from '@/shared/domain/money'
 
 const REQUESTS_BASE = '/finance/ap/payment-requests'

@@ -1,7 +1,7 @@
 import { Currency } from '@/shared/domain/money'
 import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { DailyCashflowDTO } from './api.types'
-import type { DailyCashflowEntry } from '../domain/reporting.types'
+import type { DailyCashflowEntry } from '../models/reporting.types'
 
 /**
  * Reporting Mapper-as-Factory.

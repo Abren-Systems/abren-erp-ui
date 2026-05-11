@@ -7,7 +7,7 @@
 
 import type { FieldOptionContract } from '@/platform/component-contracts'
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { PaymentRequest } from '../../domain/ap.types'
+import type { PaymentRequest } from '../../models/ap.types'
 
 export const PAYMENT_REQUEST_STATUS_OPTIONS: readonly FieldOptionContract[] = [
   { label: 'Draft', value: 'DRAFT' },

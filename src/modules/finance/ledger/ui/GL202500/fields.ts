@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { Account } from '../../domain/account.types'
+import type { Account } from '../../models/account.types'
 
 export const GL202500_FIELDS = {
   code: {

@@ -8,7 +8,7 @@ import {
 import { SM201010 } from './screen'
 import { useUsers } from '../../application/useUsers'
 import { useRoles } from '../../application/useRoles'
-import type { User } from '../../domain/user.types'
+import type { User } from '../../models/user.types'
 
 export function useUsersController() {
   const gridState = useDataGrid()

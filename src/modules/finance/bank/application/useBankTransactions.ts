@@ -1,6 +1,6 @@
 import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { bankAdapter } from '../infrastructure/bank.adapter'
-import type { BankTransaction } from '../domain/bank.types'
+import type { BankTransaction } from '../models/bank.types'
 import type { BankAccountId } from '@/shared/types/brand.types'
 import { computed } from 'vue'
 import { bankKeys } from './query-keys'

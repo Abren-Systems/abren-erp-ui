@@ -6,7 +6,7 @@ import { GL202500 } from './screen'
 import { GL202500_FIELDS } from './fields'
 import { GL202500_POLICY, type AccountStatus } from './policy'
 import { useField } from '@/platform/field-system/bindings/useField'
-import type { Account } from '../../domain/account.types'
+import type { Account } from '../../models/account.types'
 
 export function useAccountController(id: string) {
   const router = useRouter()

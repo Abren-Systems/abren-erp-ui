@@ -7,7 +7,7 @@ import {
   listScreenDomainState,
 } from '@/platform/screen-runtime'
 // Mocking bank account hooks as we don't have them in application layer
-import type { BankAccount } from '../../domain/bank.types'
+import type { BankAccount } from '../../models/bank.types'
 import { CA2020PL } from './screen'
 
 export function useBankAccountsListController() {

@@ -5,7 +5,7 @@ import type {
   BankAccount,
   BankTransaction,
   ScheduledPayment,
-} from '@/modules/finance/bank/domain/bank.types'
+} from '@/modules/finance/bank/models/bank.types'
 import type {
   BankAccountDTO,
   BankTransactionDTO,

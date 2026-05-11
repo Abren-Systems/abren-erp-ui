@@ -8,7 +8,7 @@ import { IN204000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
-import type { Warehouse } from '../../domain/inventory.types'
+import type { Warehouse } from '../../models/inventory.types'
 
 const warehouseSchema = z.object({
   code: z.string().min(1, 'Required'),

@@ -2,7 +2,7 @@
 import { Clock } from 'lucide-vue-next'
 import { AppBadge } from '@/shared/components/primitives'
 import { BusinessDate } from '@/shared/domain/business-date'
-import type { PaymentRequest } from '../../../domain/ap.types'
+import type { PaymentRequest } from '../../../models/ap.types'
 
 /**
  * PaymentRequestTimeline — The authoritative audit trail component.

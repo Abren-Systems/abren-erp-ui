@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { InventoryMapper } from '../infrastructure/mappers'
 import { inventoryKeys } from './query-keys'
-import type { Item } from '../domain/inventory.types'
+import type { Item } from '../models/inventory.types'
 
 /**
  * Use Case: View Inventory Items

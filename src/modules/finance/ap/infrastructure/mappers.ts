@@ -14,7 +14,7 @@ import type {
   VendorBill,
   VendorBillLine,
   VendorBillStatus,
-} from '../domain/ap.types'
+} from '../models/ap.types'
 import type {
   PaymentRequestId,
   PaymentRequestLineId,

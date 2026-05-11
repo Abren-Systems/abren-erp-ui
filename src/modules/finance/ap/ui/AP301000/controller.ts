@@ -12,7 +12,7 @@ import type { VendorBillId } from '@/shared/types/brand.types'
 import { AP301000 } from './screen'
 import { AP301000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings'
-import type { VendorBill, VendorBillStatus } from '../../domain/ap.types'
+import type { VendorBill, VendorBillStatus } from '../../models/ap.types'
 
 const AP301000_POLICY: ScreenStatePolicy<VendorBillStatus> = {
   states: {

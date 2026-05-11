@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { JournalEntry } from '../../domain/journal-entry.types'
+import type { JournalEntry } from '../../models/journal-entry.types'
 
 /**
  * GL301000 — Field Registry Bindings

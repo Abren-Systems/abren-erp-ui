@@ -2,7 +2,7 @@
 import { AppButton, AppDialog, AppInput } from '@/shared/components/primitives'
 import { CheckCircle, XCircle, Download } from 'lucide-vue-next'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
-import type { PaymentRequest } from '../../domain/ap.types'
+import type { PaymentRequest } from '../../models/ap.types'
 import { useScreenControllerContext } from '@/platform/screen-runtime'
 
 const props = defineProps<{

@@ -1,7 +1,7 @@
 import { toId } from '@/shared/types/brand.types'
 import type { TenantId, UserId, RoleId } from '@/shared/types/brand.types'
 import type { UserDTO, RoleDTO, UserRoleDTO } from './api.types'
-import type { User, Role, UserRoleAssignment, UserStatus } from '../domain/user.types'
+import type { User, Role, UserRoleAssignment, UserStatus } from '../models/user.types'
 
 /**
  * Identity Mapper

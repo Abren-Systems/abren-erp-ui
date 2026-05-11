@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
-import type { JournalEntry } from '../../domain/journal-entry.types'
+import type { JournalEntry } from '../../models/journal-entry.types'
 import { useJournalEntry } from '../../application/useJournalEntry'
 import { GL301000 } from './screen'
 import { GL301000_FIELDS } from './fields'

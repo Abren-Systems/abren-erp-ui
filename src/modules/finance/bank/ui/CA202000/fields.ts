@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { BankAccount } from '../../domain/bank.types'
+import type { BankAccount } from '../../models/bank.types'
 
 export const CA202000_FIELDS = {
   accountName: {

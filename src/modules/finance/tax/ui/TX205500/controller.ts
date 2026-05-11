@@ -8,7 +8,7 @@ import { TX205500_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
-import type { TaxRule, CalculationMethod } from '../../domain/tax.types'
+import type { TaxRule, CalculationMethod } from '../../models/tax.types'
 import type { TaxGroupId } from '@/shared/types/brand.types'
 
 const taxGroupSchema = z.object({

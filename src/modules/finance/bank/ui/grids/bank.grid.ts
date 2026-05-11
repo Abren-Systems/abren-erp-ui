@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import { type ColumnDef } from '@tanstack/vue-table'
 import { DataGridColumnHeader, MoneyCell, BadgeCell } from '@/shared/components/data-grid'
-import type { BankAccount } from '../../domain/bank.types'
+import type { BankAccount } from '../../models/bank.types'
 
 /**
  * Bank Account Grid Column Definitions

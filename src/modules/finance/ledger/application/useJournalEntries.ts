@@ -5,7 +5,7 @@ import { ledgerAdapter } from '../infrastructure/ledger.adapter'
 import { LedgerMapper } from '../infrastructure/mappers'
 import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
-import type { JournalEntry } from '../domain/journal-entry.types'
+import type { JournalEntry } from '../models/journal-entry.types'
 import type { CreateJournalEntryDTO } from '../infrastructure/api.types'
 
 /**

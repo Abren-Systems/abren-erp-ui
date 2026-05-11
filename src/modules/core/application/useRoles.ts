@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { coreAdapter } from '../infrastructure/core.adapter'
 import { IdentityMapper } from '../infrastructure/mappers'
 import { coreKeys } from './query-keys'
-import type { Role } from '../domain/user.types'
+import type { Role } from '../models/user.types'
 import type { CreateRoleDTO } from '../infrastructure/api.types'
 
 /**

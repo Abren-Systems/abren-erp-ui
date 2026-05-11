@@ -9,9 +9,9 @@ import { TX205000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
-import type { TaxRule } from '../../domain/tax.types'
+import type { TaxRule } from '../../models/tax.types'
 import type { TaxRuleId } from '@/shared/types/brand.types'
-import type { Account } from '@/modules/finance/ledger/domain/account.types'
+import type { Account } from '@/modules/finance/ledger/models/account.types'
 
 const taxRuleSchema = z.object({
   name: z.string().min(1, 'Required'),

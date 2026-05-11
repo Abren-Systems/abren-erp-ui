@@ -25,33 +25,6 @@ export type PaymentRequestStatus =
   | 'CANCELLED'
   | 'PAID'
 
-export const PaymentRequestStatus = {
-  isFinal: (status: PaymentRequestStatus): boolean =>
-    status === 'REJECTED' || status === 'CANCELLED' || status === 'PAID',
-
-  isApproved: (status: PaymentRequestStatus): boolean =>
-    status === 'APPROVED' || status === 'AUTHORIZED',
-
-  isEditable: (status: PaymentRequestStatus): boolean => status === 'DRAFT',
-
-  canTransitionTo: (current: PaymentRequestStatus, target: PaymentRequestStatus): boolean => {
-    if (current === target) return true
-    if (PaymentRequestStatus.isFinal(current)) return false
-
-    const transitions: Record<PaymentRequestStatus, PaymentRequestStatus[]> = {
-      DRAFT: ['SUBMITTED', 'CANCELLED'],
-      SUBMITTED: ['APPROVED', 'REJECTED', 'CANCELLED'],
-      APPROVED: ['AUTHORIZED', 'REJECTED'],
-      AUTHORIZED: ['PAID'],
-      REJECTED: [],
-      CANCELLED: [],
-      PAID: [],
-    }
-
-    return transitions[current].includes(target)
-  },
-} as const
-
 export interface PaymentRequestLine {
   id: PaymentRequestLineId // Line IDs are now branded for full type purity
   description: string
@@ -86,11 +59,6 @@ export interface PaymentRequest extends OperationalMetadata {
 // --- Vendor Bill Types ---
 
 export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID' | 'VOIDED'
-
-export const VendorBillStatus = {
-  isPaid: (status: VendorBillStatus): boolean => status === 'PAID',
-  isValidated: (status: VendorBillStatus): boolean => status === 'VALIDATED' || status === 'PAID',
-} as const
 
 export interface VendorBillLine {
   id?: VendorBillLineId | undefined

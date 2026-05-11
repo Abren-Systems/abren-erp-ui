@@ -7,7 +7,7 @@ import {
 } from '@/platform/screen-runtime'
 import { SM201100 } from './screen'
 import { useRoles } from '../../application/useRoles'
-import type { Role } from '../../domain/user.types'
+import type { Role } from '../../models/user.types'
 
 export function useRolesController() {
   const gridState = useDataGrid()

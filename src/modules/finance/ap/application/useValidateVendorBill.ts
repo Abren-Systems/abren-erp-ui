@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import type { VendorBillId } from '@/shared/types/brand.types'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
-import type { VendorBill } from '../domain/ap.types'
+import type { VendorBill } from '../models/ap.types'
 import type { ApiError } from '@/shared/api/http-client'
 
 /**

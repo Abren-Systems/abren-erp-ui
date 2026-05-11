@@ -1,5 +1,5 @@
 import type { ScreenStatePolicy } from '@/platform/screen-runtime'
-import type { PaymentRequestStatus } from '../../domain/ap.types'
+import type { PaymentRequestStatus } from '../../models/ap.types'
 
 // ── AP301500 Screen State Policy ──────────────────────────
 // Declares how the Payment Request Entry screen renders in each domain state.

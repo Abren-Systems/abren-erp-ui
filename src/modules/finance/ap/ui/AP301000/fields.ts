@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { VendorBill } from '../../domain/ap.types'
+import type { VendorBill } from '../../models/ap.types'
 
 /**
  * AP301000 — Field Registry Bindings

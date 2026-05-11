@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { StockItem } from '../../domain/inventory.types'
+import type { StockItem } from '../../models/inventory.types'
 
 export const IN202500_FIELDS = {
   itemId: {

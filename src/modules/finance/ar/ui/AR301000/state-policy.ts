@@ -1,5 +1,5 @@
 import type { ScreenStatePolicy } from '@/platform/screen-runtime/screen-state-policy.types'
-import { ARDocumentStatus } from '../../domain/invoice.schema'
+import { ARDocumentStatus } from '../../models/invoice.schema'
 
 /**
  * AR301000 State Policy

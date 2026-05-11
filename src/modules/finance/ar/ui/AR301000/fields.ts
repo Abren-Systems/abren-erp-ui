@@ -1,5 +1,5 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { ARInvoice } from '../../domain/invoice.schema'
+import type { ARInvoice } from '../../models/invoice.schema'
 
 export const AR301000_FIELDS = {
   customerId: {

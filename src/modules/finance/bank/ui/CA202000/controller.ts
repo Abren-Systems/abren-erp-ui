@@ -1,7 +1,7 @@
 import { computed, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
-import type { BankAccount } from '../../domain/bank.types'
+import type { BankAccount } from '../../models/bank.types'
 import { CA202000 } from './screen'
 import { CA202000_FIELDS } from './fields'
 import { CA202000_POLICY, type BankAccountStatus } from './policy'

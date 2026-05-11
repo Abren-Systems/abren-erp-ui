@@ -11,7 +11,7 @@ import type {
   BankTransaction,
   FinancialObligationCategory,
   ScheduledPayment,
-} from '../domain/bank.types'
+} from '../models/bank.types'
 import type { BankAccountDTO, BankTransactionDTO, ScheduledPaymentDTO } from './api.types'
 
 /**

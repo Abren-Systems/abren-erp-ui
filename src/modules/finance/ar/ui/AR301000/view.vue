@@ -6,7 +6,7 @@ import AppFieldset from '@/shared/components/field-system/AppFieldset.vue'
 import AppField from '@/shared/components/field-system/AppField.vue'
 import { SemanticKind } from '@/platform/semantic-runtime/contracts'
 import { useVueTable, getCoreRowModel, createColumnHelper, FlexRender } from '@tanstack/vue-table'
-import type { ARInvoiceLine } from '../../domain/invoice.schema'
+import type { ARInvoiceLine } from '../../models/invoice.schema'
 import { Trash2, Plus } from 'lucide-vue-next'
 import { h } from 'vue'
 

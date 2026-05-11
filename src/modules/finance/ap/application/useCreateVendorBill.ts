@@ -8,7 +8,7 @@ import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
 import { apKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
-import type { VendorBill } from '../domain/ap.types'
+import type { VendorBill } from '../models/ap.types'
 
 /**
  * Validation Schema for Vendor Bill Creation.
