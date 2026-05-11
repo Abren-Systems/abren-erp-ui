@@ -1139,3 +1139,62 @@ TX2050PL (list) ←→ TX205000 (detail)
 | Field cascades location         | **Controller only** — Vue templates must never contain cross-field update logic               | Matches Acumatica's Graph event handler exclusivity (§16.2)                      |
 | RowSelected vs StatePolicy      | **Declarative policy** — `ScreenStatePolicy` replaces imperative `RowSelected` handlers       | Eliminates per-screen boilerplate; single file governs all field states (§16.3)  |
 | BQL vs CQRS filters             | **Backend CQRS** — filters are typed DTOs validated by Zod, not embedded queries              | Maintains clean architecture boundary; backend owns query logic (§18)            |
+
+---
+
+## 22. State Taxonomy
+
+> **Full specification:** [Operational Contract §5](OPERATIONAL_CONTRACT.md#5-state-taxonomy)
+
+Every piece of state in the system must belong to exactly one of these six categories. Cross-category state is an architectural violation.
+
+| Category               | Owner Tier        | Storage                       | Lifetime             | Examples                                                                                |
+| ---------------------- | ----------------- | ----------------------------- | -------------------- | --------------------------------------------------------------------------------------- |
+| **Operational State**  | Backend Authority | PostgreSQL                    | Persistent           | `PaymentRequest.status`, `JournalEntry.posted`, workflow instance state                 |
+| **Projection State**   | Platform Runtime  | `ScreenProjection` (computed) | Per-render cycle     | `commandProjections[]`, `fieldOverrides`, `expectedNextAction`, `banner`                |
+| **Cached Query State** | Platform Runtime  | TanStack Query cache          | Until invalidation   | Fetched entity data, list results, stats aggregates                                     |
+| **Form Edit State**    | Platform Runtime  | TanStack Form                 | Until save/discard   | Dirty field values, validation errors, touched state                                    |
+| **Session State**      | Platform Runtime  | Controller instance           | Until screen unmount | OCC version token, stale detection flag, command execution state, mutation coordination |
+| **Ephemeral UI State** | UI Rendering      | `ref()` / `reactive()` locals | Until unmount        | Active tab index, dialog open/closed, expanded grid rows, filter panel visibility       |
+
+### 22.1 The Taxonomy Rule
+
+If you cannot place a piece of state into exactly one row of this table, the design is wrong. Common violations:
+
+- A `ref()` that tracks workflow status → **violation** (operational state as ephemeral UI state)
+- A computed that checks `if (status === 'DRAFT')` for editability → **violation** (operational inference in platform runtime)
+- A Pinia store holding entity data → **violation** (belongs in TanStack Query cache)
+
+### 22.2 Acumatica Mapping
+
+| Acumatica Concept             | State Category     | Notes                                                       |
+| ----------------------------- | ------------------ | ----------------------------------------------------------- |
+| `PXCache<DAC>` current record | Cached Query State | TanStack Query cache replaces PXCache                       |
+| `PXView.Current<>` selection  | Session State      | Controller tracks selected record ID                        |
+| `Graph.IsDirty`               | Form Edit State    | TanStack Form `form.state.isDirty`                          |
+| `DAC.Status` (DB)             | Operational State  | Backend owns; frontend reads from entity response           |
+| `PXAction.Enabled`            | Session State      | Backend `available_actions` determines command availability |
+| UI control focus/selection    | Ephemeral UI State | Local `ref()` in component                                  |
+
+---
+
+## 23. Screen Session Model
+
+> **Full specification:** [Operational Contract §6](OPERATIONAL_CONTRACT.md#6-screen-session-model)
+
+The controller (`useScreenController`) is not just a composable — it is a **screen session**. This maps directly to Acumatica's `PXGraph` concept: a `PXGraph` instance IS the active session for a screen, holding the current record, dirty state, and available actions.
+
+| Session Property       | Acumatica Equivalent                         | Source                      | Purpose                          |
+| ---------------------- | -------------------------------------------- | --------------------------- | -------------------------------- |
+| Loaded entity snapshot | `PXCache<DAC>.Current`                       | TanStack Query              | Last-known server state          |
+| OCC version            | `PXDBTimestamp`                              | Backend `version` field     | Stale-write detection            |
+| Dirty field graph      | `Graph.IsDirty` + field-level dirty tracking | TanStack Form               | Unsaved edits                    |
+| Available commands     | `PXAction.GetState()`                        | Backend `available_actions` | What the user can do             |
+| Field capabilities     | `PXFieldState`                               | Backend `field_permissions` | Which fields are editable        |
+| Projection             | N/A (implicit in Acumatica)                  | `resolveScreenProjection()` | Deterministic rendering contract |
+
+### 23.1 The Anti-Drift Rule
+
+> The frontend must NEVER infer operational legality from status values. It renders what the backend declares.
+
+This is the single most important architectural rule in the system. When the backend does not provide `field_permissions`, the frontend **fails closed**: all fields render as readonly with a degraded UX banner. No inference. No assumptions.
