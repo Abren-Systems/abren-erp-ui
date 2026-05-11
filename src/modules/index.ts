@@ -5,7 +5,7 @@ import { apModule } from './finance/ap'
 import { taxModule } from './finance/tax'
 import { arModule } from './finance/ar'
 import { reportingModule } from './reporting'
-import { workflowsModule } from './workflows'
+import { systemModule } from './system'
 import { inventoryModule } from './inventory'
 import type { BusinessDomain, PlatformEngine } from '@/shared/types/module.types'
 
@@ -24,7 +24,7 @@ export const businessModules: BusinessDomain[] = [
   inventoryModule,
 ]
 
-export const platformModules: PlatformEngine[] = [coreModule, workflowsModule]
+export const platformModules: PlatformEngine[] = [coreModule, systemModule]
 
 import { screenRegistry } from '@/platform/screen-runtime'
 

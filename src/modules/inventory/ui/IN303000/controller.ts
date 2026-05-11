@@ -35,7 +35,7 @@ export function useAdjustmentController(id: string) {
   const isNew = computed(() => id === 'new')
   const adjustmentId = computed(() => (isNew.value ? null : id))
 
-  const { adjustment: entity, isLoading, error } = useAdjustment(adjustmentId)
+  const { adjustment: entity, operations, isLoading, error } = useAdjustment(adjustmentId)
   const { createAdjustment, isPending: isSubmitting } = useInventoryAdjustment()
   const { warehouses } = useWarehouses()
 
@@ -74,7 +74,11 @@ export function useAdjustmentController(id: string) {
       error,
     },
     isNew,
-    getDomainState: () => (isNew.value ? 'DRAFT' : 'POSTED') as AdjustmentStatus,
+    getDomainState: (entity) =>
+      (isNew.value
+        ? 'DRAFT'
+        : (entity as unknown as { status: string }).status) as AdjustmentStatus,
+    operations,
     statePolicy: IN303000_POLICY,
   })
 

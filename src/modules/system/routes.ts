@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { resolveScreenRoutes } from '@/platform/screen-runtime'
 import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
-import { workflowScreens } from './screens'
+import { systemScreens } from './screens'
 import { workflowWorkspace } from './workspace'
 
 export default [
@@ -14,5 +14,5 @@ export default [
   },
 
   // --- Screens (State B) ---
-  ...resolveScreenRoutes(workflowScreens),
+  ...resolveScreenRoutes(systemScreens),
 ] satisfies RouteRecordRaw[]

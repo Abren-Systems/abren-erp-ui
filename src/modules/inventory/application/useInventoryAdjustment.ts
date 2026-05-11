@@ -22,7 +22,7 @@ export function useInventoryAdjustment() {
   } = useMutation({
     mutationFn: async (payload: CreateAdjustmentDTO) => {
       const response = await inventoryAdapter.postAdjustment(payload)
-      return response
+      return response.data
     },
     onSuccess: (_, variables) => {
       // Invalidate stock positions for this warehouse so UI updates
@@ -54,7 +54,13 @@ export function useAdjustment(adjustmentId: Ref<string | null>) {
     staleTime: 1000 * 60,
   })
 
-  return { adjustment, isLoading: isPending, error, refetch }
+  return {
+    adjustment: computed(() => adjustment.value?.data),
+    operations: computed(() => adjustment.value?.operations),
+    isLoading: isPending,
+    error,
+    refetch,
+  }
 }
 
 import type { ListQuery } from '@/shared/domain/pagination'
@@ -76,5 +82,10 @@ export function useAdjustments(query?: ListQuery) {
     staleTime: 1000 * 60 * 5,
   })
 
-  return { adjustments: response, isLoading: isPending, error, refetch }
+  return {
+    adjustments: response, // Adapter already handles ListResponse formatting if needed, but here we just return the full response
+    isLoading: isPending,
+    error,
+    refetch,
+  }
 }

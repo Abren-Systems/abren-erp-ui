@@ -19,7 +19,7 @@ export function useVendorBillsListController() {
   const base = useScreenController<VendorBill[], 'VIEW'>({
     screen: AP3010PL,
     dataSource: {
-      entity: computed(() => bills.value?.items ?? []),
+      entity: computed(() => bills.value?.items.map((i) => i.data) ?? []),
       isLoading,
       error,
     },

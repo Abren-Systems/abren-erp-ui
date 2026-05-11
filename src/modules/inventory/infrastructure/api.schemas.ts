@@ -1,5 +1,8 @@
 import { z } from 'zod'
-import { createPaginatedResponseSchema } from '@/shared/infrastructure/api.schemas'
+import {
+  createPaginatedResponseSchema,
+  createOperationalResponseSchema,
+} from '@/shared/infrastructure/api.schemas'
 
 /**
  * Inventory Module API Schemas
@@ -77,9 +80,14 @@ export const AdjustmentSchema = z.object({
   id: z.string().uuid(),
   warehouse_id: z.string().uuid(),
   reason: z.string(),
+  status: z.string(),
   lines: z.array(AdjustmentLineSchema),
 })
 
+export const OperationalAdjustmentSchema = createOperationalResponseSchema(AdjustmentSchema)
+
 export const ItemListSchema = createPaginatedResponseSchema(ItemSchema)
 export const StockLevelListSchema = createPaginatedResponseSchema(StockLevelSchema)
-export const AdjustmentListSchema = createPaginatedResponseSchema(AdjustmentSchema)
+export const AdjustmentListSchema = createPaginatedResponseSchema(
+  createOperationalResponseSchema(AdjustmentSchema),
+)

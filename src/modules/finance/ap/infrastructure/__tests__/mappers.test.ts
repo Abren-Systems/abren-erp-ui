@@ -35,9 +35,6 @@ describe('APMapper', () => {
         source_module: null,
         source_id: null,
         request_number: 'PR-2026-001',
-        available_actions: ['approve', 'reject'],
-        field_permissions: {},
-        version: 1,
       }
 
       const model = APMapper.toPaymentRequest(dto)
@@ -84,9 +81,6 @@ describe('APMapper', () => {
             wht_amount: '0.00',
           },
         ],
-        available_actions: ['void'],
-        field_permissions: { vendor_id: 'readonly' },
-        version: 1,
       }
 
       const model = APMapper.toVendorBill(dto)

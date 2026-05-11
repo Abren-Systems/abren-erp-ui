@@ -27,5 +27,6 @@ export type AdjustmentDTO = {
   id: string
   warehouse_id: string
   reason: string
+  status: string
   lines: AdjustmentLineDTO[]
 }

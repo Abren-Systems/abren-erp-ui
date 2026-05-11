@@ -1,5 +1,8 @@
 import { z } from 'zod'
-import { createPaginatedResponseSchema } from '@/shared/infrastructure/api.schemas'
+import {
+  createPaginatedResponseSchema,
+  createOperationalResponseSchema,
+} from '@/shared/infrastructure/api.schemas'
 
 /**
  * General Ledger (GL) API Schemas.
@@ -94,4 +97,8 @@ export const LedgerSettingsSchema = z.object({
   base_currency_code: z.string(),
 })
 
-export const JournalEntryListSchema = createPaginatedResponseSchema(JournalEntrySchema)
+export const OperationalJournalEntrySchema = createOperationalResponseSchema(JournalEntrySchema)
+
+export const JournalEntryListSchema = createPaginatedResponseSchema(
+  createOperationalResponseSchema(JournalEntrySchema),
+)

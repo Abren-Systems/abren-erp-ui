@@ -2,11 +2,11 @@ import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../infrastructure/ledger.adapter'
-import { LedgerMapper } from '../infrastructure/mappers'
 import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../models/journal-entry.types'
 import type { CreateJournalEntryDTO } from '../infrastructure/api.types'
+import type { WorkflowOperations } from '@/platform/workflow-runtime/models/workflows.types'
 
 import type { ListQuery } from '@/shared/domain/pagination'
 
@@ -29,23 +29,17 @@ export function useJournalEntries(query?: ListQuery) {
     isLoading,
     error,
     refetch,
-  } = useResourceQuery(
-    ledgerKeys.journalEntries(query),
-    () => ledgerAdapter.getJournalEntries(query),
-    (data) => ({
-      ...data,
-      items: data.items.map((dto) => LedgerMapper.toJournalEntry(dto)),
-    }),
+  } = useResourceQuery(ledgerKeys.journalEntries(query), () =>
+    ledgerAdapter.getJournalEntries(query),
   )
 
   const { mutateAsync: createEntry, isPending: isCreating } = useApiMutation<
-    JournalEntry,
+    { data: JournalEntry; operations: WorkflowOperations },
     ApiError,
     CreateJournalEntryDTO
   >(
     async (data: CreateJournalEntryDTO) => {
-      const dto = await ledgerAdapter.createJournalEntry(data)
-      return LedgerMapper.toJournalEntry(dto)
+      return await ledgerAdapter.createJournalEntry(data)
     },
     {
       onSuccess: () => {
@@ -56,9 +50,13 @@ export function useJournalEntries(query?: ListQuery) {
     },
   )
 
-  const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<void, ApiError, string>(
+  const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<
+    { data: JournalEntry; operations: WorkflowOperations },
+    ApiError,
+    string
+  >(
     async (id: string) => {
-      await ledgerAdapter.postJournalEntry(id)
+      return await ledgerAdapter.postJournalEntry(id)
     },
     {
       onSuccess: () => {

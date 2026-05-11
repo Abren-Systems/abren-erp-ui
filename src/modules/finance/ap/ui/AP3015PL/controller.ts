@@ -66,14 +66,14 @@ export function usePaymentRequestList() {
     let data = requests.value.items
 
     if (statusFilter.value === 'needs_attention') {
-      data = data.filter((r) => ['DRAFT', 'REJECTED'].includes(r.status))
+      data = data.filter((r) => ['DRAFT', 'REJECTED'].includes(r.data.status))
     } else if (statusFilter.value === 'in_review') {
-      data = data.filter((r) => ['SUBMITTED', 'APPROVED', 'AUTHORIZED'].includes(r.status))
+      data = data.filter((r) => ['SUBMITTED', 'APPROVED', 'AUTHORIZED'].includes(r.data.status))
     }
 
     return data.map((r) => {
-      const requester = users.value?.find((u) => u.id === r.requesterId)
-      const beneficiary = users.value?.find((u) => u.id === r.beneficiaryId)
+      const requester = users.value?.find((u) => u.id === r.data.requesterId)
+      const beneficiary = users.value?.find((u) => u.id === r.data.beneficiaryId)
 
       const formatName = (user?: User, id?: string) => {
         if (!user) return id?.slice(0, 8) || 'Unknown'
@@ -95,11 +95,15 @@ export function usePaymentRequestList() {
         }
       }
 
+      // Flatten: spread PaymentRequest fields at top level so grid column
+      // accessorKeys ('status', 'totalAmount', etc.) resolve correctly.
+      // Attach operations for version/bulk-action access.
       return {
-        ...r,
-        requesterName: formatName(requester, r.requesterId),
-        beneficiaryName: formatName(beneficiary, r.beneficiaryId),
-        actionRequired: getActionRequired(r.status),
+        ...r.data,
+        operations: r.operations,
+        requesterName: formatName(requester, r.data.requesterId),
+        beneficiaryName: formatName(beneficiary, r.data.beneficiaryId),
+        actionRequired: getActionRequired(r.data.status),
       }
     })
   })
@@ -116,7 +120,7 @@ export function usePaymentRequestList() {
     const selected = new Set(selectedIds.value)
     return filteredRequests.value
       .filter((request) => selected.has(request.id))
-      .map((request) => ({ id: request.id, version: request.version }))
+      .map((request) => ({ id: request.id, version: request.operations.version }))
   })
 
   // ── Handlers ──
@@ -155,7 +159,7 @@ export function usePaymentRequestList() {
   const base = useScreenController<PaymentRequest[], 'VIEW'>({
     screen: AP3015PL,
     dataSource: {
-      entity: computed(() => requests.value?.items ?? []),
+      entity: computed(() => requests.value?.items.map((i) => i.data) ?? []),
       isLoading,
       error,
     },

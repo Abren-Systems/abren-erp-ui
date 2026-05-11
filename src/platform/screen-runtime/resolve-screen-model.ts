@@ -8,6 +8,7 @@ import type {
 } from './screen-state-policy.types'
 import { FieldPermission } from '@/shared/domain/operational'
 import type { ScreenProjection, CommandProjection } from './screen-projection.types'
+import type { WorkflowOperations } from '../workflow-runtime/models/workflows.types'
 
 /**
  * resolveScreenProjection
@@ -26,8 +27,7 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
   screenId: string
   commands: readonly ScreenCommand[]
   domainState: TState
-  availableActions: readonly string[]
-  fieldPermissions: Record<string, string>
+  operations?: WorkflowOperations
   statePolicy: ScreenStatePolicy<TState, TFieldKey>
   services?: {
     hasNotes: boolean
@@ -40,7 +40,9 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
   sessionBanner?: BannerPolicy
   forceReadonly?: boolean
 }): ScreenProjection {
-  const { screenId, commands, domainState, availableActions, fieldPermissions, statePolicy } = input
+  const { screenId, commands, domainState, operations, statePolicy } = input
+  const availableActions = operations?.actions.map((a) => a.action) || []
+  const fieldPermissions = operations?.permissions || {}
 
   // ── 1. Domain Constraints (backend-derived truth) ──
   const behavior = statePolicy.states[domainState]
@@ -63,7 +65,13 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
   for (const cmd of commands) {
     const visible = isCommandVisible(cmd, domainState, availableActions)
     const enabled = visible
-    const projection: CommandProjection = { command: cmd, visible, enabled }
+    const actionDescriptor = operations?.actions.find((a) => a.action === cmd.key)
+    const projection: CommandProjection = {
+      command: cmd,
+      action: actionDescriptor,
+      visible,
+      enabled,
+    }
 
     if (!visible) continue
 
@@ -77,8 +85,11 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
     }
   }
 
+  const expectedNextAction = operations?.actions.find(
+    (a) => expectedNextCmd && a.action === expectedNextCmd.key,
+  )
   const expectedNext: CommandProjection | undefined = expectedNextCmd
-    ? { command: expectedNextCmd, visible: true, enabled: true }
+    ? { command: expectedNextCmd, action: expectedNextAction, visible: true, enabled: true }
     : undefined
 
   // ── 4. UI: Layout (section overrides) ──
@@ -131,8 +142,8 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
     },
     domain: {
       backend: {
-        availableActions,
         status: domainState,
+        operations,
       },
       capabilities: {
         canEdit,

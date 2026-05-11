@@ -37,7 +37,7 @@ export function usePaymentRequestEntry(id: string) {
   const isNew = computed(() => id === 'new')
 
   // ── Data Sources ──
-  const { request, isLoading, error } = usePaymentRequest(id as PaymentRequestId)
+  const { request, operations, isLoading, error } = usePaymentRequest(id as PaymentRequestId)
   const { users } = useUsers()
 
   // ── Creation Form ──
@@ -62,6 +62,7 @@ export function usePaymentRequestEntry(id: string) {
     dataSource: { entity: activeEntity, isLoading, error },
     isNew,
     getDomainState: (entity) => entity.status,
+    operations,
     statePolicy: AP301500_POLICY,
   })
 
@@ -75,7 +76,7 @@ export function usePaymentRequestEntry(id: string) {
   const isRejectDialogOpen = ref(false)
   const isCancelDialogOpen = ref(false)
   const auditReason = ref('')
-  const entityVersion = computed(() => activeEntity.value?.version)
+  const entityVersion = computed(() => operations.value?.version ?? 1)
 
   // ── Workflow Action Executors ──
   const { approve, isPending: isApproving } = useApprovePaymentRequest(

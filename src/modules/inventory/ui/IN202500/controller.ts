@@ -102,7 +102,7 @@ export function useStockItemController(id: string) {
 
   const itemOptions = computed(
     () =>
-      items.value?.map((i) => ({
+      items.value?.items.map((i) => ({
         label: `${i.sku} - ${i.name}`,
         value: i.id,
       })) || [],

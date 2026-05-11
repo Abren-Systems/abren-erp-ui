@@ -18,7 +18,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         v-model:column-visibility="ctrl.gridState.columnVisibility"
         v-model:global-filter="ctrl.gridState.globalFilter"
         :columns="vendorBillColumns"
-        :data="ctrl.bills.value || []"
+        :data="ctrl.bills.value?.items.map((i) => i.data) ?? []"
         :loading="ctrl.isLoading.value"
         placeholder="Search bills..."
         empty-message="No vendor bills found."

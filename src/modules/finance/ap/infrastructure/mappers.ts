@@ -1,5 +1,4 @@
 import { type Currency } from '@/shared/domain/money'
-import { FieldPermission } from '@/shared/domain/operational'
 import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type {
   PaymentRequestDTO,
@@ -93,11 +92,6 @@ export class APMapper {
       sourceModule: dto.source_module ?? null,
       sourceId: dto.source_id ?? null,
       requestNumber: dto.request_number ?? `PR-${dto.id.slice(0, 4).toUpperCase()}`,
-      // --- Operational Metadata ---
-      availableActions: dto.available_actions || [],
-      fieldPermissions: (dto.field_permissions as Record<string, FieldPermission>) || {},
-      expectedNext: dto.expected_next,
-      version: dto.version || 1,
     }
   }
 
@@ -147,11 +141,6 @@ export class APMapper {
       totalPaid: CommonMapper.toMoney(dto.total_paid || '0', currency),
       totalWithheld: CommonMapper.toMoney(dto.total_withheld || '0', currency),
       lines,
-      // --- Operational Metadata ---
-      availableActions: dto.available_actions || [],
-      fieldPermissions: (dto.field_permissions as Record<string, FieldPermission>) || {},
-      expectedNext: dto.expected_next,
-      version: dto.version || 1,
     }
   }
 }

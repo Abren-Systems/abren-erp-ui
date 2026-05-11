@@ -4,9 +4,14 @@ import type {
   SectionStateOverride,
   FieldStateOverride,
 } from './screen-state-policy.types'
+import type {
+  ActionDescriptor,
+  WorkflowOperations,
+} from '../workflow-runtime/models/workflows.types'
 
 export interface CommandProjection {
   readonly command: ScreenCommand
+  readonly action?: ActionDescriptor
   readonly visible: boolean
   readonly enabled: boolean
   readonly reason?: string
@@ -32,13 +37,12 @@ export interface ScreenProjection {
   /** 1. Domain Constraints (Backend-Derived Truth) */
   readonly domain: {
     readonly backend: {
-      readonly availableActions: readonly string[]
       readonly status?: string
+      readonly operations?: WorkflowOperations
     }
     readonly capabilities: {
       readonly canEdit: boolean
       readonly canDelete: boolean
-      // future: canCreate, etc. derived from backend metadata/permissions
     }
     readonly services: {
       readonly hasNotes: boolean

@@ -37,5 +37,10 @@ export function useVendorBill(id: MaybeRefOrGetter<VendorBillId | null | undefin
     },
   )
 
-  return { bill, isLoading, error }
+  return {
+    bill: computed(() => bill.value?.data),
+    operations: computed(() => bill.value?.operations),
+    isLoading,
+    error,
+  }
 }

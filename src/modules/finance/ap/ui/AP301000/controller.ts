@@ -29,7 +29,7 @@ export function useVendorBillController(id: string) {
   const billId = toId<VendorBillId>(id)
 
   // Data fetching
-  const { bill, isLoading } = useVendorBill(billId)
+  const { bill, operations, isLoading } = useVendorBill(billId)
   const { validate, isPending: isValidating } = useValidateVendorBill(billId)
   const { reject, isPending: isRejecting } = useRejectVendorBill(id)
   const { cancel, isPending: isCancelling } = useCancelVendorBill(billId)
@@ -43,6 +43,7 @@ export function useVendorBillController(id: string) {
     dataSource: { entity: bill, isLoading, error: ref(null) },
     isNew,
     getDomainState: (entity) => entity.status,
+    operations,
     statePolicy: AP301000_POLICY,
   })
 

@@ -3,6 +3,7 @@ import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { BannerPolicy, ScreenStatePolicy } from './screen-state-policy.types'
+import type { WorkflowOperations } from '../workflow-runtime/models/workflows.types'
 import { resolveScreenProjection } from './resolve-screen-model'
 import { transitionRecorder } from '../debug/transition-recorder'
 import { ConflictError } from '@/shared/api/http-client'
@@ -17,6 +18,8 @@ export interface ScreenControllerDataSource<T> {
   readonly isLoading: Ref<boolean>
   /** Error from the data source, if any */
   readonly error: Ref<Error | null | undefined>
+  /** Authoritative projection of current operational capabilities */
+  readonly operations?: Ref<WorkflowOperations | undefined>
 }
 
 export interface ScreenControllerOptions<T, TDomain extends string = BaseDomainState> {
@@ -28,6 +31,7 @@ export interface ScreenControllerOptions<T, TDomain extends string = BaseDomainS
   readonly isNew?: Ref<boolean>
   /** Function to extract the module-specific DomainState from the entity */
   readonly getDomainState: (entity: T) => TDomain
+  readonly operations?: Ref<WorkflowOperations | undefined>
   readonly statePolicy: ScreenStatePolicy<TDomain>
   /** Grid states to project into the model */
   readonly grids?: ComputedRef<Record<string, unknown>>
@@ -216,15 +220,11 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
 
   // ── Unified Screen Model ──
   const model = computed(() => {
-    const ent = dataSource.entity.value as Record<string, unknown> | null
-    const availableActions = (ent?.['availableActions'] || []) as readonly string[]
-    const fieldPermissions = (ent?.['fieldPermissions'] || {}) as Record<string, string>
     return resolveScreenProjection({
       screenId: screen.id,
       commands: screen.commands,
       domainState: domain.value,
-      availableActions,
-      fieldPermissions,
+      operations: options.operations?.value,
       statePolicy,
       sessionBanner: degradedBanner.value,
       forceReadonly: degradedBanner.value !== undefined,

@@ -1,5 +1,8 @@
 import { z } from 'zod'
-import { createPaginatedResponseSchema } from '@/shared/infrastructure/api.schemas'
+import {
+  createPaginatedResponseSchema,
+  createOperationalResponseSchema,
+} from '@/shared/infrastructure/api.schemas'
 
 /**
  * BankAccountDTO — Architectural shielding for bank account data.
@@ -56,6 +59,11 @@ export const ScheduledPaymentSchema = z.object({
   source_id: z.string().nullable().optional(),
 })
 
+export const OperationalScheduledPaymentSchema =
+  createOperationalResponseSchema(ScheduledPaymentSchema)
+
 export const BankAccountListSchema = createPaginatedResponseSchema(BankAccountSchema)
 export const BankTransactionListSchema = createPaginatedResponseSchema(BankTransactionSchema)
-export const ScheduledPaymentListSchema = createPaginatedResponseSchema(ScheduledPaymentSchema)
+export const ScheduledPaymentListSchema = createPaginatedResponseSchema(
+  createOperationalResponseSchema(ScheduledPaymentSchema),
+)

@@ -13,12 +13,13 @@ import {
   StockLevelSchema,
   BatchSchema,
   SerialNumberSchema,
-  AdjustmentSchema,
   AdjustmentListSchema,
   ItemListSchema,
   StockLevelListSchema,
+  OperationalAdjustmentSchema,
 } from './api.schemas'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
+import type { WorkflowOperations } from '@/platform/workflow-runtime/models/workflows.types'
 
 /**
  * Inventory API Adapter
@@ -71,18 +72,41 @@ export const inventoryAdapter = {
     return raw.map((item) => SerialNumberSchema.parse(item))
   },
 
-  async postAdjustment(dto: CreateAdjustmentDTO): Promise<AdjustmentDTO> {
+  async postAdjustment(
+    dto: CreateAdjustmentDTO,
+  ): Promise<{ data: AdjustmentDTO; operations: WorkflowOperations }> {
     const raw = await apiPost<unknown>('/inventory/adjustments', dto)
-    return AdjustmentSchema.parse(raw) as unknown as AdjustmentDTO
+    const parsed = OperationalAdjustmentSchema.parse(raw)
+    return {
+      data: parsed.data as unknown as AdjustmentDTO,
+      operations: parsed.operations as unknown as WorkflowOperations,
+    }
   },
 
-  async getAdjustmentById(id: string): Promise<AdjustmentDTO> {
+  async getAdjustmentById(
+    id: string,
+  ): Promise<{ data: AdjustmentDTO; operations: WorkflowOperations }> {
     const raw = await apiGet<unknown>(`/inventory/adjustments/${id}`)
-    return AdjustmentSchema.parse(raw) as unknown as AdjustmentDTO
+    const parsed = OperationalAdjustmentSchema.parse(raw)
+    return {
+      data: parsed.data as unknown as AdjustmentDTO,
+      operations: parsed.operations as unknown as WorkflowOperations,
+    }
   },
 
-  async getAdjustments(query?: ListQuery): Promise<ListResponse<AdjustmentDTO>> {
+  async getAdjustments(
+    query?: ListQuery,
+  ): Promise<ListResponse<{ data: AdjustmentDTO; operations: WorkflowOperations }>> {
     const raw = await apiGet<unknown>('/inventory/adjustments', { params: query })
-    return AdjustmentListSchema.parse(raw) as unknown as ListResponse<AdjustmentDTO>
+    const parsed = AdjustmentListSchema.parse(raw)
+
+    return {
+      items: parsed.items.map((item) => ({
+        data: item.data as unknown as unknown as AdjustmentDTO,
+        operations: item.operations as unknown as WorkflowOperations,
+      })),
+      nextCursor: parsed.next_cursor,
+      totalCount: parsed.total_count,
+    }
   },
 }

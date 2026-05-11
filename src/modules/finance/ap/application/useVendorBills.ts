@@ -21,7 +21,7 @@ export function useVendorBills(query?: ListQuery) {
   } = useResourceQuery(apKeys.vendorBills(query), () => apAdapter.listBills(query))
 
   return {
-    bills: response, // Now returns ListResponse<VendorBill>
+    bills: response, // ListResponse<{ data: VendorBill; operations: WorkflowOperations }>
     isLoading,
     error,
     refetch,

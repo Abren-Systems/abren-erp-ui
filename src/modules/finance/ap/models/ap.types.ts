@@ -1,6 +1,5 @@
 import type { Money, Currency } from '@/shared/domain/money'
 import type { IsoDate } from '@/shared/domain/business-date'
-import type { OperationalMetadata } from '@/shared/domain/operational'
 import type {
   PaymentRequestId,
   PaymentRequestLineId,
@@ -35,7 +34,7 @@ export interface PaymentRequestLine {
   taxAmount: Money | null
 }
 
-export interface PaymentRequest extends OperationalMetadata {
+export interface PaymentRequest {
   id: PaymentRequestId
   requesterId: UserId
   beneficiaryId: UserId
@@ -71,7 +70,7 @@ export interface VendorBillLine {
   whtAmount: Money | null
 }
 
-export interface VendorBill extends OperationalMetadata {
+export interface VendorBill {
   id: VendorBillId
   vendorId: VendorId
   billNumber: string

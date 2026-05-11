@@ -14,10 +14,13 @@ export function useAdjustmentsListController() {
   const router = useRouter()
   const { adjustments, isLoading, error, refetch: refresh } = useAdjustments()
 
+  // Unwrap operational envelopes for grid consumption
+  const adjustmentItems = computed(() => adjustments.value?.items.map((i) => i.data) ?? [])
+
   const base = useScreenController({
     screen: IN3030PL,
     dataSource: {
-      entity: computed(() => adjustments.value?.items ?? []),
+      entity: adjustmentItems,
       isLoading,
       error,
     },
@@ -47,7 +50,7 @@ export function useAdjustmentsListController() {
 
   return {
     ...base,
-    adjustments,
+    adjustmentItems,
     refresh,
     handleCreate,
     handleRowClick,

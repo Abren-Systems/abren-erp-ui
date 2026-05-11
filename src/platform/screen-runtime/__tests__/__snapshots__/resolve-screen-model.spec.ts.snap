@@ -4,9 +4,18 @@ exports[`resolveScreenProjection > should resolve a valid model for DRAFT state 
 {
   "domain": {
     "backend": {
-      "availableActions": [
-        "RELEASE",
-      ],
+      "operations": {
+        "actions": [
+          {
+            "action": "RELEASE",
+            "isPrimary": true,
+            "label": "Release",
+            "requiresReason": false,
+          },
+        ],
+        "permissions": {},
+        "version": 1,
+      },
       "status": "DRAFT",
     },
     "capabilities": {
@@ -27,6 +36,12 @@ exports[`resolveScreenProjection > should resolve a valid model for DRAFT state 
   "ui": {
     "actions": {
       "expectedNext": {
+        "action": {
+          "action": "RELEASE",
+          "isPrimary": true,
+          "label": "Release",
+          "requiresReason": false,
+        },
         "command": {
           "displayOnMainToolbar": true,
           "key": "RELEASE",
@@ -39,6 +54,7 @@ exports[`resolveScreenProjection > should resolve a valid model for DRAFT state 
       },
       "primary": [
         {
+          "action": undefined,
           "command": {
             "displayOnMainToolbar": true,
             "key": "save",
@@ -81,7 +97,11 @@ exports[`resolveScreenProjection > should resolve a valid model for RELEASED sta
 {
   "domain": {
     "backend": {
-      "availableActions": [],
+      "operations": {
+        "actions": [],
+        "permissions": {},
+        "version": 1,
+      },
       "status": "RELEASED",
     },
     "capabilities": {
@@ -104,6 +124,7 @@ exports[`resolveScreenProjection > should resolve a valid model for RELEASED sta
       "expectedNext": undefined,
       "primary": [
         {
+          "action": undefined,
           "command": {
             "displayOnMainToolbar": true,
             "key": "save",

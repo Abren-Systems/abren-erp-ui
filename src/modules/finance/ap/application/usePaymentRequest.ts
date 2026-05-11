@@ -37,5 +37,10 @@ export function usePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
     },
   )
 
-  return { request, isLoading, error }
+  return {
+    request: computed(() => request.value?.data),
+    operations: computed(() => request.value?.operations),
+    isLoading,
+    error,
+  }
 }

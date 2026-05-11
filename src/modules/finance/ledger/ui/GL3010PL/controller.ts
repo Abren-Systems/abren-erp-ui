@@ -14,11 +14,20 @@ export function useJournalEntriesListController() {
   const router = useRouter()
   const { entries, isLoading, error, refresh } = useJournalEntries()
 
+  // ── Flattened Data for Grid ──
+  const flattenedEntries = computed(() => {
+    if (!entries.value?.items) return []
+    return entries.value.items.map((r) => ({
+      ...r.data,
+      operations: r.operations,
+    }))
+  })
+
   // ── Platform Base ──
   const base = useScreenController({
     screen: GL3010PL,
     dataSource: {
-      entity: computed(() => entries.value?.items ?? []),
+      entity: flattenedEntries,
       isLoading,
       error,
     },
@@ -40,7 +49,7 @@ export function useJournalEntriesListController() {
 
   return {
     ...base,
-    entries,
+    entries: flattenedEntries,
     refresh,
     handleRowClick,
     gridState,

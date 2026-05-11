@@ -58,8 +58,11 @@ describe('resolveScreenProjection', () => {
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'DRAFT',
-      availableActions: ['RELEASE'],
-      fieldPermissions: {},
+      operations: {
+        actions: [{ action: 'RELEASE', label: 'Release', isPrimary: true, requiresReason: false }],
+        permissions: {},
+        version: 1,
+      },
       statePolicy: mockPolicy,
     })
 
@@ -78,8 +81,11 @@ describe('resolveScreenProjection', () => {
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'RELEASED',
-      availableActions: [],
-      fieldPermissions: {},
+      operations: {
+        actions: [],
+        permissions: {},
+        version: 1,
+      },
       statePolicy: mockPolicy,
     })
 
@@ -96,8 +102,11 @@ describe('resolveScreenProjection', () => {
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'RELEASED',
-      availableActions: [], // Void requires 'VOID' in availableActions
-      fieldPermissions: {},
+      operations: {
+        actions: [],
+        permissions: {},
+        version: 1,
+      },
       statePolicy: mockPolicy,
     })
 
@@ -111,8 +120,11 @@ describe('resolveScreenProjection', () => {
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'DRAFT',
-      availableActions: ['RELEASE'],
-      fieldPermissions: {},
+      operations: {
+        actions: [{ action: 'RELEASE', label: 'Release', isPrimary: true, requiresReason: false }],
+        permissions: {},
+        version: 1,
+      },
       statePolicy: mockPolicy,
     })
 
@@ -130,10 +142,13 @@ describe('resolveScreenProjection', () => {
       screenId: 'AP301000',
       commands: mockCommands,
       domainState: 'DRAFT', // Normally editable
-      availableActions: ['RELEASE'],
-      fieldPermissions: {
-        vendorId: 'editable', // Explicitly editable from backend
-        totalAmount: 'readonly',
+      operations: {
+        actions: [{ action: 'RELEASE', label: 'Release', isPrimary: true, requiresReason: false }],
+        permissions: {
+          vendorId: 'editable',
+          totalAmount: 'readonly',
+        },
+        version: 1,
       },
       statePolicy: mockPolicy,
       sessionBanner: {

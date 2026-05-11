@@ -2,10 +2,10 @@ import { useApiMutation } from '@/shared/composables/useApiMutation'
 import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { useQueryClient } from '@tanstack/vue-query'
 import { ledgerAdapter } from '../infrastructure/ledger.adapter'
-import { LedgerMapper } from '../infrastructure/mappers'
 import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../models/journal-entry.types'
+import type { WorkflowOperations } from '@/platform/workflow-runtime/models/workflows.types'
 
 /**
  * Use Case: Focus on a single Journal Entry.
@@ -28,10 +28,8 @@ export function useJournalEntry(entryId: string) {
     isLoading: isFetching,
     error,
     refetch,
-  } = useResourceQuery(
-    ledgerKeys.journalEntry(entryId),
-    () => ledgerAdapter.getJournalEntry(entryId),
-    (dto) => LedgerMapper.toJournalEntry(dto),
+  } = useResourceQuery(ledgerKeys.journalEntry(entryId), () =>
+    ledgerAdapter.getJournalEntry(entryId),
   )
 
   /**
@@ -39,16 +37,15 @@ export function useJournalEntry(entryId: string) {
    * This is a Primary action on the DetailPage Action Surface.
    */
   const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<
-    JournalEntry,
+    { data: JournalEntry; operations: WorkflowOperations },
     ApiError,
     void
   >(
     async () => {
-      const dto = await ledgerAdapter.postJournalEntry(entryId)
-      return LedgerMapper.toJournalEntry(dto)
+      return await ledgerAdapter.postJournalEntry(entryId)
     },
     {
-      onSuccess: (updated: JournalEntry) => {
+      onSuccess: (updated: { data: JournalEntry; operations: WorkflowOperations }) => {
         // Update the single-entry cache immediately for instant UI feedback
         queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated)
         // Invalidate the list so the queue reflects the state change
@@ -64,16 +61,15 @@ export function useJournalEntry(entryId: string) {
    * Requires a mandatory reason. Must be called after ActionModal confirmation.
    */
   const { mutateAsync: voidEntry, isPending: isVoiding } = useApiMutation<
-    JournalEntry,
+    { data: JournalEntry; operations: WorkflowOperations },
     ApiError,
     { reason: string }
   >(
     async ({ reason }) => {
-      const dto = await ledgerAdapter.voidJournalEntry(entryId, { reason })
-      return LedgerMapper.toJournalEntry(dto)
+      return await ledgerAdapter.voidJournalEntry(entryId, { reason })
     },
     {
-      onSuccess: (updated: JournalEntry) => {
+      onSuccess: (updated: { data: JournalEntry; operations: WorkflowOperations }) => {
         queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated)
         void queryClient.invalidateQueries({
           queryKey: ledgerKeys.journalEntries(),

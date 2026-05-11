@@ -1,10 +1,12 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
+import type { WorkflowOperations } from '@/platform/workflow-runtime/models/workflows.types'
+import type { JournalEntry } from '../models/journal-entry.types'
+import { LedgerMapper } from './mappers'
 import type {
   AccountDTO,
   CreateAccountDTO,
   RenameAccountDTO,
-  JournalEntryDTO,
   CreateJournalEntryDTO,
   VoidJournalEntryDTO,
   FiscalPeriodDTO,
@@ -15,7 +17,7 @@ import type {
 } from './api.types'
 import {
   AccountSchema,
-  JournalEntrySchema,
+  OperationalJournalEntrySchema,
   JournalEntryListSchema,
   FiscalPeriodSchema,
   FiscalYearSchema,
@@ -76,11 +78,16 @@ export const ledgerAdapter = {
   /**
    * Fetches a paginated list of journal entries.
    */
-  async getJournalEntries(query?: ListQuery): Promise<ListResponse<JournalEntryDTO>> {
+  async getJournalEntries(
+    query?: ListQuery,
+  ): Promise<ListResponse<{ data: JournalEntry; operations: WorkflowOperations }>> {
     const raw = await apiGet<unknown>('/finance/ledger/journal-entries', { params: query })
     const parsed = JournalEntryListSchema.parse(raw)
     return {
-      items: parsed.items,
+      items: parsed.items.map((item) => ({
+        data: LedgerMapper.toJournalEntry(item.data),
+        operations: item.operations as unknown as WorkflowOperations,
+      })),
       nextCursor: parsed.next_cursor,
       totalCount: parsed.total_count,
     }
@@ -90,33 +97,49 @@ export const ledgerAdapter = {
    * Fetches a single journal entry by ID.
    *
    * @param entryId - The UUID of the journal entry.
-   * @returns A promise resolving to the validated JournalEntryDTO.
+   * @returns A promise resolving to the validated Domain Model and Operations.
    */
-  async getJournalEntry(entryId: string): Promise<JournalEntryDTO> {
-    const raw = await apiGet<JournalEntryDTO>(`/finance/ledger/journal-entries/${entryId}`)
-    return JournalEntrySchema.parse(raw)
+  async getJournalEntry(
+    entryId: string,
+  ): Promise<{ data: JournalEntry; operations: WorkflowOperations }> {
+    const raw = await apiGet<unknown>(`/finance/ledger/journal-entries/${entryId}`)
+    const parsed = OperationalJournalEntrySchema.parse(raw)
+    return {
+      data: LedgerMapper.toJournalEntry(parsed.data),
+      operations: parsed.operations as unknown as WorkflowOperations,
+    }
   },
 
   /**
    * Creates a new draft journal entry.
    *
    * @param data - The raw journal entry creation data.
-   * @returns A promise resolving to the validated JournalEntryDTO.
    */
-  async createJournalEntry(data: CreateJournalEntryDTO): Promise<JournalEntryDTO> {
-    const raw = await apiPost<JournalEntryDTO>('/finance/ledger/journal-entries', data)
-    return JournalEntrySchema.parse(raw)
+  async createJournalEntry(
+    data: CreateJournalEntryDTO,
+  ): Promise<{ data: JournalEntry; operations: WorkflowOperations }> {
+    const raw = await apiPost<unknown>('/finance/ledger/journal-entries', data)
+    const parsed = OperationalJournalEntrySchema.parse(raw)
+    return {
+      data: LedgerMapper.toJournalEntry(parsed.data),
+      operations: parsed.operations as unknown as WorkflowOperations,
+    }
   },
 
   /**
    * Posts an existing draft journal entry to the ledger.
    *
    * @param entryId - The unique identifier of the journal entry.
-   * @returns A promise resolving to the validated JournalEntryDTO.
    */
-  async postJournalEntry(entryId: string): Promise<JournalEntryDTO> {
-    const raw = await apiPost<JournalEntryDTO>(`/finance/ledger/journal-entries/${entryId}/post`)
-    return JournalEntrySchema.parse(raw)
+  async postJournalEntry(
+    entryId: string,
+  ): Promise<{ data: JournalEntry; operations: WorkflowOperations }> {
+    const raw = await apiPost<unknown>(`/finance/ledger/journal-entries/${entryId}/post`)
+    const parsed = OperationalJournalEntrySchema.parse(raw)
+    return {
+      data: LedgerMapper.toJournalEntry(parsed.data),
+      operations: parsed.operations as unknown as WorkflowOperations,
+    }
   },
 
   /**
@@ -124,14 +147,17 @@ export const ledgerAdapter = {
    *
    * @param entryId - The UUID of the journal entry to void.
    * @param data - The void payload containing the reason.
-   * @returns A promise resolving to the validated JournalEntryDTO.
    */
-  async voidJournalEntry(entryId: string, data: VoidJournalEntryDTO): Promise<JournalEntryDTO> {
-    const raw = await apiPost<JournalEntryDTO>(
-      `/finance/ledger/journal-entries/${entryId}/void`,
-      data,
-    )
-    return JournalEntrySchema.parse(raw)
+  async voidJournalEntry(
+    entryId: string,
+    data: VoidJournalEntryDTO,
+  ): Promise<{ data: JournalEntry; operations: WorkflowOperations }> {
+    const raw = await apiPost<unknown>(`/finance/ledger/journal-entries/${entryId}/void`, data)
+    const parsed = OperationalJournalEntrySchema.parse(raw)
+    return {
+      data: LedgerMapper.toJournalEntry(parsed.data),
+      operations: parsed.operations as unknown as WorkflowOperations,
+    }
   },
 
   /**

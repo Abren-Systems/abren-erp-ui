@@ -5,10 +5,10 @@ import {
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
-import { usePendingApprovals } from '../../application/usePendingApprovals'
-import { useApprovalAction } from '../../application/useApprovalAction'
+import { usePendingApprovals } from '@/platform/workflow-runtime/application/usePendingApprovals'
+import { useApprovalAction } from '@/platform/workflow-runtime/application/useApprovalAction'
 import { EP503010 } from './screen'
-import type { PendingApproval } from '../../models/workflows.types'
+import type { PendingApproval } from '@/platform/workflow-runtime/models/workflows.types'
 
 export function useWorkflowInboxController() {
   const gridState = useDataGrid()
