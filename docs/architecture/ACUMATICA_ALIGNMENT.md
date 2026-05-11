@@ -595,29 +595,95 @@ gl.GL301000.summary.batchNumber  → "Batch Number"
 
 ## Use the key as fallback display string until full i18n infrastructure is implemented.
 
-## 13. Field-Level Semantics (The DAC Model)
+## 13. The DAC Architecture (Data Access Class) — Deep Dive
 
-Acumatica doesn't just bind data; it binds **behaviors** to fields via Data Access Class (DAC) attributes.
+In Acumatica, a **DAC** is the typed schema for a database table. But it is much more than a data model — it is a **declarative behavior contract**. Every field on a DAC carries attributes that control persistence, UI rendering, validation, defaulting, and cross-field relationships.
 
-| Acumatica Attribute | Abren Equivalent        | Description                                                                       |
-| ------------------- | ----------------------- | --------------------------------------------------------------------------------- |
-| `PXSelector`        | `AppSelector`           | Defines a lookup to another view. Must include `primaryView` and `displayFields`. |
-| `PXDBIdentity`      | `createScreenId()`      | Auto-incrementing or UUIDv7 identity field.                                       |
-| `PXDefault`         | `defaultValue`          | Constant or expression-based default.                                             |
-| `PXUIField`         | `FieldDefinition`       | Controls Visibility, Enabled state, and Label.                                    |
-| `PXDBQuantity`      | `SemanticKind.Quantity` | Enforces precision and unit-of-measure alignment.                                 |
+### 13.1 Bound vs. Unbound Fields
 
-### The "Selector" Contract
+| Type                  | Acumatica                       | Abren                      | Persisted? | Example                         |
+| --------------------- | ------------------------------- | -------------------------- | ---------- | ------------------------------- |
+| **Bound**             | `[PXDBString]`, `[PXDBDecimal]` | Domain entity property     | ✅ Yes     | `vendor_name`, `amount`         |
+| **Unbound (Virtual)** | `[PXString]`, `[PXDecimal]`     | `computed()` in controller | ❌ No      | `displayTotal`, `formattedDate` |
 
-A Selector in Abren is a **portal**. It must be defined in the `FieldDefinition`:
+**Key Rule:** Unbound fields are calculated on the server (in Acumatica) or in the controller (in Abren). They must NEVER appear in mutation payloads. In Abren, declare them as `computed()` properties on the controller return object, not as form fields.
+
+### 13.2 DAC Attribute → Abren Mapping (Complete)
+
+| Acumatica Attribute          | Abren Equivalent                            | Layer            | Purpose                            |
+| ---------------------------- | ------------------------------------------- | ---------------- | ---------------------------------- |
+| `[PXDBString(60)]`           | Zod `z.string().max(60)`                    | Validation       | String field with max length       |
+| `[PXDBDecimal(2)]`           | `SemanticKind.Amount`                       | Semantic Runtime | Decimal with precision             |
+| `[PXDBBool]`                 | `type: 'checkbox'` in `FieldDefinition`     | Field System     | Boolean toggle                     |
+| `[PXDBDate]`                 | `type: 'date'` in `FieldDefinition`         | Field System     | Date picker                        |
+| `[PXDBIdentity]`             | `UUIDv7` via `generate_uuid7()`             | Shared Kernel    | Auto-generated identity            |
+| `[PXUIField(DisplayName)]`   | `label` in `FieldDefinition`                | Field System     | UI label                           |
+| `[PXUIField(Enabled=false)]` | `readonly: () => true` in `FieldDefinition` | Field System     | Always read-only                   |
+| `[PXDefault]`                | `defaultValues` in TanStack Form            | Controller       | Static default                     |
+| `[PXDefault(typeof(...))]`   | `watch` + `form.setFieldValue()`            | Controller       | Derived default from another field |
+| `[PXSelector(typeof(...))]`  | `type: 'selector'` + lookup composable      | Field System     | Cross-entity lookup                |
+| `[PXDBQuantity]`             | `SemanticKind.Quantity`                     | Semantic Runtime | Unit-aware quantity                |
+| `[PXDBCurrency]`             | `SemanticKind.Amount`                       | Semantic Runtime | Currency-aware amount              |
+| `[PXFormula]`                | `computed()` in controller                  | Controller       | Server-calculated derived value    |
+| `[PXParent]`                 | View dependency in `ScreenDefinition.views` | Screen Runtime   | Master-detail FK link              |
+
+### 13.3 Key Structure
+
+| Acumatica Key          | Abren Equivalent                                 | Purpose                    |
+| ---------------------- | ------------------------------------------------ | -------------------------- |
+| `[PXDBIdentity]`       | `UUIDv7` branded type (e.g., `PaymentRequestId`) | Surrogate primary key      |
+| `[IsKey]`              | Composite key fields on domain entity            | Natural key for uniqueness |
+| `[PXParent]`           | `parentId` property + view `queryKey` dependency | FK to master record        |
+| `[PXForeignReference]` | Soft reference validated by facade               | Cross-module reference     |
+
+### 13.4 The Selector Contract (Deep)
+
+In Acumatica, `PXSelector` doesn't just render a dropdown — it opens a **lookup panel** that is itself a mini-screen backed by a BQL query. The selector defines:
+
+```csharp
+// Acumatica: PXSelector with substitution
+[PXSelector(typeof(Search<Vendor.bAccountID>),
+  SubstituteKey = typeof(Vendor.acctCD),
+  DescriptionField = typeof(Vendor.acctName))]
+public int? VendorID { get; set; }
+```
+
+**Abren equivalent** — the `FieldDefinition` must declare a selector contract:
 
 ```typescript
-selector: {
-  screenId: 'CA2020PL', // Where the lookup data comes from
-  resultMap: { 'id': 'cashAccountId' }, // How to map selection back to form
-  displayField: 'accountCode'
-}
+// fields.ts — Selector field with lookup binding
+{
+  key: 'vendorId',
+  label: 'Vendor',
+  type: 'selector',
+  selector: {
+    // The list screen that provides lookup data
+    screenId: 'AP2020PL',
+    // Which field to display to the user (SubstituteKey)
+    displayField: 'acctCD',
+    // Description shown alongside the key
+    descriptionField: 'acctName',
+    // How to map selection result back to form fields
+    resultMap: {
+      'bAccountID': 'vendorId',
+      'defaultTermsId': 'termsId',  // Auto-populate related fields
+    },
+  },
+} as FieldDefinition<APBill, string>
 ```
+
+> [!IMPORTANT]
+> **Selectors are portals, not dropdowns.** A selector's `resultMap` can populate multiple fields at once (e.g., selecting a Vendor auto-fills `Terms`, `PaymentMethod`, `DefaultCashAccount`). This is the Acumatica "field cascade" pattern and is critical for data entry efficiency.
+
+### 13.5 Default Value Strategies
+
+| Strategy         | Acumatica                                   | Abren                                         | When                       |
+| ---------------- | ------------------------------------------- | --------------------------------------------- | -------------------------- |
+| **Constant**     | `[PXDefault("USD")]`                        | `defaultValues: { currency: 'ETB' }` in form  | Static value on new record |
+| **From Parent**  | `[PXDefault(typeof(APSetup.defaultTerms))]` | `watch(vendor, ...)` + `form.setFieldValue()` | When parent field changes  |
+| **Sequence**     | `[PXDefault(typeof(Numbering.newSymbol))]`  | Backend auto-number via API response          | Server-generated on create |
+| **Current User** | `[PXDefault(typeof(AccessInfo.userID))]`    | `SYSTEM_ACTOR_ID` or auth context             | Auto-fill current user     |
+| **Formula**      | `[PXFormula(typeof(...))]`                  | `computed()` derived from other fields        | Calculated field           |
 
 ---
 
@@ -658,7 +724,411 @@ Processing screens are **Batch Engines**. They follow a rigid interaction model:
 
 ---
 
-## 16. Resolved Architectural Decisions
+## 16. The Graph Lifecycle — Event Model (Deep Dive)
+
+In Acumatica, `PXGraph` is not just a controller — it is a **reactive event bus**. Every field change, row selection, and persistence attempt fires typed events that the developer hooks into. This is the behavioral core of the framework.
+
+### 16.1 The Event Categories
+
+| Event               | Acumatica Handler               | Fires When                                    | Abren Equivalent                                 |
+| ------------------- | ------------------------------- | --------------------------------------------- | ------------------------------------------------ |
+| **FieldDefaulting** | `{DAC}_{Field}_FieldDefaulting` | A field's default value is being calculated   | `defaultValues` in TanStack Form config          |
+| **FieldUpdating**   | `{DAC}_{Field}_FieldUpdating`   | A field value is about to change (can cancel) | `validate` in `FieldDefinition`                  |
+| **FieldUpdated**    | `{DAC}_{Field}_FieldUpdated`    | A field value has changed                     | `watch()` on form field + `form.setFieldValue()` |
+| **FieldVerifying**  | `{DAC}_{Field}_FieldVerifying`  | A field is being validated before acceptance  | Zod schema validator on the form                 |
+| **RowSelecting**    | `{DAC}_RowSelecting`            | A database row is being loaded                | TanStack Query `select` transform                |
+| **RowSelected**     | `{DAC}_RowSelected`             | A record is now the current record            | `watch(entity, ...)` in controller               |
+| **RowInserting**    | `{DAC}_RowInserting`            | A new record is being created                 | `onSubmit` in form config                        |
+| **RowUpdating**     | `{DAC}_RowUpdating`             | An existing record is being modified          | `onSubmit` in form config                        |
+| **RowPersisting**   | `{DAC}_RowPersisting`           | A record is about to be saved to DB           | Pre-submit validation in `handleSave()`          |
+| **RowPersisted**    | `{DAC}_RowPersisted`            | A record was saved successfully               | TanStack Query `onSuccess` callback              |
+
+### 16.2 The "FieldUpdated Cascade" Pattern
+
+This is the most critical pattern in Acumatica. When a user changes one field, related fields must automatically update:
+
+```csharp
+// Acumatica: When Vendor changes, auto-populate Terms and Currency
+protected void APInvoice_VendorID_FieldUpdated(PXCache cache, PXFieldUpdatedEventArgs e)
+{
+    APInvoice doc = (APInvoice)e.Row;
+    Vendor vendor = PXSelect<Vendor,
+        Where<Vendor.bAccountID, Equal<Required<APInvoice.vendorID>>>>
+        .Select(this, doc.VendorID);
+    doc.TermsID = vendor.TermsID;
+    doc.CuryID = vendor.CuryID;
+    doc.PaymentMethodID = vendor.PaymentMethodID;
+}
+```
+
+**Abren equivalent** — use `watch` on the form field inside the controller:
+
+```typescript
+// controller.ts — Field cascade: Vendor → Terms + Currency
+watch(
+  () => form.getFieldValue('vendorId'),
+  async (newVendorId) => {
+    if (!newVendorId) return
+    const vendor = await fetchVendor(newVendorId)
+    form.setFieldValue('termsId', vendor.defaultTermsId)
+    form.setFieldValue('currency', vendor.currencyId)
+    form.setFieldValue('paymentMethodId', vendor.paymentMethodId)
+  },
+)
+```
+
+> [!IMPORTANT]
+> **All field cascades MUST live in the controller.** The Vue template must never contain logic that updates one field based on another. This preserves the Acumatica principle that the Graph (controller) is the single source of behavior.
+
+### 16.3 The "RowSelected" Pattern — State-Driven UI
+
+In Acumatica, `RowSelected` is where you enable/disable fields and buttons based on the current record's state:
+
+```csharp
+// Acumatica: Disable editing when document is Released
+protected void APInvoice_RowSelected(PXCache cache, PXRowSelectedEventArgs e)
+{
+    APInvoice doc = (APInvoice)e.Row;
+    bool isEditable = doc.Status == APDocStatus.Hold || doc.Status == APDocStatus.Balanced;
+    PXUIFieldAttribute.SetEnabled<APInvoice.vendorID>(cache, doc, isEditable);
+    PXUIFieldAttribute.SetEnabled<APInvoice.curyOrigDocAmt>(cache, doc, isEditable);
+    Release.SetEnabled(doc.Status == APDocStatus.Balanced);
+}
+```
+
+**Abren equivalent** — this is the `ScreenStatePolicy`:
+
+```typescript
+// policy.ts — Declarative replacement for RowSelected event handlers
+export const AP301500_POLICY: ScreenStatePolicy<PaymentRequestStatus, PRFieldKey> = {
+  states: {
+    DRAFT: {
+      editable: true,
+      fields: {
+        requesterId: { readonly: true }, // Auto-filled, never editable
+        status: { readonly: true }, // System-managed
+        beneficiaryId: { required: true },
+      },
+    },
+    SUBMITTED: { editable: false }, // Everything locked
+    RELEASED: { editable: false },
+  },
+}
+```
+
+> [!TIP]
+> **Abren's `ScreenStatePolicy` replaces hundreds of lines of `RowSelected` handlers.** Instead of imperatively calling `SetEnabled()` per field, we declare the contract once. The platform's `useField` binding reads the policy via the unified `ScreenProjection` and enforces it automatically.
+
+### 16.4 The "RowPersisting" Pattern — Pre-Save Validation
+
+```csharp
+// Acumatica: Block saving if total is zero
+protected void APInvoice_RowPersisting(PXCache cache, PXRowPersistingEventArgs e)
+{
+    APInvoice doc = (APInvoice)e.Row;
+    if (doc.CuryOrigDocAmt == 0)
+        throw new PXRowPersistingException(typeof(APInvoice.curyOrigDocAmt),
+            doc.CuryOrigDocAmt, "Document total cannot be zero.");
+}
+```
+
+**Abren equivalent** — Zod schema validation in the form:
+
+```typescript
+// controller.ts — Form-level validation (replaces RowPersisting)
+const billSchema = z.object({
+  vendorId: z.string().min(1, 'Vendor is required'),
+  amount: z.number().positive('Amount must be greater than zero'),
+  currency: z.string().min(1, 'Currency is required'),
+})
+
+const form = useForm({
+  validators: { onChange: billSchema },
+  onSubmit: async ({ value }) => {
+    /* persists only if valid */
+  },
+})
+```
+
+---
+
+## 17. Master-Detail-SubDetail Orchestration
+
+Acumatica's most powerful pattern is the **header-detail** relationship, where a document (header) owns a collection of line items (details), and each line may have sub-details (e.g., tax breakdown per line).
+
+### 17.1 The View Dependency Graph
+
+```
+┌─────────────────────────────────────────────────────┐
+│ PXGraph: APInvoiceEntry                             │
+│                                                     │
+│  Document (Primary View)                            │
+│     │ PXSelect<APInvoice>                           │
+│     │                                               │
+│     ├── Transactions (Detail View)                  │
+│     │    PXSelect<APTran,                           │
+│     │      Where<APTran.refNbr, Equal<Current       │
+│     │            <APInvoice.refNbr>>>>              │
+│     │    │                                          │
+│     │    └── TaxLines (Sub-Detail View)             │
+│     │         PXSelect<APTaxTran,                   │
+│     │           Where<APTaxTran.tranLineNbr,        │
+│     │             Equal<Current<APTran.lineNbr>>>>  │
+│     │                                               │
+│     └── Taxes (Aggregate View)                      │
+│          PXSelect<APTaxTran, summarized>            │
+└─────────────────────────────────────────────────────┘
+```
+
+### 17.2 Abren View Dependency Declaration
+
+```typescript
+// screen.ts — Declaring the view dependency graph
+views: {
+  // Primary View (the header)
+  document: {
+    name: 'document',
+    kind: 'single',
+    containerName: 'APInvoice',
+    queryKey: ['ap', 'bills', 'detail'] as const,
+  },
+  // Detail View (line items, filtered by header ID)
+  transactions: {
+    name: 'transactions',
+    kind: 'collection',
+    containerName: 'APTran',
+    queryKey: ['ap', 'bills', 'lines'] as const,
+    // PROPOSED: parentView binding
+    // parentView: 'document',
+    // foreignKey: 'refNbr',
+  },
+}
+```
+
+### 17.3 The "Current" Mechanism
+
+In Acumatica, `Current<APInvoice.refNbr>` means "the value of `refNbr` on the currently selected record in the primary view." This is how details stay in sync with the header.
+
+**Abren equivalent** — TanStack Query key includes the parent ID:
+
+```typescript
+// application/useBillLines.ts
+export function useBillLines(billId: Ref<string | null>) {
+  return useQuery({
+    queryKey: computed(() => ['ap', 'bills', 'lines', billId.value]),
+    queryFn: () => apApi.getBillLines(billId.value!),
+    enabled: computed(() => !!billId.value),
+  })
+}
+```
+
+The controller wires this by deriving `billId` from the primary entity:
+
+```typescript
+// controller.ts
+const billId = computed(() => entity.value?.id ?? null)
+const { data: lines } = useBillLines(billId)
+```
+
+> [!IMPORTANT]
+> **When the header record changes (via navigation ◁▷), all detail queries must automatically re-fetch.** This is guaranteed by including the parent ID in the `queryKey`. TanStack Query's reactivity handles the rest — no manual invalidation needed.
+
+---
+
+## 18. BQL and the Query Contract
+
+Acumatica's **BQL (Business Query Language)** is a strongly-typed query DSL embedded in C#. Every data view is backed by a BQL statement that defines what data is fetched, filtered, and sorted.
+
+### 18.1 BQL → Abren Query Mapping
+
+| BQL Concept                  | Abren Equivalent                  | Example                      |
+| ---------------------------- | --------------------------------- | ---------------------------- |
+| `PXSelect<DAC>`              | `useQuery({ queryKey, queryFn })` | Fetch all records            |
+| `Where<Field, Equal<Const>>` | Backend CQRS filter DTO           | `{ status: 'OPEN' }`         |
+| `And<Field, Greater<Zero>>`  | Compound filter                   | `{ amount: { $gt: 0 } }`     |
+| `OrderBy<Asc<Field>>`        | `orderBy` param in API call       | `?sort=date:asc`             |
+| `Current<Parent.field>`      | `queryKey` includes parent ref    | `['bills', 'lines', billId]` |
+| `Optional<Where<...>>`       | Conditional `enabled` on query    | `enabled: computed(...)`     |
+
+### 18.2 The Read-Side Contract
+
+Every list screen (PL suffix) needs a **query contract** that maps to the backend's CQRS read model:
+
+```typescript
+// Abren: List query with filters and sorting
+export function usePaymentRequests(filters: Ref<PRFilterDTO>) {
+  return useQuery({
+    queryKey: computed(() => ['ap', 'payment-requests', filters.value]),
+    queryFn: () => apApi.listPaymentRequests(filters.value),
+  })
+}
+```
+
+The `filters` object is the Abren equivalent of BQL's `Where` clause. It is typed by the backend's read DTO and validated by Zod.
+
+---
+
+## 19. The Workflow Engine — Deep Architecture
+
+Acumatica's Workflow API is a **declarative finite state machine** configured in C# fluent syntax. It controls which actions are available, which fields are editable, and what the "expected next action" is — all based on the current document status.
+
+### 19.1 The Three Layers of Workflow
+
+| Layer                 | Acumatica                             | Abren                         | File          |
+| --------------------- | ------------------------------------- | ----------------------------- | ------------- |
+| **State Declaration** | `context.AddScreenConfigurationFor()` | `ScreenStatePolicy`           | `policy.ts`   |
+| **Transition Rules**  | `.WithTransitions(t => ...)`          | `ScreenCommand.from[]` / `to` | `commands.ts` |
+| **Field States**      | `.WithFieldStates(fs => ...)`         | `StateBehavior.fields`        | `policy.ts`   |
+
+### 19.2 Acumatica Workflow Configuration (Full Example)
+
+```csharp
+// Acumatica: Full workflow for AP Bill
+context.AddScreenConfigurationFor(screen => screen
+  .StateIdentifierIs<APInvoice.status>()
+  .AddDefaultFlow(flow => flow
+    .WithFlowStates(states => {
+      states.Add<State.hold>(state => state
+        .IsInitial()
+        .WithFieldStates(fs => {
+          fs.AddField<APInvoice.vendorID>(f => f.IsDisabled());
+        })
+        .WithActions(actions => {
+          actions.Add(g => g.RemoveHold, a => a.IsDuplicatedInToolbar());
+        }));
+      states.Add<State.balanced>(state => state
+        .WithActions(actions => {
+          actions.Add(g => g.Release, a => a
+            .IsDuplicatedInToolbar()
+            .WithConnotation(ActionConnotation.Success));
+          actions.Add(g => g.PutOnHold);
+        }));
+      states.Add<State.released>(state => state
+        .WithFieldStates(fs => {
+          fs.DisableFields();  // All fields locked
+        }));
+    })
+    .WithTransitions(transitions => {
+      transitions.Add(t => t.From<State.hold>().To<State.balanced>()
+        .IsTriggeredOn(g => g.RemoveHold));
+      transitions.Add(t => t.From<State.balanced>().To<State.hold>()
+        .IsTriggeredOn(g => g.PutOnHold));
+      transitions.Add(t => t.From<State.balanced>().To<State.released>()
+        .IsTriggeredOn(g => g.Release));
+    })
+  )
+);
+```
+
+### 19.3 Abren Equivalent — The Four Files of Authority
+
+The same workflow is expressed across four files in Abren:
+
+**1. `policy.ts`** — Declares field states per domain status (replaces `WithFieldStates`):
+
+```typescript
+export const AP301000_POLICY: ScreenStatePolicy<APBillStatus, APBillFieldKey> = {
+  states: {
+    HOLD: {
+      editable: true,
+      fields: { vendorId: { readonly: true } },
+      actionRequiredLabel: 'Remove Hold',
+    },
+    BALANCED: {
+      editable: true,
+      deletable: true,
+      actionRequiredLabel: 'Release',
+    },
+    RELEASED: { editable: false },
+  },
+}
+```
+
+**2. `commands.ts`** — Declares transitions (replaces `WithTransitions` + `WithActions`):
+
+```typescript
+export const AP301000_COMMANDS: readonly ScreenCommand[] = [
+  {
+    key: 'removeHold',
+    kind: 'workflow',
+    labelKey: 'Remove Hold',
+    variant: 'primary',
+    displayOnMainToolbar: true,
+    from: ['HOLD'],
+    to: 'BALANCED',
+  },
+  {
+    key: 'putOnHold',
+    kind: 'workflow',
+    labelKey: 'Put on Hold',
+    variant: 'neutral',
+    from: ['BALANCED'],
+    to: 'HOLD',
+  },
+  {
+    key: 'release',
+    kind: 'workflow',
+    labelKey: 'Release',
+    variant: 'primary',
+    displayOnMainToolbar: true,
+    from: ['BALANCED'],
+    to: 'RELEASED',
+    requiresConfirmation: true,
+  },
+]
+```
+
+**3. `fields.ts`** — Declares field metadata (replaces DAC attributes).
+
+**4. `controller.ts`** — Registers command executors and field cascades (replaces Graph event handlers).
+
+### 19.4 Expected Next Action Resolution
+
+The "green button" in Acumatica's toolbar is the **Expected Next Action** — the single most likely action the user should take given the current document state.
+
+```
+State: HOLD      → Expected Next: "Remove Hold" (green)
+State: BALANCED  → Expected Next: "Release" (green)
+State: RELEASED  → No expected next (document is final)
+```
+
+**Abren resolution** — `resolveScreenProjection()` finds the first `primary` variant command whose `from[]` includes the current domain state:
+
+```typescript
+// resolve-screen-model.ts (already implemented)
+const expectedNextCmd = getExpectedNextAction(commands, domainState, availableActions)
+```
+
+---
+
+## 20. Navigation & Record Identity
+
+### 20.1 The Record Navigator (◁ ▷)
+
+In Acumatica, data entry and maintenance screens have **record navigation arrows** that let users browse through records without returning to the list. The navigator maintains a **record set** derived from the list screen's last filter.
+
+| Component    | Acumatica | Abren                                  |
+| ------------ | --------- | -------------------------------------- |
+| First Record | `\|◁`     | `pairedListRoute` + query cache        |
+| Previous     | `◁`       | Navigate to previous ID in cached list |
+| Next         | `▷`       | Navigate to next ID in cached list     |
+| Last Record  | `▷\|`     | Navigate to last ID in cached list     |
+
+### 20.2 The Paired List Pattern
+
+Every data entry screen has a **paired list screen** that feeds it records:
+
+```
+AP3010PL (list) ←→ AP301000 (detail)
+GL3010PL (list) ←→ GL301000 (detail)
+TX2050PL (list) ←→ TX205000 (detail)
+```
+
+**Abren:** The `ScreenDefinition.pairedListRoute` property links form screens to their list counterparts. When navigating from a list to a detail, the list's current filter state should be preserved in a query cache so the record navigator can use it.
+
+---
+
+## 21. Resolved Architectural Decisions
 
 | Decision                        | Resolution                                                                                    | Rationale                                                                        |
 | ------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -666,3 +1136,6 @@ Processing screens are **Batch Engines**. They follow a rigid interaction model:
 | ActionContract vs ScreenCommand | **Two-layer hybrid** — declarative data objects + platform resolver                           | Matches Acumatica's PXAction + Workflow API pattern                              |
 | Processing screens              | **Standardized**                                                                              | Pattern defined in §15.                                                          |
 | Workspace as screen kind        | **No** — Workspace View is State A of the center area, not a screen kind or a separate region | Workspace and Working Area are mutually exclusive states of the same center area |
+| Field cascades location         | **Controller only** — Vue templates must never contain cross-field update logic               | Matches Acumatica's Graph event handler exclusivity (§16.2)                      |
+| RowSelected vs StatePolicy      | **Declarative policy** — `ScreenStatePolicy` replaces imperative `RowSelected` handlers       | Eliminates per-screen boilerplate; single file governs all field states (§16.3)  |
+| BQL vs CQRS filters             | **Backend CQRS** — filters are typed DTOs validated by Zod, not embedded queries              | Maintains clean architecture boundary; backend owns query logic (§18)            |
