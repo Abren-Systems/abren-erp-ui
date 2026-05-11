@@ -13,6 +13,14 @@ export function createPaginatedResponseSchema<T extends z.ZodTypeAny>(itemSchema
 }
 
 /**
+ * Standard payload for workflow state transitions and mutations.
+ * Enforces Optimistic Concurrency Control (OCC).
+ */
+export const StateTransitionRequestSchema = z.object({
+  expected_version: z.number().int(),
+})
+
+/**
  * Authoritative projection of current operational capabilities.
  */
 export const WorkflowOperationsSchema = z.object({

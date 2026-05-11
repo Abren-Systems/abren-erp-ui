@@ -16,6 +16,7 @@ import type { AxiosRequestConfig } from 'axios'
 export interface ApiResponse<T> {
   success: boolean
   data: T
+  operations?: unknown // Will be strongly typed by consumers using OperationalEntity
   meta?: Record<string, unknown>
 }
 
@@ -75,6 +76,7 @@ const httpClient = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
+    'X-Abren-Response-Profile': 'operational', // Opt into the Platform Workflow Runtime capability sidecar
   },
 })
 
@@ -148,6 +150,10 @@ httpClient.interceptors.response.use(
  */
 export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   const response = await httpClient.get<ApiResponse<T>>(url, config)
+  // If operations exist, we return the whole enveloped entity (OperationalEntity<T> equivalent), otherwise just data
+  if (response.data.operations) {
+    return { data: response.data.data, operations: response.data.operations } as unknown as T
+  }
   return response.data.data
 }
 
@@ -172,6 +178,9 @@ export async function apiPost<T>(
     })
   }
   const response = await httpClient.post<ApiResponse<T>>(url, body, axiosConfig)
+  if (response.data.operations) {
+    return { data: response.data.data, operations: response.data.operations } as unknown as T
+  }
   return response.data.data
 }
 
@@ -196,6 +205,9 @@ export async function apiPut<T>(
     })
   }
   const response = await httpClient.put<ApiResponse<T>>(url, body, axiosConfig)
+  if (response.data.operations) {
+    return { data: response.data.data, operations: response.data.operations } as unknown as T
+  }
   return response.data.data
 }
 
@@ -220,6 +232,9 @@ export async function apiPatch<T>(
     })
   }
   const response = await httpClient.patch<ApiResponse<T>>(url, body, axiosConfig)
+  if (response.data.operations) {
+    return { data: response.data.data, operations: response.data.operations } as unknown as T
+  }
   return response.data.data
 }
 
@@ -233,6 +248,9 @@ export async function apiPatch<T>(
  */
 export async function apiDelete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   const response = await httpClient.delete<ApiResponse<T>>(url, config)
+  if (response.data.operations) {
+    return { data: response.data.data, operations: response.data.operations } as unknown as T
+  }
   return response.data.data
 }
 

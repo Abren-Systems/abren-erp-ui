@@ -130,11 +130,15 @@ export const ledgerAdapter = {
    * Posts an existing draft journal entry to the ledger.
    *
    * @param entryId - The unique identifier of the journal entry.
+   * @param version - The OCC expected version.
    */
   async postJournalEntry(
     entryId: string,
+    version: number,
   ): Promise<{ data: JournalEntry; operations: WorkflowOperations }> {
-    const raw = await apiPost<unknown>(`/finance/ledger/journal-entries/${entryId}/post`)
+    const raw = await apiPost<unknown>(`/finance/ledger/journal-entries/${entryId}/post`, {
+      expected_version: version,
+    })
     const parsed = OperationalJournalEntrySchema.parse(raw)
     return {
       data: LedgerMapper.toJournalEntry(parsed.data),
@@ -146,11 +150,11 @@ export const ledgerAdapter = {
    * Voids a posted journal entry.
    *
    * @param entryId - The UUID of the journal entry to void.
-   * @param data - The void payload containing the reason.
+   * @param data - The void payload containing the reason and expected version.
    */
   async voidJournalEntry(
     entryId: string,
-    data: VoidJournalEntryDTO,
+    data: VoidJournalEntryDTO & { expected_version: number },
   ): Promise<{ data: JournalEntry; operations: WorkflowOperations }> {
     const raw = await apiPost<unknown>(`/finance/ledger/journal-entries/${entryId}/void`, data)
     const parsed = OperationalJournalEntrySchema.parse(raw)
