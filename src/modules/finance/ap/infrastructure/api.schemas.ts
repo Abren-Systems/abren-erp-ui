@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createPaginatedResponseSchema } from '@/shared/infrastructure/api.schemas'
 
 /**
  * Zod Schemas for Accounts Payable (AP) Module.
@@ -99,3 +100,6 @@ export const VendorBillSchema = z.object({
   expected_next: z.string().nullable().optional(),
   version: z.number().int().default(1),
 })
+
+export const PaymentRequestListSchema = createPaginatedResponseSchema(PaymentRequestSchema)
+export const VendorBillListSchema = createPaginatedResponseSchema(VendorBillSchema)

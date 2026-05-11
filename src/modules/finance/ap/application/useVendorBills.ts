@@ -2,22 +2,28 @@ import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 
+import type { ListQuery } from '@/shared/domain/pagination'
+
 /**
  * Use Case: View Vendor Bills List.
  *
- * Fetches and maps all supplier invoices (Vendor Bills).
+ * Fetches and maps supplier invoices (Vendor Bills) with keyset pagination support.
  *
- * @returns Reactive vendor bills collection and refetch function.
- * @example
- * const { bills, isLoading } = useVendorBills()
+ * @param {ListQuery} [query] - Optional pagination and filter parameters.
+ * @returns Reactive paginated vendor bills collection.
  */
-export function useVendorBills() {
+export function useVendorBills(query?: ListQuery) {
   const {
-    data: bills,
+    data: response,
     isLoading,
     error,
     refetch,
-  } = useResourceQuery(apKeys.vendorBills(), () => apAdapter.listBills())
+  } = useResourceQuery(apKeys.vendorBills(query), () => apAdapter.listBills(query))
 
-  return { bills, isLoading, error, refetch }
+  return {
+    bills: response, // Now returns ListResponse<VendorBill>
+    isLoading,
+    error,
+    refetch,
+  }
 }

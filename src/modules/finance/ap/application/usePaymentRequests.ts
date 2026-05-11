@@ -2,22 +2,28 @@ import { useResourceQuery } from '@/shared/composables/useResourceQuery'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 
+import type { ListQuery } from '@/shared/domain/pagination'
+
 /**
  * Use Case: View Payment Requests List.
  *
- * Fetches and maps all standalone payment requests.
+ * Fetches and maps standalone payment requests with keyset pagination support.
  *
- * @returns Reactive payment requests collection and refetch function.
- * @example
- * const { requests, isLoading } = usePaymentRequests()
+ * @param {ListQuery} [query] - Optional pagination and filter parameters.
+ * @returns Reactive paginated payment requests collection.
  */
-export function usePaymentRequests() {
+export function usePaymentRequests(query?: ListQuery) {
   const {
-    data: requests,
+    data: response,
     isLoading,
     error,
     refetch,
-  } = useResourceQuery(apKeys.paymentRequests(), () => apAdapter.listRequests())
+  } = useResourceQuery(apKeys.paymentRequests(query), () => apAdapter.listRequests(query))
 
-  return { requests, isLoading, error, refetch }
+  return {
+    requests: response, // Now returns ListResponse<PaymentRequest>
+    isLoading,
+    error,
+    refetch,
+  }
 }

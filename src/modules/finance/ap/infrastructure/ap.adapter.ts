@@ -1,5 +1,11 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
-import { PaymentRequestSchema, PaymentRequestStatsSchema, VendorBillSchema } from './api.schemas'
+import {
+  PaymentRequestSchema,
+  PaymentRequestListSchema,
+  PaymentRequestStatsSchema,
+  VendorBillSchema,
+  VendorBillListSchema,
+} from './api.schemas'
 import type {
   CreatePaymentRequestDTO,
   RejectPaymentRequestDTO,
@@ -8,6 +14,7 @@ import type {
 import { APMapper } from './mappers'
 import type { PaymentRequest, PaymentRequestStats, VendorBill } from '../models/ap.types'
 import { Money } from '@/shared/domain/money'
+import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
 
 const REQUESTS_BASE = '/finance/ap/payment-requests'
 const BILLS_BASE = '/finance/ap/vendor-bills'
@@ -20,11 +27,17 @@ const BILLS_BASE = '/finance/ap/vendor-bills'
  */
 export const apAdapter = {
   /**
-   * Fetches the list of all Payment Requests.
+   * Fetches a paginated list of Payment Requests.
    */
-  async listRequests(): Promise<PaymentRequest[]> {
-    const raw = (await apiGet<unknown[]>(REQUESTS_BASE)) as unknown[]
-    return raw.map((item) => APMapper.toPaymentRequest(PaymentRequestSchema.parse(item)))
+  async listRequests(query?: ListQuery): Promise<ListResponse<PaymentRequest>> {
+    const raw = await apiGet<unknown>(REQUESTS_BASE, { params: query })
+    const parsed = PaymentRequestListSchema.parse(raw)
+
+    return {
+      items: parsed.items.map((item) => APMapper.toPaymentRequest(item)),
+      nextCursor: parsed.next_cursor,
+      totalCount: parsed.total_count,
+    }
   },
 
   /**
@@ -107,11 +120,17 @@ export const apAdapter = {
   },
 
   /**
-   * Fetches the list of all Vendor Bills.
+   * Fetches a paginated list of Vendor Bills.
    */
-  async listBills(): Promise<VendorBill[]> {
-    const raw = (await apiGet<unknown[]>(BILLS_BASE)) as unknown[]
-    return raw.map((item) => APMapper.toVendorBill(VendorBillSchema.parse(item)))
+  async listBills(query?: ListQuery): Promise<ListResponse<VendorBill>> {
+    const raw = await apiGet<unknown>(BILLS_BASE, { params: query })
+    const parsed = VendorBillListSchema.parse(raw)
+
+    return {
+      items: parsed.items.map((item) => APMapper.toVendorBill(item)),
+      nextCursor: parsed.next_cursor,
+      totalCount: parsed.total_count,
+    }
   },
 
   /**

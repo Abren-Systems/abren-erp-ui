@@ -62,8 +62,8 @@ export function usePaymentRequestList() {
   const selectedCount = computed(() => Object.keys(gridState.rowSelection.value).length)
 
   const filteredRequests = computed(() => {
-    if (!requests.value) return []
-    let data = requests.value
+    if (!requests.value?.items) return []
+    let data = requests.value.items
 
     if (statusFilter.value === 'needs_attention') {
       data = data.filter((r) => ['DRAFT', 'REJECTED'].includes(r.status))
@@ -155,7 +155,7 @@ export function usePaymentRequestList() {
   const base = useScreenController<PaymentRequest[], 'VIEW'>({
     screen: AP3015PL,
     dataSource: {
-      entity: requests,
+      entity: computed(() => requests.value?.items ?? []),
       isLoading,
       error,
     },
