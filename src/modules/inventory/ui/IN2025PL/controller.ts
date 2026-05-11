@@ -6,7 +6,7 @@ import {
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
-import { useStockPositions } from '../../application/useStockPositions'
+import { useStockLevels } from '../../application/useStockPositions'
 import { useWarehouses } from '../../application/useWarehouses'
 import { IN2025PL } from './screen'
 
@@ -16,16 +16,15 @@ export function useStockItemsListController() {
   const selectedWarehouseId = ref<string | undefined>(undefined)
 
   const { warehouses } = useWarehouses()
-  const {
-    stockItems,
-    isPending: isLoading,
-    error,
-    refetch: refresh,
-  } = useStockPositions(selectedWarehouseId)
+  const { stockLevels, isPending: isLoading, error, refetch: refresh } = useStockLevels()
 
   const base = useScreenController({
     screen: IN2025PL,
-    dataSource: { entity: computed(() => null), isLoading, error },
+    dataSource: {
+      entity: computed(() => stockLevels.value?.items ?? []),
+      isLoading,
+      error,
+    },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,
@@ -42,7 +41,7 @@ export function useStockItemsListController() {
   return {
     ...base,
     warehouses,
-    stockItems,
+    stockLevels,
     selectedWarehouseId,
     refresh,
     handleCreateAdjustment,

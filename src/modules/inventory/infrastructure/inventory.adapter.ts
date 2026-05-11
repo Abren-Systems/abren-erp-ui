@@ -10,12 +10,15 @@ import type {
 } from './api.types'
 import {
   WarehouseSchema,
-  ItemSchema,
   StockLevelSchema,
   BatchSchema,
   SerialNumberSchema,
   AdjustmentSchema,
+  AdjustmentListSchema,
+  ItemListSchema,
+  StockLevelListSchema,
 } from './api.schemas'
+import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
 
 /**
  * Inventory API Adapter
@@ -38,9 +41,14 @@ export const inventoryAdapter = {
     return WarehouseSchema.parse(raw)
   },
 
-  async getItems(): Promise<ItemDTO[]> {
-    const raw = await apiGet<unknown[]>('/inventory/items')
-    return raw.map((item) => ItemSchema.parse(item))
+  async getItems(query?: ListQuery): Promise<ListResponse<ItemDTO>> {
+    const raw = await apiGet<unknown>('/inventory/items', { params: query })
+    return ItemListSchema.parse(raw) as unknown as ListResponse<ItemDTO>
+  },
+
+  async getStockLevels(query?: ListQuery): Promise<ListResponse<StockLevelDTO>> {
+    const raw = await apiGet<unknown>('/inventory/stock-positions', { params: query })
+    return StockLevelListSchema.parse(raw) as unknown as ListResponse<StockLevelDTO>
   },
 
   async getStockByWarehouse(warehouseId: string): Promise<StockLevelDTO[]> {
@@ -73,8 +81,8 @@ export const inventoryAdapter = {
     return AdjustmentSchema.parse(raw) as unknown as AdjustmentDTO
   },
 
-  async getAdjustments(): Promise<AdjustmentDTO[]> {
-    const raw = await apiGet<unknown[]>('/inventory/adjustments')
-    return raw.map((item) => AdjustmentSchema.parse(item) as unknown as AdjustmentDTO)
+  async getAdjustments(query?: ListQuery): Promise<ListResponse<AdjustmentDTO>> {
+    const raw = await apiGet<unknown>('/inventory/adjustments', { params: query })
+    return AdjustmentListSchema.parse(raw) as unknown as ListResponse<AdjustmentDTO>
   },
 }

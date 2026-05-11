@@ -16,7 +16,11 @@ export function useAdjustmentsListController() {
 
   const base = useScreenController({
     screen: IN3030PL,
-    dataSource: { entity: adjustments, isLoading, error },
+    dataSource: {
+      entity: computed(() => adjustments.value?.items ?? []),
+      isLoading,
+      error,
+    },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,

@@ -6,8 +6,36 @@ import { InventoryMapper } from '../infrastructure/mappers'
 import { inventoryKeys } from './query-keys'
 import type { StockItem } from '../models/inventory.types'
 
+import type { ListQuery } from '@/shared/domain/pagination'
+
 /**
- * Use Case: View Stock Positions
+ * Use Case: View All Stock Positions (Paginated)
+ *
+ * @param {ListQuery} [query] - Optional pagination parameters.
+ */
+export function useStockLevels(query?: ListQuery) {
+  const {
+    data: response,
+    isPending,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: inventoryKeys.stockLevels(query),
+    queryFn: async () => {
+      const data = await inventoryAdapter.getStockLevels(query)
+      return {
+        ...data,
+        items: data.items.map((dto) => InventoryMapper.toStockItem(dto)),
+      }
+    },
+    staleTime: 1000 * 60,
+  })
+
+  return { stockLevels: response, isPending, error, refetch }
+}
+
+/**
+ * Use Case: View Stock Positions per Warehouse
  *
  * Retrieves stock physical reality per warehouse.
  */

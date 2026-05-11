@@ -2,25 +2,31 @@ import { useQuery } from '@tanstack/vue-query'
 import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { InventoryMapper } from '../infrastructure/mappers'
 import { inventoryKeys } from './query-keys'
-import type { Item } from '../models/inventory.types'
+
+import type { ListQuery } from '@/shared/domain/pagination'
 
 /**
- * Use Case: View Inventory Items
+ * Use Case: View Inventory Items (Paginated)
+ *
+ * @param {ListQuery} [query] - Optional pagination parameters.
  */
-export function useItems() {
+export function useItems(query?: ListQuery) {
   const {
-    data: items,
+    data: response,
     isPending,
     error,
     refetch,
-  } = useQuery<Item[], Error>({
-    queryKey: inventoryKeys.items(),
+  } = useQuery({
+    queryKey: inventoryKeys.items(query),
     queryFn: async () => {
-      const dtos = await inventoryAdapter.getItems()
-      return dtos.map((dto) => InventoryMapper.toItem(dto))
+      const data = await inventoryAdapter.getItems(query)
+      return {
+        ...data,
+        items: data.items.map((dto) => InventoryMapper.toItem(dto)),
+      }
     },
     staleTime: 1000 * 60 * 5,
   })
 
-  return { items, isPending, error, refetch }
+  return { items: response, isPending, error, refetch }
 }

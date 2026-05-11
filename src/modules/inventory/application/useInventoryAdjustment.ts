@@ -57,20 +57,24 @@ export function useAdjustment(adjustmentId: Ref<string | null>) {
   return { adjustment, isLoading: isPending, error, refetch }
 }
 
+import type { ListQuery } from '@/shared/domain/pagination'
+
 /**
- * Use Case: View Adjustments List
+ * Use Case: View Adjustments List (Paginated)
+ *
+ * @param {ListQuery} [query] - Optional pagination parameters.
  */
-export function useAdjustments() {
+export function useAdjustments(query?: ListQuery) {
   const {
-    data: adjustments,
+    data: response,
     isPending,
     error,
     refetch,
   } = useQuery({
-    queryKey: ['inventory', 'adjustments', 'list'],
-    queryFn: () => inventoryAdapter.getAdjustments(),
+    queryKey: inventoryKeys.adjustments(query),
+    queryFn: () => inventoryAdapter.getAdjustments(query),
     staleTime: 1000 * 60 * 5,
   })
 
-  return { adjustments, isLoading: isPending, error, refetch }
+  return { adjustments: response, isLoading: isPending, error, refetch }
 }
