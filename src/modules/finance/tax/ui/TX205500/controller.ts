@@ -2,9 +2,9 @@ import { computed, watch, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import { useTaxGroup, useCreateTaxGroup, useActiveTaxRules } from '../../application/useTaxRules'
-import { TX201000 } from './screen'
-import { TX201000_POLICY, type TaxGroupStatus } from './policy'
-import { TX201000_FIELDS } from './fields'
+import { TX205500 } from './screen'
+import { TX205500_POLICY, type TaxGroupStatus } from './policy'
+import { TX205500_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
@@ -50,7 +50,7 @@ export function useTaxGroupController(id: string) {
     onSubmit: async ({ value }) => {
       if (isNew.value) {
         await createGroup(value)
-        void router.push({ name: 'finance.tax.groups' })
+        void router.push({ name: 'TaxGroupsList' })
       } else {
         // TODO: Implement update mutation
         console.warn('[TODO] Update not yet implemented', value)
@@ -83,7 +83,7 @@ export function useTaxGroupController(id: string) {
   })
 
   const base = useScreenController<TaxGroupFormEntity, TaxGroupStatus>({
-    screen: TX201000,
+    screen: TX205500,
     dataSource: {
       entity: activeEntity,
       isLoading: computed(() => isLoading.value || isRulesLoading.value),
@@ -91,16 +91,16 @@ export function useTaxGroupController(id: string) {
     },
     isNew,
     getDomainState: (ent) => (ent?.isActive ? 'ACTIVE' : 'INACTIVE') as TaxGroupStatus,
-    statePolicy: TX201000_POLICY,
+    statePolicy: TX205500_POLICY,
   })
 
   // Attach form to base so useField can find it
   Object.assign(base, { form })
 
   const fields = {
-    name: useField(base, TX201000_FIELDS.name),
-    method: useField(base, TX201000_FIELDS.method),
-    isActive: useField(base, TX201000_FIELDS.isActive),
+    name: useField(base, TX205500_FIELDS.name),
+    method: useField(base, TX205500_FIELDS.method),
+    isActive: useField(base, TX205500_FIELDS.isActive),
   }
 
   const selectedRuleId = ref('')

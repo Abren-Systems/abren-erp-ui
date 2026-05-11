@@ -15,8 +15,8 @@ export const taxModule: BusinessDomain = {
   permissions: ['finance:tax:view'],
   menuItems: [
     {
-      label: 'Tax Rules',
-      route: 'TaxRulesList',
+      label: 'Taxes',
+      route: 'TaxesList',
       icon: 'percent',
     },
     {

@@ -7,7 +7,7 @@ import type { ScreenDefinition } from '@/platform/screen-runtime'
 export const SM201100: ScreenDefinition = {
   id: createScreenId('SM201100'),
   titleKey: 'User Roles',
-  kind: 'setup',
+  kind: 'maintenance',
   moduleId: 'core' as ModuleId,
 
   controller: () => useRolesController(),

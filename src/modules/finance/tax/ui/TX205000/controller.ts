@@ -3,9 +3,9 @@ import { useRouter } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import { useTaxRule, useCreateTaxRule } from '../../application/useTaxRules'
 import { useLedgerAccounts } from '../../../ledger/application/useLedgerAccounts'
-import { TX202000 } from './screen'
-import { TX202000_POLICY, type TaxRuleStatus } from './policy'
-import { TX202000_FIELDS } from './fields'
+import { TX205000 } from './screen'
+import { TX205000_POLICY, type TaxRuleStatus } from './policy'
+import { TX205000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
@@ -86,7 +86,7 @@ export function useTaxRuleController(id: string) {
   })
 
   const base = useScreenController<TaxRule, TaxRuleStatus>({
-    screen: TX202000,
+    screen: TX205000,
     dataSource: {
       entity: activeEntity as unknown as ComputedRef<TaxRule>,
       isLoading: computed(() => isLoading.value || isAccountsLoading.value),
@@ -94,19 +94,19 @@ export function useTaxRuleController(id: string) {
     },
     isNew,
     getDomainState: (ent: TaxRule) => (ent?.isActive ? 'ACTIVE' : 'INACTIVE') as TaxRuleStatus,
-    statePolicy: TX202000_POLICY,
+    statePolicy: TX205000_POLICY,
   })
 
   // Attach form to base so useField can find it
   Object.assign(base, { form })
 
   const fields = {
-    name: useField(base, TX202000_FIELDS.name),
-    rate: useField(base, TX202000_FIELDS.rate),
-    taxType: useField(base, TX202000_FIELDS.taxType),
-    direction: useField(base, TX202000_FIELDS.direction),
-    glAccountId: useField(base, TX202000_FIELDS.glAccountId),
-    isActive: useField(base, TX202000_FIELDS.isActive),
+    name: useField(base, TX205000_FIELDS.name),
+    rate: useField(base, TX205000_FIELDS.rate),
+    taxType: useField(base, TX205000_FIELDS.taxType),
+    direction: useField(base, TX205000_FIELDS.direction),
+    glAccountId: useField(base, TX205000_FIELDS.glAccountId),
+    isActive: useField(base, TX205000_FIELDS.isActive),
   }
 
   const handleSave = async () => {

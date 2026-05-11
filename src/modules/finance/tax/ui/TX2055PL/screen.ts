@@ -2,17 +2,17 @@ import { useTaxGroupsListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { createScreenId } from '@/platform/screen-runtime'
 import type { ModuleId } from '@/shared/types/brand.types'
-import { TX2010PL_COMMANDS } from './commands'
+import { TX2055PL_COMMANDS } from './commands'
 
-export const TX2010PL: ScreenDefinition = {
-  id: createScreenId('TX2010PL'),
+export const TX2055PL: ScreenDefinition = {
+  id: createScreenId('TX2055PL'),
   moduleId: 'tax' as ModuleId,
   controller: () => useTaxGroupsListController(),
   kind: 'primaryList',
   titleKey: 'Tax Groups',
   primaryView: 'groups',
   route: {
-    path: 'groups',
+    path: 'tax-groups',
     name: 'TaxGroupsList',
   },
   permissions: [{ key: 'finance:tax:view' }],
@@ -29,7 +29,7 @@ export const TX2010PL: ScreenDefinition = {
     renderTarget: () => import('./view.vue') as never,
     sidePanel: { tabs: [], defaultCollapsed: true },
   },
-  commands: Object.values(TX2010PL_COMMANDS),
+  commands: Object.values(TX2055PL_COMMANDS),
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,
@@ -37,7 +37,7 @@ export const TX2010PL: ScreenDefinition = {
     allowSectionPersonalization: false,
   },
   test: {
-    containerName: 'TX2010PL',
+    containerName: 'TX2055PL',
     viewNames: [],
     actionNames: [],
   },

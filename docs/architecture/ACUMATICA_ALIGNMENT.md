@@ -193,7 +193,7 @@ In addition to forms, the Working Area can display:
 | Detail Grid            | No                | No                         | **Yes** (line items)                           | **Yes** (results grid)     | **Yes** (results grid)   | **Yes** (selectable grid) |
 | Record Navigation (◁▷) | No                | Yes                        | Yes                                            | No                         | No                       | No                        |
 | Record Services        | No                | Yes (Notes/Files)          | Yes (Notes/Files)                              | No                         | No                       | No                        |
-| Toolbar commands       | Save, Cancel      | Save, Cancel, Delete, Nav  | Save, Cancel, Delete, Nav, Expected Next, More | New, Refresh, Filter, Bulk | Refresh                  | Process, Process All      |
+| Toolbar commands       | Save, Cancel      | Save, Cancel, Delete, Nav  | Save, Cancel, Delete, Nav, Expected Next, More | New, Refresh, Filter, Bulk | Refresh                  | **Process, Process All**  |
 
 > [!IMPORTANT]
 > **Chrome selection is non-negotiable.** List and inquiry screens (`PL` suffix, `inquiry`, `processing`) use `ListTitleBar` — a minimal title-only bar. Form screens (`setup`, `maintenance`, `dataEntry`) use `FormTitleBar` — a full record-context bar with back navigation, record title, and service buttons. See [Screen Runtime §4](SCREEN_RUNTIME.md#4-working-area-chrome-title-bar--toolbar) for rendering rules.
@@ -248,15 +248,23 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 | `GL2025PL` | Primary List | Chart of Accounts (List)   | GL2025PL             | ✅ Aligned |
 | `GL301000` | Data Entry   | Journal Transactions       | GL301000             | ✅ Aligned |
 | `GL3010PL` | Primary List | Journal Transactions List  | GL3010PL             | ✅ Aligned |
-| `GL503000` | Processing   | Manage Financial Periods   | GL503000             | 📋 Future  |
+| `GL501000` | Processing   | Release Transactions       | GL501000             | 📋 Future  |
+| `GL503000` | Processing   | Manage Financial Periods   | GL503000             | ✅ Aligned |
 
 #### System Management (SM)
 
 | Screen ID  | Form Kind   | Title      | Acumatica Equivalent | Status     |
 | ---------- | ----------- | ---------- | -------------------- | ---------- |
 | `SM201010` | Maintenance | Users      | SM201010             | ✅ Aligned |
-| `SM201100` | Setup       | User Roles | SM201100             | ✅ Aligned |
-| `SM203500` | Maintenance | Companies  | SM203500             | ✅ Aligned |
+| `SM201100` | Maintenance | User Roles | SM201100             | ✅ Aligned |
+| `CS102000` | Maintenance | Companies  | CS102000             | ✅ Aligned |
+
+#### Accounts Receivable (AR)
+
+| Screen ID  | Form Kind  | Title                     | Acumatica Equivalent | Status     |
+| ---------- | ---------- | ------------------------- | -------------------- | ---------- |
+| `AR301000` | Data Entry | Invoices and Memos        | AR301000             | ✅ Aligned |
+| `AR303000` | Data Entry | Payments and Applications | AR303000             | 📋 Future  |
 
 #### Enterprise Portal (EP)
 
@@ -266,26 +274,33 @@ Screen IDs are **8-character codes** with strict semantic meaning:
 
 #### Banking (CA)
 
-| Screen ID  | Form Kind   | Title         | Acumatica Equivalent | Status    |
-| ---------- | ----------- | ------------- | -------------------- | --------- |
-| `CA202000` | Maintenance | Bank Accounts | CA202000             | ❌ Legacy |
+| Screen ID  | Form Kind    | Title                | Acumatica Equivalent | Status     |
+| ---------- | ------------ | -------------------- | -------------------- | ---------- |
+| `CA202000` | Maintenance  | Bank Accounts        | CA202000             | ✅ Aligned |
+| `CA2020PL` | Primary List | Bank Accounts (List) | CA2020PL             | ✅ Aligned |
 
 #### Tax (TX)
 
-| Screen ID  | Form Kind | Title           | Acumatica Equivalent | Status    |
-| ---------- | --------- | --------------- | -------------------- | --------- |
-| `TX101000` | Setup     | Tax Preferences | TX101000             | ❌ Legacy |
+| Screen ID  | Form Kind    | Title             | Acumatica Equivalent | Status     |
+| ---------- | ------------ | ----------------- | -------------------- | ---------- |
+| `TX101000` | Setup        | Tax Categories    | TX101000             | 📋 Future  |
+| `TX205000` | Maintenance  | Taxes             | TX205000             | ✅ Aligned |
+| `TX2050PL` | Primary List | Taxes (List)      | TX2050PL             | ✅ Aligned |
+| `TX205500` | Maintenance  | Tax Groups        | TX205500             | ✅ Aligned |
+| `TX2055PL` | Primary List | Tax Groups (List) | TX2055PL             | ✅ Aligned |
 
 #### Inventory (IN)
 
-| Screen ID  | Form Kind    | Title       | Acumatica Equivalent | Status     |
-| ---------- | ------------ | ----------- | -------------------- | ---------- |
-| `IN202500` | Maintenance  | Stock Items | IN202500             | ✅ Aligned |
-| `IN2025PL` | Primary List | Stock Items | IN2025PL             | ✅ Aligned |
-| `IN204000` | Maintenance  | Warehouses  | IN204000             | ✅ Aligned |
-| `IN2040PL` | Primary List | Warehouses  | IN2040PL             | ✅ Aligned |
-| `IN303000` | Data Entry   | Adjustments | IN303000             | ✅ Aligned |
-| `IN3030PL` | Primary List | Adjustments | IN3030PL             | ✅ Aligned |
+| Screen ID  | Form Kind    | Title                 | Acumatica Equivalent | Status     |
+| ---------- | ------------ | --------------------- | -------------------- | ---------- |
+| `IN101000` | Setup        | Inventory Preferences | IN101000             | 📋 Future  |
+| `IN202000` | Maintenance  | Item Classes          | IN202000             | 📋 Future  |
+| `IN202500` | Maintenance  | Stock Items           | IN202500             | ✅ Aligned |
+| `IN2025PL` | Primary List | Stock Items           | IN2025PL             | ✅ Aligned |
+| `IN204000` | Maintenance  | Warehouses            | IN204000             | ✅ Aligned |
+| `IN2040PL` | Primary List | Warehouses            | IN2040PL             | ✅ Aligned |
+| `IN303000` | Data Entry   | Adjustments           | IN303000             | ✅ Aligned |
+| `IN3030PL` | Primary List | Adjustments           | IN3030PL             | ✅ Aligned |
 
 ### The `PL` Suffix
 
@@ -578,15 +593,76 @@ ap.AP301000.tabs.details         → "Document Details"
 gl.GL301000.summary.batchNumber  → "Batch Number"
 ```
 
-Use the key as fallback display string until full i18n infrastructure is implemented.
+## Use the key as fallback display string until full i18n infrastructure is implemented.
+
+## 13. Field-Level Semantics (The DAC Model)
+
+Acumatica doesn't just bind data; it binds **behaviors** to fields via Data Access Class (DAC) attributes.
+
+| Acumatica Attribute | Abren Equivalent        | Description                                                                       |
+| ------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| `PXSelector`        | `AppSelector`           | Defines a lookup to another view. Must include `primaryView` and `displayFields`. |
+| `PXDBIdentity`      | `createScreenId()`      | Auto-incrementing or UUIDv7 identity field.                                       |
+| `PXDefault`         | `defaultValue`          | Constant or expression-based default.                                             |
+| `PXUIField`         | `FieldDefinition`       | Controls Visibility, Enabled state, and Label.                                    |
+| `PXDBQuantity`      | `SemanticKind.Quantity` | Enforces precision and unit-of-measure alignment.                                 |
+
+### The "Selector" Contract
+
+A Selector in Abren is a **portal**. It must be defined in the `FieldDefinition`:
+
+```typescript
+selector: {
+  screenId: 'CA2020PL', // Where the lookup data comes from
+  resultMap: { 'id': 'cashAccountId' }, // How to map selection back to form
+  displayField: 'accountCode'
+}
+```
 
 ---
 
-## 13. Resolved Architectural Decisions
+## 14. Platform Services (Notes, Files, Audit)
+
+The `FormTitleBar` hosts **Standard Service Icons** that provide cross-cutting functionality without screen-specific logic.
+
+### 14.1 Notes & Attachments
+
+Any screen of kind `maintenance` or `dataEntry` automatically supports the **Notes/Files toggle**.
+
+- **Notes**: Simple text blob associated with the record.
+- **Files**: List of UUID references to the file storage system.
+
+### 14.2 Audit & Change Log
+
+Every record in a `maintenance` or `dataEntry` screen must implement the **Audit Contract**:
+
+- `CreatedBy`, `CreatedDateTime`
+- `LastModifiedBy`, `LastModifiedDateTime`
+
+Visible via the "Tools > Audit History" menu item (Standard in FormTitleBar).
+
+---
+
+## 15. The Processing Pattern (50-Series)
+
+Processing screens are **Batch Engines**. They follow a rigid interaction model:
+
+1. **Selection Area**: Filters to narrow down the records to process.
+2. **Selectable Grid**: A grid where the first column is a checkbox (`PXCheckBox`).
+3. **Action Bar**:
+   - `Process`: Executes the command for checked rows.
+   - `Process All`: Executes for all rows matching filters (ignoring checkboxes).
+4. **Long Operation Manager**: A progress modal or background job tracker that prevents concurrent execution of the same processing type.
+
+**Abren:** Use `kind: 'processing'` in `ScreenDefinition`. The `ScreenRenderer` will automatically inject the `Process/Process All` buttons and wire them to the controller's `process` command.
+
+---
+
+## 16. Resolved Architectural Decisions
 
 | Decision                        | Resolution                                                                                    | Rationale                                                                        |
 | ------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Maintenance vs Data Entry       | **Keep separate**                                                                             | Acumatica's way — proven at scale. Layout contracts differ.                      |
 | ActionContract vs ScreenCommand | **Two-layer hybrid** — declarative data objects + platform resolver                           | Matches Acumatica's PXAction + Workflow API pattern                              |
-| Processing screens              | **Deferred**                                                                                  | Document pattern spec only; implement when needed                                |
+| Processing screens              | **Standardized**                                                                              | Pattern defined in §15.                                                          |
 | Workspace as screen kind        | **No** — Workspace View is State A of the center area, not a screen kind or a separate region | Workspace and Working Area are mutually exclusive states of the same center area |

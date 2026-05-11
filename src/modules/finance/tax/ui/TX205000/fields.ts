@@ -1,7 +1,7 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
 import type { TaxRule } from '../../domain/tax.types'
 
-export const TX202000_FIELDS = {
+export const TX205000_FIELDS = {
   name: {
     key: 'name',
     label: 'Rule Name',

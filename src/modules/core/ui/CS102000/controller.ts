@@ -5,7 +5,7 @@ import {
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
-import { SM203500 } from './screen'
+import { CS102000 } from './screen'
 import { useTenantSettings } from '../../application/useTenantSettings'
 
 export interface TenantSetting {
@@ -18,7 +18,7 @@ export function useTenantSettingsController() {
   const { settings, isSettingsPending, settingsError } = useTenantSettings()
 
   const base = useScreenController<{ settings: TenantSetting[] }, 'VIEW'>({
-    screen: SM203500,
+    screen: CS102000,
     dataSource: {
       entity: computed(() => ({ settings: (settings.value as TenantSetting[]) || [] })),
       isLoading: isSettingsPending,

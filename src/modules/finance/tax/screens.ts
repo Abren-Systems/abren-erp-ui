@@ -3,12 +3,12 @@ import type { ScreenDefinition } from '@/platform/screen-runtime'
 // Re-export foundation layer for public API consumers
 export { TAX_MODULE_ID, taxScreenId } from './constants'
 
-import { TX2010PL } from './ui/TX2010PL/screen'
-import { TX201000 } from './ui/TX201000/screen'
-import { TX2020PL } from './ui/TX2020PL/screen'
-import { TX202000 } from './ui/TX202000/screen'
+import { TX2055PL } from './ui/TX2055PL/screen'
+import { TX205500 } from './ui/TX205500/screen'
+import { TX2050PL } from './ui/TX2050PL/screen'
+import { TX205000 } from './ui/TX205000/screen'
 
-export { TX2010PL, TX201000, TX2020PL, TX202000 }
+export { TX2055PL, TX205500, TX2050PL, TX205000 }
 
 /** All screens registered by the Tax module */
-export const taxScreens: readonly ScreenDefinition[] = [TX2010PL, TX201000, TX2020PL, TX202000]
+export const taxScreens: readonly ScreenDefinition[] = [TX2055PL, TX205500, TX2050PL, TX205000]

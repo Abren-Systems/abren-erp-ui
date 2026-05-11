@@ -3,13 +3,11 @@ import type { ScreenStatePolicy } from '@/platform/screen-runtime/screen-state-p
 export type TaxGroupStatus = 'ACTIVE' | 'INACTIVE'
 
 /**
- * TX201000 State Policy
+ * TX205500 State Policy
  *
- * Defines visual behavior and field editability for Tax Groups.
- * Maintenance screens are generally editable in all active states,
- * but specific policies can be enforced for INACTIVE records.
+ * Maintenance screen for Tax Groups.
  */
-export const TX201000_POLICY: ScreenStatePolicy<TaxGroupStatus, string> = {
+export const TX205500_POLICY: ScreenStatePolicy<TaxGroupStatus, string> = {
   states: {
     ACTIVE: {
       editable: true,

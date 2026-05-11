@@ -6,18 +6,18 @@ import {
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
-import { useActiveTaxRules } from '../../application/useTaxRules'
-import { TX2020PL } from './screen'
+import { useActiveTaxGroups } from '../../application/useTaxRules'
+import { TX2055PL } from './screen'
 
-export function useTaxRulesListController() {
+export function useTaxGroupsListController() {
   const gridState = useDataGrid()
   const router = useRouter()
-  const { data: rules, isLoading, error, refetch } = useActiveTaxRules()
+  const { data: groups, isLoading, error, refetch } = useActiveTaxGroups()
 
   const base = useScreenController({
-    screen: TX2020PL,
+    screen: TX2055PL,
     dataSource: {
-      entity: rules,
+      entity: groups,
       isLoading,
       error,
     },
@@ -29,14 +29,14 @@ export function useTaxRulesListController() {
   // Register Creation Command
   base.registerCommand('create', {
     execute: async () => {
-      void router.push({ name: 'finance.tax.rules.detail', params: { id: 'new' } })
+      void router.push({ name: 'TaxGroupsDetail', params: { id: 'new' } })
     },
     isPending: computed(() => false),
   })
 
   const handleRowClick = (row: unknown) => {
     void router.push({
-      name: 'finance.tax.rules.detail',
+      name: 'TaxGroupsDetail',
       params: { id: (row as { id: string }).id },
     })
   }
@@ -47,7 +47,7 @@ export function useTaxRulesListController() {
 
   return {
     ...base,
-    rules,
+    groups,
     handleRowClick,
     handleCreate,
     refresh: refetch,

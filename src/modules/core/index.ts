@@ -12,6 +12,6 @@ export const coreModule: PlatformEngine = {
   menuItems: [
     { label: 'Users', route: 'SMUsers', icon: 'users' },
     { label: 'Roles', route: 'SMRoles', icon: 'shield' },
-    { label: 'Tenants', route: 'SMCompanies', icon: 'building' },
+    { label: 'Companies', route: 'CSCompanies', icon: 'building' },
   ],
 }

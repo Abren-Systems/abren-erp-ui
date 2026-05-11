@@ -3,11 +3,11 @@ import type { ScreenStatePolicy } from '@/platform/screen-runtime/screen-state-p
 export type TaxRuleStatus = 'ACTIVE' | 'INACTIVE'
 
 /**
- * TX202000 State Policy
+ * TX205000 State Policy
  *
- * Maintenance screen for Tax Rules.
+ * Maintenance screen for Taxes.
  */
-export const TX202000_POLICY: ScreenStatePolicy<TaxRuleStatus, string> = {
+export const TX205000_POLICY: ScreenStatePolicy<TaxRuleStatus, string> = {
   states: {
     ACTIVE: {
       editable: true,

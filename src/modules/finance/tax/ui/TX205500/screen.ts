@@ -1,26 +1,26 @@
-import { useTaxRuleController } from './controller'
+import { useTaxGroupController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { createScreenId } from '@/platform/screen-runtime'
 import type { ModuleId } from '@/shared/types/brand.types'
 
-export const TX202000: ScreenDefinition = {
-  id: createScreenId('TX202000'),
+export const TX205500: ScreenDefinition = {
+  id: createScreenId('TX205500'),
   moduleId: 'tax' as ModuleId,
-  controller: (ctx) => useTaxRuleController(ctx.params['id'] as string),
-  kind: 'setup',
-  titleKey: 'Tax Rule',
-  primaryView: 'rule',
+  controller: (ctx) => useTaxGroupController(ctx.params['id'] as string),
+  kind: 'maintenance',
+  titleKey: 'Tax Groups',
+  primaryView: 'group',
   route: {
-    path: 'rules/:id',
-    name: 'finance.tax.rule',
+    path: 'tax-groups/:id',
+    name: 'TaxGroupsDetail',
   },
   permissions: [{ key: 'finance:tax:view' }],
   views: {
-    rule: {
-      name: 'rule',
+    group: {
+      name: 'group',
       kind: 'single',
-      containerName: 'TaxRuleRecord',
-      queryKey: ['tax', 'rules', 'detail'] as const,
+      containerName: 'TaxGroupRecord',
+      queryKey: ['tax', 'groups', 'detail'] as const,
     },
   },
   layout: {
@@ -36,7 +36,7 @@ export const TX202000: ScreenDefinition = {
     allowSectionPersonalization: false,
   },
   test: {
-    containerName: 'TX202000',
+    containerName: 'TX205500',
     viewNames: [],
     actionNames: [],
   },

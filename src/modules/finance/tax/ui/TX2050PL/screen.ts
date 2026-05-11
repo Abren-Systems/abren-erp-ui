@@ -2,18 +2,18 @@ import { useTaxRulesListController } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { createScreenId } from '@/platform/screen-runtime'
 import type { ModuleId } from '@/shared/types/brand.types'
-import { TX2020PL_COMMANDS } from './commands'
+import { TX2050PL_COMMANDS } from './commands'
 
-export const TX2020PL: ScreenDefinition = {
-  id: createScreenId('TX2020PL'),
+export const TX2050PL: ScreenDefinition = {
+  id: createScreenId('TX2050PL'),
   moduleId: 'tax' as ModuleId,
   controller: () => useTaxRulesListController(),
   kind: 'primaryList',
-  titleKey: 'Tax Rules',
+  titleKey: 'Taxes',
   primaryView: 'rules',
   route: {
-    path: 'rules',
-    name: 'TaxRulesList',
+    path: 'taxes',
+    name: 'TaxesList',
   },
   permissions: [{ key: 'finance:tax:view' }],
   views: {
@@ -29,7 +29,7 @@ export const TX2020PL: ScreenDefinition = {
     renderTarget: () => import('./view.vue') as never,
     sidePanel: { tabs: [], defaultCollapsed: true },
   },
-  commands: Object.values(TX2020PL_COMMANDS),
+  commands: Object.values(TX2050PL_COMMANDS),
   personalization: {
     allowTabPersonalization: false,
     allowGridPersonalization: true,
@@ -37,7 +37,7 @@ export const TX2020PL: ScreenDefinition = {
     allowSectionPersonalization: false,
   },
   test: {
-    containerName: 'TX2020PL',
+    containerName: 'TX2050PL',
     viewNames: [],
     actionNames: [],
   },

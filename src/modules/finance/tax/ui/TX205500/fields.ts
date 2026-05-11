@@ -9,7 +9,7 @@ interface TaxGroupFormEntity {
   isActive: boolean
 }
 
-export const TX201000_FIELDS = {
+export const TX205500_FIELDS = {
   name: {
     key: 'name',
     label: 'Group Name',
