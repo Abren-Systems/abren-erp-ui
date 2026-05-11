@@ -39,6 +39,19 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * ConflictError — Thrown when an OCC version mismatch (HTTP 409) is detected.
+ * The controller should catch this and display a degraded UX banner.
+ */
+export class ConflictError extends ApiError {
+  constructor(
+    message: string = 'This record was modified by another user. Please refresh and try again.',
+  ) {
+    super(message, 'VERSION_CONFLICT')
+    this.name = 'ConflictError'
+  }
+}
+
 export interface PaginatedResponse<T> {
   items: T[]
   total: number
@@ -104,6 +117,11 @@ httpClient.interceptors.response.use(
         }
       }
 
+      // OCC: Version conflict (HTTP 409)
+      if (status === 409) {
+        return Promise.reject(new ConflictError(data?.error?.message))
+      }
+
       // Structured error envelope from backend (The Error Contract)
       if (data?.error) {
         return Promise.reject(new ApiError(data.error.message, data.error.code, data.error.details))
@@ -145,9 +163,13 @@ export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promi
 export async function apiPost<T>(
   url: string,
   body?: unknown,
-  config?: AxiosRequestConfig,
+  config?: AxiosRequestConfig & { version?: number },
 ): Promise<T> {
-  const response = await httpClient.post<ApiResponse<T>>(url, body, config)
+  const { version, ...axiosConfig } = config ?? {}
+  if (version != null) {
+    axiosConfig.headers = { ...axiosConfig.headers, 'If-Match': String(version) }
+  }
+  const response = await httpClient.post<ApiResponse<T>>(url, body, axiosConfig)
   return response.data.data
 }
 
@@ -163,9 +185,13 @@ export async function apiPost<T>(
 export async function apiPut<T>(
   url: string,
   body?: unknown,
-  config?: AxiosRequestConfig,
+  config?: AxiosRequestConfig & { version?: number },
 ): Promise<T> {
-  const response = await httpClient.put<ApiResponse<T>>(url, body, config)
+  const { version, ...axiosConfig } = config ?? {}
+  if (version != null) {
+    axiosConfig.headers = { ...axiosConfig.headers, 'If-Match': String(version) }
+  }
+  const response = await httpClient.put<ApiResponse<T>>(url, body, axiosConfig)
   return response.data.data
 }
 
@@ -181,9 +207,13 @@ export async function apiPut<T>(
 export async function apiPatch<T>(
   url: string,
   body?: unknown,
-  config?: AxiosRequestConfig,
+  config?: AxiosRequestConfig & { version?: number },
 ): Promise<T> {
-  const response = await httpClient.patch<ApiResponse<T>>(url, body, config)
+  const { version, ...axiosConfig } = config ?? {}
+  if (version != null) {
+    axiosConfig.headers = { ...axiosConfig.headers, 'If-Match': String(version) }
+  }
+  const response = await httpClient.patch<ApiResponse<T>>(url, body, axiosConfig)
   return response.data.data
 }
 
