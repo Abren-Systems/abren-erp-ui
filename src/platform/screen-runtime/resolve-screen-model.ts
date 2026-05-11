@@ -5,6 +5,7 @@ import type {
   FieldStateOverride,
   SectionStateOverride,
 } from './screen-state-policy.types'
+import { FieldPermission } from '@/shared/domain/operational'
 import type { ScreenProjection, CommandProjection } from './screen-projection.types'
 
 /**
@@ -25,6 +26,7 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
   commands: readonly ScreenCommand[]
   domainState: TState
   availableActions: readonly string[]
+  fieldPermissions: Record<string, string>
   statePolicy: ScreenStatePolicy<TState, TFieldKey>
   services?: {
     hasNotes: boolean
@@ -35,7 +37,7 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
   timestamp?: number
   grids?: Record<string, unknown>
 }): ScreenProjection {
-  const { screenId, commands, domainState, availableActions, statePolicy } = input
+  const { screenId, commands, domainState, availableActions, fieldPermissions, statePolicy } = input
 
   // ── 1. Domain Constraints (backend-derived truth) ──
   const behavior = statePolicy.states[domainState]
@@ -93,6 +95,21 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
       if (override) {
         fieldOverrides[key] = override
       }
+    }
+  }
+
+  // ── 5.5 UI: Backend Field Permissions (authoritative overrides) ──
+  for (const [key, perm] of Object.entries(fieldPermissions)) {
+    if (!fieldOverrides[key]) {
+      fieldOverrides[key] = {}
+    }
+
+    if (perm === FieldPermission.READONLY) {
+      fieldOverrides[key] = { ...fieldOverrides[key], readonly: true }
+    } else if (perm === FieldPermission.HIDDEN) {
+      fieldOverrides[key] = { ...fieldOverrides[key], hidden: true }
+    } else if (perm === FieldPermission.EDITABLE) {
+      fieldOverrides[key] = { ...fieldOverrides[key], readonly: false }
     }
   }
 

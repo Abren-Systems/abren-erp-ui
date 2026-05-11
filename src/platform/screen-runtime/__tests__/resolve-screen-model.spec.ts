@@ -59,6 +59,7 @@ describe('resolveScreenProjection', () => {
       commands: mockCommands,
       domainState: 'DRAFT',
       availableActions: ['RELEASE'],
+      fieldPermissions: {},
       statePolicy: mockPolicy,
     })
 
@@ -78,6 +79,7 @@ describe('resolveScreenProjection', () => {
       commands: mockCommands,
       domainState: 'RELEASED',
       availableActions: [],
+      fieldPermissions: {},
       statePolicy: mockPolicy,
     })
 
@@ -95,6 +97,7 @@ describe('resolveScreenProjection', () => {
       commands: mockCommands,
       domainState: 'RELEASED',
       availableActions: [], // Void requires 'VOID' in availableActions
+      fieldPermissions: {},
       statePolicy: mockPolicy,
     })
 
@@ -109,6 +112,7 @@ describe('resolveScreenProjection', () => {
       commands: mockCommands,
       domainState: 'DRAFT',
       availableActions: ['RELEASE'],
+      fieldPermissions: {},
       statePolicy: mockPolicy,
     })
 

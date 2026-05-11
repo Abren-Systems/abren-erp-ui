@@ -143,4 +143,12 @@ export const apAdapter = {
     const raw = await apiPost<unknown>(BILLS_BASE, dto)
     return APMapper.toVendorBill(VendorBillSchema.parse(raw))
   },
+
+  /**
+   * Cancels a Vendor Bill with a reason.
+   */
+  async cancelBill(id: string, reason: string): Promise<VendorBill> {
+    const raw = await apiPost<unknown>(`${BILLS_BASE}/${id}/cancel`, { reason })
+    return APMapper.toVendorBill(VendorBillSchema.parse(raw))
+  },
 }

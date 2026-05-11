@@ -43,6 +43,11 @@ export const PaymentRequestSchema = z.object({
   source_module: z.string().nullable().optional(),
   source_id: z.string().uuid().nullable().optional(),
   request_number: z.string().nullable().optional(),
+  // --- Operational Metadata ---
+  available_actions: z.array(z.string()).default([]),
+  field_permissions: z.record(z.string(), z.enum(['editable', 'readonly', 'hidden'])).default({}),
+  expected_next: z.string().nullable().optional(),
+  version: z.number().int().default(1),
 })
 
 export const PaymentRequestStatsSchema = z.object({
@@ -88,4 +93,9 @@ export const VendorBillSchema = z.object({
   total_paid: z.coerce.string().default('0'),
   total_withheld: z.coerce.string().default('0'),
   lines: z.array(VendorBillLineSchema),
+  // --- Operational Metadata ---
+  available_actions: z.array(z.string()).default([]),
+  field_permissions: z.record(z.string(), z.enum(['editable', 'readonly', 'hidden'])).default({}),
+  expected_next: z.string().nullable().optional(),
+  version: z.number().int().default(1),
 })

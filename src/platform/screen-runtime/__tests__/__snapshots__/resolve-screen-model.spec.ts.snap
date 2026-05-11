@@ -131,3 +131,141 @@ exports[`resolveScreenModel > should resolve a valid model for RELEASED state 1`
   "version": 1,
 }
 `;
+
+exports[`resolveScreenProjection > should resolve a valid model for DRAFT state 1`] = `
+{
+  "domain": {
+    "backend": {
+      "availableActions": [
+        "RELEASE",
+      ],
+      "status": "DRAFT",
+    },
+    "capabilities": {
+      "canDelete": true,
+      "canEdit": true,
+    },
+    "services": {
+      "fileCount": 0,
+      "hasActivities": false,
+      "hasNotes": false,
+    },
+  },
+  "meta": {
+    "projectionId": "deterministic-id",
+    "screenId": "AP301000",
+    "timestamp": 0,
+  },
+  "ui": {
+    "actions": {
+      "expectedNext": {
+        "command": {
+          "displayOnMainToolbar": true,
+          "key": "RELEASE",
+          "kind": "workflow",
+          "labelKey": "Release",
+          "variant": "primary",
+        },
+        "enabled": true,
+        "visible": true,
+      },
+      "primary": [
+        {
+          "command": {
+            "displayOnMainToolbar": true,
+            "key": "save",
+            "kind": "local",
+            "labelKey": "Save",
+            "variant": "primary",
+          },
+          "enabled": true,
+          "visible": true,
+        },
+      ],
+      "secondary": [],
+    },
+    "chrome": {
+      "actionRequiredLabel": undefined,
+      "banner": undefined,
+    },
+    "fields": {
+      "overrides": {
+        "totalAmount": {
+          "readonly": true,
+        },
+        "vendorId": {
+          "required": true,
+        },
+      },
+    },
+    "grids": {
+      "state": {},
+    },
+    "layout": {
+      "sections": {},
+    },
+  },
+  "version": 1,
+}
+`;
+
+exports[`resolveScreenProjection > should resolve a valid model for RELEASED state 1`] = `
+{
+  "domain": {
+    "backend": {
+      "availableActions": [],
+      "status": "RELEASED",
+    },
+    "capabilities": {
+      "canDelete": false,
+      "canEdit": false,
+    },
+    "services": {
+      "fileCount": 0,
+      "hasActivities": false,
+      "hasNotes": false,
+    },
+  },
+  "meta": {
+    "projectionId": "deterministic-id",
+    "screenId": "AP301000",
+    "timestamp": 0,
+  },
+  "ui": {
+    "actions": {
+      "expectedNext": undefined,
+      "primary": [
+        {
+          "command": {
+            "displayOnMainToolbar": true,
+            "key": "save",
+            "kind": "local",
+            "labelKey": "Save",
+            "variant": "primary",
+          },
+          "enabled": true,
+          "visible": true,
+        },
+      ],
+      "secondary": [],
+    },
+    "chrome": {
+      "actionRequiredLabel": undefined,
+      "banner": {
+        "messageKey": "Record is released and read-only",
+        "variant": "info",
+      },
+    },
+    "fields": {
+      "overrides": {},
+    },
+    "grids": {
+      "state": {},
+    },
+    "layout": {
+      "sections": {},
+    },
+  },
+  "version": 1,
+}
+`;

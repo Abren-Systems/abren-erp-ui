@@ -205,11 +205,13 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   const model = computed(() => {
     const ent = dataSource.entity.value as Record<string, unknown> | null
     const availableActions = (ent?.['availableActions'] || []) as readonly string[]
+    const fieldPermissions = (ent?.['fieldPermissions'] || {}) as Record<string, string>
     return resolveScreenProjection({
       screenId: screen.id,
       commands: screen.commands,
       domainState: domain.value,
       availableActions,
+      fieldPermissions,
       statePolicy,
       services: {
         hasNotes: false,
