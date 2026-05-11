@@ -71,4 +71,7 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
 
   /** Register a command on this controller */
   registerCommand(id: string, command: ControllerCommand): void
+
+  /** Let the platform react to command errors that occur outside registerCommand wrappers */
+  handleCommandError(error: unknown): void
 }

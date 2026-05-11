@@ -7,6 +7,7 @@ import { apKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import type { PaymentRequest } from '../models/ap.types'
+import { resolveOccVersion, type OccVersionSource } from './occ'
 
 /**
  * Use Case: Cancel a Payment Request.
@@ -17,7 +18,10 @@ import type { PaymentRequest } from '../models/ap.types'
  * @param id - The unique identifier (or Ref/Getter) of the payment request.
  * @returns Reactive cancel state and mutate function.
  */
-export function useCancelPaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
+export function useCancelPaymentRequest(
+  id: MaybeRefOrGetter<PaymentRequestId>,
+  version: OccVersionSource,
+) {
   const queryClient = useQueryClient()
 
   const {
@@ -28,7 +32,7 @@ export function useCancelPaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) 
     async (reason: string) => {
       const unwrappedId = toValue(id)
       if (!unwrappedId) throw new Error('Missing Payment Request ID')
-      return await apAdapter.cancelRequest(unwrappedId, reason)
+      return await apAdapter.cancelRequest(unwrappedId, reason, resolveOccVersion(version))
     },
     {
       onSuccess: (data: PaymentRequest) => {

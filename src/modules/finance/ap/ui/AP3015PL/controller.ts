@@ -7,7 +7,10 @@ import {
 } from '@/platform/screen-runtime'
 import { usePermissions } from '@/shared/auth/usePermissions'
 import { usePaymentRequests } from '../../application/usePaymentRequests'
-import { useBulkPaymentRequestActions } from '../../application/useBulkPaymentRequestActions'
+import {
+  useBulkPaymentRequestActions,
+  type BulkActionTarget,
+} from '../../application/useBulkPaymentRequestActions'
 import type { PaymentRequest } from '../../models/ap.types'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { useUsers } from '@/modules/core/application/useUsers'
@@ -109,6 +112,13 @@ export function usePaymentRequestList() {
     return Object.keys(gridState.rowSelection.value) as PaymentRequestId[]
   })
 
+  const selectedTargets = computed<BulkActionTarget[]>(() => {
+    const selected = new Set(selectedIds.value)
+    return filteredRequests.value
+      .filter((request) => selected.has(request.id))
+      .map((request) => ({ id: request.id, version: request.version }))
+  })
+
   // ── Handlers ──
   function handleTrace(pr: PaymentRequest) {
     if (traceTarget.value?.id === pr.id && isTraceOpen.value) {
@@ -181,7 +191,7 @@ export function usePaymentRequestList() {
   base.registerCommand('executeBulkApprove', {
     execute: async () => {
       bulkState.approveOpen.value = false
-      const results = await approveMultiple(selectedIds.value)
+      const results = await approveMultiple(selectedTargets.value)
       computeCounts(results)
       bulkState.resultsOpen.value = true
       clearSelection()
@@ -193,7 +203,7 @@ export function usePaymentRequestList() {
     execute: async () => {
       if (!bulkState.rejectReason.value) return
       bulkState.rejectOpen.value = false
-      const results = await rejectMultiple(selectedIds.value, bulkState.rejectReason.value)
+      const results = await rejectMultiple(selectedTargets.value, bulkState.rejectReason.value)
       computeCounts(results)
       bulkState.rejectReason.value = ''
       bulkState.resultsOpen.value = true
@@ -215,6 +225,7 @@ export function usePaymentRequestList() {
     filteredRequests,
     totalFilteredAmount,
     selectedIds,
+    selectedTargets,
     columns,
     handleTrace,
     handleRowClick,

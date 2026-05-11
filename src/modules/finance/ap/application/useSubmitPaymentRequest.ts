@@ -7,6 +7,7 @@ import { apKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import type { PaymentRequest } from '../models/ap.types'
+import { resolveOccVersion, type OccVersionSource } from './occ'
 
 /**
  * Use Case: Submit a Payment Request for Approval.
@@ -19,7 +20,10 @@ import type { PaymentRequest } from '../models/ap.types'
  * @example
  * const { submit, isPending } = useSubmitPaymentRequest(() => selectedId.value)
  */
-export function useSubmitPaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
+export function useSubmitPaymentRequest(
+  id: MaybeRefOrGetter<PaymentRequestId>,
+  version: OccVersionSource,
+) {
   const queryClient = useQueryClient()
 
   const {
@@ -30,7 +34,7 @@ export function useSubmitPaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) 
     async () => {
       const unwrappedId = toValue(id)
       if (!unwrappedId) throw new Error('Missing Payment Request ID')
-      return await apAdapter.submitRequest(unwrappedId)
+      return await apAdapter.submitRequest(unwrappedId, resolveOccVersion(version))
     },
     {
       onSuccess: (data: PaymentRequest) => {

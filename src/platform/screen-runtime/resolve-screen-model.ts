@@ -2,6 +2,7 @@ import type { ScreenCommand } from '../commands/command.types'
 import { isCommandVisible, getExpectedNextAction } from '../commands/command.types'
 import type {
   ScreenStatePolicy,
+  BannerPolicy,
   FieldStateOverride,
   SectionStateOverride,
 } from './screen-state-policy.types'
@@ -36,19 +37,21 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
   projectionId?: string
   timestamp?: number
   grids?: Record<string, unknown>
+  sessionBanner?: BannerPolicy
+  forceReadonly?: boolean
 }): ScreenProjection {
   const { screenId, commands, domainState, availableActions, fieldPermissions, statePolicy } = input
 
   // ── 1. Domain Constraints (backend-derived truth) ──
   const behavior = statePolicy.states[domainState]
-  const canEdit = behavior?.editable ?? false
-  const canDelete = behavior?.deletable ?? false
+  const canEdit = input.forceReadonly ? false : (behavior?.editable ?? false)
+  const canDelete = input.forceReadonly ? false : (behavior?.deletable ?? false)
 
   // ── 1.5 Record Services (API boundary) ──
   const { hasNotes = false, fileCount = 0, hasActivities = false } = input.services ?? {}
 
   // ── 2. UI: Chrome ──
-  const banner = behavior?.banner
+  const banner = input.sessionBanner ?? behavior?.banner
   const actionRequiredLabel = behavior?.actionRequiredLabel
 
   // ── 3. UI: Actions (command projection) ──
@@ -110,6 +113,12 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
       fieldOverrides[key] = { ...fieldOverrides[key], hidden: true }
     } else if (perm === FieldPermission.EDITABLE) {
       fieldOverrides[key] = { ...fieldOverrides[key], readonly: false }
+    }
+  }
+
+  if (input.forceReadonly) {
+    for (const [key, override] of Object.entries(fieldOverrides)) {
+      fieldOverrides[key] = { ...override, readonly: true }
     }
   }
 

@@ -117,8 +117,8 @@ httpClient.interceptors.response.use(
         }
       }
 
-      // OCC: Version conflict (HTTP 409)
-      if (status === 409) {
+      // OCC: Version conflict (HTTP 409/412)
+      if (status === 409 || status === 412) {
         return Promise.reject(new ConflictError(data?.error?.message))
       }
 
@@ -167,7 +167,9 @@ export async function apiPost<T>(
 ): Promise<T> {
   const { version, ...axiosConfig } = config ?? {}
   if (version != null) {
-    axiosConfig.headers = { ...axiosConfig.headers, 'If-Match': String(version) }
+    axiosConfig.headers = Object.assign({}, axiosConfig.headers, {
+      'If-Match': `"v${version}"`,
+    })
   }
   const response = await httpClient.post<ApiResponse<T>>(url, body, axiosConfig)
   return response.data.data
@@ -189,7 +191,9 @@ export async function apiPut<T>(
 ): Promise<T> {
   const { version, ...axiosConfig } = config ?? {}
   if (version != null) {
-    axiosConfig.headers = { ...axiosConfig.headers, 'If-Match': String(version) }
+    axiosConfig.headers = Object.assign({}, axiosConfig.headers, {
+      'If-Match': `"v${version}"`,
+    })
   }
   const response = await httpClient.put<ApiResponse<T>>(url, body, axiosConfig)
   return response.data.data
@@ -211,7 +215,9 @@ export async function apiPatch<T>(
 ): Promise<T> {
   const { version, ...axiosConfig } = config ?? {}
   if (version != null) {
-    axiosConfig.headers = { ...axiosConfig.headers, 'If-Match': String(version) }
+    axiosConfig.headers = Object.assign({}, axiosConfig.headers, {
+      'If-Match': `"v${version}"`,
+    })
   }
   const response = await httpClient.patch<ApiResponse<T>>(url, body, axiosConfig)
   return response.data.data

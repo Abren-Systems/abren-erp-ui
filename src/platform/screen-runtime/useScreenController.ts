@@ -2,9 +2,10 @@ import { ref, computed, watch, onUnmounted, type ComputedRef, type Ref } from 'v
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
-import type { ScreenStatePolicy } from './screen-state-policy.types'
+import type { BannerPolicy, ScreenStatePolicy } from './screen-state-policy.types'
 import { resolveScreenProjection } from './resolve-screen-model'
 import { transitionRecorder } from '../debug/transition-recorder'
+import { ConflictError } from '@/shared/api/http-client'
 
 // ── Screen Controller Options ─────────────────────────────
 // Passed by the screen-specific controller to configure data loading.
@@ -147,6 +148,17 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   // Sync UI state with data loading lifecycle
   const isLoading = dataSource.isLoading
   const error = dataSource.error
+  const degradedBanner = ref<BannerPolicy | undefined>()
+
+  function handleCommandError(error: unknown) {
+    if (error instanceof ConflictError) {
+      degradedBanner.value = {
+        messageKey: error.message,
+        variant: 'danger',
+      }
+      stateMachine.transitionUI('DEGRADED')
+    }
+  }
 
   // ── Command Registry ──
   const commands = ref<Record<string, ControllerCommand>>({})
@@ -176,6 +188,7 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
             model.value?.version ?? 0,
           )
         } catch (error) {
+          handleCommandError(error)
           transitionRecorder.recordTransition(
             { type: 'command', source: `Command(${id})` },
             {
@@ -213,6 +226,8 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
       availableActions,
       fieldPermissions,
       statePolicy,
+      sessionBanner: degradedBanner.value,
+      forceReadonly: degradedBanner.value !== undefined,
       services: {
         hasNotes: false,
         fileCount: 0,
@@ -282,6 +297,9 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
 
     /** Register a command on this controller */
     registerCommand,
+
+    /** Let the platform react to command errors that occur outside registerCommand wrappers */
+    handleCommandError,
 
     /** Whether any command is currently executing */
     isPending,

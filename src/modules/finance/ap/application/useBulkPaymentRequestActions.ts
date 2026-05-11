@@ -13,6 +13,11 @@ export interface BulkActionResult {
   error?: string
 }
 
+export interface BulkActionTarget {
+  id: PaymentRequestId
+  version: number
+}
+
 /**
  * Use Case: Multi-Select Single Actions for Payment Requests.
  *
@@ -28,14 +33,16 @@ export function useBulkPaymentRequestActions() {
   const isPending = ref(false)
   const results = ref<BulkActionResult[]>([])
 
-  async function approveMultiple(ids: PaymentRequestId[]): Promise<BulkActionResult[]> {
+  async function approveMultiple(targets: BulkActionTarget[]): Promise<BulkActionResult[]> {
     isPending.value = true
     results.value = []
 
-    const settled = await Promise.allSettled(ids.map((id) => apAdapter.approveRequest(id)))
+    const settled = await Promise.allSettled(
+      targets.map((target) => apAdapter.approveRequest(target.id, target.version)),
+    )
 
     const itemResults: BulkActionResult[] = settled.map((result, index) => ({
-      id: ids[index]!,
+      id: targets[index]!.id,
       status: result.status,
       error:
         result.status === 'rejected'
@@ -55,18 +62,18 @@ export function useBulkPaymentRequestActions() {
   }
 
   async function rejectMultiple(
-    ids: PaymentRequestId[],
+    targets: BulkActionTarget[],
     reason: string,
   ): Promise<BulkActionResult[]> {
     isPending.value = true
     results.value = []
 
     const settled = await Promise.allSettled(
-      ids.map((id) => apAdapter.rejectRequest(id, { reason })),
+      targets.map((target) => apAdapter.rejectRequest(target.id, { reason }, target.version)),
     )
 
     const itemResults: BulkActionResult[] = settled.map((result, index) => ({
-      id: ids[index]!,
+      id: targets[index]!.id,
       status: result.status,
       error:
         result.status === 'rejected'

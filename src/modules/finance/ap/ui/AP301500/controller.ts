@@ -75,20 +75,43 @@ export function usePaymentRequestEntry(id: string) {
   const isRejectDialogOpen = ref(false)
   const isCancelDialogOpen = ref(false)
   const auditReason = ref('')
+  const entityVersion = computed(() => activeEntity.value?.version)
 
   // ── Workflow Action Executors ──
-  const { approve, isPending: isApproving } = useApprovePaymentRequest(id as PaymentRequestId)
-  const { reject, isPending: isRejecting } = useRejectPaymentRequest(id as PaymentRequestId)
-  const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(id as PaymentRequestId)
-  const { cancel, isPending: isCancelling } = useCancelPaymentRequest(id as PaymentRequestId)
-  const { submit, isPending: isSubmittingRequest } = useSubmitPaymentRequest(id as PaymentRequestId)
+  const { approve, isPending: isApproving } = useApprovePaymentRequest(
+    id as PaymentRequestId,
+    entityVersion,
+  )
+  const { reject, isPending: isRejecting } = useRejectPaymentRequest(
+    id as PaymentRequestId,
+    entityVersion,
+  )
+  const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(
+    id as PaymentRequestId,
+    entityVersion,
+  )
+  const { cancel, isPending: isCancelling } = useCancelPaymentRequest(
+    id as PaymentRequestId,
+    entityVersion,
+  )
+  const { submit, isPending: isSubmittingRequest } = useSubmitPaymentRequest(
+    id as PaymentRequestId,
+    entityVersion,
+  )
 
   // Register command executors — the FormToolbar reads these for dispatch
   base.registerCommand('submit', {
-    execute: async () => void submit(),
+    execute: async () => {
+      await submit()
+    },
     isPending: isSubmittingRequest,
   })
-  base.registerCommand('approve', { execute: async () => void approve(), isPending: isApproving })
+  base.registerCommand('approve', {
+    execute: async () => {
+      await approve()
+    },
+    isPending: isApproving,
+  })
   base.registerCommand('reject', {
     execute: async () => {
       auditReason.value = ''
@@ -97,7 +120,9 @@ export function usePaymentRequestEntry(id: string) {
     isPending: isRejecting,
   })
   base.registerCommand('authorize', {
-    execute: async () => void authorize(),
+    execute: async () => {
+      await authorize()
+    },
     isPending: isAuthorizing,
   })
   base.registerCommand('cancel', {
@@ -110,14 +135,24 @@ export function usePaymentRequestEntry(id: string) {
 
   const handleRejectConfirm = async () => {
     if (!auditReason.value.trim()) return
-    await reject(auditReason.value)
-    isRejectDialogOpen.value = false
+    try {
+      await reject(auditReason.value)
+      isRejectDialogOpen.value = false
+    } catch (error) {
+      base.handleCommandError(error)
+      throw error
+    }
   }
 
   const handleCancelConfirm = async () => {
     if (!auditReason.value.trim()) return
-    await cancel(auditReason.value)
-    isCancelDialogOpen.value = false
+    try {
+      await cancel(auditReason.value)
+      isCancelDialogOpen.value = false
+    } catch (error) {
+      base.handleCommandError(error)
+      throw error
+    }
   }
 
   // ── Domain Derived State ──

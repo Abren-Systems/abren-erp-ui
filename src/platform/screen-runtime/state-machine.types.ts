@@ -12,6 +12,7 @@ export type UIState =
   | 'VIEW' // An existing record in read-only mode
   | 'EDIT' // An existing record with unsaved mutations
   | 'SAVING' // An active mutation is in flight
+  | 'DEGRADED' // Operational metadata or concurrency state is unsafe; render read-only
 
 /**
  * Base domain states shared across modules.

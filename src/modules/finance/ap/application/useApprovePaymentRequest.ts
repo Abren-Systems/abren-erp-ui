@@ -7,6 +7,7 @@ import type { PaymentRequest } from '../models/ap.types'
 import { apAdapter } from '../infrastructure/ap.adapter'
 import { apKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
+import { resolveOccVersion, type OccVersionSource } from './occ'
 
 /**
  * Use Case: Approve a Payment Request.
@@ -19,7 +20,10 @@ import type { ApiError } from '@/shared/api/http-client'
  * @example
  * const { approve, isPending } = useApprovePaymentRequest(() => selectedId.value)
  */
-export function useApprovePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
+export function useApprovePaymentRequest(
+  id: MaybeRefOrGetter<PaymentRequestId>,
+  version: OccVersionSource,
+) {
   const queryClient = useQueryClient()
 
   const {
@@ -30,7 +34,7 @@ export function useApprovePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>)
     async (_: void) => {
       const unwrappedId = toValue(id)
       if (!unwrappedId) throw new Error('Missing Payment Request ID')
-      return await apAdapter.approveRequest(unwrappedId)
+      return await apAdapter.approveRequest(unwrappedId, resolveOccVersion(version))
     },
     {
       onSuccess: (data: PaymentRequest) => {

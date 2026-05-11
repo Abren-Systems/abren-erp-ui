@@ -65,40 +65,44 @@ export const apAdapter = {
   /**
    * Submits a draft Payment Request for approval.
    */
-  async submitRequest(id: string): Promise<PaymentRequest> {
-    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/submit`)
+  async submitRequest(id: string, version: number): Promise<PaymentRequest> {
+    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/submit`, undefined, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
 
   /**
    * Approves a submitted Payment Request.
    */
-  async approveRequest(id: string): Promise<PaymentRequest> {
-    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/approve`)
+  async approveRequest(id: string, version: number): Promise<PaymentRequest> {
+    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/approve`, undefined, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
 
   /**
    * Rejects a submitted Payment Request with a reason.
    */
-  async rejectRequest(id: string, dto: RejectPaymentRequestDTO): Promise<PaymentRequest> {
-    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/reject`, dto)
+  async rejectRequest(
+    id: string,
+    dto: RejectPaymentRequestDTO,
+    version: number,
+  ): Promise<PaymentRequest> {
+    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/reject`, dto, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
 
   /**
    * Authorizes an approved Payment Request.
    */
-  async authorizeRequest(id: string): Promise<PaymentRequest> {
-    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/authorize`)
+  async authorizeRequest(id: string, version: number): Promise<PaymentRequest> {
+    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/authorize`, undefined, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
 
   /**
    * Cancels a Payment Request with a reason.
    */
-  async cancelRequest(id: string, reason: string): Promise<PaymentRequest> {
-    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/cancel`, { reason })
+  async cancelRequest(id: string, reason: string, version: number): Promise<PaymentRequest> {
+    const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/cancel`, { reason }, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
 

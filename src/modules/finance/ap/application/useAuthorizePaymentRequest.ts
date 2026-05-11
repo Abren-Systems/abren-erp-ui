@@ -7,6 +7,7 @@ import { apKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import type { PaymentRequest } from '../models/ap.types'
+import { resolveOccVersion, type OccVersionSource } from './occ'
 
 /**
  * Use Case: Authorize a Payment Request.
@@ -17,7 +18,10 @@ import type { PaymentRequest } from '../models/ap.types'
  * @param id - The unique identifier (or Ref/Getter) of the payment request.
  * @returns Reactive authorize state and mutate function.
  */
-export function useAuthorizePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
+export function useAuthorizePaymentRequest(
+  id: MaybeRefOrGetter<PaymentRequestId>,
+  version: OccVersionSource,
+) {
   const queryClient = useQueryClient()
 
   const {
@@ -28,7 +32,7 @@ export function useAuthorizePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId
     async () => {
       const unwrappedId = toValue(id)
       if (!unwrappedId) throw new Error('Missing Payment Request ID')
-      return await apAdapter.authorizeRequest(unwrappedId)
+      return await apAdapter.authorizeRequest(unwrappedId, resolveOccVersion(version))
     },
     {
       onSuccess: (data: PaymentRequest) => {
