@@ -1,18 +1,19 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
-import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type { BankAccountId } from '@/shared/types/brand.types'
-import type {
-  BankAccount,
-  BankTransaction,
-  ScheduledPayment,
-} from '@/modules/finance/bank/models/bank.types'
+import type { ScheduledPayment } from '../models/bank.types'
 import type {
   BankAccountDTO,
   BankTransactionDTO,
   ScheduledPaymentDTO,
   CreateScheduledPaymentRequest,
 } from './api.types'
-import { BankAccountSchema, BankTransactionSchema, ScheduledPaymentSchema } from './api.schemas'
+import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
+import {
+  BankAccountListSchema,
+  BankTransactionListSchema,
+  ScheduledPaymentListSchema,
+  ScheduledPaymentSchema,
+} from './api.schemas'
 import { BankMapper } from './mappers'
 
 /**
@@ -23,37 +24,35 @@ import { BankMapper } from './mappers'
  */
 export const bankAdapter = {
   /**
-   * Fetches all banking accounts for the current tenant.
-   *
-   * @returns List of validated and mapped BankAccounts.
+   * Fetches all banking accounts for the current tenant (Paginated).
    */
-  async getBankAccounts(): Promise<BankAccount[]> {
-    const raw = (await apiGet<unknown[]>('/finance/bank/accounts')) || []
-    const dtos = raw.map((item) => BankAccountSchema.parse(item) as BankAccountDTO)
-    return CommonMapper.mapCollection(dtos, (dto) => BankMapper.toBankAccount(dto))
+  async getBankAccounts(query?: ListQuery): Promise<ListResponse<BankAccountDTO>> {
+    const raw = await apiGet<unknown>('/finance/bank/accounts', { params: query })
+    return BankAccountListSchema.parse(raw) as unknown as ListResponse<BankAccountDTO>
   },
 
   /**
-   * Fetches the transaction history for a specific bank account.
+   * Fetches the transaction history for a specific bank account (Paginated).
    *
    * @param accountId - The unique identifier of the bank account.
-   * @returns List of validated and mapped BankTransactions.
+   * @param query - Pagination parameters.
    */
-  async getTransactions(accountId: BankAccountId): Promise<BankTransaction[]> {
-    const raw = (await apiGet<unknown[]>(`/finance/bank/accounts/${accountId}/transactions`)) || []
-    const dtos = raw.map((item) => BankTransactionSchema.parse(item) as BankTransactionDTO)
-    return dtos.map((dto) => BankMapper.toTransaction(dto, accountId))
+  async getTransactions(
+    accountId: BankAccountId,
+    query?: ListQuery,
+  ): Promise<ListResponse<BankTransactionDTO>> {
+    const raw = await apiGet<unknown>(`/finance/bank/accounts/${accountId}/transactions`, {
+      params: query,
+    })
+    return BankTransactionListSchema.parse(raw) as unknown as ListResponse<BankTransactionDTO>
   },
 
   /**
-   * Fetches all scheduled payments for the current tenant.
-   *
-   * @returns List of validated and mapped ScheduledPayments.
+   * Fetches all scheduled payments for the current tenant (Paginated).
    */
-  async getScheduledPayments(): Promise<ScheduledPayment[]> {
-    const raw = (await apiGet<unknown[]>('/finance/bank/scheduled-payments')) || []
-    const dtos = raw.map((item) => ScheduledPaymentSchema.parse(item) as ScheduledPaymentDTO)
-    return CommonMapper.mapCollection(dtos, (dto) => BankMapper.toScheduledPayment(dto))
+  async getScheduledPayments(query?: ListQuery): Promise<ListResponse<ScheduledPaymentDTO>> {
+    const raw = await apiGet<unknown>('/finance/bank/scheduled-payments', { params: query })
+    return ScheduledPaymentListSchema.parse(raw) as unknown as ListResponse<ScheduledPaymentDTO>
   },
 
   /**

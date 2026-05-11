@@ -1,25 +1,27 @@
 import { useDataGrid } from '@/shared/components/data-grid'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   useScreenController,
   LIST_SCREEN_POLICY,
   listScreenDomainState,
 } from '@/platform/screen-runtime'
-// Mocking bank account hooks as we don't have them in application layer
-import type { BankAccount } from '../../models/bank.types'
+import { useBankAccounts } from '../../application/useBankAccounts'
 import { CA2020PL } from './screen'
 
 export function useBankAccountsListController() {
   const gridState = useDataGrid()
   const router = useRouter()
-  const accounts = ref<BankAccount[]>([])
-  const isLoading = ref(false)
-  const error = ref(null)
+
+  const { accounts, isPending: isLoading, error, refetch: refresh } = useBankAccounts()
 
   const base = useScreenController({
     screen: CA2020PL,
-    dataSource: { entity: computed(() => null), isLoading, error },
+    dataSource: {
+      entity: computed(() => accounts.value?.items ?? []),
+      isLoading,
+      error,
+    },
     isNew: computed(() => false),
     getDomainState: listScreenDomainState,
     statePolicy: LIST_SCREEN_POLICY,
@@ -36,7 +38,7 @@ export function useBankAccountsListController() {
   return {
     ...base,
     accounts,
-    refresh: () => {},
+    refresh,
     gridState,
     handleCreate,
     handleRowClick,
