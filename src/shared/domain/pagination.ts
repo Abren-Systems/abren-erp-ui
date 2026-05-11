@@ -6,6 +6,7 @@
 export interface ListQuery {
   limit?: number
   cursor?: string
+  offset?: number
   [key: string]: string | number | boolean | undefined
 }
 

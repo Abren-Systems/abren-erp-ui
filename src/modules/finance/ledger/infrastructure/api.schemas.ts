@@ -45,6 +45,15 @@ export const JournalEntrySchema = z.object({
   created_at: z.string().nullable(),
 })
 
+export const JournalEntryListItemSchema = z.object({
+  id: z.string().uuid(),
+  entry_number: z.string(),
+  date: z.string(),
+  description: z.string(),
+  status: z.string(),
+  base_currency_code: z.string(),
+})
+
 export const AccountSchema = z.object({
   id: z.string().uuid(),
   tenant_id: z.string().uuid(),
@@ -100,5 +109,5 @@ export const LedgerSettingsSchema = z.object({
 export const OperationalJournalEntrySchema = createOperationalResponseSchema(JournalEntrySchema)
 
 export const JournalEntryListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(JournalEntrySchema),
+  createOperationalResponseSchema(JournalEntryListItemSchema),
 )

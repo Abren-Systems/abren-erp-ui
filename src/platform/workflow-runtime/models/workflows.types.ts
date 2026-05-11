@@ -37,8 +37,7 @@ export interface OperationalResponse<T> {
   meta?: Record<string, unknown>
 }
 
-/** Frontend runtime representation of an operational entity (unwrapped from success envelope). */
-export type OperationalEntity<T> = {
-  data: T
-  operations: WorkflowOperations
+/** Frontend runtime representation of an operational entity (flattened from envelope). */
+export type Operational<T> = T & {
+  __operations?: WorkflowOperations
 }

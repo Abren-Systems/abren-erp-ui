@@ -14,13 +14,9 @@ export function useJournalEntriesListController() {
   const router = useRouter()
   const { entries, isLoading, error, refresh } = useJournalEntries()
 
-  // ── Flattened Data for Grid ──
+  // ── Data Source ──
   const flattenedEntries = computed(() => {
-    if (!entries.value?.items) return []
-    return entries.value.items.map((r) => ({
-      ...r.data,
-      operations: r.operations,
-    }))
+    return entries.value?.items ?? []
   })
 
   // ── Platform Base ──

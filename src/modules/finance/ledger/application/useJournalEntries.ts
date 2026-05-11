@@ -6,7 +6,7 @@ import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../models/journal-entry.types'
 import type { CreateJournalEntryDTO } from '../infrastructure/api.types'
-import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
+import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
 
 import type { ListQuery } from '@/shared/domain/pagination'
 
@@ -34,7 +34,7 @@ export function useJournalEntries(query?: ListQuery) {
   )
 
   const { mutateAsync: createEntry, isPending: isCreating } = useApiMutation<
-    OperationalEntity<JournalEntry>,
+    Operational<JournalEntry>,
     ApiError,
     CreateJournalEntryDTO
   >(
@@ -51,7 +51,7 @@ export function useJournalEntries(query?: ListQuery) {
   )
 
   const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<
-    OperationalEntity<JournalEntry>,
+    Operational<JournalEntry>,
     ApiError,
     { id: string; version: number }
   >(

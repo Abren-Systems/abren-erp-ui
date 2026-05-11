@@ -5,7 +5,7 @@ import { ledgerAdapter } from '../infrastructure/ledger.adapter'
 import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../models/journal-entry.types'
-import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
+import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
 
 /**
  * Use Case: Focus on a single Journal Entry.
@@ -37,16 +37,16 @@ export function useJournalEntry(entryId: string) {
    * This is a Primary action on the DetailPage Action Surface.
    */
   const { mutateAsync: postEntry, isPending: isPosting } = useApiMutation<
-    OperationalEntity<JournalEntry>,
+    Operational<JournalEntry>,
     ApiError,
     void
   >(
     async () => {
-      const version = entry.value?.operations?.version ?? 1
+      const version = entry.value?.__operations?.version ?? 1
       return await ledgerAdapter.postJournalEntry(entryId, version)
     },
     {
-      onSuccess: (updated: OperationalEntity<JournalEntry>) => {
+      onSuccess: (updated: Operational<JournalEntry>) => {
         // Update the single-entry cache immediately for instant UI feedback
         queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated)
         // Invalidate the list so the queue reflects the state change
@@ -62,16 +62,16 @@ export function useJournalEntry(entryId: string) {
    * Requires a mandatory reason. Must be called after ActionModal confirmation.
    */
   const { mutateAsync: voidEntry, isPending: isVoiding } = useApiMutation<
-    OperationalEntity<JournalEntry>,
+    Operational<JournalEntry>,
     ApiError,
     { reason: string }
   >(
     async ({ reason }) => {
-      const version = entry.value?.operations?.version ?? 1
+      const version = entry.value?.__operations?.version ?? 1
       return await ledgerAdapter.voidJournalEntry(entryId, { reason, expected_version: version })
     },
     {
-      onSuccess: (updated: OperationalEntity<JournalEntry>) => {
+      onSuccess: (updated: Operational<JournalEntry>) => {
         queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated)
         void queryClient.invalidateQueries({
           queryKey: ledgerKeys.journalEntries(),

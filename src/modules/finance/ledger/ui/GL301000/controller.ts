@@ -19,8 +19,8 @@ export function useJournalEntryController(id: string) {
   const base = useScreenController<JournalEntry, JournalEntryStatus>({
     screen: GL301000,
     dataSource: {
-      entity: computed(() => entry.value?.data),
-      operations: computed(() => entry.value?.operations),
+      entity: computed(() => entry.value),
+      operations: computed(() => entry.value?.__operations),
       isLoading,
       error: ref(null),
     },
@@ -41,7 +41,7 @@ export function useJournalEntryController(id: string) {
   })
 
   // ── Grid Data ──
-  const currentLines = computed(() => entry.value?.data.lines || [])
+  const currentLines = computed(() => entry.value?.lines || [])
   const activeTab = ref('Journal Lines')
 
   // ── Field Bindings ──

@@ -150,11 +150,22 @@ httpClient.interceptors.response.use(
  */
 export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   const response = await httpClient.get<ApiResponse<T>>(url, config)
-  // If operations exist, we return the whole enveloped entity (OperationalEntity<T> equivalent), otherwise just data
-  if (response.data.operations) {
-    return { data: response.data.data, operations: response.data.operations } as unknown as T
-  }
   return response.data.data
+}
+
+/**
+ * Performs an authenticated GET request and returns the full operational envelope.
+ * Use this when the adapter needs to map capabilities or metadata.
+ *
+ * @template T - The expected type of the 'data' property in the response.
+ * @returns {Promise<ApiResponse<T>>} - The full response envelope.
+ */
+export async function apiGetEnvelope<T>(
+  url: string,
+  config?: AxiosRequestConfig,
+): Promise<ApiResponse<T>> {
+  const response = await httpClient.get<ApiResponse<T>>(url, config)
+  return response.data
 }
 
 /**
@@ -178,10 +189,28 @@ export async function apiPost<T>(
     })
   }
   const response = await httpClient.post<ApiResponse<T>>(url, body, axiosConfig)
-  if (response.data.operations) {
-    return { data: response.data.data, operations: response.data.operations } as unknown as T
-  }
   return response.data.data
+}
+
+/**
+ * Performs an authenticated POST request and returns the full operational envelope.
+ *
+ * @template T - The expected type of the 'data' property in the response.
+ * @returns {Promise<ApiResponse<T>>} - The full response envelope.
+ */
+export async function apiPostEnvelope<T>(
+  url: string,
+  body?: unknown,
+  config?: AxiosRequestConfig & { version?: number },
+): Promise<ApiResponse<T>> {
+  const { version, ...axiosConfig } = config ?? {}
+  if (version != null) {
+    axiosConfig.headers = Object.assign({}, axiosConfig.headers, {
+      'If-Match': `"v${version}"`,
+    })
+  }
+  const response = await httpClient.post<ApiResponse<T>>(url, body, axiosConfig)
+  return response.data
 }
 
 /**
@@ -205,9 +234,6 @@ export async function apiPut<T>(
     })
   }
   const response = await httpClient.put<ApiResponse<T>>(url, body, axiosConfig)
-  if (response.data.operations) {
-    return { data: response.data.data, operations: response.data.operations } as unknown as T
-  }
   return response.data.data
 }
 
@@ -232,9 +258,6 @@ export async function apiPatch<T>(
     })
   }
   const response = await httpClient.patch<ApiResponse<T>>(url, body, axiosConfig)
-  if (response.data.operations) {
-    return { data: response.data.data, operations: response.data.operations } as unknown as T
-  }
   return response.data.data
 }
 
