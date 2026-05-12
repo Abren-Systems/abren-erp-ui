@@ -12,6 +12,7 @@ export interface FieldBinding<TValue = unknown> {
   label: string
   readonly: ComputedRef<boolean>
   required: ComputedRef<boolean>
+  hidden: ComputedRef<boolean>
   'onUpdate:modelValue': (newValue: TValue) => void
   error: ComputedRef<string | null>
   type: FieldType
@@ -32,12 +33,18 @@ export function useField<TEntity, TValue>(
   const value = controller.data.select(definition.key) as ComputedRef<TValue | undefined>
 
   const isReadonly = computed(() => {
-    // Priority 1: Unified model field overrides (single source of truth)
+    // Priority 0: Operational Projection (Backend-Derived Authority)
+    const operationalPermission =
+      controller.model.value.domain.backend.operations?.permissions[String(definition.key)]
+    if (operationalPermission === 'readonly') return true
+    if (operationalPermission === 'hidden') return true // Hidden implies readonly
+
+    // Priority 1: Unified model field overrides (Frontend Personalization/Logic)
     const fieldOverride = controller.model.value.ui.fields.overrides[String(definition.key)]
     if (fieldOverride?.readonly !== undefined) {
       return fieldOverride.readonly
     }
-    // Priority 2: Field-level custom readonly function (legacy fallback)
+    // Priority 2: Field-level custom readonly function (Legacy fallback)
     if (definition.readonly) {
       return definition.readonly(
         controller.state as ScreenStateMachine,
@@ -46,6 +53,20 @@ export function useField<TEntity, TValue>(
     }
     // Priority 3: Global editability from domain capabilities
     return !controller.model.value.domain.capabilities.canEdit
+  })
+
+  const isHidden = computed(() => {
+    // Priority 0: Operational Projection
+    const operationalPermission =
+      controller.model.value.domain.backend.operations?.permissions[String(definition.key)]
+    if (operationalPermission === 'hidden') return true
+
+    // Priority 1: Unified model field overrides
+    const fieldOverride = controller.model.value.ui.fields.overrides[String(definition.key)]
+    if (fieldOverride?.hidden !== undefined) {
+      return fieldOverride.hidden
+    }
+    return false
   })
 
   const isRequired = computed(() => {
@@ -77,7 +98,7 @@ export function useField<TEntity, TValue>(
 
   // The view is not allowed to use v-model. It calls onChange, which routes through the controller.
   const onChange = (newValue: TValue) => {
-    if (isReadonly.value) return // Block mutation if State Machine forbids it
+    if (isReadonly.value) return // Block mutation if State Machine or Backend forbids it
 
     const fieldKey = definition.key
 
@@ -109,7 +130,7 @@ export function useField<TEntity, TValue>(
       { type: 'mutation', source: `AppField(${String(fieldKey)})` },
       { operations: [{ op: 'replace', path: String(fieldKey), value: newValue }] },
       [],
-      controller.model.value.version,
+      controller.model.value.domain.backend.operations?.version ?? 0,
     )
   }
 
@@ -120,6 +141,7 @@ export function useField<TEntity, TValue>(
     label: definition.label,
     readonly: isReadonly,
     required: isRequired,
+    hidden: isHidden,
     'onUpdate:modelValue': onChange,
     error,
     type: definition.type as FieldType,

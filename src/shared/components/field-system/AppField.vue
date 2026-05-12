@@ -46,6 +46,8 @@ const props = withDefaults(
     readonly?: boolean
     /** Runtime props forwarded to the editor (e.g., select options). Merges with registry editorProps. */
     editorAttrs?: Record<string, unknown>
+    /** Hides the entire field from the layout. */
+    hidden?: boolean
   }>(),
   {
     value: undefined,
@@ -57,6 +59,7 @@ const props = withDefaults(
     disabled: false,
     readonly: false,
     editorAttrs: undefined,
+    hidden: false,
   },
 )
 
@@ -114,6 +117,7 @@ const mergedEditorProps = computed(() => ({
 
 <template>
   <div
+    v-if="!hidden"
     :id="`field-${field}`"
     class="app-field"
     :class="[`app-field--${size}`, `app-field--align-${definition.align}`]"

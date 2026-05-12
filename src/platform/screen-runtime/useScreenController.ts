@@ -265,7 +265,7 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
         ],
       },
       [],
-      model.value?.version ?? 0,
+      model.value.domain.backend.operations?.version ?? 0,
     )
     try {
       await command.execute(...args)
@@ -273,7 +273,7 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
         { type: 'command', source: `Command(${id})` },
         { operations: [{ op: 'replace', path: 'status', value: 'end' }] },
         [],
-        model.value?.version ?? 0,
+        model.value.domain.backend.operations?.version ?? 0,
       )
     } catch (error) {
       handleCommandError(error)
@@ -290,7 +290,7 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
           ],
         },
         [],
-        model.value?.version ?? 0,
+        model.value.domain.backend.operations?.version ?? 0,
       )
       throw error
     }
@@ -416,5 +416,20 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
 
     /** Whether any command is currently executing */
     isPending,
+
+    /**
+     * Ingest an authoritative operational response from the backend.
+     * Synchronizes the entity and operational sidecar.
+     */
+    ingestResponse(
+      response: import('../workflow-runtime/models/workflows.types').OperationalResponse<T>,
+    ) {
+      if (dataSource.entity) {
+        dataSource.entity.value = response.data
+      }
+      if (dataSource.operations) {
+        dataSource.operations.value = response.operations
+      }
+    },
   }
 }

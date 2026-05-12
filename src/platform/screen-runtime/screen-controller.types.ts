@@ -1,4 +1,5 @@
 import type { ComputedRef, Ref } from 'vue'
+import type { OperationalResponse } from '../workflow-runtime/models/workflows.types'
 import type { ScreenStateMachine } from './state-machine.types'
 
 export interface ScreenContext {
@@ -94,4 +95,10 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
 
   /** Let the platform react to command errors that occur outside registerCommand wrappers */
   handleCommandError(error: unknown): void
+
+  /**
+   * Ingest an authoritative operational response from the backend.
+   * Updates the entity and operational sidecar simultaneously.
+   */
+  ingestResponse(response: OperationalResponse<T>): void
 }
