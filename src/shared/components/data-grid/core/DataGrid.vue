@@ -29,6 +29,7 @@ const props = withDefaults(
   defineProps<{
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    totalCount?: number
     loading?: boolean
     skeletonRows?: number
     placeholder?: string
@@ -81,6 +82,12 @@ const table = useVueTable({
   enableColumnResizing: true,
   columnResizeMode: 'onChange',
   globalFilterFn: 'includesString',
+
+  // Server-side pagination support
+  manualPagination: computed(() => props.totalCount !== undefined),
+  get rowCount() {
+    return props.totalCount
+  },
 
   state: {
     get sorting() {
