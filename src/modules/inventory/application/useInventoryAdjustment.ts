@@ -1,8 +1,9 @@
-import { type Ref, computed } from 'vue'
+import { type Ref, computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { inventoryKeys } from './query-keys'
 import type { CreateAdjustmentDTO } from '../infrastructure/api.types'
+import type { ListQuery } from '@/shared/domain/pagination'
 
 export type { CreateAdjustmentDTO }
 
@@ -62,14 +63,12 @@ export function useAdjustment(adjustmentId: Ref<string | null>) {
   }
 }
 
-import type { ListQuery } from '@/shared/domain/pagination'
-
 /**
  * Use Case: View Adjustments List (Paginated)
  *
- * @param {ListQuery} [query] - Optional pagination parameters.
+ * @param {MaybeRefOrGetter<ListQuery>} [query] - Optional pagination parameters.
  */
-export function useAdjustments(query?: ListQuery) {
+export function useAdjustments(query?: MaybeRefOrGetter<ListQuery>) {
   const {
     data: response,
     isPending,
@@ -77,7 +76,7 @@ export function useAdjustments(query?: ListQuery) {
     refetch,
   } = useQuery({
     queryKey: inventoryKeys.adjustments(query),
-    queryFn: () => inventoryAdapter.getAdjustments(query),
+    queryFn: () => inventoryAdapter.getAdjustments(toValue(query)),
     staleTime: 1000 * 60 * 5,
   })
 

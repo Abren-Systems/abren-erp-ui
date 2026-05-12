@@ -8,6 +8,7 @@ import {
 } from '@/platform/screen-runtime'
 import { useAdjustments } from '../../application/useInventoryAdjustment'
 import { IN3030PL } from './screen'
+import type { ListQuery } from '@/shared/domain/pagination'
 
 export function useAdjustmentsListController() {
   const gridState = useDataGrid()

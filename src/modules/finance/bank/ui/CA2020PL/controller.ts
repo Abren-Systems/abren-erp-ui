@@ -23,7 +23,7 @@ export function useBankAccountsListController() {
   const base = useScreenController({
     screen: CA2020PL,
     dataSource: {
-      entity: computed(() => response.value?.items ?? []),
+      entity: computed(() => bankAccounts.value?.items ?? []),
       isLoading,
       error,
     },

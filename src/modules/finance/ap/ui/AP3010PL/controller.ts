@@ -8,6 +8,7 @@ import {
 import { useDataGrid } from '@/shared/components/data-grid'
 import { useVendorBills } from '../../application/useVendorBills'
 import { AP3010PL } from './screen'
+import type { ListQuery } from '@/shared/domain/pagination'
 
 import type { VendorBill } from '../../models/ap.types'
 

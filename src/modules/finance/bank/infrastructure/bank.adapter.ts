@@ -1,4 +1,3 @@
-import { apiGet, apiPost } from '@/shared/api/http-client'
 import type { BankAccountId } from '@/shared/types/brand.types'
 import type { ScheduledPayment } from '../models/bank.types'
 import type {
@@ -7,8 +6,19 @@ import type {
   ScheduledPaymentDTO,
   CreateScheduledPaymentRequest,
 } from './api.types'
-import { Operational, WorkflowOperations } from '@/platform/workflow-runtime/models/workflows.types'
+import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
+import type {
+  Operational,
+  WorkflowOperations,
+} from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
+import {
+  BankAccountListSchema,
+  BankTransactionListSchema,
+  ScheduledPaymentListSchema,
+  OperationalScheduledPaymentSchema,
+} from './api.schemas'
+import { BankMapper } from './mappers'
 
 /**
  * Bank API Adapter

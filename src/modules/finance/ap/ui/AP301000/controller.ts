@@ -29,7 +29,7 @@ export function useVendorBillController(id: string) {
   const billId = toId<VendorBillId>(id)
 
   // Data fetching
-  const { bill, operations, isLoading } = useVendorBill(billId)
+  const { vendorBill, operations, isLoading } = useVendorBill(billId)
   const { validate, isPending: isValidating } = useValidateVendorBill(billId)
   const { reject, isPending: isRejecting } = useRejectVendorBill(id)
   const { cancel, isPending: isCancelling } = useCancelVendorBill(billId)
@@ -40,7 +40,7 @@ export function useVendorBillController(id: string) {
 
   const base = useScreenController<VendorBill, VendorBillStatus>({
     screen: AP301000,
-    dataSource: { entity: bill, isLoading, error: ref(null) },
+    dataSource: { entity: vendorBill, isLoading, error: ref(null) },
     isNew,
     getDomainState: (entity) => entity.status,
     operations,
@@ -51,7 +51,7 @@ export function useVendorBillController(id: string) {
   Object.assign(base, { form })
 
   // UI state
-  const currentLines = computed(() => bill.value?.lines || [])
+  const currentLines = computed(() => vendorBill.value?.lines || [])
   const activeTab = ref('Expense Lines')
   const isRejectDialogOpen = ref(false)
   const auditReason = ref('')

@@ -14,6 +14,16 @@ import type {
   WorkflowOperations,
 } from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
+import {
+  WarehouseSchema,
+  ItemListSchema,
+  StockLevelSchema,
+  StockLevelListSchema,
+  BatchSchema,
+  SerialNumberSchema,
+  OperationalAdjustmentSchema,
+  AdjustmentListSchema,
+} from './api.schemas'
 
 /**
  * Inventory API Adapter

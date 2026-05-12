@@ -13,13 +13,17 @@ import type {
   RejectPaymentRequestDTO,
   CreateVendorBillDTO,
   VendorBillDTO,
+  PaymentRequestDTO,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
 import type {
   Operational,
   WorkflowOperations,
 } from '@/platform/workflow-runtime/models/workflows.types'
-import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
+import { apiGetEnvelope } from '@/shared/api/http-client'
+import { APMapper } from './mappers'
+import { Money } from '@/shared/domain/money'
+import type { PaymentRequest, PaymentRequestStats, VendorBill } from '../models/ap.types'
 
 const REQUESTS_BASE = '/finance/ap/payment-requests'
 const BILLS_BASE = '/finance/ap/vendor-bills'
@@ -40,7 +44,7 @@ export const apAdapter = {
 
     return {
       items: parsed.items.map((item) => ({
-        ...APMapper.toPaymentRequest(item.data),
+        ...APMapper.toPaymentRequest(item.data as unknown as PaymentRequestDTO),
         __operations: item.operations as unknown as WorkflowOperations,
       })),
       totalCount: parsed.total_count,
@@ -54,7 +58,7 @@ export const apAdapter = {
     const raw = await apiGetEnvelope<unknown>(`${REQUESTS_BASE}/${id}`)
     const parsed = OperationalPaymentRequestSchema.parse(raw)
     return {
-      ...APMapper.toPaymentRequest(parsed.data),
+      ...APMapper.toPaymentRequest(parsed.data as unknown as PaymentRequestDTO),
       __operations: parsed.operations as unknown as WorkflowOperations,
     }
   },

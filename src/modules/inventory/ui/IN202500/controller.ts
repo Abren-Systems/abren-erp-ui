@@ -25,7 +25,7 @@ export function useStockItemController(id: string) {
 
   const { stockItem: entity, isLoading, error } = useStockItem(stockItemId)
   const { warehouses } = useWarehouses()
-  const { items } = useItems()
+  const { inventoryItems } = useItems()
 
   const form = useForm({
     defaultValues: {
@@ -102,7 +102,7 @@ export function useStockItemController(id: string) {
 
   const itemOptions = computed(
     () =>
-      items.value?.items.map((i) => ({
+      inventoryItems.value?.items.map((i) => ({
         label: `${i.sku} - ${i.name}`,
         value: i.id,
       })) || [],

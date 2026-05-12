@@ -79,8 +79,8 @@ export function usePaymentRequestList() {
     }
 
     return data.map((r) => {
-      const requester = users.value?.find((u) => u.id === r.request.requesterId)
-      const beneficiary = users.value?.find((u) => u.id === r.request.beneficiaryId)
+      const requester = users.value?.find((u) => u.id === r.requesterId)
+      const beneficiary = users.value?.find((u) => u.id === r.beneficiaryId)
 
       const formatName = (user?: User, id?: string) => {
         if (!user) return id?.slice(0, 8) || 'Unknown'
@@ -129,7 +129,7 @@ export function usePaymentRequestList() {
     const selected = new Set(selectedIds.value)
     return filteredRequests.value
       .filter((request) => selected.has(request.id))
-      .map((request) => ({ id: request.id, version: request.operations.version }))
+      .map((request) => ({ id: request.id, version: request.__operations?.version ?? 0 }))
   })
 
   // ── Handlers ──

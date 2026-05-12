@@ -1,7 +1,7 @@
 import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { bankAdapter } from '../infrastructure/bank.adapter'
 import type { BankAccountId } from '@/shared/types/brand.types'
-import { computed } from 'vue'
+import { toValue, type MaybeRefOrGetter, computed } from 'vue'
 import { bankKeys } from './query-keys'
 
 import type { ListQuery } from '@/shared/domain/pagination'
@@ -12,9 +12,9 @@ import type { BankTransactionDTO } from '../infrastructure/api.types'
  * Use Case: View Bank Account Transactions (Paginated).
  *
  * @param accountId - The unique identifier of the bank account.
- * @param {ListQuery} [query] - Optional pagination parameters.
+ * @param {MaybeRefOrGetter<ListQuery>} [query] - Optional pagination parameters.
  */
-export function useBankTransactions(accountId: BankAccountId, query?: ListQuery) {
+export function useBankTransactions(accountId: BankAccountId, query?: MaybeRefOrGetter<ListQuery>) {
   const {
     data: response,
     isPending,
@@ -23,7 +23,7 @@ export function useBankTransactions(accountId: BankAccountId, query?: ListQuery)
   } = useApiQuery(
     bankKeys.transactions(accountId, query),
     async () => {
-      const data = await bankAdapter.getTransactions(accountId, query)
+      const data = await bankAdapter.getTransactions(accountId, toValue(query))
       return {
         ...data,
         items: data.items.map((dto: BankTransactionDTO) =>
