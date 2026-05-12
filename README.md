@@ -1,18 +1,18 @@
 # Abren ERP UI
 
-Frontend for Abren ERP, a workflow-centered financial operations workspace for SMEs.
+Frontend for Abren ERP, an Acumatica-aligned financial operations workspace for SMEs.
 
 ## Product Direction
 
 Abren is not being designed as a generic admin dashboard. The frontend is evolving toward:
 
-- a **workboard-first** home experience
-- dense but calm operational workspaces
-- route-driven focus for consequential tasks
-- drawer-based traceability and supporting context
+- an **Acumatica-aligned Modern UI** experience
+- dense but calm operational workspaces (Inquiry/Processing/Report)
+- standardized form anatomy (Setup/Maintenance/Data Entry)
+- state-machine driven center area (Workspace View vs Working Area)
 - truthful UI surfaces that avoid fake metrics and placeholder theater
 
-The current UX reset proposal lives in [docs/architecture/UX_RESET_PROPOSAL.md](docs/architecture/UX_RESET_PROPOSAL.md).
+The definitive mental model lives in [docs/architecture/ACUMATICA_ALIGNMENT.md](docs/architecture/ACUMATICA_ALIGNMENT.md).
 
 ## Tech Stack
 
@@ -65,15 +65,14 @@ modules/{area}/{module}/
 Start here:
 
 - [docs/OVERVIEW.md](docs/OVERVIEW.md)
-- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
-- [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)
+- [docs/architecture/ACUMATICA_ALIGNMENT.md](docs/architecture/ACUMATICA_ALIGNMENT.md)
+- [docs/architecture/SCREEN_RUNTIME.md](docs/architecture/SCREEN_RUNTIME.md)
 - [docs/architecture/UX_ARCHITECTURE.md](docs/architecture/UX_ARCHITECTURE.md)
-- [docs/architecture/UX_RESET_PROPOSAL.md](docs/architecture/UX_RESET_PROPOSAL.md)
 - [docs/architecture/DESIGN_SYSTEM.md](docs/architecture/DESIGN_SYSTEM.md)
 
 ## Current Priorities
 
-- replace the generic dashboard with a real workboard
-- standardize the workspace shell and page composition
-- strengthen traceability and action hierarchy across finance flows
-- align docs, skills, and implementation so the UX stops drifting
+- standardize all screens using the **Acumatica Screen ID system** (e.g., AP301000)
+- implement the **6-part Form Anatomy** across all financial modules
+- replace legacy "workboard" triage with the **Workspace View / Working Area** state machine
+- strengthen field cascades and business logic within the **Screen Controllers** (Graphs)

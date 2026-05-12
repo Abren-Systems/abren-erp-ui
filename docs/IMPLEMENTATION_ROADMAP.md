@@ -92,13 +92,13 @@ To prevent layout drift, the following screens serve as the **immutable referenc
 
 ### 5.1 Core Operating System
 
-| Capability                  | Status | Notes                                        |
-| --------------------------- | ------ | -------------------------------------------- |
-| Identity — Users/Roles List | ✅     | `UsersPage.vue`, `RolesListPage.vue` live    |
-| Tenant Context              | ✅     | Hydration working on reload                  |
-| Workboard                   | ✅     | `WorkboardPage.vue` with stats, queue, trace |
-| Dashboard Stat Cards        | ✅     | `CashflowDashboard` wired via `useCashflow`  |
-| User Profile Management     | 📋     | Planned                                      |
+| Capability                  | Status | Notes                                           |
+| --------------------------- | ------ | ----------------------------------------------- |
+| Identity — Users/Roles List | ✅     | `UsersPage.vue`, `RolesListPage.vue` live       |
+| Tenant Context              | ✅     | Hydration working on reload                     |
+| Workspace View              | ✅     | Navigation hub with tiles and categorized links |
+| Dashboard Stat Cards        | ✅     | `CashflowDashboard` wired via `useCashflow`     |
+| User Profile Management     | 📋     | Planned                                         |
 
 ### 5.2 Financial Engine — Ledger
 

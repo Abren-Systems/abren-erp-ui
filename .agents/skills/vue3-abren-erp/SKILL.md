@@ -1,223 +1,100 @@
 ---
 name: Vue 3 Abren ERP Development
-description: Patterns and guardrails for building the Abren ERP UI with Vue 3, TypeScript, TanStack Query/Table, and the current workboard-first UX architecture.
+description: Patterns and guardrails for building the Abren ERP UI with Vue 3, TypeScript, TanStack Query/Table, and the v3.0 Deterministic Runtime architecture.
 ---
 
 # Vue 3 Abren ERP Development Skill
 
 > **Architecture Authority:** [`docs/architecture/ARCHITECTURE.md`](../../docs/architecture/ARCHITECTURE.md) (v3.0, Locked Baseline)
 > **Key Companions:** [`docs/architecture/ACUMATICA_ALIGNMENT.md`](../../docs/architecture/ACUMATICA_ALIGNMENT.md) (Rosetta Stone) · [`docs/architecture/SCREEN_RUNTIME.md`](../../docs/architecture/SCREEN_RUNTIME.md) (Runtime) · [`docs/architecture/SCREEN_MIGRATION.md`](../../docs/architecture/SCREEN_MIGRATION.md) (Migration Guide) · [`docs/architecture/COMPONENT_SYSTEM.md`](../../docs/architecture/COMPONENT_SYSTEM.md) (UI & Contracts)
-> This skill file provides AI-specific guardrails and UX doctrine. For structural decisions (module anatomy, layer rules, platform contracts), defer to the Architecture Manifesto.
+> This skill provides AI-specific guardrails for the **deterministic execution architecture**. Defer to the Manifesto for structural rules.
 
 ## Core Rules
 
 1. **Always** use Vue 3 Composition API with `<script setup lang="ts">`.
-2. **Always** use strict TypeScript. Do not introduce `any`.
-3. **Always** keep server state in TanStack Query via the shared composables. Do not duplicate domain data in Pinia.
+2. **Always** use strict TypeScript. `any` is strictly banned. Use `unknown` + type guards.
+3. **Always** use **Branded Types** for IDs (`UserId`, `AccountId`) and **IsoDate** for strings. Use `toId<T>(val)` helper.
 4. **Always** preserve the 4-layer module architecture: Domain, Application, Infrastructure, UI.
-5. **Always** use props-in/events-out component contracts.
-6. **Always** prefer Abren-owned shared components from `@/shared/components/` and `@/shared/components/primitives/`.
-7. **Do not reintroduce Fluent as a UI foundation**. New UI architecture must center Abren-owned composition and headless foundations.
-8. **Never** import across module internals. Cross-module coordination should happen through explicit boundaries.
-9. **Never** move business logic into `shared/`.
-10. **Always** optimize UX around operational clarity, traceability, and action hierarchy.
-11. **Always** place composables directly in `application/` (flat — no `composables/` sub-folder).
-12. **Always** place screen folders directly under `ui/` keyed by Screen ID (flat — no `transactions/` or `profiles/` sub-folders).
+5. **Always** use **Zod Shielding** in `infrastructure/schemas.ts` to parse all backend DTOs.
+6. **Always** keep server state in **TanStack Query**. Do not duplicate domain data in Pinia.
+7. **Always** place screen folders directly under `ui/` keyed by **Screen ID** (e.g., `AP301000/`).
+8. **Never** import across module internals. Cross-module coordination must go through the **Event Bus**.
+9. **Never** move business logic into `shared/`. Use the **Shared Semantic Kernel** for module-agnostic components.
+10. **Absolute Doctrine**: **The UI does not decide truth. The runtime derives truth.** Components render the `ScreenModel` strictly.
 
-## Product UX Doctrine
+## Product UX Doctrine (The Three Runtimes)
 
-When building UI for this project, assume Abren is:
+When building UI, assume Abren is governed by three deterministic runtimes:
 
-- a **workboard-first** ERP
-- a **decision-and-execution workspace**, not a vanity dashboard
-- a system where **traceability is a first-class feature**
-- a product that favors **calm density** over decorative complexity
+1. **Navigation Runtime (State A)**: The authoritative environment for **Workspaces**. It projects `WorkspaceDefinition` (tiles/links) into the center area.
+2. **Screen Runtime (State B)**: The authoritative environment for **Working Areas**. It projects `ScreenDefinition` and business state into a `ScreenModel`.
+3. **Canonical Semantic Runtime**: The authoritative meaning registry. Maps primitive data to business semantics (Money, Quantity, Status).
 
-That means:
+### Interaction Grammar
 
-- home screens should prioritize approvals, exceptions, blockers, and next actions
-- list screens should behave like workspaces for scanning and triage
-- detail screens should behave like focus canvases for consequential work
-- drawers should carry trace and supporting context
-- destructive actions must be explicit and gated
-- fake metrics and placeholder analytics should be avoided
+- **Sequential Progressive Disclosure**: Always follow the `List (PL) -> Detail (000)` path. Never render list and detail simultaneously (no master-detail splits).
+- **Standardized Form Anatomy**: Every Working Area form has exactly 6 parts: Title Bar, Toolbar, Summary, Tabs, Details, Row.
 
-## Structural Patterns
+## Structural Patterns (Area Codes)
 
-Every route should generally fit one of these surface types:
+Every route corresponds to an 8-character Screen ID with strict semantic meaning:
 
-1. **Workboard**
-   - Time-sensitive work, approvals, exceptions, alerts
-2. **Workspace**
-   - Dense list/filter/grid surface for scanning and triage
-3. **Focus**
-   - Single-record execution or review surface
-4. **Setup**
-   - Configuration and governance surface
-5. **Quick Triage** (Workspace sub-pattern)
-   - List-level audit preview via a docked `AppSidePane` beside the grid
-   - Shows the timeline/trace for a selected row _without leaving the queue_
-   - Uses `mode="docked"` to push the grid left; does NOT navigate away
-   - Supplements but does not replace the Focus route
+- `10` **Setup**: Configuration/Preferences (e.g., `GL102000`).
+- `20` **Maintenance**: Master data (e.g., `SM201010`).
+- `30` **Data Entry**: Transactional header-detail (e.g., `AP301000`).
+- `PL` **Primary List**: Paired inquiry for data entry (e.g., `AP3010PL`).
+- `40` **Inquiry**: Read-only analytical grids (e.g., `IN401000`).
+- `50` **Processing**: Batch engines with selectable grids and "Process All" actions.
+- `60` **Report**: Parameter-driven printable output.
 
-Prefer this grammar for transactional flows:
+## Component Architecture & Sizing
 
-`Workspace -> Focus -> Trace Drawer -> Confirmed Action`
+Avoid the **SFC God-Component** anti-pattern. Pages are orchestrators, not implementers.
 
-For high-volume review workflows, the extended grammar is:
-
-`Workspace (+ Quick Triage pane) -> Focus -> Confirmed Action`
-
-## Component Architecture
-
-Avoid the **SFC God-Component** anti-pattern. While Vue Single-File Components are powerful, pages should not become dumping grounds for multiple layout regions, complex dialogs, and heavy orchestrations.
-
-1. **Size Limits**: An SFC should ideally remain under 200 lines. If a component exceeds 300-400 lines, it is almost certainly doing too much.
-2. **Separation of Concerns**: A page component should act as an orchestrator, not an implementer.
-3. **Extraction Triggers**: Extract the following into dedicated child components:
-   - Floating action bars and their associated confirmation dialogs (e.g., `BulkActionBar.vue`).
-   - Complex side panes (e.g., `FilterPane.vue`, `TracePane.vue`).
-   - Domain-heavy data grids, if they require extensive custom cell formatting.
-4. **State Delegation**: The parent page holds the core data (`requests`, `selectedIds`) and passes them down as props, listening for events (`@approve`, `@reject`) from the extracted children.
+1. **Size Limits**: SFCs **must** remain under 200 lines. Above 300 lines is a critical failure.
+2. **Extraction Triggers**: Extract side panes (`SidePanel.vue`), action bars, and complex grids into dedicated child components.
+3. **State Delegation**: Parent page holds the core data; children receive props and emit events.
 
 ## Shared UI Expectations
 
-Prefer shared page composition over one-off page markup. Reuse or introduce shared patterns such as:
+- **`<AppField>`** — The **only** way to display data fields.
+- **`<AppFieldset>`** — The **only** way to group fields. No raw `<div class="grid">`.
+- **`<AppTemplate>`** — named templates for Summary Area widths (e.g., `7-10-7`).
+- **`FormTitleBar`** — Renders record context (ID, Title, Notes, Files). Used for 10, 20, 30.
+- **`ListTitleBar`** — Minimal title-only bar. Used for PL, 40, 50, 60.
+- **`FormToolbar`** — Renders declarative commands from the `ScreenModel`.
 
-- **`<AppField>`** — the only way to display data fields in business screens (see Field System below)
-- **`<AppFieldset>`** — the only way to group fields (see Field System below)
-- **`<FieldGroup>`** — sub-grouping within fieldsets
-- page headers (use `PageHeader` with a dynamic operational subtitle, not a static description)
-- section wrappers
-- toolbars
-- empty states
-- exception banners
-- metric strips
-- trace sections
-- `AppSidePane` for filter drawers and docked trace panes (mode: `overlay` for filters, `docked` for trace)
+### DataGrid Contract
 
-Pages in different modules should feel like one operating system, not isolated demos.
+Every inquiry/list grid **must** populate the footer:
+`Showing X of Y rows  •  Total: {Currency} X,XXX.XX  •  Selected: N`
 
-### DataGrid Footer Contract
+## Deterministic Data Flow
 
-Every financial Workspace page **must** populate the `DataGrid` `#footer` slot:
-
-```
-Showing X of Y rows  •  Total: ETB X,XXX.XX  •  Selected: N
-```
-
-- Row count is always present
-- Financial aggregate (sum of primary currency column) is always present
-- Selection count appears only when `rowSelection` is active
-
-### Bulk Action Bar Contract
-
-When `selectedCount > 0` in a Workspace grid, a **floating action bar** must appear anchored to the bottom of the grid surface:
-
-- State-advancing: `Approve Selected (N)`
-- State-reversing: `Reject Selected (N)`
-- Utility: `Export Selected`
-- Uses `<Transition>` and dismisses when selection is cleared
-- Never a modal — it is a floating bar so the user can see which rows are selected
-
-### Smart Filter (Bucket Tab) Pattern
-
-Do not expose raw backend statuses as a flat dropdown filter. Instead, group statuses into **actionable buckets** at the top of a Workspace:
-
-- `ALL` — total count
-- `NEEDS ATTENTION` — Rejected, Draft (requires user action)
-- `IN REVIEW` — Submitted, Pending Approval
-- `COMPLETED` — Authorized, Paid
-
-Bucket tabs are computed from live data, not hardcoded. They drive the `statusFilter` ref which the grid's row filter reads.
-
-## Data and Forms
-
-- Queries should use the module adapter + mapper pattern through shared query composables.
-- Mutations should use shared mutation helpers and invalidate/query-update deliberately.
-- Forms should keep domain rules in schemas/composables and presentation in UI components.
-- Loading, empty, error, and success states are part of the UX contract, not afterthoughts.
+1. **Raw Domain State** (TanStack Query) + **ScreenDefinition** (Metadata)
+2. **Projection Engine** (`resolveScreenModel`)
+3. **ScreenModel** (Reactive Projection)
+4. **Binding API** (`useField`, `useGrid`, `useCommand`)
+5. **Pure View** (`view.vue`)
 
 ## Field System (Non-Negotiable)
 
-> Full reference: `docs/FIELD_SYSTEM.md`
->
-> This system exists to enable a future metadata-driven UI runtime without rewriting screens.
-
-All business screens **must** use the Field System primitives. This is the foundational architectural constraint of the Abren ERP frontend.
-
-### Mandatory Primitives
-
-- `<AppField>` — the **only** way to display a data field. Takes `field` (stable key), `label` (display text), `value` (raw domain value), and `type` (registry key).
-- `<AppFieldset>` — the **only** way to group fields. Max 3 columns. Color-coded variants.
-- `<FieldGroup>` — lightweight sub-grouping within a fieldset.
-
-### Enforced Constraints (all 11)
-
-1. **No raw layout** — use `<AppFieldset>` or `<FieldGroup>`, never `<div class="grid">`
-2. **No raw data display** — use `<AppField>`, never `<span>{{ value }}</span>`
-3. **No business logic in components** — components render, servers decide
-4. **One field system** — all rendering goes through the registry
-5. **field/label separation** — stable `field` key distinct from display `label`
-6. **No conditional field rendering** — no `v-if` based on business state; null renders as `"—"`
-7. **Generic types only** — never `money_etb` or `status_pr`; use `FieldContext` for context
-8. **AppField is a renderer** — no business rules, no visibility decisions, no mutations
-9. **Value purity** — raw domain values only; no `formatMoney(x)` before passing to `<AppField>`
-10. **FieldContext is rendering-only** — no permissions, workflow state, or user roles
-11. **Empty state semantics** — `null`, `0`, `""`, `[]` are distinct; registry defines emptiness
-
-### Registry Types
-
-Valid `FieldType` values (enforced via TypeScript union):
-
-`text` | `money` | `status` | `date` | `id` | `number`
-
-To add a new type: extend the `FieldType` union in `registry.ts` and register its `FieldDefinition`. No other files need to change.
-
-### Action Contract
-
-Focus screens render actions from a `ScreenAction[]` array:
-
-```ts
-interface ScreenAction {
-  key: string
-  label: string
-  variant: 'primary' | 'danger' | 'neutral'
-  enabled: boolean
-  requiresConfirmation?: boolean
-}
-```
-
-The component renders actions. It does not decide which actions to show.
-
-## Styling Guidance
-
-- Use the design tokens in `src/assets/main.css`.
-- Prefer semantic utility composition over ad hoc color choices.
-- Keep accent color scarce and meaningful.
-- Use spacing and surface contrast to create hierarchy before adding borders or shadows.
-- Preserve readability of financial data with strong alignment and tabular numerals.
+1. **field/label separation**: Stable `field` key distinct from display `label`.
+2. **Value purity**: Pass raw domain values only; formatting is handled by the Registry.
+3. **No conditional rendering**: Use `isVisible` in the controller; null renders as `"—"`.
+4. **Registry Types**: `text` | `money` | `status` | `date` | `id` | `number` | `selector`.
 
 ## What To Avoid
 
-- generic admin-dashboard layouts
-- decorative KPI cards without trustworthy data
-- inconsistent action placement across modules
-- raw vendor primitives inside business pages when a shared wrapper exists
-- layout decisions that hide what needs attention now
-- **raw HTML for data display in business screens** — `<span>{{ amount }}</span>` bypasses the Field System; use `<AppField>` exclusively
-- **raw layout divs in business screens** — `<div class="grid">` bypasses the layout system; use `<AppFieldset>` or `<FieldGroup>`
-- **pre-formatted values in AppField** — `<AppField :value="formatMoney(x)" />` breaks value purity; pass raw domain values
-- **conditional field rendering based on business state** — `v-if="status === 'APPROVED'"` on fields violates constraint 6
-- **inline cell editing in financial data grids** — editing amounts, dates, or statuses directly in a grid cell bypasses domain validation, state machine checks, and audit trail recording; all mutations must flow through the Focus Canvas or a sanctioned Drawer form; this is a financial control, not a UX limitation
-- **tri-pane / master-detail layouts that render list + detail simultaneously on the same route** — this violates Sequential Progressive Disclosure and creates split-focus fatigue; the sanctioned pattern is the Quick Triage docked pane (trace only) + a separate Focus route for full editing
-- fake or placeholder metrics — if data is not real, show an honest empty state
+- **Legacy Terminology**: Never use "Workboard", "Queue", or "Triage" in new code. Use "Workspace View" or "Inquiry".
+- **Direct Binding**: Never bind components to raw business state (e.g., `v-model="entity.amount"`). Use `useField('amount')`.
+- **Inference in UI**: Never check `if (status === 'APPROVED')` in a component. Use the Projection's capability flags (`field.readonly`, `command.visible`).
+- **Inline editing**: Mutate only via sanctioned Forms or Drawers.
+- **Raw HTML for data**: `<span>{{ val }}</span>` is banned in business screens. Use `AppField`.
 
 ## Implementation Bias
 
-When you have a choice, prefer:
-
-- clear work prioritization over visual novelty
-- truthful empty states over invented demo data
-- reusable page architecture over isolated page styling
-- Abren-specific UX language over vendor imitation
+- **Graph-Centric Behavior**: All field cascades (`watch`) live in the `controller.ts` (The Graph).
+- **Layer Isolation**: Keep `infrastructure/` as a strict firewall using Mappers and Zod.
+- **Screen ID alignment**: Name files, routes, and folders by their 8-character ID.
+- **Full-Stack Symmetry**: Use the same module and action names as the backend.
