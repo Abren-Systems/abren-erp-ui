@@ -50,7 +50,7 @@ export function useJournalEntry(entryId: JournalEntryId) {
       onSuccess: (updated: OperationalEntity<JournalEntry>) => {
         // Update the single-entry cache immediately for instant UI feedback
         queryClient.setQueryData(ledgerKeys.journalEntry(entryId), updated)
-        // Invalidate the list so the queue reflects the state change
+        // Invalidate the list so the list reflects the state change
         void queryClient.invalidateQueries({
           queryKey: ledgerKeys.journalEntries(),
         })

@@ -6,7 +6,7 @@ import { AppButton } from '../button'
  * AppSidePane — The authoritative surface for contextual work.
  *
  * Unlike traditional drawers, the SidePane is designed to be "Docked"
- * by default for triage workflows, or "Overlay" for transient tasks.
+ * by default for record context, or "Overlay" for transient tasks.
  * It is non-modal, allowing simultaneous interaction with the main content.
  */
 
