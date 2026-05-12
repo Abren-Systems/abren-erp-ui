@@ -25,20 +25,6 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         row-clickable
         @row-click="ctrl.handleRowClick"
       >
-        <template #toolbar>
-          <AppButton
-            variant="primary"
-            size="sm"
-            @click="
-              (
-                ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'invite') ||
-                ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'invite')
-              )?.command?.execute()
-            "
-          >
-            Invite User
-          </AppButton>
-        </template>
       </DataGrid>
     </div>
 

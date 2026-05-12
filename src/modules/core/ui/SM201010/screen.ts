@@ -7,7 +7,7 @@ import { useUsersController } from './controller'
 export const SM201010: ScreenDefinition = {
   id: createScreenId('SM201010'),
   titleKey: 'Users',
-  kind: 'maintenance',
+  kind: 'primaryList',
   moduleId: 'core' as ModuleId,
 
   controller: () => useUsersController(),
