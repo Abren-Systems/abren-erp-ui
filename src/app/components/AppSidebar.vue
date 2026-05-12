@@ -144,7 +144,7 @@ function toggleSidebar() {
     <div class="flex items-center border-b border-[color:var(--color-neutral-200)] px-3 py-2.5">
       <div class="flex min-w-0 items-center gap-2">
         <div
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-600)] text-xs font-semibold text-white shadow-sm"
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--color-primary-600)] text-xs font-semibold text-white shadow-sm"
         >
           AB
         </div>
@@ -162,7 +162,7 @@ function toggleSidebar() {
           :key="item.id"
           :to="item.to"
           :class="[
-            'group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors',
+            'group flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-[13px] transition-colors',
             isItemActive(item)
               ? 'bg-[var(--color-primary-600)] text-white shadow-sm'
               : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]',
@@ -184,7 +184,7 @@ function toggleSidebar() {
           :key="item.id"
           :to="item.to"
           :class="[
-            'group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors',
+            'group flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-[13px] transition-colors',
             isItemActive(item)
               ? 'bg-[var(--color-primary-600)] text-white shadow-sm'
               : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]',
@@ -201,7 +201,7 @@ function toggleSidebar() {
     <div class="flex justify-end border-t border-[color:var(--color-neutral-200)] p-2">
       <button
         type="button"
-        class="flex items-center justify-center rounded-lg p-1.5 text-[var(--color-neutral-600)] transition-colors hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-neutral-900)]"
+        class="flex items-center justify-center rounded-sm p-1.5 text-[var(--color-neutral-600)] transition-colors hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-neutral-900)]"
         :title="collapsed ? 'Expand' : 'Collapse'"
         @click="toggleSidebar"
       >
