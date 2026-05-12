@@ -10,15 +10,7 @@
  * - Height contained within Working Area.
  */
 import { ref, computed, inject, type Component } from 'vue'
-import {
-  ChevronRight,
-  ChevronLeft,
-  MessageSquare,
-  Paperclip,
-  FileText,
-  User,
-  GitBranch,
-} from 'lucide-vue-next'
+import { ChevronRight, ChevronLeft, User, LayoutDashboard, FileText } from 'lucide-vue-next'
 import type { SidePanelContract, SidePanelTabContract } from '@/platform/component-contracts'
 
 const props = defineProps<{
@@ -35,17 +27,16 @@ const sidePanel = inject<SidePanelState>('sidePanel')!
 // Default services if no contract is provided (for demonstration/hardening)
 const defaultTabs: SidePanelTabContract[] = [
   {
-    id: 'activities',
-    labelKey: 'Activities',
-    icon: 'MessageSquare',
+    id: 'related-form-1',
+    labelKey: 'Customer Details',
+    icon: 'User',
     kind: 'local',
     component: async () => ({}),
   },
-  { id: 'files', labelKey: 'Files', icon: 'Paperclip', kind: 'local', component: async () => ({}) },
   {
-    id: 'relations',
-    labelKey: 'Relations',
-    icon: 'GitBranch',
+    id: 'related-dashboard',
+    labelKey: 'Sales Overview',
+    icon: 'LayoutDashboard',
     kind: 'local',
     component: async () => ({}),
   },
@@ -57,11 +48,8 @@ const activeTab = computed(() => tabs.value.find((t) => t.id === activeTabId.val
 
 // Map of icons for demonstration
 const iconMap: Record<string, Component> = {
-  MessageSquare,
-  Paperclip,
-  FileText,
   User,
-  GitBranch,
+  LayoutDashboard,
 }
 
 function selectTab(tab: SidePanelTabContract) {
