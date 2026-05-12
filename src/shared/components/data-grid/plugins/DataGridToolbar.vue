@@ -149,10 +149,10 @@ function clear() {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Command Mode Aesthetic */
+/* Command Mode Aesthetic — Synchronized with Search Palette and Sidebar Header */
 .toolbar--selection-mode {
-  background: var(--color-primary-900);
-  border-bottom-color: var(--color-primary-800);
+  background: var(--color-neutral-800);
+  border-bottom-color: var(--color-neutral-700);
   color: #ffffff;
 }
 
@@ -208,16 +208,17 @@ function clear() {
   height: 20px;
   padding: 0 6px;
   background: #ffffff;
-  color: var(--color-primary-900);
+  color: var(--color-neutral-800);
   border-radius: 4px;
   font-size: 11px;
   font-weight: 800;
 }
 
 .selection-text {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   opacity: 0.9;
 }
 
@@ -228,7 +229,7 @@ function clear() {
 
 .toolbar--selection-mode :deep(.app-button--primary) {
   background: #ffffff;
-  color: var(--color-primary-900);
+  color: var(--color-neutral-800);
 }
 
 .toolbar--selection-mode :deep(.app-button--stealth) {
