@@ -1,4 +1,13 @@
-import { ref, computed, watch, onUnmounted, shallowRef, type ComputedRef, type Ref } from 'vue'
+import {
+  ref,
+  computed,
+  watch,
+  onUnmounted,
+  shallowRef,
+  type ComputedRef,
+  type Ref,
+  onMounted,
+} from 'vue'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
@@ -7,6 +16,7 @@ import type { WorkflowOperations } from '../workflow-runtime/models/workflows.ty
 import { resolveScreenProjection } from './resolve-screen-model'
 import type { CommandProjection } from './screen-projection.types'
 import { transitionRecorder } from '../debug/transition-recorder'
+import { registerActiveController } from '../debug/devtools/devtools-registry'
 import { ConflictError } from '@/shared/api/http-client'
 
 // ── Screen Controller Options ─────────────────────────────
@@ -377,7 +387,7 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     // Future: tear down subscriptions, release memory
   })
 
-  return {
+  const controller: ScreenController<T, TDomain> = {
     /** The ScreenDefinition metadata */
     screen,
 
@@ -432,4 +442,14 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
       }
     },
   }
+
+  onMounted(() => {
+    registerActiveController(controller as unknown as ScreenController<unknown, string>)
+  })
+
+  onUnmounted(() => {
+    registerActiveController(null)
+  })
+
+  return controller
 }
