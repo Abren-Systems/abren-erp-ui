@@ -341,11 +341,11 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-header-row {
-  height: 32px;
+  height: var(--grid-row-standard);
 }
 
 .grid-th {
-  padding: 0 10px;
+  padding: 0 var(--grid-cell-px);
   text-align: left;
   font-size: 11px;
   font-weight: 800; /* Extra bold for headers */
@@ -365,7 +365,7 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-row {
-  height: 32px;
+  height: var(--grid-row-standard);
   border-bottom: 1px solid var(--color-neutral-100);
   cursor: pointer;
   background: #ffffff;
@@ -404,7 +404,7 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-td {
-  padding: 0 10px;
+  padding: 0 var(--grid-cell-px);
   border-right: 1px solid transparent;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -416,7 +416,7 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-row--compact {
-  height: 28px;
+  height: var(--grid-row-compact);
 }
 .grid-row--compact .grid-td {
   padding: 0 8px;
@@ -424,11 +424,11 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-row--standard {
-  height: 36px;
+  height: var(--grid-row-standard);
 }
 
 .grid-row--relaxed {
-  height: 44px;
+  height: var(--grid-row-relaxed);
 }
 .grid-row--relaxed .grid-td {
   padding: 0 16px;
@@ -456,8 +456,8 @@ const handleRowClick = (row: Row<TData>) => {
 .grid-footer {
   display: flex;
   align-items: center;
-  height: 40px;
-  padding: 0 10px;
+  height: var(--grid-footer-h);
+  padding: 0 var(--grid-cell-px);
   border-top: 1px solid var(--color-neutral-200);
   background: var(--color-neutral-50);
   font-size: 11px;

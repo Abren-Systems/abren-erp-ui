@@ -141,8 +141,8 @@ function clear() {
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 40px;
-  padding: 0 10px;
+  height: var(--grid-toolbar-h);
+  padding: 0 var(--grid-cell-px);
   background: #ffffff;
   border-bottom: 1px solid var(--color-neutral-200);
   flex-shrink: 0;

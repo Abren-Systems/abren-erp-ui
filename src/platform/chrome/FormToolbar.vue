@@ -132,11 +132,11 @@ function getButtonVariant(cmd: ScreenCommand) {
 .form-toolbar {
   display: flex;
   align-items: center;
-  padding: 0.25rem 0.625rem;
+  padding: var(--chrome-toolbar-py) var(--layout-gutter);
   border-bottom: 1px solid var(--color-neutral-200);
   background: white;
   gap: 0.25rem;
-  min-height: 2.25rem;
+  min-height: var(--chrome-toolbar-min-h);
 }
 
 .form-toolbar__standard {

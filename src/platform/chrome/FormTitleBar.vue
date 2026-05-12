@@ -62,10 +62,10 @@ function goBack() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.375rem 0.625rem;
+  padding: var(--chrome-titlebar-py) var(--layout-gutter);
   border-bottom: 1px solid var(--color-neutral-200);
   background: #ffffff;
-  min-height: 2.25rem;
+  min-height: var(--chrome-titlebar-min-h);
 }
 
 .form-title-bar__left {

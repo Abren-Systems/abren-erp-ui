@@ -122,7 +122,37 @@
   --text-micro: 0.6875rem; /* 11px 400 +0.02em — timestamps, metadata */
 
   /*
-   * ── Spacing ───────────────────────────────────────────────────
+   * ── Layout Frame ──────────────────────────────────────────
+   * The single source of truth for all structural dimensions.
+   * Change these once → every sidebar, chrome bar, and grid updates.
+   */
+  --layout-gutter: 10px; /* Horizontal "Line of Authority" */
+  --layout-sidebar-width: 10rem; /* 160px — expanded nav */
+  --layout-sidebar-collapsed: 4rem; /* 64px — icon-only nav */
+
+  /*
+   * ── Chrome Heights ────────────────────────────────────────
+   * Controls the vertical rhythm of the platform frame.
+   */
+  --chrome-topbar-py: 6px;
+  --chrome-titlebar-py: 6px;
+  --chrome-titlebar-min-h: 2.25rem; /* 36px */
+  --chrome-toolbar-py: 4px;
+  --chrome-toolbar-min-h: 2.25rem; /* 36px */
+
+  /*
+   * ── Grid Density ──────────────────────────────────────────
+   * Cell padding and row heights for the DataGrid system.
+   */
+  --grid-cell-px: 10px;
+  --grid-row-compact: 28px;
+  --grid-row-standard: 36px;
+  --grid-row-relaxed: 44px;
+  --grid-toolbar-h: 40px;
+  --grid-footer-h: 40px;
+
+  /*
+   * ── Spacing ───────────────────────────────────────────────
    */
   --ds-spacing-xs: 0.25rem; /* 4px */
   --ds-spacing-sm: 0.5rem; /* 8px */
