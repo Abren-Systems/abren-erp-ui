@@ -9,8 +9,8 @@
  * with filter controls on the left and search on the right.
  */
 import { ref, watch } from 'vue'
-import { Search, X } from 'lucide-vue-next'
-import { AppInput } from '@/shared/components/primitives'
+import { Search, X, LayoutGrid } from 'lucide-vue-next'
+import { AppInput, AppButton } from '@/shared/components/primitives'
 
 const props = defineProps<{
   modelValue: string
@@ -70,54 +70,32 @@ function clear() {
         </AppInput>
       </div>
 
-      <!-- Density Toggle -->
-      <div
-        class="flex items-center bg-[var(--color-neutral-100)] p-0.5 rounded border border-[var(--color-neutral-200)]"
-      >
-        <button
-          class="px-2 py-1 text-xs rounded-sm transition-colors"
-          :class="
-            props.density === 'compact'
-              ? 'bg-white shadow-sm font-medium'
-              : 'text-[var(--color-neutral-500)] hover:text-black'
-          "
-          @click="emit('update:density', 'compact')"
-          title="Compact View"
-        >
-          Compact
-        </button>
-        <button
-          class="px-2 py-1 text-xs rounded-sm transition-colors"
-          :class="
-            props.density === 'standard'
-              ? 'bg-white shadow-sm font-medium'
-              : 'text-[var(--color-neutral-500)] hover:text-black'
-          "
-          @click="emit('update:density', 'standard')"
-          title="Standard View"
-        >
-          Standard
-        </button>
-        <button
-          class="px-2 py-1 text-xs rounded-sm transition-colors"
-          :class="
-            props.density === 'relaxed'
-              ? 'bg-white shadow-sm font-medium'
-              : 'text-[var(--color-neutral-500)] hover:text-black'
-          "
-          @click="emit('update:density', 'relaxed')"
-          title="Relaxed View"
-        >
-          Relaxed
-        </button>
-      </div>
-
       <slot />
     </div>
 
-    <!-- Right: Filter controls -->
+    <!-- Right: Filter controls + Grid Settings -->
     <div class="toolbar-right">
       <slot name="controls" />
+
+      <!-- Density Gutter (Relocated from Center) -->
+      <div
+        class="flex items-center bg-[var(--color-neutral-50)] p-0.5 rounded border border-[var(--color-neutral-200)] ml-1"
+      >
+        <button
+          v-for="d in ['compact', 'standard', 'relaxed'] as const"
+          :key="d"
+          class="px-2 py-1 text-[10px] font-bold uppercase tracking-tight rounded-sm transition-colors"
+          :class="
+            props.density === d
+              ? 'bg-white shadow-sm text-black'
+              : 'text-[var(--color-neutral-400)] hover:text-black'
+          "
+          @click="emit('update:density', d)"
+          :title="`${d.charAt(0).toUpperCase() + d.slice(1)} Density`"
+        >
+          {{ d[0] }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
