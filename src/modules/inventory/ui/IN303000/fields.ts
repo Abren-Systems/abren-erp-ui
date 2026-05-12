@@ -1,9 +1,9 @@
 import type { FieldDefinition } from '@/platform/field-system/field-definition.types'
-import type { AdjustmentDTO } from '../../infrastructure/api.types'
+import type { Adjustment } from '../../models/inventory.types'
 
 export const IN303000_FIELDS = {
-  warehouse_id: {
-    key: 'warehouse_id',
+  warehouseId: {
+    key: 'warehouseId',
     label: 'Warehouse',
     type: 'selector',
   },
@@ -12,4 +12,4 @@ export const IN303000_FIELDS = {
     label: 'Reason for Adjustment',
     type: 'text',
   },
-} satisfies Record<string, FieldDefinition<AdjustmentDTO>>
+} satisfies Record<string, FieldDefinition<Adjustment>>

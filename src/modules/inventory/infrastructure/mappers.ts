@@ -6,6 +6,7 @@ import type {
   StockItemId,
   BatchId,
   SerialNumberId,
+  AdjustmentId,
 } from '@/shared/types/brand.types'
 import type {
   WarehouseDTO,
@@ -15,7 +16,17 @@ import type {
   SerialNumberDTO,
   TrackingMode,
 } from './api.types'
-import type { Warehouse, Item, StockItem, Batch, SerialNumber } from '../models/inventory.types'
+import type {
+  Warehouse,
+  Item,
+  StockItem,
+  Batch,
+  SerialNumber,
+  Adjustment,
+  AdjustmentLine,
+  AdjustmentStatus,
+} from '../models/inventory.types'
+import type { AdjustmentDTO, AdjustmentLineDTO } from './api.types'
 
 /**
  * Mapper-as-Factory for the Inventory Module.
@@ -71,6 +82,25 @@ export class InventoryMapper {
       serialNumber: dto.serial_number,
       currentStockItemId: null, // TBD or populated by join
       isAvailable: dto.is_available,
+    }
+  }
+
+  static toAdjustment(dto: AdjustmentDTO): Adjustment {
+    return {
+      id: toId<AdjustmentId>(dto.id),
+      warehouseId: toId<WarehouseId>(dto.warehouse_id),
+      reason: dto.reason,
+      status: dto.status as unknown as AdjustmentStatus,
+      lines: dto.lines.map((l) => this.toAdjustmentLine(l)),
+    }
+  }
+
+  private static toAdjustmentLine(dto: AdjustmentLineDTO): AdjustmentLine {
+    return {
+      stockItemId: toId<StockItemId>(dto.stock_item_id),
+      quantityDelta: Number(dto.quantity_delta),
+      batchNumber: dto.batch_number ?? null,
+      serialIds: dto.serial_ids ? dto.serial_ids.map((id) => toId<SerialNumberId>(id)) : null,
     }
   }
 }

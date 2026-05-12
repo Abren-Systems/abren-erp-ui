@@ -13,7 +13,8 @@ import { IN303000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
-import type { AdjustmentDTO } from '../../infrastructure/api.types'
+import type { Adjustment } from '../../models/inventory.types'
+import type { AdjustmentId } from '@/shared/types/brand.types'
 
 const adjustmentLineSchema = z.object({
   stock_item_id: z.string().uuid('Required'),
@@ -33,9 +34,9 @@ type AdjustmentFormValues = z.infer<typeof adjustmentSchema>
 export function useAdjustmentController(id: string) {
   const router = useRouter()
   const isNew = computed(() => id === 'new')
-  const adjustmentId = computed(() => (isNew.value ? null : id))
+  const adjustmentId = computed(() => (isNew.value ? null : (id as AdjustmentId)))
 
-  const { inventoryAdjustment: entity, operations, isLoading, error } = useAdjustment(adjustmentId)
+  const { adjustment: entity, operations, isLoading, error } = useAdjustment(adjustmentId)
   const { createAdjustment, isPending: isSubmitting } = useInventoryAdjustment()
   const { warehouses } = useWarehouses()
 
@@ -66,7 +67,7 @@ export function useAdjustmentController(id: string) {
     },
   })
 
-  const base = useScreenController<AdjustmentDTO, AdjustmentStatus>({
+  const base = useScreenController<Adjustment, AdjustmentStatus>({
     screen: IN303000,
     dataSource: {
       entity,
@@ -94,7 +95,7 @@ export function useAdjustmentController(id: string) {
   })
 
   const fields = {
-    warehouse_id: useField(base, IN303000_FIELDS.warehouse_id),
+    warehouseId: useField(base, IN303000_FIELDS.warehouseId),
     reason: useField(base, IN303000_FIELDS.reason),
   }
 

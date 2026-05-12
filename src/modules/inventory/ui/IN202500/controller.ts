@@ -9,6 +9,7 @@ import { IN202500_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
+import type { StockItemId } from '@/shared/types/brand.types'
 
 const stockItemSchema = z.object({
   itemId: z.string().uuid('Required'),
@@ -21,7 +22,7 @@ type StockItemFormValues = z.infer<typeof stockItemSchema>
 
 export function useStockItemController(id: string) {
   const isNew = computed(() => id === 'new')
-  const stockItemId = computed(() => (isNew.value ? null : id))
+  const stockItemId = computed(() => (isNew.value ? null : (id as StockItemId)))
 
   const { stockItem: entity, isLoading, error } = useStockItem(stockItemId)
   const { warehouses } = useWarehouses()

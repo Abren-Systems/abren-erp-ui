@@ -8,6 +8,7 @@ import type { StockItem } from '../models/inventory.types'
 
 import type { ListQuery } from '@/shared/domain/pagination'
 import type { StockLevelDTO } from '../infrastructure/api.types'
+import type { WarehouseId, StockItemId } from '@/shared/types/brand.types'
 
 /**
  * Use Case: View All Stock Positions (Paginated)
@@ -40,7 +41,7 @@ export function useStockLevels(query?: ListQuery) {
  *
  * Retrieves stock physical reality per warehouse.
  */
-export function useStockPositions(warehouseId: Ref<string | undefined>) {
+export function useStockPositions(warehouseId: Ref<WarehouseId | undefined>) {
   const {
     data: stockItems,
     isPending,
@@ -63,7 +64,7 @@ export function useStockPositions(warehouseId: Ref<string | undefined>) {
 /**
  * Use Case: View Stock Item Detail
  */
-export function useStockItem(stockItemId: Ref<string | null>) {
+export function useStockItem(stockItemId: Ref<StockItemId | null>) {
   const {
     data: stockItem,
     isPending,

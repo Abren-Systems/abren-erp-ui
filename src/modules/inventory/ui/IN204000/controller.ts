@@ -9,6 +9,7 @@ import { useField } from '@/platform/field-system/bindings/useField'
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
 import type { Warehouse } from '../../models/inventory.types'
+import type { WarehouseId } from '@/shared/types/brand.types'
 
 const warehouseSchema = z.object({
   code: z.string().min(1, 'Required'),
@@ -22,7 +23,7 @@ type WarehouseFormValues = z.infer<typeof warehouseSchema>
 export function useWarehouseController(id: string) {
   const router = useRouter()
   const isNew = computed(() => id === 'new')
-  const warehouseId = computed(() => (isNew.value ? null : id))
+  const warehouseId = computed(() => (isNew.value ? null : (id as WarehouseId)))
 
   const { warehouse: entity, isLoading, error } = useWarehouse(warehouseId)
   const { createWarehouse, isCreating } = useCreateWarehouse()

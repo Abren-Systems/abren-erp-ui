@@ -4,6 +4,7 @@ import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { InventoryMapper } from '../infrastructure/mappers'
 import { inventoryKeys } from './query-keys'
 import type { Warehouse } from '../models/inventory.types'
+import type { WarehouseId } from '@/shared/types/brand.types'
 import type { WarehouseDTO } from '../infrastructure/api.types'
 
 /**
@@ -31,7 +32,7 @@ export function useWarehouses() {
 /**
  * Use Case: View Warehouse Detail
  */
-export function useWarehouse(warehouseId: Ref<string | null>) {
+export function useWarehouse(warehouseId: Ref<WarehouseId | null>) {
   const {
     data: warehouse,
     isPending,

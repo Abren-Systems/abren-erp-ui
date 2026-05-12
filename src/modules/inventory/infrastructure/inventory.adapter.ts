@@ -9,21 +9,18 @@ import type {
   AdjustmentDTO,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type {
-  Operational,
-  WorkflowOperations,
-} from '@/platform/workflow-runtime/models/workflows.types'
+import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 import {
-  WarehouseSchema,
-  ItemListSchema,
-  StockLevelSchema,
-  StockLevelListSchema,
-  BatchSchema,
-  SerialNumberSchema,
-  OperationalAdjustmentSchema,
-  AdjustmentListSchema,
-} from './api.schemas'
+  mapOperational,
+  mapOperationalList,
+  type OperationalDTO,
+  type OperationalListDTO,
+} from '@/platform/workflow-runtime/utils/operational'
+import { InventoryMapper } from './mappers'
+import { WarehouseSchema, StockLevelSchema, BatchSchema, SerialNumberSchema } from './api.schemas'
+import type { WarehouseId, StockItemId, ItemId, AdjustmentId } from '@/shared/types/brand.types'
+import type { Adjustment } from '../models/inventory.types'
 
 /**
  * Inventory API Adapter
@@ -36,7 +33,7 @@ export const inventoryAdapter = {
     return raw.map((item) => WarehouseSchema.parse(item))
   },
 
-  async getWarehouseById(id: string): Promise<WarehouseDTO> {
+  async getWarehouseById(id: WarehouseId): Promise<WarehouseDTO> {
     const raw = await apiGet<unknown>(`/inventory/warehouses/${id}`)
     return WarehouseSchema.parse(raw)
   },
@@ -47,71 +44,51 @@ export const inventoryAdapter = {
   },
 
   async getItems(query?: ListQuery): Promise<ListResponse<ItemDTO>> {
-    const raw = await apiGetEnvelope<unknown>('/inventory/items', { params: query })
-    const parsed = ItemListSchema.parse(raw.data)
-    return {
-      items: parsed.items,
-      totalCount: parsed.total_count,
-    }
+    const raw = await apiGetEnvelope<ListResponse<ItemDTO>>('/inventory/items', { params: query })
+    return raw.data
   },
 
   async getStockLevels(query?: ListQuery): Promise<ListResponse<StockLevelDTO>> {
-    const raw = await apiGetEnvelope<unknown>('/inventory/stock-positions', { params: query })
-    const parsed = StockLevelListSchema.parse(raw.data)
-    return {
-      items: parsed.items,
-      totalCount: parsed.total_count,
-    }
+    const raw = await apiGetEnvelope<ListResponse<StockLevelDTO>>('/inventory/stock-positions', {
+      params: query,
+    })
+    return raw.data
   },
 
-  async getStockByWarehouse(warehouseId: string): Promise<StockLevelDTO[]> {
+  async getStockByWarehouse(warehouseId: WarehouseId): Promise<StockLevelDTO[]> {
     const raw = await apiGet<unknown[]>(`/inventory/warehouses/${warehouseId}/stock`)
     return raw.map((item) => StockLevelSchema.parse(item))
   },
 
-  async getStockItemById(stockItemId: string): Promise<StockLevelDTO> {
+  async getStockItemById(stockItemId: StockItemId): Promise<StockLevelDTO> {
     const raw = await apiGet<unknown>(`/inventory/stock/${stockItemId}`)
     return StockLevelSchema.parse(raw)
   },
 
-  async getBatches(itemId: string): Promise<BatchDTO[]> {
+  async getBatches(itemId: ItemId): Promise<BatchDTO[]> {
     const raw = await apiGet<unknown[]>(`/inventory/items/${itemId}/batches`)
     return raw.map((item) => BatchSchema.parse(item))
   },
 
-  async getSerials(itemId: string): Promise<SerialNumberDTO[]> {
+  async getSerials(itemId: ItemId): Promise<SerialNumberDTO[]> {
     const raw = await apiGet<unknown[]>(`/inventory/items/${itemId}/serials`)
     return raw.map((item) => SerialNumberSchema.parse(item))
   },
 
-  async postAdjustment(dto: CreateAdjustmentDTO): Promise<Operational<AdjustmentDTO>> {
-    const raw = await apiPostEnvelope<unknown>('/inventory/adjustments', dto)
-    const parsed = OperationalAdjustmentSchema.parse(raw)
-    return {
-      ...(parsed.data as unknown as AdjustmentDTO),
-      __operations: parsed.operations as unknown as WorkflowOperations,
-    }
+  async postAdjustment(dto: CreateAdjustmentDTO): Promise<Operational<Adjustment>> {
+    const raw = await apiPostEnvelope<OperationalDTO<AdjustmentDTO>>('/inventory/adjustments', dto)
+    return mapOperational(raw.data, (dto: AdjustmentDTO) => InventoryMapper.toAdjustment(dto))
   },
 
-  async getAdjustmentById(id: string): Promise<Operational<AdjustmentDTO>> {
-    const raw = await apiGetEnvelope<unknown>(`/inventory/adjustments/${id}`)
-    const parsed = OperationalAdjustmentSchema.parse(raw)
-    return {
-      ...(parsed.data as unknown as AdjustmentDTO),
-      __operations: parsed.operations as unknown as WorkflowOperations,
-    }
+  async getAdjustmentById(id: AdjustmentId): Promise<Operational<Adjustment>> {
+    const raw = await apiGetEnvelope<OperationalDTO<AdjustmentDTO>>(`/inventory/adjustments/${id}`)
+    return mapOperational(raw.data, (dto: AdjustmentDTO) => InventoryMapper.toAdjustment(dto))
   },
 
-  async getAdjustments(query?: ListQuery): Promise<ListResponse<Operational<AdjustmentDTO>>> {
-    const raw = await apiGetEnvelope<unknown>('/inventory/adjustments', { params: query })
-    const parsed = AdjustmentListSchema.parse(raw.data)
-
-    return {
-      items: parsed.items.map((item) => ({
-        ...(item.data as unknown as AdjustmentDTO),
-        __operations: item.operations as unknown as WorkflowOperations,
-      })),
-      totalCount: parsed.total_count,
-    }
+  async getAdjustments(query?: ListQuery): Promise<ListResponse<Operational<Adjustment>>> {
+    const raw = await apiGetEnvelope<OperationalListDTO<AdjustmentDTO>>('/inventory/adjustments', {
+      params: query,
+    })
+    return mapOperationalList(raw.data, (dto: AdjustmentDTO) => InventoryMapper.toAdjustment(dto))
   },
 }

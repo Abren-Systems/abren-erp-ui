@@ -4,6 +4,7 @@ import { inventoryAdapter } from '../infrastructure/inventory.adapter'
 import { inventoryKeys } from './query-keys'
 import type { CreateAdjustmentDTO } from '../infrastructure/api.types'
 import type { ListQuery } from '@/shared/domain/pagination'
+import type { AdjustmentId, WarehouseId } from '@/shared/types/brand.types'
 
 export type { CreateAdjustmentDTO }
 
@@ -27,7 +28,7 @@ export function useInventoryAdjustment() {
     onSuccess: (_, variables) => {
       // Invalidate stock positions for this warehouse so UI updates
       void queryClient.invalidateQueries({
-        queryKey: inventoryKeys.stock(variables.warehouse_id),
+        queryKey: inventoryKeys.stock(variables.warehouse_id as WarehouseId),
       })
     },
   })
@@ -38,7 +39,7 @@ export function useInventoryAdjustment() {
 /**
  * Use Case: View Adjustment Detail
  */
-export function useAdjustment(adjustmentId: Ref<string | null>) {
+export function useAdjustment(adjustmentId: Ref<AdjustmentId | null>) {
   const {
     data: adjustment,
     isPending,
@@ -55,7 +56,7 @@ export function useAdjustment(adjustmentId: Ref<string | null>) {
   })
 
   return {
-    inventoryAdjustment: adjustment,
+    adjustment,
     operations: computed(() => adjustment.value?.__operations),
     isLoading: isPending,
     error,

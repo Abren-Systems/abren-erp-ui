@@ -5,6 +5,7 @@ import type {
   StockItemId,
   BatchId,
   SerialNumberId,
+  AdjustmentId,
 } from '@/shared/types/brand.types'
 
 export type TrackingMode = 'NONE' | 'BATCH' | 'SERIAL'
@@ -49,4 +50,21 @@ export interface SerialNumber {
   serialNumber: string
   currentStockItemId: StockItemId | null
   isAvailable: boolean
+}
+
+export type AdjustmentStatus = 'DRAFT' | 'POSTED' | 'CANCELLED'
+
+export interface AdjustmentLine {
+  stockItemId: StockItemId
+  quantityDelta: number
+  batchNumber?: string | null
+  serialIds?: SerialNumberId[] | null
+}
+
+export interface Adjustment {
+  id: AdjustmentId
+  warehouseId: WarehouseId
+  reason: string
+  status: AdjustmentStatus
+  lines: AdjustmentLine[]
 }
