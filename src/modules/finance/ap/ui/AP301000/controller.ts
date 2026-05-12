@@ -31,7 +31,7 @@ export function useVendorBillController(id: string) {
   // Data fetching
   const { vendorBill, operations, isLoading } = useVendorBill(billId)
   const { validate, isPending: isValidating } = useValidateVendorBill(billId)
-  const { reject, isPending: isRejecting } = useRejectVendorBill(id)
+  const { reject, isPending: isRejecting } = useRejectVendorBill(billId)
   const { cancel, isPending: isCancelling } = useCancelVendorBill(billId)
 
   // Creation form

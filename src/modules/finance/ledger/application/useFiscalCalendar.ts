@@ -7,6 +7,7 @@ import { LedgerMapper } from '../infrastructure/mappers'
 import type { FiscalYear } from '../models/fiscal-calendar.types'
 import type { GenerateFiscalYearDTO } from '../infrastructure/api.types'
 import type { ApiError } from '@/shared/api/http-client'
+import type { FiscalYearId, FiscalPeriodId } from '@/shared/types/brand.types'
 
 /**
  * Use Case: Manage Fiscal Calendar (Years and Periods).
@@ -20,7 +21,7 @@ export function useFiscalCalendar() {
   const queryClient = useQueryClient()
 
   const {
-    data: years,
+    data: fiscalYears,
     isLoading: isLoadingYears,
     error: yearsError,
     refetch: refreshYears,
@@ -52,21 +53,21 @@ export function useFiscalCalendar() {
   )
 
   return {
-    years,
+    fiscalYears,
     isLoading: isLoadingYears || isGenerating,
     error: yearsError,
     refresh: refreshYears,
     generateYear,
     isGenerating,
     // Period Actions
-    closePeriod: (id: string) => ledgerAdapter.closePeriod(id).then(() => refreshYears()),
-    openPeriod: (id: string) => ledgerAdapter.openPeriod(id).then(() => refreshYears()),
-    lockPeriod: (id: string) => ledgerAdapter.lockPeriod(id).then(() => refreshYears()),
-    unlockPeriod: (id: string) => ledgerAdapter.unlockPeriod(id).then(() => refreshYears()),
+    closePeriod: (id: FiscalPeriodId) => ledgerAdapter.closePeriod(id).then(() => refreshYears()),
+    openPeriod: (id: FiscalPeriodId) => ledgerAdapter.openPeriod(id).then(() => refreshYears()),
+    lockPeriod: (id: FiscalPeriodId) => ledgerAdapter.lockPeriod(id).then(() => refreshYears()),
+    unlockPeriod: (id: FiscalPeriodId) => ledgerAdapter.unlockPeriod(id).then(() => refreshYears()),
     // Year Actions
-    closeYear: (id: string) => ledgerAdapter.closeYear(id).then(() => refreshYears()),
-    openYear: (id: string) => ledgerAdapter.openYear(id).then(() => refreshYears()),
-    lockYear: (id: string) => ledgerAdapter.lockYear(id).then(() => refreshYears()),
-    unlockYear: (id: string) => ledgerAdapter.unlockYear(id).then(() => refreshYears()),
+    closeYear: (id: FiscalYearId) => ledgerAdapter.closeYear(id).then(() => refreshYears()),
+    openYear: (id: FiscalYearId) => ledgerAdapter.openYear(id).then(() => refreshYears()),
+    lockYear: (id: FiscalYearId) => ledgerAdapter.lockYear(id).then(() => refreshYears()),
+    unlockYear: (id: FiscalYearId) => ledgerAdapter.unlockYear(id).then(() => refreshYears()),
   }
 }

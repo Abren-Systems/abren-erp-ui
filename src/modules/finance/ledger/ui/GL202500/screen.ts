@@ -1,13 +1,13 @@
 import { GL202500_COMMANDS } from './commands'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
-import type { ModuleId } from '@/shared/types/brand.types'
+import type { AccountId, ModuleId } from '@/shared/types/brand.types'
 import { useAccountController } from './controller'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const GL202500: ScreenDefinition = {
   id: createScreenId('GL202500'),
   moduleId: 'ledger' as ModuleId,
-  controller: (ctx) => useAccountController(ctx.params['id'] as string),
+  controller: (ctx) => useAccountController(ctx.params['id'] as AccountId),
   kind: 'maintenance',
   titleKey: 'Chart of Accounts',
   primaryView: 'account',

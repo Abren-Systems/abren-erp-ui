@@ -6,6 +6,7 @@ import { ledgerKeys } from './query-keys'
 import type { ApiError } from '@/shared/api/http-client'
 import type { JournalEntry } from '../models/journal-entry.types'
 import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
+import type { JournalEntryId } from '@/shared/types/brand.types'
 
 /**
  * Use Case: Focus on a single Journal Entry.
@@ -14,17 +15,17 @@ import type { Operational } from '@/platform/workflow-runtime/models/workflows.t
  * Provides the entry, state-advancing mutations (post, void), and a loading state
  * that consolidates all async operations.
  *
- * @param entryId - The UUID string of the journal entry to manage.
+ * @param entryId - The branded ID of the journal entry to manage.
  * @returns Reactive single-entry state and management methods.
  *
  * @example
- * const { entry, postEntry, voidEntry, isLoading } = useJournalEntry(props.entryId)
+ * const { journalEntry, postEntry, voidEntry, isLoading } = useJournalEntry(props.entryId)
  */
-export function useJournalEntry(entryId: string) {
+export function useJournalEntry(entryId: JournalEntryId) {
   const queryClient = useQueryClient()
 
   const {
-    data: entry,
+    data: journalEntry,
     isLoading: isFetching,
     error,
     refetch,
@@ -42,7 +43,7 @@ export function useJournalEntry(entryId: string) {
     void
   >(
     async () => {
-      const version = entry.value?.__operations?.version ?? 1
+      const version = journalEntry.value?.__operations?.version ?? 1
       return await ledgerAdapter.postJournalEntry(entryId, version)
     },
     {
@@ -67,7 +68,7 @@ export function useJournalEntry(entryId: string) {
     { reason: string }
   >(
     async ({ reason }) => {
-      const version = entry.value?.__operations?.version ?? 1
+      const version = journalEntry.value?.__operations?.version ?? 1
       return await ledgerAdapter.voidJournalEntry(entryId, { reason, expected_version: version })
     },
     {
@@ -81,7 +82,7 @@ export function useJournalEntry(entryId: string) {
   )
 
   return {
-    entry,
+    journalEntry,
     isLoading: isFetching || isPosting || isVoiding,
     error,
     refetch,

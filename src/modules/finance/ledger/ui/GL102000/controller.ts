@@ -21,7 +21,7 @@ type LedgerSettingsFormEntity = LedgerSettingsFormValues
 
 export function useLedgerSettingsController() {
   const { settings, isLoading, error, updateSettings } = useLedgerSettings()
-  const { accounts, isPending: isAccountsLoading } = useLedgerAccounts()
+  const { ledgerAccounts, isPending: isAccountsLoading } = useLedgerAccounts()
 
   const form = useForm({
     defaultValues: {
@@ -64,7 +64,7 @@ export function useLedgerSettingsController() {
     },
     isNew: computed(() => false),
     getDomainState: () => {
-      if (!isAccountsLoading.value && accounts.value?.length === 0) {
+      if (!isAccountsLoading.value && ledgerAccounts.value?.length === 0) {
         return 'MISSING_PREREQUISITES'
       }
       return 'OPEN'
@@ -86,7 +86,7 @@ export function useLedgerSettingsController() {
 
   const accountOptions = computed(
     () =>
-      accounts.value?.map((acc) => ({
+      ledgerAccounts.value?.map((acc) => ({
         label: `${acc.code} - ${acc.name}`,
         value: acc.id,
       })) || [],

@@ -12,7 +12,7 @@ import { TX2055PL } from './screen'
 export function useTaxGroupsListController() {
   const gridState = useDataGrid()
   const router = useRouter()
-  const { data: groups, isLoading, error, refetch } = useActiveTaxGroups()
+  const { taxGroups: groups, isLoading, error, refetch } = useActiveTaxGroups()
 
   const base = useScreenController({
     screen: TX2055PL,

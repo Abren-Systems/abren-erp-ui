@@ -7,20 +7,22 @@ import { GL301000 } from './screen'
 import { GL301000_FIELDS } from './fields'
 import { GL301000_POLICY, type JournalEntryStatus } from './policy'
 import { useField } from '@/platform/field-system/bindings'
+import type { JournalEntryId } from '@/shared/types/brand.types'
 
 export function useJournalEntryController(id: string) {
   const router = useRouter()
   const isNew = computed(() => id === 'new')
+  const journalEntryId = id as JournalEntryId
 
   // ── Data Sources ──
-  const { entry, isLoading, postEntry, voidEntry } = useJournalEntry(id)
+  const { journalEntry, isLoading, postEntry, voidEntry } = useJournalEntry(journalEntryId)
 
   // ── Platform Base ──
   const base = useScreenController<JournalEntry, JournalEntryStatus>({
     screen: GL301000,
     dataSource: {
-      entity: computed(() => entry.value),
-      operations: computed(() => entry.value?.__operations),
+      entity: computed(() => journalEntry.value),
+      operations: computed(() => journalEntry.value?.__operations),
       isLoading,
       error: ref(null),
     },
@@ -41,7 +43,7 @@ export function useJournalEntryController(id: string) {
   })
 
   // ── Grid Data ──
-  const currentLines = computed(() => entry.value?.lines || [])
+  const currentLines = computed(() => journalEntry.value?.lines || [])
   const activeTab = ref('Journal Lines')
 
   // ── Field Bindings ──

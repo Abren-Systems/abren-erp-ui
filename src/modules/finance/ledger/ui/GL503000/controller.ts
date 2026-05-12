@@ -6,11 +6,12 @@ import { useFiscalCalendar } from '../../application/useFiscalCalendar'
 import { GL503000 } from './screen'
 import { GL503000_FIELDS } from './fields'
 import type { ApiError } from '@/shared/api/http-client'
+import type { FiscalYearId, FiscalPeriodId } from '@/shared/types/brand.types'
 
 export type PeriodProcessAction = 'CLOSE' | 'OPEN' | 'LOCK' | 'UNLOCK'
 
 export function useManagePeriodsController() {
-  const { years, isLoading, error, closePeriod, openPeriod, lockPeriod, unlockPeriod } =
+  const { fiscalYears, isLoading, error, closePeriod, openPeriod, lockPeriod, unlockPeriod } =
     useFiscalCalendar()
   const gridState = useDataGrid()
 
@@ -27,13 +28,13 @@ export function useManagePeriodsController() {
   })
 
   // Header State
-  const selectedYearId = ref<string | null>(null)
+  const selectedYearId = ref<FiscalYearId | null>(null)
   const selectedAction = ref<PeriodProcessAction>('CLOSE')
   const isProcessing = ref(false)
 
   // Options
   const yearOptions = computed(() =>
-    (years.value || []).map((y) => ({
+    (fiscalYears.value || []).map((y) => ({
       label: y.year,
       value: y.id,
     })),
@@ -48,14 +49,14 @@ export function useManagePeriodsController() {
 
   // Data
   const periods = computed(() => {
-    if (!selectedYearId.value || !years.value) return []
-    const year = years.value.find((y) => y.id === selectedYearId.value)
+    if (!selectedYearId.value || !fiscalYears.value) return []
+    const year = fiscalYears.value.find((y) => y.id === selectedYearId.value)
     return year?.periods || []
   })
 
   // Set default year
   watch(
-    years,
+    fiscalYears,
     (val) => {
       if (val && val.length > 0 && !selectedYearId.value) {
         selectedYearId.value = val[0]?.id || null
@@ -74,19 +75,20 @@ export function useManagePeriodsController() {
 
     try {
       for (const id of selectedIds) {
+        const brandedId = id as FiscalPeriodId
         try {
           switch (selectedAction.value) {
             case 'CLOSE':
-              await closePeriod(id)
+              await closePeriod(brandedId)
               break
             case 'OPEN':
-              await openPeriod(id)
+              await openPeriod(brandedId)
               break
             case 'LOCK':
-              await lockPeriod(id)
+              await lockPeriod(brandedId)
               break
             case 'UNLOCK':
-              await unlockPeriod(id)
+              await unlockPeriod(brandedId)
               break
           }
           successCount++

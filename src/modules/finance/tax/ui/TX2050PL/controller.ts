@@ -12,7 +12,7 @@ import { TX2050PL } from './screen'
 export function useTaxRulesListController() {
   const gridState = useDataGrid()
   const router = useRouter()
-  const { data: rules, isLoading, error, refetch } = useActiveTaxRules()
+  const { taxRules: rules, isLoading, error, refetch } = useActiveTaxRules()
 
   const base = useScreenController({
     screen: TX2050PL,

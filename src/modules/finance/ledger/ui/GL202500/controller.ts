@@ -7,15 +7,16 @@ import { GL202500_FIELDS } from './fields'
 import { GL202500_POLICY, type AccountStatus } from './policy'
 import { useField } from '@/platform/field-system/bindings/useField'
 import type { Account } from '../../models/account.types'
+import type { AccountId } from '@/shared/types/brand.types'
 
-export function useAccountController(id: string) {
+export function useAccountController(id: AccountId) {
   const router = useRouter()
   const isNew = computed(() => id === 'new')
 
   // We are grabbing accounts from the list cache.
   // In a real app we would have a specific detail query.
-  const { accounts, isPending: isLoading } = useLedgerAccounts()
-  const account = computed(() => accounts.value?.find((a) => a.id === id) ?? null)
+  const { ledgerAccounts, isPending: isLoading } = useLedgerAccounts()
+  const account = computed(() => ledgerAccounts.value?.find((a) => a.id === id) ?? null)
 
   const base = useScreenController<Account, AccountStatus>({
     screen: GL202500,

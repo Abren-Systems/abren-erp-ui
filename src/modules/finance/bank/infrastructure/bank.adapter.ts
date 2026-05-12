@@ -1,4 +1,4 @@
-import type { BankAccountId } from '@/shared/types/brand.types'
+import type { BankAccountId, ScheduledPaymentId } from '@/shared/types/brand.types'
 import type { ScheduledPayment } from '../models/bank.types'
 import type {
   BankAccountDTO,
@@ -7,17 +7,14 @@ import type {
   CreateScheduledPaymentRequest,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type {
-  Operational,
-  WorkflowOperations,
-} from '@/platform/workflow-runtime/models/workflows.types'
+import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 import {
-  BankAccountListSchema,
-  BankTransactionListSchema,
-  ScheduledPaymentListSchema,
-  OperationalScheduledPaymentSchema,
-} from './api.schemas'
+  mapOperational,
+  mapOperationalList,
+  type OperationalDTO,
+  type OperationalListDTO,
+} from '@/platform/workflow-runtime/utils/operational'
 import { BankMapper } from './mappers'
 
 /**
@@ -31,12 +28,10 @@ export const bankAdapter = {
    * Fetches all banking accounts for the current tenant (Paginated).
    */
   async getBankAccounts(query?: ListQuery): Promise<ListResponse<BankAccountDTO>> {
-    const raw = await apiGetEnvelope<unknown>('/finance/bank/accounts', { params: query })
-    const parsed = BankAccountListSchema.parse(raw.data)
-    return {
-      items: parsed.items,
-      totalCount: parsed.total_count,
-    }
+    const raw = await apiGetEnvelope<ListResponse<BankAccountDTO>>('/finance/bank/accounts', {
+      params: query,
+    })
+    return raw.data
   },
 
   /**
@@ -49,14 +44,13 @@ export const bankAdapter = {
     accountId: BankAccountId,
     query?: ListQuery,
   ): Promise<ListResponse<BankTransactionDTO>> {
-    const raw = await apiGetEnvelope<unknown>(`/finance/bank/accounts/${accountId}/transactions`, {
-      params: query,
-    })
-    const parsed = BankTransactionListSchema.parse(raw.data)
-    return {
-      items: parsed.items,
-      totalCount: parsed.total_count,
-    }
+    const raw = await apiGetEnvelope<ListResponse<BankTransactionDTO>>(
+      `/finance/bank/accounts/${accountId}/transactions`,
+      {
+        params: query,
+      },
+    )
+    return raw.data
   },
 
   /**
@@ -65,16 +59,11 @@ export const bankAdapter = {
   async getScheduledPayments(
     query?: ListQuery,
   ): Promise<ListResponse<Operational<ScheduledPayment>>> {
-    const raw = await apiGetEnvelope<unknown>('/finance/bank/scheduled-payments', { params: query })
-    const parsed = ScheduledPaymentListSchema.parse(raw.data)
-
-    return {
-      items: parsed.items.map((item) => ({
-        ...BankMapper.toScheduledPayment(item.data as ScheduledPaymentDTO),
-        __operations: item.operations as unknown as WorkflowOperations,
-      })),
-      totalCount: parsed.total_count,
-    }
+    const raw = await apiGetEnvelope<OperationalListDTO<ScheduledPaymentDTO>>(
+      '/finance/bank/scheduled-payments',
+      { params: query },
+    )
+    return mapOperationalList(raw.data, (dto) => BankMapper.toScheduledPayment(dto))
   },
 
   /**
@@ -86,12 +75,11 @@ export const bankAdapter = {
   async createScheduledPayment(
     data: CreateScheduledPaymentRequest,
   ): Promise<Operational<ScheduledPayment>> {
-    const raw = await apiPostEnvelope<unknown>('/finance/bank/scheduled-payments', data)
-    const parsed = OperationalScheduledPaymentSchema.parse(raw)
-    return {
-      ...BankMapper.toScheduledPayment(parsed.data as ScheduledPaymentDTO),
-      __operations: parsed.operations as unknown as WorkflowOperations,
-    }
+    const raw = await apiPostEnvelope<OperationalDTO<ScheduledPaymentDTO>>(
+      '/finance/bank/scheduled-payments',
+      data,
+    )
+    return mapOperational(raw.data, (dto) => BankMapper.toScheduledPayment(dto))
   },
 
   /**
@@ -100,14 +88,12 @@ export const bankAdapter = {
    * @param paymentId - The unique identifier of the payment.
    * @returns The updated and validated ScheduledPayment domain model.
    */
-  async releaseScheduledPayment(paymentId: string): Promise<Operational<ScheduledPayment>> {
-    const raw = await apiPostEnvelope<unknown>(
+  async releaseScheduledPayment(
+    paymentId: ScheduledPaymentId,
+  ): Promise<Operational<ScheduledPayment>> {
+    const raw = await apiPostEnvelope<OperationalDTO<ScheduledPaymentDTO>>(
       `/finance/bank/scheduled-payments/${paymentId}/release`,
     )
-    const parsed = OperationalScheduledPaymentSchema.parse(raw)
-    return {
-      ...BankMapper.toScheduledPayment(parsed.data as ScheduledPaymentDTO),
-      __operations: parsed.operations as unknown as WorkflowOperations,
-    }
+    return mapOperational(raw.data, (dto) => BankMapper.toScheduledPayment(dto))
   },
 }

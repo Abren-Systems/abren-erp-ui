@@ -12,7 +12,7 @@ import { GL2025PL } from './screen'
 export function useAccountListController() {
   const gridState = useDataGrid()
   const router = useRouter()
-  const { accounts, isPending, error, refetch } = useLedgerAccounts()
+  const { ledgerAccounts, isPending, error, refetch } = useLedgerAccounts()
 
   const base = useScreenController({
     screen: GL2025PL,
@@ -22,7 +22,7 @@ export function useAccountListController() {
     statePolicy: LIST_SCREEN_POLICY,
     grids: computed(() => ({
       primary: {
-        data: accounts.value || [],
+        data: ledgerAccounts.value || [],
         columns: [], // We'll add this later if needed
         selection: gridState.rowSelection.value,
         filters: {},
@@ -43,7 +43,7 @@ export function useAccountListController() {
 
   return {
     ...base,
-    accounts,
+    ledgerAccounts,
     refresh: refetch,
     handleRowClick,
     gridState,

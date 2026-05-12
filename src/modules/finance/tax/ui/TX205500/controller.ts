@@ -33,8 +33,8 @@ export function useTaxGroupController(id: string) {
   const isNew = computed(() => id === 'new')
   const groupId = computed(() => (isNew.value ? null : (id as TaxGroupId)))
 
-  const { data: entity, isLoading, error } = useTaxGroup(groupId)
-  const { data: availableRules, isLoading: isRulesLoading } = useActiveTaxRules()
+  const { taxGroup: entity, isLoading, error } = useTaxGroup(groupId)
+  const { taxRules: availableRules, isLoading: isRulesLoading } = useActiveTaxRules()
   const { mutateAsync: createGroup, isPending: isCreating } = useCreateTaxGroup()
 
   const form = useForm({

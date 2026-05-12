@@ -7,12 +7,7 @@ import { apKeys } from './query-keys'
 /**
  * Use Case: View a Single Vendor Bill.
  *
- * Fetches and maps a specific vendor bill by ID. Supports reactive IDs.
- *
- * @param id - The unique identifier (or Ref/Getter) of the vendor bill.
- * @returns Reactive vendor bill state.
- * @example
- * const { bill, isLoading } = useVendorBill(() => props.id)
+ * @param id - The unique identifier of the vendor bill.
  */
 export function useVendorBill(id: MaybeRefOrGetter<VendorBillId | null | undefined>) {
   const {

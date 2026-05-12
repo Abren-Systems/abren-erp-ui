@@ -12,7 +12,7 @@ export function useLedgerAccounts() {
   const queryClient = useQueryClient()
 
   const {
-    data: accounts,
+    data: ledgerAccounts,
     isPending,
     error,
     refetch,
@@ -31,7 +31,7 @@ export function useLedgerAccounts() {
   })
 
   return {
-    accounts,
+    ledgerAccounts,
     isPending,
     error,
     refetch,

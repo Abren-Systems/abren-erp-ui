@@ -18,29 +18,41 @@ export const taxKeys = {
 }
 
 export function useActiveTaxRules() {
-  const query = useQuery<TaxRule[]>({
+  const {
+    data: taxRules,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<TaxRule[]>({
     queryKey: taxKeys.rules(),
     queryFn: () => TaxAdapter.getActiveRules(),
   })
 
   return {
-    ...query,
-    isLoading: computed(() => query.isLoading.value),
-    error: computed(() => query.error.value),
+    taxRules,
+    isLoading,
+    error,
+    refetch,
   }
 }
 
 export function useTaxRule(ruleId: Ref<TaxRuleId | null>) {
-  const query = useQuery<TaxRule | null>({
+  const {
+    data: taxRule,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<TaxRule | null>({
     queryKey: computed(() => taxKeys.ruleDetail(ruleId.value as string)),
     queryFn: () => (ruleId.value ? TaxAdapter.getRuleById(ruleId.value) : null),
     enabled: computed(() => !!ruleId.value && ruleId.value !== ('new' as unknown)),
   })
 
   return {
-    ...query,
-    isLoading: computed(() => query.isLoading.value),
-    error: computed(() => query.error.value),
+    taxRule,
+    isLoading,
+    error,
+    refetch,
   }
 }
 
@@ -55,29 +67,41 @@ export function useCreateTaxRule() {
 }
 
 export function useActiveTaxGroups() {
-  const query = useQuery<TaxGroup[]>({
+  const {
+    data: taxGroups,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<TaxGroup[]>({
     queryKey: taxKeys.groups(),
     queryFn: () => TaxAdapter.getActiveGroups(),
   })
 
   return {
-    ...query,
-    isLoading: computed(() => query.isLoading.value),
-    error: computed(() => query.error.value),
+    taxGroups,
+    isLoading,
+    error,
+    refetch,
   }
 }
 
 export function useTaxGroup(groupId: Ref<TaxGroupId | null>) {
-  const query = useQuery<TaxGroup | null>({
+  const {
+    data: taxGroup,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<TaxGroup | null>({
     queryKey: computed(() => taxKeys.groupDetail(groupId.value as string)),
     queryFn: () => (groupId.value ? TaxAdapter.getGroupById(groupId.value) : null),
     enabled: computed(() => !!groupId.value && groupId.value !== ('new' as unknown)),
   })
 
   return {
-    ...query,
-    isLoading: computed(() => query.isLoading.value),
-    error: computed(() => query.error.value),
+    taxGroup,
+    isLoading,
+    error,
+    refetch,
   }
 }
 

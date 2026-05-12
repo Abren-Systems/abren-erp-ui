@@ -29,8 +29,8 @@ export function useTaxRuleController(id: string) {
   const isNew = computed(() => id === 'new')
   const ruleId = computed(() => (isNew.value ? null : (id as TaxRuleId)))
 
-  const { data: entity, isLoading, error } = useTaxRule(ruleId)
-  const { accounts, isPending: isAccountsLoading } = useLedgerAccounts()
+  const { taxRule: entity, isLoading, error } = useTaxRule(ruleId)
+  const { ledgerAccounts, isPending: isAccountsLoading } = useLedgerAccounts()
   const { mutateAsync: createRule, isPending: isCreating } = useCreateTaxRule()
 
   const form = useForm({
@@ -115,7 +115,7 @@ export function useTaxRuleController(id: string) {
 
   const accountOptions = computed(
     () =>
-      accounts.value?.map((acc: Account) => ({
+      ledgerAccounts.value?.map((acc: Account) => ({
         label: `${acc.code} - ${acc.name}`,
         value: acc.id,
       })) || [],

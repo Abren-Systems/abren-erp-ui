@@ -1,79 +1,58 @@
 import { apiGet, apiPost } from '@/shared/api/http-client'
-import {
-  PaymentRequestSchema,
-  PaymentRequestListSchema,
-  PaymentRequestStatsSchema,
-  VendorBillSchema,
-  VendorBillListSchema,
-  OperationalPaymentRequestSchema,
-  OperationalVendorBillSchema,
-} from './api.schemas'
+import { PaymentRequestSchema, PaymentRequestStatsSchema, VendorBillSchema } from './api.schemas'
 import type {
   CreatePaymentRequestDTO,
   RejectPaymentRequestDTO,
   CreateVendorBillDTO,
-  VendorBillDTO,
   PaymentRequestDTO,
+  VendorBillDTO,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type {
-  Operational,
-  WorkflowOperations,
-} from '@/platform/workflow-runtime/models/workflows.types'
+import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope } from '@/shared/api/http-client'
+import {
+  mapOperational,
+  mapOperationalList,
+  type OperationalDTO,
+  type OperationalListDTO,
+} from '@/platform/workflow-runtime/utils/operational'
 import { APMapper } from './mappers'
 import { Money } from '@/shared/domain/money'
 import type { PaymentRequest, PaymentRequestStats, VendorBill } from '../models/ap.types'
+import type { PaymentRequestId, VendorBillId, UserId } from '@/shared/types/brand.types'
 
 const REQUESTS_BASE = '/finance/ap/payment-requests'
 const BILLS_BASE = '/finance/ap/vendor-bills'
 
 /**
- * Accounts Payable API Adapter — Gold Standard Implementation.
+ * Accounts Payable API Adapter
  *
- * Boundary Shielding: Every incoming response is parsed by a Zod schema
- * to ensure runtime integrity and fail-fast debugging.
+ * All incoming responses are parsed by Zod schemas to ensure runtime integrity and fail-fast debugging.
  */
 export const apAdapter = {
   /**
    * Fetches a paginated list of Payment Requests.
    */
   async listRequests(query?: ListQuery): Promise<ListResponse<Operational<PaymentRequest>>> {
-    const raw = await apiGetEnvelope<unknown>(REQUESTS_BASE, { params: query })
-    const parsed = PaymentRequestListSchema.parse(raw.data)
-
-    return {
-      items: parsed.items.map((item) => ({
-        ...APMapper.toPaymentRequest(item.data as unknown as PaymentRequestDTO),
-        __operations: item.operations as unknown as WorkflowOperations,
-      })),
-      totalCount: parsed.total_count,
-    }
+    const raw = await apiGetEnvelope<OperationalListDTO<PaymentRequestDTO>>(REQUESTS_BASE, {
+      params: query,
+    })
+    return mapOperationalList(raw.data, (dto) => APMapper.toPaymentRequest(dto))
   },
 
-  async getRequestsByUser(userId: string): Promise<ListResponse<Operational<PaymentRequest>>> {
-    const raw = await apiGetEnvelope<unknown>(`${REQUESTS_BASE}/user/${userId}`)
-    const parsed = PaymentRequestListSchema.parse(raw.data)
-
-    return {
-      items: parsed.items.map((item) => ({
-        ...APMapper.toPaymentRequest(item.data as unknown as PaymentRequestDTO),
-        __operations: item.operations as unknown as WorkflowOperations,
-      })),
-      totalCount: parsed.total_count,
-    }
+  async getRequestsByUser(userId: UserId): Promise<ListResponse<Operational<PaymentRequest>>> {
+    const raw = await apiGetEnvelope<OperationalListDTO<PaymentRequestDTO>>(
+      `${REQUESTS_BASE}/user/${userId}`,
+    )
+    return mapOperationalList(raw.data, (dto) => APMapper.toPaymentRequest(dto))
   },
 
   /**
    * Fetches a single Payment Request by ID.
    */
-  async getRequest(id: string): Promise<Operational<PaymentRequest>> {
-    const raw = await apiGetEnvelope<unknown>(`${REQUESTS_BASE}/${id}`)
-    const parsed = OperationalPaymentRequestSchema.parse(raw)
-    return {
-      ...APMapper.toPaymentRequest(parsed.data as unknown as PaymentRequestDTO),
-      __operations: parsed.operations as unknown as WorkflowOperations,
-    }
+  async getRequest(id: PaymentRequestId): Promise<Operational<PaymentRequest>> {
+    const raw = await apiGetEnvelope<OperationalDTO<PaymentRequestDTO>>(`${REQUESTS_BASE}/${id}`)
+    return mapOperational(raw.data, (dto) => APMapper.toPaymentRequest(dto))
   },
 
   /**
@@ -106,7 +85,7 @@ export const apAdapter = {
   /**
    * Submits a draft Payment Request for approval.
    */
-  async submitRequest(id: string, version: number): Promise<PaymentRequest> {
+  async submitRequest(id: PaymentRequestId, version: number): Promise<PaymentRequest> {
     const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/submit`, undefined, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
@@ -114,7 +93,7 @@ export const apAdapter = {
   /**
    * Approves a submitted Payment Request.
    */
-  async approveRequest(id: string, version: number): Promise<PaymentRequest> {
+  async approveRequest(id: PaymentRequestId, version: number): Promise<PaymentRequest> {
     const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/approve`, undefined, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
@@ -123,7 +102,7 @@ export const apAdapter = {
    * Rejects a submitted Payment Request with a reason.
    */
   async rejectRequest(
-    id: string,
+    id: PaymentRequestId,
     dto: RejectPaymentRequestDTO,
     version: number,
   ): Promise<PaymentRequest> {
@@ -134,7 +113,7 @@ export const apAdapter = {
   /**
    * Authorizes an approved Payment Request.
    */
-  async authorizeRequest(id: string, version: number): Promise<PaymentRequest> {
+  async authorizeRequest(id: PaymentRequestId, version: number): Promise<PaymentRequest> {
     const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/authorize`, undefined, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
@@ -142,7 +121,11 @@ export const apAdapter = {
   /**
    * Cancels a Payment Request with a reason.
    */
-  async cancelRequest(id: string, reason: string, version: number): Promise<PaymentRequest> {
+  async cancelRequest(
+    id: PaymentRequestId,
+    reason: string,
+    version: number,
+  ): Promise<PaymentRequest> {
     const raw = await apiPost<unknown>(`${REQUESTS_BASE}/${id}/cancel`, { reason }, { version })
     return APMapper.toPaymentRequest(PaymentRequestSchema.parse(raw))
   },
@@ -151,34 +134,24 @@ export const apAdapter = {
    * Fetches a paginated list of Vendor Bills.
    */
   async listBills(query?: ListQuery): Promise<ListResponse<Operational<VendorBill>>> {
-    const raw = await apiGetEnvelope<unknown>(BILLS_BASE, { params: query })
-    const parsed = VendorBillListSchema.parse(raw.data)
-
-    return {
-      items: parsed.items.map((item) => ({
-        ...APMapper.toVendorBill(item.data as VendorBillDTO),
-        __operations: item.operations as unknown as WorkflowOperations,
-      })),
-      totalCount: parsed.total_count,
-    }
+    const raw = await apiGetEnvelope<OperationalListDTO<VendorBillDTO>>(BILLS_BASE, {
+      params: query,
+    })
+    return mapOperationalList(raw.data, (dto) => APMapper.toVendorBill(dto))
   },
 
   /**
    * Fetches a single Vendor Bill by ID.
    */
-  async getBill(id: string): Promise<Operational<VendorBill>> {
-    const raw = await apiGetEnvelope<unknown>(`${BILLS_BASE}/${id}`)
-    const parsed = OperationalVendorBillSchema.parse(raw)
-    return {
-      ...APMapper.toVendorBill(parsed.data),
-      __operations: parsed.operations as unknown as WorkflowOperations,
-    }
+  async getBill(id: VendorBillId): Promise<Operational<VendorBill>> {
+    const raw = await apiGetEnvelope<OperationalDTO<VendorBillDTO>>(`${BILLS_BASE}/${id}`)
+    return mapOperational(raw.data, (dto) => APMapper.toVendorBill(dto))
   },
 
   /**
    * Validates a Vendor Bill.
    */
-  async validateBill(id: string): Promise<VendorBill> {
+  async validateBill(id: VendorBillId): Promise<VendorBill> {
     const raw = await apiPost<unknown>(`${BILLS_BASE}/${id}/validate`)
     return APMapper.toVendorBill(VendorBillSchema.parse(raw))
   },
@@ -186,7 +159,7 @@ export const apAdapter = {
   /**
    * Rejects a Vendor Bill with a reason.
    */
-  async rejectBill(id: string, reason: string): Promise<VendorBill> {
+  async rejectBill(id: VendorBillId, reason: string): Promise<VendorBill> {
     const raw = await apiPost<unknown>(`${BILLS_BASE}/${id}/reject`, {
       reason,
     })
@@ -204,7 +177,7 @@ export const apAdapter = {
   /**
    * Cancels a Vendor Bill with a reason.
    */
-  async cancelBill(id: string, reason: string): Promise<VendorBill> {
+  async cancelBill(id: VendorBillId, reason: string): Promise<VendorBill> {
     const raw = await apiPost<unknown>(`${BILLS_BASE}/${id}/cancel`, { reason })
     return APMapper.toVendorBill(VendorBillSchema.parse(raw))
   },

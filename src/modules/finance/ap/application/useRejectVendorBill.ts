@@ -9,7 +9,7 @@ import type { VendorBillId } from '@/shared/types/brand.types'
 import type { ApiError } from '@/shared/api/http-client'
 import type { VendorBill } from '../models/ap.types'
 
-export function useRejectVendorBill(id: string | Ref<string>) {
+export function useRejectVendorBill(id: VendorBillId | Ref<VendorBillId>) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({

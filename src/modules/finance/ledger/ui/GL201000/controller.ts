@@ -7,13 +7,14 @@ import {
 import { useDataGrid } from '@/shared/components/data-grid'
 import { useFiscalCalendar } from '../../application/useFiscalCalendar'
 import { GL201000 } from './screen'
+import type { FiscalYearId, FiscalPeriodId } from '@/shared/types/brand.types'
 
 export function useFiscalPeriodsController() {
-  const { years, isLoading, error, refresh } = useFiscalCalendar()
+  const { fiscalYears: years, isLoading, error, refresh } = useFiscalCalendar()
   const gridState = useDataGrid()
 
   // Master selection
-  const selectedYearId = ref<string | null>(null)
+  const selectedYearId = ref<FiscalYearId | null>(null)
   const selectedYear = computed(
     () => years.value?.find((y) => y.id === selectedYearId.value) || null,
   )
@@ -72,11 +73,11 @@ export function useFiscalPeriodsController() {
   })
 
   // Row-level commands for the grid
-  const handleClosePeriod = async (periodId: string) => {
+  const handleClosePeriod = async (periodId: FiscalPeriodId) => {
     await closePeriod(periodId)
   }
 
-  const handleLockPeriod = async (periodId: string) => {
+  const handleLockPeriod = async (periodId: FiscalPeriodId) => {
     await lockPeriod(periodId)
   }
 
