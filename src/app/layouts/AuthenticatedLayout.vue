@@ -4,6 +4,7 @@ import { RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/shared/auth/auth.store'
 import AppSidebar from '../components/AppSidebar.vue'
 import AppTopPane from '../components/AppTopPane.vue'
+import AppRightSidebar from '../components/AppRightSidebar.vue'
 import SearchPalette from '@/shared/components/search/SearchPalette.vue'
 import { useSearch } from '@/shared/search/useSearch'
 
@@ -62,5 +63,8 @@ async function handleLogout() {
         <RouterView />
       </div>
     </main>
+
+    <!-- Foundation 0.5: Right Side Panel (Services) -->
+    <AppRightSidebar />
   </div>
 </template>

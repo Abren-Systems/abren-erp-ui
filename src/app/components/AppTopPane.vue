@@ -28,23 +28,25 @@ function toggleDarkMode() {
     class="sticky top-0 z-20 border-b border-[color:var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
   >
     <div
-      class="flex items-center justify-end gap-2 sm:gap-3"
+      class="flex items-center gap-2 sm:gap-3"
       :style="{ padding: `var(--chrome-topbar-py) var(--layout-gutter)` }"
     >
       <button
         type="button"
-        class="hidden items-center gap-2 rounded-md border border-[color:var(--color-neutral-200)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-600)] shadow-sm transition-colors hover:bg-[var(--color-neutral-100)] md:inline-flex"
+        class="inline-flex items-center gap-2 rounded-md border border-[color:var(--color-neutral-200)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-600)] shadow-sm transition-colors hover:bg-[var(--color-neutral-100)]"
         @click="emit('search')"
       >
         <Search class="h-4 w-4" />
-        <span>Search records and actions</span>
+        <span class="hidden sm:inline">Search records and actions</span>
         <span
-          class="ml-2 inline-flex items-center gap-1 rounded-sm bg-[var(--color-neutral-100)] px-2 py-0.5 text-[11px]"
+          class="ml-2 hidden items-center gap-1 rounded-sm bg-[var(--color-neutral-100)] px-2 py-0.5 text-[11px] sm:inline-flex"
         >
           <Command class="h-3 w-3" />
           K
         </span>
       </button>
+
+      <div class="flex-1" />
 
       <button
         type="button"
