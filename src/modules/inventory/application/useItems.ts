@@ -29,5 +29,5 @@ export function useItems(query?: ListQuery) {
     staleTime: 1000 * 60 * 5,
   })
 
-  return { items: response, isPending, error, refetch }
+  return { inventoryItems: response, isPending, error, refetch }
 }

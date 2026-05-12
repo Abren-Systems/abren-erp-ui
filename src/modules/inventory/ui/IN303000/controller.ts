@@ -35,7 +35,7 @@ export function useAdjustmentController(id: string) {
   const isNew = computed(() => id === 'new')
   const adjustmentId = computed(() => (isNew.value ? null : id))
 
-  const { adjustment: entity, operations, isLoading, error } = useAdjustment(adjustmentId)
+  const { inventoryAdjustment: entity, operations, isLoading, error } = useAdjustment(adjustmentId)
   const { createAdjustment, isPending: isSubmitting } = useInventoryAdjustment()
   const { warehouses } = useWarehouses()
 

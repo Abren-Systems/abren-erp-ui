@@ -21,8 +21,7 @@ export function useInventoryAdjustment() {
     error,
   } = useMutation({
     mutationFn: async (payload: CreateAdjustmentDTO) => {
-      const response = await inventoryAdapter.postAdjustment(payload)
-      return response.data
+      return await inventoryAdapter.postAdjustment(payload)
     },
     onSuccess: (_, variables) => {
       // Invalidate stock positions for this warehouse so UI updates
@@ -55,8 +54,8 @@ export function useAdjustment(adjustmentId: Ref<string | null>) {
   })
 
   return {
-    adjustment: computed(() => adjustment.value?.data),
-    operations: computed(() => adjustment.value?.operations),
+    inventoryAdjustment: adjustment,
+    operations: computed(() => adjustment.value?.__operations),
     isLoading: isPending,
     error,
     refetch,
@@ -83,7 +82,7 @@ export function useAdjustments(query?: ListQuery) {
   })
 
   return {
-    adjustments: response, // Adapter already handles ListResponse formatting if needed, but here we just return the full response
+    inventoryAdjustments: response, // Adapter already returns ListResponse<AdjustmentDTO>
     isLoading: isPending,
     error,
     refetch,

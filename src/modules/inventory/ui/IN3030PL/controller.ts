@@ -12,10 +12,15 @@ import { IN3030PL } from './screen'
 export function useAdjustmentsListController() {
   const gridState = useDataGrid()
   const router = useRouter()
-  const { adjustments, isLoading, error, refetch: refresh } = useAdjustments()
+  const query = computed<ListQuery>(() => ({
+    offset: gridState.pagination.value.pageIndex * gridState.pagination.value.pageSize,
+    limit: gridState.pagination.value.pageSize,
+  }))
+
+  const { inventoryAdjustments, isLoading, error, refetch: refresh } = useAdjustments(query)
 
   // Unwrap operational envelopes for grid consumption
-  const adjustmentItems = computed(() => adjustments.value?.items.map((i) => i.data) ?? [])
+  const adjustmentItems = computed(() => inventoryAdjustments.value?.items ?? [])
 
   const base = useScreenController({
     screen: IN3030PL,
@@ -48,9 +53,12 @@ export function useAdjustmentsListController() {
     })
   }
 
+  const totalCount = computed(() => inventoryAdjustments.value?.totalCount ?? 0)
+
   return {
     ...base,
     adjustmentItems,
+    totalCount,
     refresh,
     handleCreate,
     handleRowClick,

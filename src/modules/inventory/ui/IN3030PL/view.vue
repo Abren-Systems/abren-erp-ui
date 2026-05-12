@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useScreenControllerContext } from '@/platform/screen-runtime'
-import { inject } from 'vue'
 import { DataGrid } from '@/shared/components/data-grid'
 import { AppButton } from '@/shared/components/primitives'
 import { RefreshCcw } from 'lucide-vue-next'
@@ -17,8 +16,10 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         v-model:row-selection="ctrl.gridState.rowSelection"
         v-model:column-visibility="ctrl.gridState.columnVisibility"
         v-model:global-filter="ctrl.gridState.globalFilter"
+        v-model:pagination="ctrl.gridState.pagination"
         :columns="adjustmentColumns"
         :data="ctrl.adjustmentItems.value ?? []"
+        :total-count="ctrl.totalCount.value"
         :loading="ctrl.isLoading.value"
         placeholder="Search adjustments..."
         empty-message="No adjustments found."
