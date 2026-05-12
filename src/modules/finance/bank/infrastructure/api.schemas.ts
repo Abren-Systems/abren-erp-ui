@@ -65,5 +65,5 @@ export const OperationalScheduledPaymentSchema =
 export const BankAccountListSchema = createPaginatedResponseSchema(BankAccountSchema)
 export const BankTransactionListSchema = createPaginatedResponseSchema(BankTransactionSchema)
 export const ScheduledPaymentListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(ScheduledPaymentSchema),
+  OperationalScheduledPaymentSchema,
 )

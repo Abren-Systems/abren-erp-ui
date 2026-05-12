@@ -6,6 +6,7 @@ import { bankKeys } from './query-keys'
 
 import type { ListQuery } from '@/shared/domain/pagination'
 import { BankMapper } from '../infrastructure/mappers'
+import type { BankTransactionDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: View Bank Account Transactions (Paginated).
@@ -25,7 +26,9 @@ export function useBankTransactions(accountId: BankAccountId, query?: ListQuery)
       const data = await bankAdapter.getTransactions(accountId, query)
       return {
         ...data,
-        items: data.items.map((dto) => BankMapper.toTransaction(dto, accountId)),
+        items: data.items.map((dto: BankTransactionDTO) =>
+          BankMapper.toTransaction(dto, accountId),
+        ),
       }
     },
     {
