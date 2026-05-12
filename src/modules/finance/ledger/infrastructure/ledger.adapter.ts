@@ -87,35 +87,14 @@ export const ledgerAdapter = {
       params: query,
       headers: { 'X-Abren-Response-Profile': 'summary' },
     })
-    // Lightweight parse for grids
-    const parsed = JournalEntryListSchema.safeParse(raw)
-    if (!parsed.success) {
-      // In production, log and fallback, but here we can just cast to bypass deep validation
-      const rawData = raw as unknown as {
-        items: { data?: unknown; operations?: unknown; [key: string]: unknown }[]
-        next_cursor?: string
-        total_count?: number
-      }
-      return {
-        items: rawData.items.map((item) => {
-          const itemData = (item.data || item) as JournalEntryDTO
-          return {
-            ...LedgerMapper.toJournalEntry(itemData),
-            __operations: item.operations as WorkflowOperations | undefined,
-          }
-        }),
-        nextCursor: rawData.next_cursor || null,
-        totalCount: rawData.total_count || null,
-      }
-    }
+    const parsed = JournalEntryListSchema.parse(raw.data)
 
     return {
-      items: parsed.data.items.map((item) => ({
+      items: parsed.items.map((item) => ({
         ...LedgerMapper.toJournalEntry(item.data as unknown as JournalEntryDTO),
         __operations: item.operations as unknown as WorkflowOperations,
       })),
-      nextCursor: parsed.data.next_cursor,
-      totalCount: parsed.data.total_count,
+      totalCount: parsed.total_count ?? 0,
     }
   },
 
