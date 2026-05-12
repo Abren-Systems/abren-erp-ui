@@ -35,7 +35,12 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         <template #toolbar>
           <DataGridFilterSelector v-model="ctrl.statusFilter.value" :options="ctrl.filterPresets" />
           <div class="h-4 w-px bg-[var(--color-neutral-200)] mx-1" />
-          <AppButton variant="stealth" size="sm" @click="ctrl.commands.value['refresh']?.execute()">
+          <AppButton
+            variant="stealth"
+            size="sm"
+            :loading="ctrl.commands.value['refresh']?.isPending.value"
+            @click="ctrl.commands.value['refresh']?.execute()"
+          >
             <template #start>
               <RefreshCcw :class="['h-3.5 w-3.5', ctrl.isLoading.value && 'animate-spin']" />
             </template>
@@ -49,9 +54,11 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
             Filter
           </AppButton>
           <AppButton
-            v-if="ctrl.hasPermission('ap:create')"
+            v-if="ctrl.commands.value['create']"
             variant="primary"
             size="sm"
+            :disabled="ctrl.commands.value['create']?.canExecute.value === false"
+            :loading="ctrl.commands.value['create']?.isPending.value"
             @click="ctrl.commands.value['create']?.execute()"
           >
             <template #start><Plus :size="14" /></template>

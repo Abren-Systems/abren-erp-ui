@@ -26,7 +26,14 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         @row-click="ctrl.handleRowClick"
       >
         <template #toolbar-controls>
-          <AppButton variant="primary" size="sm" @click="ctrl.isInviteOpen.value = true">
+          <AppButton
+            v-if="ctrl.commands.value['invite']"
+            variant="primary"
+            size="sm"
+            :disabled="ctrl.commands.value['invite']?.canExecute.value === false"
+            :loading="ctrl.commands.value['invite']?.isPending.value"
+            @click="ctrl.commands.value['invite']?.execute()"
+          >
             Invite User
           </AppButton>
         </template>

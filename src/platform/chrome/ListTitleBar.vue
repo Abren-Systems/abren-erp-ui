@@ -20,7 +20,6 @@ defineProps<{
 <template>
   <div class="list-title-bar">
     <span class="list-title-bar__title">{{ screenTitle }}</span>
-    <slot name="actions" />
   </div>
 </template>
 
