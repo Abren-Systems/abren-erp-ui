@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { AppBreadcrumb } from '@/shared/components/primitives'
-import { Bell, Command, LogOut, Menu, Search } from 'lucide-vue-next'
+import { Bell, Command, LogOut, Menu, Moon, Search, Sun } from 'lucide-vue-next'
 
 interface Props {
   tenantName: string
@@ -16,6 +17,12 @@ const emit = defineEmits<{
   notifications: []
   logout: []
 }>()
+
+const isDark = ref(document.documentElement.classList.contains('dark'))
+function toggleDarkMode() {
+  isDark.value = !isDark.value
+  document.documentElement.classList.toggle('dark')
+}
 </script>
 
 <template>
@@ -59,6 +66,16 @@ const emit = defineEmits<{
           @click="emit('notifications')"
         >
           <Bell class="h-4 w-4" />
+        </button>
+
+        <button
+          type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)] shadow-sm"
+          title="Toggle Dark Mode"
+          @click="toggleDarkMode"
+        >
+          <Sun v-if="isDark" class="h-4 w-4" />
+          <Moon v-else class="h-4 w-4" />
         </button>
 
         <div class="hidden h-8 w-px bg-[var(--color-neutral-200)] sm:block" />

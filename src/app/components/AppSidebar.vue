@@ -198,15 +198,14 @@ function toggleSidebar() {
       </div>
     </nav>
 
-    <div class="border-t border-[color:var(--color-neutral-200)] p-2">
+    <div class="flex justify-end border-t border-[color:var(--color-neutral-200)] p-2">
       <button
         type="button"
-        class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-[var(--color-neutral-600)] transition-colors hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-neutral-900)]"
-        :title="collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
+        class="flex items-center justify-center rounded-lg p-1.5 text-[var(--color-neutral-600)] transition-colors hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-neutral-900)]"
+        :title="collapsed ? 'Expand' : 'Collapse'"
         @click="toggleSidebar"
       >
         <component :is="collapsed ? PanelLeftOpen : PanelLeftClose" class="h-4 w-4 shrink-0" />
-        <span v-if="!collapsed">Collapse sidebar</span>
       </button>
     </div>
   </aside>

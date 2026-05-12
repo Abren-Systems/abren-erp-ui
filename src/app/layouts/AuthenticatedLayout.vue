@@ -30,7 +30,7 @@ async function handleLogout() {
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-white text-[var(--color-neutral-900)]">
+  <div class="flex min-h-screen bg-[var(--color-neutral-50)] text-[var(--color-neutral-900)]">
     <!-- Mobile overlay -->
     <div
       v-if="isMobileSidebarOpen"
