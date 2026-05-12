@@ -49,6 +49,14 @@ export const PaymentRequestSchema = z.object({
   request_number: z.string().nullable().optional(),
 })
 
+/**
+ * Shallow schema for Grid/List views.
+ * Omit lines and heavy relations to minimize memory footprint.
+ */
+export const PaymentRequestListItemSchema = PaymentRequestSchema.omit({
+  lines: true,
+})
+
 export const PaymentRequestStatsSchema = z.object({
   tenant_id: z.string().uuid(),
   total_count: z.number().int(),
@@ -94,12 +102,19 @@ export const VendorBillSchema = z.object({
   lines: z.array(VendorBillLineSchema),
 })
 
+/**
+ * Shallow schema for Grid/List views.
+ */
+export const VendorBillListItemSchema = VendorBillSchema.omit({
+  lines: true,
+})
+
 export const OperationalPaymentRequestSchema = createOperationalResponseSchema(PaymentRequestSchema)
 export const OperationalVendorBillSchema = createOperationalResponseSchema(VendorBillSchema)
 
 export const PaymentRequestListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(PaymentRequestSchema),
+  createOperationalResponseSchema(PaymentRequestListItemSchema),
 )
 export const VendorBillListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(VendorBillSchema),
+  createOperationalResponseSchema(VendorBillListItemSchema),
 )

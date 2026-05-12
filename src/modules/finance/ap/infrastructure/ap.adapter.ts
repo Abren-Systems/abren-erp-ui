@@ -14,11 +14,12 @@ import type {
   CreateVendorBillDTO,
   VendorBillDTO,
 } from './api.types'
-import { APMapper } from './mappers'
-import type { PaymentRequest, PaymentRequestStats, VendorBill } from '../models/ap.types'
-import { Money } from '@/shared/domain/money'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type { WorkflowOperations } from '@/platform/workflow-runtime/models/workflows.types'
+import type {
+  Operational,
+  WorkflowOperations,
+} from '@/platform/workflow-runtime/models/workflows.types'
+import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 
 const REQUESTS_BASE = '/finance/ap/payment-requests'
 const BILLS_BASE = '/finance/ap/vendor-bills'
@@ -33,18 +34,15 @@ export const apAdapter = {
   /**
    * Fetches a paginated list of Payment Requests.
    */
-  async listRequests(
-    query?: ListQuery,
-  ): Promise<ListResponse<{ data: PaymentRequest; operations: WorkflowOperations }>> {
-    const raw = await apiGet<unknown>(REQUESTS_BASE, { params: query })
-    const parsed = PaymentRequestListSchema.parse(raw)
+  async listRequests(query?: ListQuery): Promise<ListResponse<Operational<PaymentRequest>>> {
+    const raw = await apiGetEnvelope<unknown>(REQUESTS_BASE, { params: query })
+    const parsed = PaymentRequestListSchema.parse(raw.data)
 
     return {
       items: parsed.items.map((item) => ({
-        data: APMapper.toPaymentRequest(item.data),
-        operations: item.operations as unknown as WorkflowOperations,
+        ...APMapper.toPaymentRequest(item.data),
+        __operations: item.operations as unknown as WorkflowOperations,
       })),
-      nextCursor: parsed.next_cursor,
       totalCount: parsed.total_count,
     }
   },
@@ -52,12 +50,12 @@ export const apAdapter = {
   /**
    * Fetches a single Payment Request by ID.
    */
-  async getRequest(id: string): Promise<{ data: PaymentRequest; operations: WorkflowOperations }> {
-    const raw = await apiGet<unknown>(`${REQUESTS_BASE}/${id}`)
+  async getRequest(id: string): Promise<Operational<PaymentRequest>> {
+    const raw = await apiGetEnvelope<unknown>(`${REQUESTS_BASE}/${id}`)
     const parsed = OperationalPaymentRequestSchema.parse(raw)
     return {
-      data: APMapper.toPaymentRequest(parsed.data),
-      operations: parsed.operations as unknown as WorkflowOperations,
+      ...APMapper.toPaymentRequest(parsed.data),
+      __operations: parsed.operations as unknown as WorkflowOperations,
     }
   },
 
@@ -135,18 +133,15 @@ export const apAdapter = {
   /**
    * Fetches a paginated list of Vendor Bills.
    */
-  async listBills(
-    query?: ListQuery,
-  ): Promise<ListResponse<{ data: VendorBill; operations: WorkflowOperations }>> {
-    const raw = await apiGet<unknown>(BILLS_BASE, { params: query })
-    const parsed = VendorBillListSchema.parse(raw)
+  async listBills(query?: ListQuery): Promise<ListResponse<Operational<VendorBill>>> {
+    const raw = await apiGetEnvelope<unknown>(BILLS_BASE, { params: query })
+    const parsed = VendorBillListSchema.parse(raw.data)
 
     return {
       items: parsed.items.map((item) => ({
-        data: APMapper.toVendorBill(item.data as VendorBillDTO),
-        operations: item.operations as unknown as WorkflowOperations,
+        ...APMapper.toVendorBill(item.data as VendorBillDTO),
+        __operations: item.operations as unknown as WorkflowOperations,
       })),
-      nextCursor: parsed.next_cursor,
       totalCount: parsed.total_count,
     }
   },
@@ -154,12 +149,12 @@ export const apAdapter = {
   /**
    * Fetches a single Vendor Bill by ID.
    */
-  async getBill(id: string): Promise<{ data: VendorBill; operations: WorkflowOperations }> {
-    const raw = await apiGet<unknown>(`${BILLS_BASE}/${id}`)
+  async getBill(id: string): Promise<Operational<VendorBill>> {
+    const raw = await apiGetEnvelope<unknown>(`${BILLS_BASE}/${id}`)
     const parsed = OperationalVendorBillSchema.parse(raw)
     return {
-      data: APMapper.toVendorBill(parsed.data),
-      operations: parsed.operations as unknown as WorkflowOperations,
+      ...APMapper.toVendorBill(parsed.data),
+      __operations: parsed.operations as unknown as WorkflowOperations,
     }
   },
 
