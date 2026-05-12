@@ -103,41 +103,50 @@ function selectTab(tab: SidePanelTabContract) {
         </div>
       </div>
 
-      <!-- Icon Strip (Always visible, flush right) -->
+      <!-- Navigation Menu (Expands to show text) -->
       <div
-        class="w-11 shrink-0 border-l border-[var(--color-neutral-100)] flex flex-col items-center py-4 relative h-full"
+        class="shrink-0 border-l border-[var(--color-neutral-100)] flex flex-col py-4 relative h-full transition-all duration-200"
+        :class="
+          sidePanel.expanded.value ? 'w-48 bg-[var(--color-neutral-50)]' : 'w-11 items-center'
+        "
       >
-        <!-- Service Tabs -->
-        <div class="flex flex-col gap-4 items-center flex-1">
+        <!-- Service Links -->
+        <div class="flex flex-col gap-1 w-full" :class="sidePanel.expanded.value ? 'px-2' : 'px-1'">
           <button
             v-for="tab in tabs"
             :key="tab.id"
-            class="group relative flex h-10 w-10 items-center justify-center transition-all"
+            class="group relative flex h-[36px] w-full items-center transition-colors rounded-md"
             :class="[
+              sidePanel.expanded.value ? 'justify-start px-3 gap-3' : 'justify-center',
               activeTabId === tab.id
-                ? 'text-[var(--color-primary-600)]'
-                : 'text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)]',
+                ? 'bg-[var(--color-primary-50)] text-[var(--color-primary-700)] font-medium'
+                : 'text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-neutral-900)]',
             ]"
             @click="selectTab(tab)"
-            :title="tab.labelKey"
+            :title="!sidePanel.expanded.value ? tab.labelKey : ''"
           >
-            <component :is="iconMap[tab.icon] || FileText" :size="18" />
+            <component :is="iconMap[tab.icon] || FileText" :size="16" class="shrink-0" />
+
+            <span v-if="sidePanel.expanded.value" class="text-[12px] truncate">
+              {{ tab.labelKey }}
+            </span>
 
             <div
-              v-if="activeTabId === tab.id && sidePanel.expanded.value"
-              class="absolute right-0 top-1 bottom-1 w-[3px] bg-[var(--color-primary-600)]"
+              v-if="activeTabId === tab.id && !sidePanel.expanded.value"
+              class="absolute right-0 top-1 bottom-1 w-[3px] bg-[var(--color-primary-600)] rounded-l"
             />
           </button>
         </div>
 
         <!-- Expansion Toggle (At the bottom) -->
         <button
-          class="mt-auto flex h-10 w-10 items-center justify-center text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)] transition-colors border-t border-[var(--color-neutral-100)] pt-2"
+          class="mt-auto flex h-10 w-full items-center text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)] transition-colors border-t border-[var(--color-neutral-100)] pt-2"
+          :class="sidePanel.expanded.value ? 'justify-end px-4' : 'justify-center'"
           @click="sidePanel.expanded.value = !sidePanel.expanded.value"
           title="Toggle Expansion"
         >
-          <ChevronLeft v-if="!sidePanel.expanded.value" :size="18" />
-          <ChevronRight v-else :size="18" />
+          <ChevronRight v-if="!sidePanel.expanded.value" :size="18" />
+          <ChevronLeft v-else :size="18" />
         </button>
       </div>
     </div>
@@ -156,7 +165,7 @@ function selectTab(tab: SidePanelTabContract) {
 }
 
 .side-pane--expanded {
-  width: 300px;
+  width: 500px;
 }
 
 /* 
