@@ -160,10 +160,24 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     statePolicy,
   )
 
-  // Sync UI state with data loading lifecycle
   const isLoading = dataSource.isLoading
-  const error = dataSource.error
+  const localError = ref<Error | null>(dataSource.error.value || null)
   const degradedBanner = ref<BannerPolicy | undefined>()
+
+  // Sync localError with dataSource.error, but allow manual dismissal
+  watch(
+    () => dataSource.error.value,
+    (newErr) => {
+      if (newErr) localError.value = newErr
+    },
+  )
+
+  const error = computed({
+    get: () => localError.value,
+    set: (v) => {
+      localError.value = v
+    },
+  })
 
   function handleCommandError(error: unknown) {
     if (error instanceof ConflictError) {
@@ -407,8 +421,8 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     /** Whether the data source is loading */
     isLoading,
 
-    /** Error from the data source */
-    error,
+    /** Writable error ref (tracks dataSource.error but allows dismissal) */
+    error: error as unknown as Ref<Error | null>,
 
     /** Whether this is a new record */
     isNew,
