@@ -54,11 +54,11 @@ function onKeydown(e: KeyboardEvent) {
   >
     <div
       v-if="isPaletteOpen"
-      class="fixed inset-0 z-[100] flex items-start justify-center bg-[var(--color-neutral-900)]/40 pt-[10vh] backdrop-blur-sm"
+      class="fixed inset-0 z-[100] flex items-start justify-center bg-[var(--color-neutral-800)]/70 pt-[12vh] backdrop-blur-[6px]"
       @click.self="closePalette"
     >
       <div
-        class="w-full max-w-[600px] overflow-hidden rounded-md border border-[var(--color-neutral-200)] bg-white shadow-2xl ring-1 ring-black/5"
+        class="w-full max-w-[600px] overflow-hidden rounded-md border border-[var(--color-neutral-200)] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-1 ring-black/5"
         @keydown="onKeydown"
       >
         <!-- Search Header -->
@@ -140,7 +140,7 @@ function onKeydown(e: KeyboardEvent) {
           <!-- Initial State -->
           <div v-else class="px-4 py-3">
             <p
-              class="text-[10px] font-bold uppercase tracking-wider text-[var(--color-neutral-400)]"
+              class="text-[var(--text-micro)] font-bold uppercase tracking-widest text-[var(--color-neutral-400)]"
             >
               Recent & Suggestions
             </p>
