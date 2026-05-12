@@ -28,7 +28,7 @@ function toggleDarkMode() {
   <header
     class="sticky top-0 z-20 border-b border-[color:var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
   >
-    <div class="flex items-center justify-between gap-4 px-2.5 py-3">
+    <div class="flex items-center justify-between gap-4 px-2.5 py-1.5">
       <div class="flex min-w-0 items-center gap-3">
         <div class="hidden min-w-0 md:block">
           <AppBreadcrumb />
