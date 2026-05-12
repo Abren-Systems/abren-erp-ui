@@ -13,12 +13,17 @@ export function useBankAccountsListController() {
   const gridState = useDataGrid()
   const router = useRouter()
 
-  const { accounts, isPending: isLoading, error, refetch: refresh } = useBankAccounts()
+  const query = computed(() => ({
+    offset: gridState.pagination.value.pageIndex * gridState.pagination.value.pageSize,
+    limit: gridState.pagination.value.pageSize,
+  }))
+
+  const { bankAccounts, isPending: isLoading, error, refetch: refresh } = useBankAccounts(query)
 
   const base = useScreenController({
     screen: CA2020PL,
     dataSource: {
-      entity: computed(() => accounts.value?.items ?? []),
+      entity: computed(() => response.value?.items ?? []),
       isLoading,
       error,
     },
@@ -35,9 +40,12 @@ export function useBankAccountsListController() {
     void router.push({ name: 'finance.bank.account', params: { id: row.id } })
   }
 
+  const totalCount = computed(() => bankAccounts.value?.totalCount ?? 0)
+
   return {
     ...base,
-    accounts,
+    bankAccounts,
+    totalCount,
     refresh,
     gridState,
     handleCreate,

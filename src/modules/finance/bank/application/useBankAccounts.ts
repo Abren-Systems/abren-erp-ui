@@ -28,7 +28,7 @@ export function useBankAccounts(query?: ListQuery) {
   )
 
   return {
-    accounts: response,
+    bankAccounts: response,
     isPending,
     error,
     refetch,
