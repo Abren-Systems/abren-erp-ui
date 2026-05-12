@@ -51,7 +51,7 @@ async function handleLogout() {
       />
 
       <!-- Foundation 0.3/0.4: Workspace / Working Area -->
-      <div class="flex-1 overflow-y-auto p-2.5">
+      <div class="flex-1 overflow-y-auto">
         <RouterView />
       </div>
     </main>
