@@ -4,9 +4,12 @@ import { RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/shared/auth/auth.store'
 import AppSidebar from '../components/AppSidebar.vue'
 import AppTopPane from '../components/AppTopPane.vue'
+import SearchPalette from '@/shared/components/search/SearchPalette.vue'
+import { useSearch } from '@/shared/search/useSearch'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { togglePalette } = useSearch()
 
 const isSidebarCollapsed = ref(false)
 const isMobileSidebarOpen = ref(false)
@@ -31,6 +34,9 @@ async function handleLogout() {
 
 <template>
   <div class="flex min-h-screen bg-[var(--color-neutral-50)] text-[var(--color-neutral-900)]">
+    <!-- Search Overlay (Global) -->
+    <SearchPalette />
+
     <!-- Mobile overlay -->
     <div
       v-if="isMobileSidebarOpen"
@@ -48,6 +54,7 @@ async function handleLogout() {
         :user-email="userEmail"
         :user-initials="userInitials"
         @logout="handleLogout"
+        @search="togglePalette"
       />
 
       <!-- Foundation 0.3/0.4: Workspace / Working Area -->
