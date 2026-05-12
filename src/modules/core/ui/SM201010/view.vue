@@ -30,7 +30,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
             v-if="ctrl.commands.value['invite']"
             variant="primary"
             size="sm"
-            :disabled="ctrl.commands.value['invite']?.canExecute.value === false"
+            :disabled="ctrl.commands.value['invite']?.canExecute?.value === false"
             :loading="ctrl.commands.value['invite']?.isPending.value"
             @click="ctrl.commands.value['invite']?.execute()"
           >
@@ -68,18 +68,8 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         <AppButton variant="ghost" @click="ctrl.isInviteOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="
-            (
-              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeInvite') ||
-              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeInvite')
-            )?.command?.isPending.value
-          "
-          @click="
-            (
-              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeInvite') ||
-              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeInvite')
-            )?.command?.execute()
-          "
+          :loading="ctrl.commands.value['executeInvite']?.isPending.value"
+          @click="ctrl.commands.value['executeInvite']?.execute()"
         >
           Send Invite
         </AppButton>
@@ -112,18 +102,8 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         <AppButton variant="ghost" @click="ctrl.isAssignmentOpen.value = false">Cancel</AppButton>
         <AppButton
           variant="primary"
-          :loading="
-            (
-              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeAssign') ||
-              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeAssign')
-            )?.command?.isPending.value
-          "
-          @click="
-            (
-              ctrl.model.value.ui.actions.primary.find((a) => a.command.id === 'executeAssign') ||
-              ctrl.model.value.ui.actions.secondary.find((a) => a.command.id === 'executeAssign')
-            )?.command?.execute()
-          "
+          :loading="ctrl.commands.value['executeAssign']?.isPending.value"
+          @click="ctrl.commands.value['executeAssign']?.execute()"
         >
           Update Role
         </AppButton>

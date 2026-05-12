@@ -33,6 +33,8 @@ export interface ControllerCommand {
   execute: (...args: unknown[]) => Promise<void>
   /** Whether the command is currently executing */
   isPending: Ref<boolean>
+  /** Whether the command is allowed to execute based on state/perms */
+  canExecute?: Ref<boolean> | ComputedRef<boolean>
 }
 
 // ── Screen Controller ─────────────────────────────────────

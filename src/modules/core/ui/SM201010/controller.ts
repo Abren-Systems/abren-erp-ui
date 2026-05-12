@@ -1,5 +1,5 @@
 import { useDataGrid } from '@/shared/components/data-grid'
-import { computed, ref } from 'vue'
+import { computed, ref, reactive } from 'vue'
 import {
   useScreenController,
   LIST_SCREEN_POLICY,
@@ -46,6 +46,7 @@ export function useUsersController() {
       inviteErrorMessage.value = null
       isInviteOpen.value = true
     },
+    canExecute: computed(() => true),
     isPending: computed(() => false),
   })
 
@@ -60,6 +61,7 @@ export function useUsersController() {
         inviteErrorMessage.value = err instanceof Error ? err.message : 'Failed to create user.'
       }
     },
+    canExecute: computed(() => !!inviteEmail.value && !!invitePassword.value),
     isPending: isCreating,
   })
 
@@ -69,6 +71,7 @@ export function useUsersController() {
       await assignRole({ userId: selectedUser.value.id, roleId: assignRoleId.value })
       isAssignmentOpen.value = false
     },
+    canExecute: computed(() => !!selectedUser.value && !!assignRoleId.value),
     isPending: isAssigning,
   })
 
@@ -99,6 +102,6 @@ export function useUsersController() {
     roleOptions,
     isRolesPending,
     handleRowClick,
-    gridState,
+    gridState: reactive(gridState),
   }
 }

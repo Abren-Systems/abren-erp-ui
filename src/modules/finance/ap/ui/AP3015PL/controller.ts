@@ -1,4 +1,4 @@
-import { computed, ref, type Ref } from 'vue'
+import { computed, ref, type Ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   useScreenController,
@@ -190,6 +190,7 @@ export function usePaymentRequestList() {
     execute: async () => {
       void router.push({ name: 'PaymentRequestDetail', params: { id: 'new' } })
     },
+    canExecute: computed(() => true),
     isPending: computed(() => false),
   })
 
@@ -197,6 +198,7 @@ export function usePaymentRequestList() {
     execute: async () => {
       await refetch()
     },
+    canExecute: computed(() => true),
     isPending: isLoading,
   })
 
@@ -209,6 +211,7 @@ export function usePaymentRequestList() {
       bulkState.resultsOpen.value = true
       clearSelection()
     },
+    canExecute: computed(() => selectedCount.value > 0),
     isPending: isBulkPending,
   })
 
@@ -222,13 +225,14 @@ export function usePaymentRequestList() {
       bulkState.resultsOpen.value = true
       clearSelection()
     },
+    canExecute: computed(() => selectedCount.value > 0 && !!bulkState.rejectReason.value),
     isPending: isBulkPending,
   })
 
   return {
     ...base,
     hasPermission,
-    gridState,
+    gridState: reactive(gridState),
     statusFilter,
     filterPresets,
     statusOptions,

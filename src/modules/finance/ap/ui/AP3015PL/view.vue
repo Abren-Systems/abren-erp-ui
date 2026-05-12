@@ -57,7 +57,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
             v-if="ctrl.commands.value['create']"
             variant="primary"
             size="sm"
-            :disabled="ctrl.commands.value['create']?.canExecute.value === false"
+            :disabled="ctrl.commands.value['create']?.canExecute?.value === false"
             :loading="ctrl.commands.value['create']?.isPending.value"
             @click="ctrl.commands.value['create']?.execute()"
           >

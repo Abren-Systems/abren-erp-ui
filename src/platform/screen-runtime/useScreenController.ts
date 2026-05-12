@@ -309,6 +309,7 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
   function registerCommand(id: string, command: ControllerCommand) {
     const wrappedCommand: ControllerCommand = {
       isPending: command.isPending,
+      canExecute: command.canExecute,
       execute: async (...args: unknown[]) => {
         // 1. Find the projection to check for interception requirements
         const projection = findProjection(id)
