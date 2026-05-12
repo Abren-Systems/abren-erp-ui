@@ -43,7 +43,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:collapsed': [value: boolean]
   'update:mobileOpen': [value: boolean]
-  logout: []
 }>()
 
 const route = useRoute()
@@ -137,57 +136,36 @@ function toggleSidebar() {
 <template>
   <aside
     :class="[
-      'fixed inset-y-0 left-0 z-40 flex w-[19rem] flex-col border-r border-[color:var(--color-neutral-200)] bg-[linear-gradient(180deg,#ffffff,rgba(248,250,252,0.96))] transition-transform duration-200 lg:static lg:translate-x-0',
+      'fixed inset-y-0 left-0 z-40 flex w-[12.5rem] flex-col border-r border-[color:var(--color-neutral-200)] bg-[var(--color-neutral-100)] transition-transform duration-200 lg:static lg:translate-x-0',
       mobileOpen ? 'translate-x-0' : '-translate-x-full',
-      collapsed ? 'lg:w-[5.5rem]' : 'lg:w-[19rem]',
+      collapsed ? 'lg:w-[4rem]' : 'lg:w-[12.5rem]',
     ]"
   >
-    <div
-      class="flex items-center justify-between border-b border-[color:var(--color-neutral-200)] px-4 py-3"
-    >
-      <div class="flex min-w-0 items-center gap-3">
+    <div class="flex items-center border-b border-[color:var(--color-neutral-200)] px-3 py-2.5">
+      <div class="flex min-w-0 items-center gap-2">
         <div
-          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-primary-600)] text-sm font-semibold text-white shadow-[0_12px_24px_rgba(79,70,229,0.22)]"
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-600)] text-xs font-semibold text-white shadow-sm"
         >
           AB
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="truncate text-sm font-semibold text-[var(--color-neutral-900)]">Abren ERP</p>
-          <p class="mt-0.5 truncate text-xs text-[var(--color-neutral-500)]">
-            Finance operations workspace
-          </p>
+          <p class="truncate text-xs font-bold text-[var(--color-neutral-900)]">Abren ERP</p>
+          <p class="truncate text-[10px] text-[var(--color-neutral-500)]">Operations</p>
         </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button
-          class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)] lg:hidden"
-          type="button"
-          @click="closeMobileSidebar"
-        >
-          <PanelLeftClose class="h-4 w-4" />
-        </button>
-        <button
-          class="hidden h-9 w-9 items-center justify-center rounded-xl border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)] lg:inline-flex"
-          type="button"
-          @click="toggleSidebar"
-        >
-          <component :is="collapsed ? PanelLeftOpen : PanelLeftClose" class="h-4 w-4" />
-        </button>
       </div>
     </div>
 
-    <nav class="flex-1 space-y-4 overflow-y-auto px-3 py-3">
-      <div class="space-y-1.5">
+    <nav class="flex-1 space-y-3 overflow-y-auto px-2 py-3">
+      <div class="space-y-0.5">
         <RouterLink
           v-for="item in businessVisible"
           :key="item.id"
           :to="item.to"
           :class="[
-            'group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium transition-colors',
+            'group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors',
             isItemActive(item)
-              ? 'bg-[var(--color-neutral-900)] text-white'
-              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-100)]',
+              ? 'bg-[var(--color-primary-600)] text-white shadow-sm'
+              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]',
             collapsed ? 'justify-center px-0' : '',
           ]"
           @click="closeMobileSidebar"
@@ -206,10 +184,10 @@ function toggleSidebar() {
           :key="item.id"
           :to="item.to"
           :class="[
-            'group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm transition-colors',
+            'group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors',
             isItemActive(item)
-              ? 'bg-[var(--color-neutral-900)] text-white'
-              : 'text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-neutral-900)]',
+              ? 'bg-[var(--color-primary-600)] text-white shadow-sm'
+              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]',
             collapsed ? 'justify-center px-0' : '',
           ]"
           @click="closeMobileSidebar"
@@ -220,17 +198,15 @@ function toggleSidebar() {
       </div>
     </nav>
 
-    <div class="border-t border-[color:var(--color-neutral-200)] p-3">
+    <div class="border-t border-[color:var(--color-neutral-200)] p-2">
       <button
         type="button"
-        :class="[
-          'flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium text-[var(--color-danger-700)] transition-colors hover:bg-[var(--color-danger-50)]',
-          collapsed ? 'justify-center px-0' : '',
-        ]"
-        @click="emit('logout')"
+        class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-[var(--color-neutral-600)] transition-colors hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-neutral-900)]"
+        :title="collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
+        @click="toggleSidebar"
       >
-        <LogOut class="h-4 w-4 shrink-0" />
-        <span v-if="!collapsed">Logout</span>
+        <component :is="collapsed ? PanelLeftOpen : PanelLeftClose" class="h-4 w-4 shrink-0" />
+        <span v-if="!collapsed">Collapse sidebar</span>
       </button>
     </div>
   </aside>

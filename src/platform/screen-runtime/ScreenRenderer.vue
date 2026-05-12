@@ -8,6 +8,7 @@ import {
   getCurrentInstance,
   onScopeDispose,
   defineComponent,
+  defineAsyncComponent,
 } from 'vue'
 import type { EffectScope, PropType } from 'vue'
 import { useRoute } from 'vue-router'
@@ -91,7 +92,12 @@ provide(ScreenControllerKey, controllerRef)
 // eventually this will resolve dynamically from views contract)
 const WorkingArea = computed(() => {
   if (!screen.value?.layout.renderTarget) return null
-  return screen.value.layout.renderTarget
+  const target = screen.value.layout.renderTarget
+  // If it's a function (dynamic import), wrap it
+  if (typeof target === 'function') {
+    return defineAsyncComponent(target as () => Promise<import('vue').Component>)
+  }
+  return target
 })
 
 // Extract the side panel contract if defined

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AppBreadcrumb } from '@/shared/components/primitives'
-import { Bell, Command, Menu, Search } from 'lucide-vue-next'
+import { Bell, Command, LogOut, Menu, Search } from 'lucide-vue-next'
 
 interface Props {
   tenantName: string
@@ -14,6 +14,7 @@ const emit = defineEmits<{
   'open-mobile-sidebar': []
   search: []
   notifications: []
+  logout: []
 }>()
 </script>
 
@@ -63,19 +64,27 @@ const emit = defineEmits<{
         <div class="hidden h-8 w-px bg-[var(--color-neutral-200)] sm:block" />
 
         <div
-          class="flex items-center gap-3 rounded-2xl border border-[color:var(--color-neutral-200)] bg-white px-3 py-2 shadow-sm"
+          class="flex items-center gap-2 rounded-2xl border border-[color:var(--color-neutral-200)] bg-white px-3 py-1.5 shadow-sm"
         >
           <div class="hidden text-right sm:block">
-            <p class="text-sm font-semibold text-[var(--color-neutral-900)]">
+            <p class="text-xs font-bold text-[var(--color-neutral-900)]">
               {{ tenantName }}
             </p>
-            <p class="text-xs text-[var(--color-neutral-500)]">{{ userEmail }}</p>
+            <p class="text-[10px] text-[var(--color-neutral-500)]">{{ userEmail }}</p>
           </div>
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-neutral-900)] text-sm font-semibold text-white"
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-neutral-900)] text-xs font-semibold text-white"
           >
             {{ userInitials }}
           </div>
+          <button
+            type="button"
+            class="ml-1 flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-neutral-400)] transition-colors hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-danger-600)]"
+            title="Logout"
+            @click="emit('logout')"
+          >
+            <LogOut class="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>

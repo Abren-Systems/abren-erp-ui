@@ -30,7 +30,7 @@ async function handleLogout() {
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-[var(--app-canvas)] text-[var(--color-neutral-900)]">
+  <div class="flex min-h-screen bg-white text-[var(--color-neutral-900)]">
     <!-- Mobile overlay -->
     <div
       v-if="isMobileSidebarOpen"
@@ -39,11 +39,7 @@ async function handleLogout() {
     />
 
     <!-- Foundation 0.2: Sidebar -->
-    <AppSidebar
-      v-model:collapsed="isSidebarCollapsed"
-      v-model:mobileOpen="isMobileSidebarOpen"
-      @logout="handleLogout"
-    />
+    <AppSidebar v-model:collapsed="isSidebarCollapsed" v-model:mobileOpen="isMobileSidebarOpen" />
 
     <main class="flex min-w-0 flex-1 flex-col">
       <!-- Foundation 0.1: Top Pane -->
@@ -52,6 +48,7 @@ async function handleLogout() {
         :user-email="userEmail"
         :user-initials="userInitials"
         @open-mobile-sidebar="isMobileSidebarOpen = true"
+        @logout="handleLogout"
       />
 
       <!-- Foundation 0.3/0.4: Workspace / Working Area -->
