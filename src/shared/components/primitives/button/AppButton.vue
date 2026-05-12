@@ -46,7 +46,7 @@ const sizeClasses = {
 
 const variantClasses = {
   primary:
-    'border-[var(--color-primary-700)] bg-[var(--color-primary-600)] text-white shadow-[0_8px_18px_rgba(79,70,229,0.18)] hover:bg-[var(--color-primary-700)]',
+    'border-[var(--color-primary-700)] bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)]',
   secondary:
     'border-[var(--color-neutral-200)] bg-[var(--color-neutral-100)] text-[var(--color-neutral-800)] hover:bg-[var(--color-neutral-200)]',
   stealth:

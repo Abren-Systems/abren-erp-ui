@@ -87,7 +87,7 @@ function clear() {
           class="px-2 py-1 text-[10px] font-bold uppercase tracking-tight rounded-sm transition-colors"
           :class="
             props.density === d
-              ? 'bg-white shadow-sm text-black'
+              ? 'bg-white text-black'
               : 'text-[var(--color-neutral-400)] hover:text-black'
           "
           @click="emit('update:density', d)"

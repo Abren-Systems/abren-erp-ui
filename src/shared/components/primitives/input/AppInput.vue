@@ -36,7 +36,7 @@ const forwardedAttrs = computed(() => {
 
 const controlClass = computed(() =>
   cn(
-    'flex h-8 w-full items-center gap-2 rounded-[var(--radius-sm)] border bg-white px-3 shadow-sm transition-colors',
+    'flex h-8 w-full items-center gap-2 rounded-[var(--radius-sm)] border bg-white px-3 transition-colors',
     props.error
       ? 'border-[var(--color-danger-500)]'
       : 'border-[var(--color-neutral-300)] focus-within:border-[var(--color-primary-600)] focus-within:ring-2 focus-within:ring-[var(--color-primary-100)]',
