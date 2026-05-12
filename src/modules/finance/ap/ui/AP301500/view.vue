@@ -28,7 +28,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <!-- Error State -->
 
     <!-- Loading State -->
@@ -79,7 +79,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
       <div class="px-[var(--layout-gutter)] pb-6">
         <div
           v-if="ctrl.activeTab.value === 'Line Details'"
-          class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-white shadow-sm"
+          class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-[var(--app-surface)] shadow-sm"
         >
           <DataGrid
             :columns="paymentRequestLineColumns"

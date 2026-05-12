@@ -8,7 +8,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <!-- Header -->
 
     <!-- Toolbar -->

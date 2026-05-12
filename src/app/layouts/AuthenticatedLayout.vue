@@ -47,7 +47,7 @@ async function handleLogout() {
     <!-- Foundation 0.2: Sidebar -->
     <AppSidebar v-model:collapsed="isSidebarCollapsed" v-model:mobileOpen="isMobileSidebarOpen" />
 
-    <main class="flex min-w-0 flex-1 flex-col bg-[var(--color-neutral-50)]">
+    <main class="flex min-w-0 flex-1 flex-col bg-[var(--app-canvas)]">
       <!-- Foundation 0.1: Top Pane -->
       <AppTopPane
         :tenant-name="tenantName"

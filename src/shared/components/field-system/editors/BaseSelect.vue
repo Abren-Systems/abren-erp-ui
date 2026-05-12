@@ -47,7 +47,7 @@ const attrs = useAttrs()
 
 const selectClass = computed(() =>
   cn(
-    'h-8 w-full rounded-[var(--radius-sm)] border bg-white px-3 text-[var(--text-body)] text-[var(--color-neutral-900)] shadow-sm outline-none transition-colors',
+    'h-8 w-full rounded-[var(--radius-sm)] border bg-[var(--app-focus)] px-3 text-[var(--text-body)] text-[var(--color-neutral-900)] shadow-sm outline-none transition-colors',
     props.error
       ? 'border-[var(--color-danger-500)]'
       : 'border-[var(--color-neutral-300)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)]',

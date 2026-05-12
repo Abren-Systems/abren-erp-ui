@@ -46,7 +46,7 @@ const attrs = useAttrs()
 
 const inputClass = computed(() =>
   cn(
-    'flex h-8 w-full items-center rounded-[var(--radius-sm)] border bg-white px-3 text-[var(--text-body)] text-[var(--color-neutral-900)] shadow-sm outline-none transition-colors placeholder:text-[var(--color-neutral-400)]',
+    'flex h-8 w-full items-center rounded-[var(--radius-sm)] border bg-[var(--app-focus)] px-3 text-[var(--text-body)] text-[var(--color-neutral-900)] shadow-sm outline-none transition-colors placeholder:text-[var(--color-neutral-400)]',
     props.error
       ? 'border-[var(--color-danger-500)]'
       : 'border-[var(--color-neutral-300)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)]',

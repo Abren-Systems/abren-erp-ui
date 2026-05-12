@@ -15,13 +15,13 @@ const valuationOptions = [
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <template>
       <div class="flex-1 overflow-y-auto p-0">
         <div class="w-full space-y-6">
           <!-- General Info -->
           <div
-            class="p-[var(--layout-gutter)] bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+            class="p-[var(--layout-gutter)] bg-[var(--app-surface)] rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
           >
             <FieldGroup>
               <AppField
@@ -51,7 +51,7 @@ const valuationOptions = [
               <div
                 v-for="(line, index) in ctrl.form.getFieldValue('lines')"
                 :key="index"
-                class="grid grid-cols-12 gap-[var(--layout-gutter)] items-end p-[var(--layout-gutter)] bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+                class="grid grid-cols-12 gap-[var(--layout-gutter)] items-end p-[var(--layout-gutter)] bg-[var(--app-surface)] rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
               >
                 <div class="col-span-12 md:col-span-5">
                   <AppField

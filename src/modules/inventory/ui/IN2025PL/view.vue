@@ -14,7 +14,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <div class="flex-1 p-0 min-h-0">
       <div
         v-if="!ctrl.selectedWarehouseId.value"
-        class="h-full flex flex-col items-center justify-center text-[var(--color-neutral-500)] bg-white border border-[var(--color-neutral-200)] rounded-sm"
+        class="h-full flex flex-col items-center justify-center text-[var(--color-neutral-500)] bg-[var(--app-surface)] border border-[var(--color-neutral-200)] rounded-sm"
       >
         <ListFilter :size="48" class="mb-4 opacity-10" />
         <p class="text-sm font-medium">Select a warehouse location to view current stock.</p>
@@ -37,7 +37,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
       >
         <template #toolbar>
           <div
-            class="flex items-center gap-2 bg-[var(--color-neutral-50)] px-3 py-1.5 rounded-sm border border-[var(--color-neutral-200)]"
+            class="flex items-center gap-2 bg-[var(--app-canvas)] px-3 py-1.5 rounded-sm border border-[var(--color-neutral-200)]"
           >
             <MapPin :size="14" class="text-[var(--color-neutral-400)]" />
             <AppSelect

@@ -23,7 +23,7 @@ const statusOptions = [
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <div class="px-[var(--layout-gutter)] py-5">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
         <FieldGroup>

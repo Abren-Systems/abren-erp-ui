@@ -15,7 +15,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <!-- Loading State -->
 
     <!-- Main Content -->
@@ -56,7 +56,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <div class="px-[var(--layout-gutter)] pb-6 flex-1 overflow-hidden">
       <div
         v-if="ctrl.activeTab.value === 'Expense Lines'"
-        class="h-full rounded-lg border border-[var(--color-neutral-200)] bg-white shadow-sm flex flex-col"
+        class="h-full rounded-lg border border-[var(--color-neutral-200)] bg-[var(--app-surface)] shadow-sm flex flex-col"
       >
         <DataGrid
           :columns="vendorBillLineColumns"

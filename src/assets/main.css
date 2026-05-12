@@ -122,6 +122,16 @@
   --text-micro: 0.6875rem; /* 11px 400 +0.02em — timestamps, metadata */
 
   /*
+   * ── Surface Architecture — Ergonomic Depth ──────────────────
+   * Layer 0 (Canvas): Foundation background (Fatigue-reduction).
+   * Layer 1 (Surface): Primary operational containers (Paper off-white).
+   * Layer 2 (Focus): Data-entry elements (Spotlight white).
+   */
+  --app-canvas: var(--color-neutral-100);
+  --app-surface: #fafafa;
+  --app-focus: #ffffff;
+
+  /*
    * ── Layout Frame ──────────────────────────────────────────
    * The single source of truth for all structural dimensions.
    * Change these once → every sidebar, chrome bar, and grid updates.

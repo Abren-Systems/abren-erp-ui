@@ -312,7 +312,7 @@ const handleRowClick = (row: Row<TData>) => {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: #ffffff;
+  background: var(--app-surface);
   border: none;
   border-radius: 0;
   overflow: hidden;

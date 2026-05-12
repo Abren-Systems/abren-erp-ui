@@ -109,7 +109,7 @@ function navigatePayload(p: WorkspaceNavigatePayload) {
       <button
         v-for="tile in model.tiles"
         :key="tile.id"
-        class="group flex flex-col items-center justify-center gap-4 rounded-2xl border border-[color:var(--color-neutral-200)] bg-white p-6 shadow-sm transition-all hover:border-[var(--color-primary-600)] hover:shadow-md active:scale-[0.98]"
+        class="group flex flex-col items-center justify-center gap-4 rounded-2xl border border-[color:var(--color-neutral-200)] bg-[var(--app-surface)] p-6 shadow-sm transition-all hover:border-[var(--color-primary-600)] hover:shadow-md active:scale-[0.98]"
         @click="navigatePayload({ screenId: tile.screenId, routeName: tile.routeName })"
       >
         <div

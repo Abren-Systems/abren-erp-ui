@@ -17,7 +17,7 @@ const methodOptions = [
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
+  <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <!-- Header -->
 
     <!-- Toolbar -->
@@ -33,7 +33,7 @@ const methodOptions = [
 
         <FieldGroup title="Tax Rules Mapping">
           <div
-            class="grid gap-[var(--layout-gutter)] p-[var(--layout-gutter)] border rounded bg-white mt-2"
+            class="grid gap-[var(--layout-gutter)] p-[var(--layout-gutter)] border rounded bg-[var(--app-surface)] mt-2"
           >
             <div class="flex gap-2">
               <AppSelect
