@@ -23,7 +23,7 @@ const pageSizeOptions = [
   <div class="pagination-controls">
     <!-- Selection Status -->
     <div class="flex items-center w-[150px]">
-      <span v-if="selectedCount > 0" class="text-xs font-semibold text-[var(--color-primary-600)]">
+      <span v-if="selectedCount > 0" class="text-xs font-semibold text-[var(--color-neutral-600)]">
         {{ selectedCount }} selected
       </span>
     </div>

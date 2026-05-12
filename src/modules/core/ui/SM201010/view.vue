@@ -25,6 +25,11 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         row-clickable
         @row-click="ctrl.handleRowClick"
       >
+        <template #toolbar-controls>
+          <AppButton variant="primary" size="sm" @click="ctrl.isInviteOpen.value = true">
+            Invite User
+          </AppButton>
+        </template>
       </DataGrid>
     </div>
 
