@@ -14,6 +14,7 @@ import type { EffectScope, PropType } from 'vue'
 import { useRoute } from 'vue-router'
 import { screenRegistry } from './screen-registry'
 import AppSidePane from '@/shared/components/AppSidePane.vue'
+import SystemErrorBanner from './components/SystemErrorBanner.vue'
 import { AppButton } from '@/shared/components/primitives'
 import ListTitleBar from '@/platform/chrome/ListTitleBar.vue'
 import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
@@ -121,95 +122,88 @@ const sidePanelContract = computed(() => {
       @ready="(c) => (controllerRef = c)"
     />
 
-    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
-      <!-- Loading State (Before Controller Resolves) -->
-      <div v-if="!controllerRef" class="flex-1 p-2.5 text-[var(--color-neutral-500)]">
-        Loading...
-      </div>
-
-      <!-- Error State (From Controller) -->
-      <div
-        v-else-if="controllerRef.error.value"
-        class="flex-1 p-2.5 text-[var(--color-danger-600)]"
-      >
-        <h2 class="text-lg font-bold">Error</h2>
-        <p>{{ controllerRef.error.value }}</p>
-      </div>
-
-      <!-- Loading State (From Controller) -->
-      <div
-        v-else-if="
-          controllerRef.isLoading.value && !controllerRef.entity.value && !controllerRef.isNew.value
-        "
-        class="flex-1 p-2.5 text-[var(--color-neutral-500)]"
-      >
-        Loading data...
-      </div>
-
-      <!-- Platform Chrome controlled by ScreenKind -->
-      <template v-else>
-        <!-- Inquiry & Lists get ListTitleBar -->
-        <ListTitleBar
-          v-if="['inquiry', 'primaryList', 'dashboard'].includes(screen.kind)"
-          :screen-title="screen.titleKey"
-        >
-          <template #actions>
-            <AppButton
-              v-for="cmd in screen.commands?.filter((c) => c.displayOnMainToolbar)"
-              :key="cmd.key"
-              :variant="cmd.variant === 'primary' ? 'primary' : 'outline'"
-              size="sm"
-              @click="controllerRef.value?.commands.value[cmd.key]?.execute()"
-            >
-              {{ cmd.labelKey }}
-            </AppButton>
-          </template>
-        </ListTitleBar>
-        <!-- Data Entry & Master Data get FormTitleBar & FormToolbar -->
-        <template
-          v-else-if="['dataEntry', 'maintenance', 'setup', 'processing'].includes(screen.kind)"
-        >
-          <FormTitleBar
-            :form-title="screen.titleKey"
-            :record-title="
-              controllerRef.isNew.value
-                ? undefined
-                : controllerRef.entity.value?.requestNumber ||
-                  controllerRef.entity.value?.documentNumber ||
-                  controllerRef.entity.value?.id
-            "
-            :back-route="screen.pairedListRoute"
-          />
-          <FormToolbar
-            :model="controllerRef.model.value"
-            :executors="controllerRef.commands.value"
-            :is-pending="controllerRef.isPending?.value ?? false"
-            :is-new="controllerRef.isNew?.value ?? false"
-            @save="controllerRef.commands.value['save']?.execute()"
-            @cancel="controllerRef.commands.value['cancel']?.execute()"
-          />
-          <FormBanner
-            v-if="controllerRef.model.value.ui.chrome.banner"
-            :banner="controllerRef.model.value.ui.chrome.banner"
-          />
-        </template>
-      </template>
-
-      <!-- Pure Working Area -->
-      <KeepAlive :max="10">
-        <component
-          :is="WorkingArea"
-          v-if="WorkingArea"
-          :key="screen.id + ':' + (props.id || 'new')"
-          :id="props.id"
+    <div class="flex-1 flex flex-col min-w-0 h-full relative">
+      <!-- High Authority Sticky Chrome Stack -->
+      <div class="sticky top-0 z-20 flex flex-col bg-[var(--app-canvas)]">
+        <!-- System Error Banner (Industrial Anatomy) -->
+        <SystemErrorBanner
+          v-if="controllerRef?.error?.value"
+          :error="controllerRef.error.value"
+          :can-retry="!!controllerRef.commands.value['refresh']"
+          @dismiss="controllerRef.error.value = null"
+          @retry="controllerRef.commands.value['refresh']?.execute()"
         />
-      </KeepAlive>
 
-      <div
-        v-if="!WorkingArea"
-        class="flex h-full items-center justify-center text-[var(--color-neutral-400)]"
-      >
-        No working area defined for {{ screen.id }}
+        <!-- Platform Header Chrome -->
+        <template v-if="controllerRef">
+          <!-- Inquiry & Lists get ListTitleBar -->
+          <ListTitleBar
+            v-if="['inquiry', 'primaryList', 'dashboard'].includes(screen.kind)"
+            :screen-title="screen.titleKey"
+          >
+            <template #actions>
+              <AppButton
+                v-for="cmd in screen.commands?.filter((c) => c.displayOnMainToolbar)"
+                :key="cmd.key"
+                :variant="cmd.variant === 'primary' ? 'primary' : 'outline'"
+                size="sm"
+                @click="controllerRef.commands.value[cmd.key]?.execute()"
+              >
+                {{ cmd.labelKey }}
+              </AppButton>
+            </template>
+          </ListTitleBar>
+
+          <!-- Data Entry & Master Data get FormTitleBar & FormToolbar -->
+          <template
+            v-if="['dataEntry', 'maintenance', 'setup', 'processing'].includes(screen.kind)"
+          >
+            <FormTitleBar
+              :form-title="screen.titleKey"
+              :record-title="
+                controllerRef.isNew.value
+                  ? undefined
+                  : controllerRef.entity.value?.requestNumber ||
+                    controllerRef.entity.value?.documentNumber ||
+                    controllerRef.entity.value?.id
+              "
+              :back-route="screen.pairedListRoute"
+            />
+            <FormToolbar
+              :model="controllerRef.model.value"
+              :executors="controllerRef.commands.value"
+              :is-pending="controllerRef.isPending?.value ?? false"
+              :is-new="controllerRef.isNew?.value ?? false"
+              @save="controllerRef.commands.value['save']?.execute()"
+              @cancel="controllerRef.commands.value['cancel']?.execute()"
+            />
+            <FormBanner
+              v-if="controllerRef.model.value.ui.chrome.banner"
+              :banner="controllerRef.model.value.ui.chrome.banner"
+            />
+          </template>
+        </template>
+      </div>
+
+      <!-- Scrolling Surface: Loading & Working Area -->
+      <div class="flex-1 min-h-0 overflow-y-auto">
+        <template v-if="controllerRef">
+          <KeepAlive :max="10">
+            <component
+              :is="WorkingArea"
+              v-if="WorkingArea"
+              :key="screen.id + ':' + (props.id || 'new')"
+              :id="props.id"
+            />
+          </KeepAlive>
+        </template>
+
+        <div
+          v-if="!WorkingArea && controllerRef"
+          class="flex h-full items-center justify-center text-[var(--color-neutral-400)]"
+        >
+          No working area defined for {{ screen.id }}
+        </div>
       </div>
     </div>
 
