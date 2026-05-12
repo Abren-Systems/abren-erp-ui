@@ -125,34 +125,13 @@ const sidePanelContract = computed(() => {
     <div class="flex-1 flex flex-col min-w-0 h-full relative">
       <!-- High Authority Sticky Chrome Stack -->
       <div class="sticky top-0 z-20 flex flex-col bg-[var(--app-canvas)]">
-        <!-- System Error Banner (Industrial Anatomy) -->
-        <SystemErrorBanner
-          v-if="controllerRef?.error?.value"
-          :error="controllerRef.error.value"
-          :can-retry="!!controllerRef.commands.value['refresh']"
-          @dismiss="controllerRef.error.value = null"
-          @retry="controllerRef.commands.value['refresh']?.execute()"
-        />
-
         <!-- Platform Header Chrome -->
         <template v-if="controllerRef">
-          <!-- Inquiry & Lists get ListTitleBar -->
+          <!-- Inquiry & Lists get ListTitleBar (Authority Anchor) -->
           <ListTitleBar
             v-if="['inquiry', 'primaryList', 'dashboard'].includes(screen.kind)"
             :screen-title="screen.titleKey"
-          >
-            <template #actions>
-              <AppButton
-                v-for="cmd in screen.commands?.filter((c) => c.displayOnMainToolbar)"
-                :key="cmd.key"
-                :variant="cmd.variant === 'primary' ? 'primary' : 'outline'"
-                size="sm"
-                @click="controllerRef.commands.value[cmd.key]?.execute()"
-              >
-                {{ cmd.labelKey }}
-              </AppButton>
-            </template>
-          </ListTitleBar>
+          />
 
           <!-- Data Entry & Master Data get FormTitleBar & FormToolbar -->
           <template
@@ -183,6 +162,15 @@ const sidePanelContract = computed(() => {
             />
           </template>
         </template>
+
+        <!-- System Error Banner (Subordinate to Title Bar) -->
+        <SystemErrorBanner
+          v-if="controllerRef?.error?.value"
+          :error="controllerRef.error.value"
+          :can-retry="!!controllerRef.commands.value['refresh']"
+          @dismiss="controllerRef.error.value = null"
+          @retry="controllerRef.commands.value['refresh']?.execute()"
+        />
       </div>
 
       <!-- Scrolling Surface: Loading & Working Area -->
