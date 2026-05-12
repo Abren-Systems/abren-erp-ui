@@ -15,7 +15,7 @@ defineProps<BadgeCellProps>()
 </script>
 
 <template>
-  <AppBadge :variant="variant" :class="cn('px-2', $props.class)">
+  <AppBadge :variant="variant" :class="$props.class">
     {{ status }}
   </AppBadge>
 </template>

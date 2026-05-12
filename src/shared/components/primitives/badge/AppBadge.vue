@@ -18,10 +18,10 @@ const attrs = useAttrs()
 
 const badgeClass = computed(() =>
   cn(
-    'inline-flex items-center justify-center border text-[11px] font-semibold uppercase tracking-[0.02em]',
+    'inline-flex items-center justify-center border text-[10px] font-bold uppercase tracking-tight',
     props.circular
-      ? 'min-h-5 min-w-5 rounded-full px-2'
-      : 'min-h-[18px] rounded-[var(--radius-sm)] px-1.5',
+      ? 'min-h-[16px] min-w-[16px] rounded-sm px-1'
+      : 'min-h-[16px] rounded-[var(--radius-sm)] px-1.5',
     variantClasses[props.variant],
     attrs.class,
   ),
