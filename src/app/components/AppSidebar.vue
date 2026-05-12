@@ -136,9 +136,9 @@ function toggleSidebar() {
 <template>
   <aside
     :class="[
-      'fixed inset-y-0 left-0 z-40 flex w-[12.5rem] flex-col border-r border-[color:var(--color-neutral-200)] bg-[var(--color-neutral-100)] transition-transform duration-200 lg:static lg:translate-x-0',
+      'fixed inset-y-0 left-0 z-40 flex w-[11.25rem] flex-col border-r border-[color:var(--color-neutral-200)] bg-[var(--color-neutral-100)] transition-transform duration-200 lg:static lg:translate-x-0',
       mobileOpen ? 'translate-x-0' : '-translate-x-full',
-      collapsed ? 'lg:w-[4rem]' : 'lg:w-[12.5rem]',
+      collapsed ? 'lg:w-[4rem]' : 'lg:w-[11.25rem]',
     ]"
   >
     <div class="flex items-center border-b border-[color:var(--color-neutral-200)] px-3 py-2.5">

@@ -29,7 +29,7 @@ function toggleDarkMode() {
   <header
     class="sticky top-0 z-20 border-b border-[color:var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
   >
-    <div class="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <div class="flex items-center justify-between gap-4 px-2.5 py-3">
       <div class="flex min-w-0 items-center gap-3">
         <button
           class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-700)] lg:hidden"
@@ -106,10 +106,10 @@ function toggleDarkMode() {
       </div>
     </div>
 
-    <div class="flex items-center justify-between gap-4 px-4 py-1 sm:px-6 md:hidden">
+    <div class="flex items-center justify-between gap-4 px-2.5 py-1 md:hidden">
       <AppBreadcrumb />
     </div>
-    <div class="hidden px-4 py-2 sm:px-6 md:block">
+    <div class="hidden px-2.5 py-2 md:block">
       <div id="command-bar-portal" />
     </div>
   </header>
