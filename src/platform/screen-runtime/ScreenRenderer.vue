@@ -17,6 +17,7 @@ import AppSidePane from '@/shared/components/AppSidePane.vue'
 import SystemErrorBanner from './components/SystemErrorBanner.vue'
 import { AppButton } from '@/shared/components/primitives'
 import ListTitleBar from '@/platform/chrome/ListTitleBar.vue'
+import ListToolbar from '@/platform/chrome/ListToolbar.vue'
 import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
 import FormToolbar from '@/platform/chrome/FormToolbar.vue'
 import FormBanner from '@/platform/chrome/FormBanner.vue'
@@ -131,6 +132,12 @@ const sidePanelContract = computed(() => {
           <ListTitleBar
             v-if="['inquiry', 'primaryList', 'dashboard'].includes(screen.kind)"
             :screen-title="screen.titleKey"
+          />
+          <ListToolbar
+            v-if="['inquiry', 'primaryList'].includes(screen.kind)"
+            :model="controllerRef.model.value"
+            :executors="controllerRef.commands.value"
+            :is-pending="controllerRef.isPending?.value ?? false"
           />
 
           <!-- Data Entry & Master Data get FormTitleBar & FormToolbar -->
