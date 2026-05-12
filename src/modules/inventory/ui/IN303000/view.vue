@@ -18,9 +18,11 @@ const valuationOptions = [
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
     <template>
       <div class="flex-1 overflow-y-auto p-0">
-        <div class="max-w-4xl mx-auto space-y-6">
+        <div class="w-full space-y-6">
           <!-- General Info -->
-          <div class="p-6 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm">
+          <div
+            class="p-[var(--layout-gutter)] bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+          >
             <FieldGroup>
               <AppField
                 v-bind="ctrl.fields.warehouse_id"
@@ -34,11 +36,7 @@ const valuationOptions = [
           <!-- Line Items Section -->
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <h2
-                class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-600)]"
-              >
-                Adjustment Lines
-              </h2>
+              <h2 class="text-label">Adjustment Lines</h2>
               <AppButton
                 v-if="ctrl.state.isEditable"
                 type="button"
@@ -53,7 +51,7 @@ const valuationOptions = [
               <div
                 v-for="(line, index) in ctrl.form.getFieldValue('lines')"
                 :key="index"
-                class="grid grid-cols-12 gap-4 items-end p-5 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+                class="grid grid-cols-12 gap-[var(--layout-gutter)] items-end p-[var(--layout-gutter)] bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
               >
                 <div class="col-span-12 md:col-span-5">
                   <AppField

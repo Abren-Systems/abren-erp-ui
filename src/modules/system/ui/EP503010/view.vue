@@ -50,7 +50,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <AppDialog v-model:open="ctrl.isDialogOpen.value" title="Review Transition" size="sm">
       <div v-if="ctrl.selectedTask.value" class="space-y-4">
         <div
-          class="flex items-center gap-4 p-4 bg-[var(--color-primary-50)] rounded-md border border-[var(--color-primary-100)]"
+          class="flex items-center gap-[var(--layout-gutter)] p-[var(--layout-gutter)] bg-[var(--color-primary-50)] rounded-md border border-[var(--color-primary-100)]"
         >
           <ShieldCheck class="h-5 w-5 text-[var(--color-primary-600)]" />
           <div>

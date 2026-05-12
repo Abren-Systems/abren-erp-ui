@@ -26,7 +26,7 @@ const directionOptions = [
     <!-- Toolbar -->
 
     <!-- Main Content -->
-    <div class="px-6 py-5 overflow-y-auto">
+    <div class="px-[var(--layout-gutter)] py-5 overflow-y-auto">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
         <FieldGroup title="General Information">
           <AppField v-bind="ctrl.fields.name" />

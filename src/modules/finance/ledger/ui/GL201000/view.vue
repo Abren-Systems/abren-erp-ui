@@ -24,7 +24,9 @@ const { hasPermission } = usePermissions()
   <div class="flex h-full bg-[var(--app-canvas)]">
     <!-- Left Master Sidebar: Fiscal Years -->
     <div class="w-64 border-r border-[var(--app-border)] bg-[var(--app-surface)] flex flex-col">
-      <div class="p-4 flex items-center justify-between border-b border-[var(--app-border)]">
+      <div
+        class="p-[var(--layout-gutter)] flex items-center justify-between border-b border-[var(--app-border)]"
+      >
         <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--app-text-muted)]">
           Fiscal Years
         </h2>
@@ -93,7 +95,7 @@ const { hasPermission } = usePermissions()
         class="flex-1 min-h-0"
       >
         <template #toolbar>
-          <div class="flex items-center gap-4 ml-2 mr-auto">
+          <div class="flex items-center gap-[var(--layout-gutter)] ml-2 mr-auto">
             <div class="flex items-center gap-2">
               <span
                 class="text-[10px] font-bold uppercase tracking-wider text-[var(--app-text-muted)]"

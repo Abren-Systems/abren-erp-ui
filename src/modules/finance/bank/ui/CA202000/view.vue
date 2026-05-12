@@ -24,7 +24,7 @@ const statusOptions = [
 
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
-    <div class="px-6 py-5">
+    <div class="px-[var(--layout-gutter)] py-5">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
         <FieldGroup>
           <AppField v-bind="ctrl.fields.accountName" />

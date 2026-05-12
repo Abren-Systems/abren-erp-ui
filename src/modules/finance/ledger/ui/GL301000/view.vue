@@ -18,7 +18,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <!-- Main Content -->
     <template>
       <!-- Summary Area -->
-      <div class="px-6 py-5">
+      <div class="px-[var(--layout-gutter)] py-5">
         <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
           <FieldGroup>
             <AppField v-bind="ctrl.fields.entryDate" />
@@ -32,12 +32,12 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
       </div>
 
       <!-- Tabs -->
-      <div class="px-6">
+      <div class="px-[var(--layout-gutter)]">
         <AppTabs :tabs="['Journal Lines']" v-model="ctrl.activeTab.value" />
       </div>
 
       <!-- Details Area -->
-      <div class="px-6 pb-6 flex-1 overflow-hidden">
+      <div class="px-[var(--layout-gutter)] pb-6 flex-1 overflow-hidden">
         <div
           v-if="ctrl.activeTab.value === 'Journal Lines'"
           class="h-full rounded-lg border border-[var(--color-neutral-200)] bg-white shadow-sm flex flex-col"

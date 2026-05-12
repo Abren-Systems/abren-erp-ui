@@ -9,8 +9,10 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <!-- Header Area -->
-    <div class="px-8 py-10 border-b border-[var(--app-border)] bg-[var(--app-surface)]">
-      <div class="max-w-4xl mx-auto flex items-center gap-6">
+    <div
+      class="px-[var(--layout-gutter)] py-10 border-b border-[var(--app-border)] bg-[var(--app-surface)]"
+    >
+      <div class="w-full flex items-center gap-[var(--layout-gutter)]">
         <div
           class="h-16 w-16 rounded-2xl bg-[var(--app-primary-muted)] flex items-center justify-center"
         >
@@ -29,14 +31,14 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
     <!-- Main Content -->
     <div class="flex-1 overflow-y-auto p-0">
-      <div class="max-w-4xl mx-auto">
+      <div class="w-full">
         <div
           class="bg-[var(--app-surface)] rounded-2xl border border-[var(--app-border)] shadow-sm overflow-hidden"
         >
           <div class="p-0 space-y-8">
             <!-- Warning/Info -->
             <div
-              class="flex gap-4 p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-900 text-sm"
+              class="flex gap-[var(--layout-gutter)] p-[var(--layout-gutter)] rounded-xl bg-amber-50 border border-amber-100 text-amber-900 text-sm"
             >
               <AlertCircle :size="20" class="shrink-0" />
               <p>
@@ -47,7 +49,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
             </div>
 
             <!-- Form Fields -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--layout-gutter)]">
               <AppInput
                 v-model="ctrl.fields.genYear.value"
                 label="Fiscal Year (YYYY)"
@@ -71,12 +73,12 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
           <!-- Footer Actions -->
           <div
-            class="px-8 py-6 bg-[var(--app-surface-subtle)] border-t border-[var(--app-border)] flex justify-end"
+            class="px-[var(--layout-gutter)] py-6 bg-[var(--app-surface-subtle)] border-t border-[var(--app-border)] flex justify-end"
           >
             <AppButton
               variant="primary"
               size="lg"
-              class="px-8"
+              class="px-[var(--layout-gutter)]"
               :loading="ctrl.isLoading.value"
               :disabled="!ctrl.isGenerateValid.value"
               @click="ctrl.commands.value['generate']?.execute()"

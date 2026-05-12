@@ -17,8 +17,10 @@ const actionOptions = [
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
     <!-- Header: Selection Criteria -->
-    <div class="p-6 bg-[var(--app-surface)] border-b border-[var(--app-border)] shadow-sm">
-      <div class="max-w-5xl mx-auto flex flex-wrap items-end gap-6">
+    <div
+      class="p-[var(--layout-gutter)] bg-[var(--app-surface)] border-b border-[var(--app-border)] shadow-sm"
+    >
+      <div class="max-w-5xl mx-auto flex flex-wrap items-end gap-[var(--layout-gutter)]">
         <div class="flex flex-col gap-2 min-w-[200px]">
           <AppLabel :field="ctrl.fields.registry.action" />
           <AppSelect
@@ -79,7 +81,7 @@ const actionOptions = [
           class="absolute bottom-8 left-1/2 -translate-x-1/2 z-50"
         >
           <div
-            class="bg-[var(--app-surface)] border border-[var(--app-border)] shadow-2xl rounded-full px-6 py-3 flex items-center gap-6 animate-in slide-in-from-bottom-4"
+            class="bg-[var(--app-surface)] border border-[var(--app-border)] shadow-2xl rounded-full px-[var(--layout-gutter)] py-3 flex items-center gap-[var(--layout-gutter)] animate-in slide-in-from-bottom-4"
           >
             <div class="flex items-center gap-3">
               <div
@@ -118,9 +120,9 @@ const actionOptions = [
 
     <!-- Status Bar -->
     <div
-      class="px-6 py-2 bg-[var(--app-surface)] border-t border-[var(--app-border)] flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-[var(--app-text-muted)]"
+      class="px-[var(--layout-gutter)] py-2 bg-[var(--app-surface)] border-t border-[var(--app-border)] flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-[var(--app-text-muted)]"
     >
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-[var(--layout-gutter)]">
         <span class="flex items-center gap-1.5">
           <div class="h-1.5 w-1.5 rounded-full bg-[var(--app-success)]" />
           Ready

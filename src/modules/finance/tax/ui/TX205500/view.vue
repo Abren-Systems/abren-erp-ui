@@ -23,7 +23,7 @@ const methodOptions = [
     <!-- Toolbar -->
 
     <!-- Main Content -->
-    <div class="px-6 py-5 overflow-y-auto">
+    <div class="px-[var(--layout-gutter)] py-5 overflow-y-auto">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
         <FieldGroup title="General Information">
           <AppField v-bind="ctrl.fields.name" />
@@ -32,7 +32,9 @@ const methodOptions = [
         </FieldGroup>
 
         <FieldGroup title="Tax Rules Mapping">
-          <div class="grid gap-4 p-4 border rounded bg-white mt-2">
+          <div
+            class="grid gap-[var(--layout-gutter)] p-[var(--layout-gutter)] border rounded bg-white mt-2"
+          >
             <div class="flex gap-2">
               <AppSelect
                 v-model="ctrl.selectedRuleId.value"
