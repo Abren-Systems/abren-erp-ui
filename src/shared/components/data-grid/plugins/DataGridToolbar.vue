@@ -104,10 +104,10 @@ function clear() {
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--layout-gutter);
   height: var(--grid-toolbar-h);
-  padding: 0 var(--grid-cell-px);
-  background: #ffffff;
+  padding: 0 var(--layout-gutter);
+  background: var(--app-surface);
   border-bottom: 1px solid var(--color-neutral-200);
   flex-shrink: 0;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
