@@ -202,7 +202,7 @@ const handleRowClick = (row: Row<TData>) => {
             <th
               v-for="header in headerGroup.headers"
               :key="header.id"
-              class="grid-th group"
+              class="grid-th group text-label"
               :style="{ width: `${header.getSize()}px` }"
             >
               <div class="flex items-center justify-between w-full h-full relative">
@@ -347,11 +347,6 @@ const handleRowClick = (row: Row<TData>) => {
 .grid-th {
   padding: 0 var(--grid-cell-px);
   text-align: left;
-  font-size: 11px;
-  font-weight: 800; /* Extra bold for headers */
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-neutral-500);
   border-bottom: 1px solid var(--color-neutral-200);
   border-right: 1px solid var(--color-neutral-100);
   white-space: nowrap;

@@ -70,10 +70,10 @@ function toggleDarkMode() {
         class="flex items-center gap-2 rounded-md border border-[color:var(--color-neutral-200)] bg-white px-3 py-1.5 shadow-sm"
       >
         <div class="hidden text-right sm:block">
-          <p class="text-xs font-bold text-[var(--color-neutral-900)]">
+          <p class="truncate text-[13px] font-bold text-[var(--color-neutral-900)]">
             {{ tenantName }}
           </p>
-          <p class="text-[10px] text-[var(--color-neutral-500)]">{{ userEmail }}</p>
+          <p class="text-[var(--text-micro)] text-[var(--color-neutral-500)]">{{ userEmail }}</p>
         </div>
         <div
           class="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-neutral-900)] text-xs font-semibold text-white"

@@ -251,7 +251,68 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-variant-numeric: tabular-nums; /* Enforce alignment for financial data */
+  font-variant-numeric: tabular-nums; /* Critical for financial data alignment */
+  color: var(--color-neutral-900);
+  background: var(--color-neutral-50);
+  line-height: 1.5;
+}
+
+/*
+ * ── Semantic Typography — Industrial Roles ────────────────────
+ */
+
+.text-heading {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-neutral-900);
+}
+
+.text-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-neutral-800);
+}
+
+.text-label {
+  font-size: var(--text-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-neutral-500);
+}
+
+.text-body-dense {
+  font-size: var(--text-base);
+  line-height: 1.25rem;
+}
+
+/*
+ * ── Industrial Scrollbars ─────────────────────────────────────
+ * Thin, non-obtrusive, and matches the industrial palette.
+ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-300);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neutral-400);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-300) transparent;
 }
 
 /*

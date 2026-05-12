@@ -149,8 +149,8 @@ function toggleSidebar() {
           AB
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="truncate text-xs font-bold text-[var(--color-neutral-900)]">Abren ERP</p>
-          <p class="truncate text-[10px] text-[var(--color-neutral-500)]">Operations</p>
+          <p class="truncate text-[13px] font-bold text-[var(--color-neutral-900)]">Abren ERP</p>
+          <p class="truncate text-label !text-[var(--color-neutral-500)]">Operations</p>
         </div>
       </div>
     </div>
