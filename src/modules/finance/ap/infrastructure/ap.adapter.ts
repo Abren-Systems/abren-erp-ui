@@ -51,6 +51,19 @@ export const apAdapter = {
     }
   },
 
+  async getRequestsByUser(userId: string): Promise<ListResponse<Operational<PaymentRequest>>> {
+    const raw = await apiGetEnvelope<unknown>(`${REQUESTS_BASE}/user/${userId}`)
+    const parsed = PaymentRequestListSchema.parse(raw.data)
+
+    return {
+      items: parsed.items.map((item) => ({
+        ...APMapper.toPaymentRequest(item.data as unknown as PaymentRequestDTO),
+        __operations: item.operations as unknown as WorkflowOperations,
+      })),
+      totalCount: parsed.total_count,
+    }
+  },
+
   /**
    * Fetches a single Payment Request by ID.
    */
