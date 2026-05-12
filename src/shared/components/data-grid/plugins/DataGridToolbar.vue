@@ -9,7 +9,7 @@
  * with filter controls on the left and search on the right.
  */
 import { ref, watch } from 'vue'
-import { Search, X, LayoutGrid } from 'lucide-vue-next'
+import { Search, X, List, LayoutGrid, LayoutList } from 'lucide-vue-next'
 import { AppInput, AppButton } from '@/shared/components/primitives'
 
 const props = defineProps<{
@@ -82,18 +82,22 @@ function clear() {
         class="flex items-center bg-[var(--color-neutral-50)] p-0.5 rounded border border-[var(--color-neutral-200)] ml-1"
       >
         <button
-          v-for="d in ['compact', 'standard', 'relaxed'] as const"
-          :key="d"
-          class="px-2 py-1 text-[10px] font-bold uppercase tracking-tight rounded-sm transition-colors"
+          v-for="d in [
+            { id: 'compact', icon: List },
+            { id: 'standard', icon: LayoutGrid },
+            { id: 'relaxed', icon: LayoutList },
+          ] as const"
+          :key="d.id"
+          class="px-1.5 py-1 flex items-center justify-center rounded-sm transition-colors"
           :class="
-            props.density === d
+            props.density === d.id
               ? 'bg-white text-black'
               : 'text-[var(--color-neutral-400)] hover:text-black'
           "
-          @click="emit('update:density', d)"
-          :title="`${d.charAt(0).toUpperCase() + d.slice(1)} Density`"
+          @click="emit('update:density', d.id as any)"
+          :title="`${d.id.charAt(0).toUpperCase() + d.id.slice(1)} Density`"
         >
-          {{ d[0] }}
+          <component :is="d.icon" :size="14" />
         </button>
       </div>
     </div>
