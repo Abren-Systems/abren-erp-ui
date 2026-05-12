@@ -30,7 +30,8 @@ export interface ModuleDefinition {
   category: ModuleCategory
   routes: RouteRecordRaw[]
   permissions: string[]
-  menuItems: MenuItem[]
+  /** Top-level icon for sidebar (Acumatica alignment) */
+  icon?: Component | string
   /** Registered screen definitions (Acumatica alignment) */
   screens?: readonly ScreenDefinition[]
   /**

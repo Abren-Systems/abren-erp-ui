@@ -29,13 +29,19 @@ const router = createRouter({
           path: '',
           redirect: '/app/core/users',
         },
-        // Dynamically register module routes
-        // Dynamically register module routes (synchronous mapping, components remain lazy loaded)
         ...allModules.map((m) => ({
           path: m.id,
           meta: { title: m.name },
           component: () => import('@/shared/components/workspace/ModuleShell.vue'),
-          children: m.routes,
+          children: [
+            {
+              path: '',
+              name: `workspace.${m.id}`,
+              component: () => import('@/platform/navigation/ModuleWorkspaceView.vue'),
+              props: { moduleId: m.id },
+            },
+            ...m.routes,
+          ],
         })),
       ],
     },

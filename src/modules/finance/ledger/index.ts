@@ -9,12 +9,5 @@ export const ledgerModule: BusinessDomain = {
   screens: ledgerScreens,
   routes,
   permissions: ['ledger:view', 'ledger:create_entry', 'ledger:post', 'ledger:manage_accounts'],
-  menuItems: [
-    { label: 'Financial Year', route: 'LedgerFinancialYear', icon: 'calendar-days' },
-    { label: 'Master Financial Calendar', route: 'LedgerFiscalCalendar', icon: 'calendar' },
-    { label: 'Manage Financial Periods', route: 'LedgerManagePeriods', icon: 'calendar-range' },
-    { label: 'Chart of Accounts', route: 'LedgerCoa', icon: 'book-open' },
-    { label: 'Journal Entries', route: 'LedgerJournals', icon: 'file-text' },
-    { label: 'GL Preferences', route: 'LedgerSettings', icon: 'settings' },
-  ],
+  icon: 'book-open',
 }

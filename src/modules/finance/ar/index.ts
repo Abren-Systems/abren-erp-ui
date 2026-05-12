@@ -9,5 +9,5 @@ export const arModule: BusinessDomain = {
   screens: arScreenDefinitions,
   routes,
   permissions: ['ar:view', 'ar:create_invoice', 'ar:release_invoice'],
-  menuItems: [{ label: 'Invoices and Memos', route: 'ARInvoice', icon: 'file-text' }],
+  icon: 'file-text',
 }

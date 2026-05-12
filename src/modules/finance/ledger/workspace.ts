@@ -1,20 +1,31 @@
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
-import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
+import {
+  createWorkspaceId,
+  type WorkspaceDefinition,
+} from '@/platform/navigation-runtime/workspace-definition'
 
 /**
  * Hub links mirror the sidebar menu (`ledgerModule.menuItems`) in the same order,
  * grouped by IA (calendar → master data → transactions → preferences).
  */
-export const ledgerWorkspace: WorkspaceContract = {
-  id: 'ledger',
+export const ledgerWorkspace: WorkspaceDefinition = {
+  id: createWorkspaceId('ledger'),
   titleKey: 'General Ledger',
   icon: 'book',
+  category: 'business',
   requiredPermissions: ['ledger:view'],
-  tiles: [],
+  tiles: [
+    {
+      id: 'new-journal-entry',
+      labelKey: 'New Journal Entry',
+      icon: 'book-open',
+      screenId: createScreenId('GL301000'),
+    },
+  ],
   categories: [
     {
-      id: 'fiscal',
-      labelKey: 'Fiscal setup',
+      id: 'setup',
+      labelKey: 'Setup',
       links: [
         {
           id: 'gl101000',
@@ -38,7 +49,7 @@ export const ledgerWorkspace: WorkspaceContract = {
     },
     {
       id: 'profiles',
-      labelKey: 'Master data',
+      labelKey: 'Profiles',
       links: [
         {
           id: 'gl2025pl',
@@ -61,8 +72,8 @@ export const ledgerWorkspace: WorkspaceContract = {
       ],
     },
     {
-      id: 'settings',
-      labelKey: 'Preferences',
+      id: 'setup',
+      labelKey: 'Setup',
       links: [
         {
           id: 'gl102000',

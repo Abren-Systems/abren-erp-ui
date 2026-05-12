@@ -9,12 +9,5 @@ export const systemModule: PlatformEngine = {
   routes,
   screens: systemScreens,
   permissions: ['workflows:view', 'workflows:approve'],
-  menuItems: [
-    // {
-    //   label: 'Approvals',
-    //   route: 'EPApprovals',
-    //   icon: 'inbox',
-    //   permissions: ['workflows:view'],
-    // },
-  ],
+  icon: 'shield',
 }

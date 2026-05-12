@@ -1,10 +1,14 @@
-import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
+import {
+  createWorkspaceId,
+  type WorkspaceDefinition,
+} from '@/platform/navigation-runtime/workspace-definition'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
-export const workflowWorkspace: WorkspaceContract = {
-  id: 'workflows',
+export const workflowWorkspace: WorkspaceDefinition = {
+  id: createWorkspaceId('workflows'),
   titleKey: 'Workflows',
   icon: 'git-branch',
+  category: 'platform',
   requiredPermissions: ['workflows:view'],
   tiles: [],
   categories: [

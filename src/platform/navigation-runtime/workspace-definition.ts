@@ -29,6 +29,8 @@ export interface WorkspaceTileDefinition {
   screenId?: string
   /** Vue Router route name when the destination is not a registered screen */
   routeName?: string
+  /** Required permissions for this tile */
+  requiredPermissions?: string[]
   /**
    * Evaluator for tile visibility based purely on context.
    * MUST be synchronous.
@@ -41,6 +43,8 @@ export interface WorkspaceLinkDefinition {
   labelKey: string
   screenId?: string
   routeName?: string
+  /** Required permissions for this link */
+  requiredPermissions?: string[]
   isVisible?: (context: WorkspaceRuntimeContext) => boolean
 }
 
@@ -59,6 +63,8 @@ export interface WorkspaceDefinition {
   id: WorkspaceId
   titleKey: string
   icon: string
+  category: 'business' | 'platform'
+  requiredPermissions?: string[]
 
   tiles: WorkspaceTileDefinition[]
   categories: WorkspaceCategoryDefinition[]

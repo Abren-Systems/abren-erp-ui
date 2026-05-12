@@ -2,8 +2,7 @@
 import { computed } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import type { Component } from 'vue'
-import { businessModules, platformModules } from '@/modules'
-import type { BusinessDomain, PlatformEngine, MenuItem } from '@/shared/types/module.types'
+import { workspaceRegistry } from '@/platform/navigation-runtime/workspace-registry'
 import { useAuthStore } from '@/shared/auth/auth.store'
 import {
   BarChart3,
@@ -11,6 +10,8 @@ import {
   Box,
   Boxes,
   Building,
+  Building2,
+  Calculator,
   Calendar,
   CalendarDays,
   CalendarRange,
@@ -50,30 +51,22 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 interface NavigationItem {
+  id: string
   label: string
   icon?: Component
-  href?: string
-  to?: { name?: string; path?: string }
+  to: { path: string }
   permissions?: string[]
-}
-
-interface NavigationGroup {
-  title: string
-  items: NavigationItem[]
-}
-
-function canAccess(item: NavigationItem): boolean {
-  if (!item.permissions?.length) return true
-  return item.permissions.every((permission) => authStore.hasPermission(permission))
 }
 
 const iconMap: Record<string, Component> = {
   users: Users,
   shield: Shield,
   building: Building,
+  'building-2': Building2,
   'credit-card': CreditCard,
   'file-text': FileText,
   'book-open': BookOpen,
+  book: BookOpen,
   calendar: Calendar,
   'calendar-days': CalendarDays,
   'calendar-range': CalendarRange,
@@ -87,7 +80,9 @@ const iconMap: Record<string, Component> = {
   warehouse: Warehouse,
   boxes: Boxes,
   box: Box,
+  package: Box,
   'refresh-cw': RefreshCw,
+  calculator: Calculator,
 }
 
 function resolveIcon(icon?: string | Component): Component | undefined {
@@ -96,77 +91,38 @@ function resolveIcon(icon?: string | Component): Component | undefined {
   return iconMap[icon]
 }
 
-function toNavigationItem(moduleId: string, item: MenuItem): NavigationItem {
-  if (item.href) {
-    return {
-      label: item.label,
-      icon: resolveIcon(item.icon),
-      permissions: item.permissions,
-      href: item.href,
-    }
-  }
-  if (item.route) {
-    return {
-      label: item.label,
-      icon: resolveIcon(item.icon),
-      permissions: item.permissions,
-      to: { name: item.route },
-    }
-  }
-  return {
-    label: item.label,
-    icon: resolveIcon(item.icon),
-    permissions: item.permissions,
-    to: { path: `/app/${moduleId}` },
-  }
+function canAccess(item: NavigationItem): boolean {
+  if (!item.permissions?.length) return true
+  return item.permissions.every((permission) => authStore.hasPermission(permission))
 }
 
-const businessGroups = computed<NavigationGroup[]>(() =>
-  businessModules.map((module: BusinessDomain) => ({
-    title: module.name,
-    items: module.menuItems.map((item) => toNavigationItem(module.id, item)),
+const businessItems = computed<NavigationItem[]>(() =>
+  workspaceRegistry.getByCategory('business').map((workspace) => ({
+    id: workspace.id,
+    label: workspace.titleKey,
+    icon: resolveIcon(workspace.icon),
+    to: { path: `/app/${workspace.id}` },
+    permissions: workspace.requiredCapabilities,
   })),
 )
 
-const businessGroupsVisible = computed(() =>
-  businessGroups.value
-    .map((g) => ({ ...g, items: g.items.filter(canAccess) }))
-    .filter((g) => g.items.length > 0),
-)
-
-const platformGroups = computed<NavigationGroup[]>(() =>
-  platformModules.map((module: PlatformEngine) => ({
-    title: module.name,
-    items: module.menuItems.map((item) => toNavigationItem(module.id, item)),
+const platformItems = computed<NavigationItem[]>(() =>
+  workspaceRegistry.getByCategory('platform').map((workspace) => ({
+    id: workspace.id,
+    label: workspace.titleKey,
+    icon: resolveIcon(workspace.icon),
+    to: { path: `/app/${workspace.id}` },
+    permissions: workspace.requiredCapabilities,
   })),
 )
 
-const platformGroupsVisible = computed(() =>
-  platformGroups.value
-    .map((g) => ({ ...g, items: g.items.filter(canAccess) }))
-    .filter((g) => g.items.length > 0),
-)
+const businessVisible = computed(() => businessItems.value.filter(canAccess))
+const platformVisible = computed(() => platformItems.value.filter(canAccess))
 
 function isItemActive(item: NavigationItem): boolean {
-  if (item.href) {
-    return route.path === item.href
-  }
-  if (item.to?.name) {
-    const resolved = router.resolve({ name: item.to.name })
-    const base = resolved.path.replace(/\/$/, '') || '/'
-    const current = route.path.replace(/\/$/, '') || '/'
-    if (current === base) return true
-    if (base.length > 1 && current.startsWith(`${base}/`)) return true
-    return route.name === item.to.name
-  }
-  if (item.to?.path) {
-    const normalized = item.to.path.replace(/\/$/, '') || '/'
-    const current = route.path.replace(/\/$/, '') || '/'
-    if (current === normalized) return true
-    if (normalized.length > 1 && current.startsWith(`${normalized}/`)) return true
-    return false
-  }
-  return false
+  const current = route.path.replace(/\/$/, '') || '/'
+  const target = item.to.path.replace(/\/$/, '') || '/'
+  return current.startsWith(target)
 }
 
 function closeMobileSidebar() {
@@ -222,61 +178,45 @@ function toggleSidebar() {
     </div>
 
     <nav class="flex-1 space-y-4 overflow-y-auto px-3 py-3">
-      <div class="space-y-3">
-        <div v-for="group in businessGroupsVisible" :key="group.title" class="space-y-1.5">
-          <p
-            v-if="!collapsed"
-            class="px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]"
-          >
-            {{ group.title }}
-          </p>
-          <RouterLink
-            v-for="item in group.items"
-            :key="`${group.title}-${item.label}`"
-            :to="item.href || item.to!"
-            :class="[
-              'group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium transition-colors',
-              isItemActive(item)
-                ? 'bg-[var(--color-neutral-900)] text-white'
-                : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-100)]',
-              collapsed ? 'justify-center px-0' : '',
-            ]"
-            @click="closeMobileSidebar"
-          >
-            <component :is="item.icon || ChevronRight" class="h-4 w-4 shrink-0" />
-            <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
-          </RouterLink>
-        </div>
+      <div class="space-y-1.5">
+        <RouterLink
+          v-for="item in businessVisible"
+          :key="item.id"
+          :to="item.to"
+          :class="[
+            'group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium transition-colors',
+            isItemActive(item)
+              ? 'bg-[var(--color-neutral-900)] text-white'
+              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-100)]',
+            collapsed ? 'justify-center px-0' : '',
+          ]"
+          @click="closeMobileSidebar"
+        >
+          <component :is="item.icon || ChevronRight" class="h-4 w-4 shrink-0" />
+          <span v-if="!collapsed" class="truncate font-medium">{{ item.label }}</span>
+        </RouterLink>
       </div>
 
       <div
-        v-if="platformGroupsVisible.length > 0"
-        class="space-y-3 border-t border-[color:var(--color-neutral-200)] pt-4"
+        v-if="platformVisible.length > 0"
+        class="space-y-1.5 border-t border-[color:var(--color-neutral-200)] pt-4"
       >
-        <div v-for="group in platformGroupsVisible" :key="group.title" class="space-y-1.5">
-          <p
-            v-if="!collapsed"
-            class="px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]"
-          >
-            {{ group.title }}
-          </p>
-          <RouterLink
-            v-for="item in group.items"
-            :key="`${group.title}-${item.label}`"
-            :to="item.href || item.to!"
-            :class="[
-              'group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium transition-colors',
-              isItemActive(item)
-                ? 'bg-[var(--color-neutral-900)] text-white'
-                : 'text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-neutral-900)]',
-              collapsed ? 'justify-center px-0' : '',
-            ]"
-            @click="closeMobileSidebar"
-          >
-            <component :is="item.icon || ChevronRight" class="h-4 w-4 shrink-0" />
-            <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
-          </RouterLink>
-        </div>
+        <RouterLink
+          v-for="item in platformVisible"
+          :key="item.id"
+          :to="item.to"
+          :class="[
+            'group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm transition-colors',
+            isItemActive(item)
+              ? 'bg-[var(--color-neutral-900)] text-white'
+              : 'text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-neutral-900)]',
+            collapsed ? 'justify-center px-0' : '',
+          ]"
+          @click="closeMobileSidebar"
+        >
+          <component :is="item.icon || ChevronRight" class="h-4 w-4 shrink-0" />
+          <span v-if="!collapsed" class="truncate font-medium">{{ item.label }}</span>
+        </RouterLink>
       </div>
     </nav>
 

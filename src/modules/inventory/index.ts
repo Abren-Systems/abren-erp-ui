@@ -1,5 +1,5 @@
 import type { BusinessDomain } from '@/shared/types/module.types'
-import { inventoryRoutes } from './routes'
+import routes from './routes'
 import { inventoryScreens } from './screens'
 
 export const inventoryModule: BusinessDomain = {
@@ -7,26 +7,7 @@ export const inventoryModule: BusinessDomain = {
   name: 'Inventory',
   category: 'business',
   permissions: ['inventory:view', 'inventory:write'],
-  routes: inventoryRoutes,
+  icon: 'warehouse',
+  routes,
   screens: inventoryScreens,
-  menuItems: [
-    {
-      label: 'Stock Items',
-      route: 'inventory.stock',
-      icon: 'box',
-      permissions: ['inventory:view'],
-    },
-    {
-      label: 'Warehouses',
-      route: 'inventory.warehouses',
-      icon: 'warehouse',
-      permissions: ['inventory:view'],
-    },
-    {
-      label: 'Adjustments',
-      route: 'inventory.adjustments',
-      icon: 'refresh-cw',
-      permissions: ['inventory:view'],
-    },
-  ],
 }

@@ -1,10 +1,14 @@
-import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
+import {
+  createWorkspaceId,
+  type WorkspaceDefinition,
+} from '@/platform/navigation-runtime/workspace-definition'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
-export const bankWorkspace: WorkspaceContract = {
-  id: 'bank',
+export const bankWorkspace: WorkspaceDefinition = {
+  id: createWorkspaceId('bank'),
   titleKey: 'Banking',
   icon: 'landmark',
+  category: 'business',
   requiredPermissions: ['bank:view'],
   tiles: [],
   categories: [

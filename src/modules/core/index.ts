@@ -9,9 +9,5 @@ export const coreModule: PlatformEngine = {
   screens: coreScreens,
   routes,
   permissions: ['core:view', 'core:user_edit', 'core:role_edit'],
-  menuItems: [
-    { label: 'Users', route: 'SMUsers', icon: 'users' },
-    { label: 'Roles', route: 'SMRoles', icon: 'shield' },
-    { label: 'Companies', route: 'CSCompanies', icon: 'building' },
-  ],
+  icon: 'settings',
 }

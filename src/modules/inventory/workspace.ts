@@ -1,17 +1,21 @@
-import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
+import {
+  createWorkspaceId,
+  type WorkspaceDefinition,
+} from '@/platform/navigation-runtime/workspace-definition'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 /** Hub links follow the same order as `inventoryModule.menuItems`. */
-export const inventoryWorkspace: WorkspaceContract = {
-  id: 'inventory',
+export const inventoryWorkspace: WorkspaceDefinition = {
+  id: createWorkspaceId('inventory'),
   titleKey: 'Inventory',
   icon: 'package',
+  category: 'business',
   requiredPermissions: ['inventory:view'],
   tiles: [],
   categories: [
     {
-      id: 'screens',
-      labelKey: 'Screens',
+      id: 'transactions',
+      labelKey: 'Transactions',
       links: [
         {
           id: 'in2025pl',

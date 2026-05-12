@@ -4,7 +4,7 @@ import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
 import { inventoryScreens } from './screens'
 import { inventoryWorkspace } from './workspace'
 
-export const inventoryRoutes: RouteRecordRaw[] = [
+export default [
   // --- Workspace (State A) ---
   {
     path: '',
@@ -15,4 +15,4 @@ export const inventoryRoutes: RouteRecordRaw[] = [
 
   // --- Screens (State B) ---
   ...resolveScreenRoutes(inventoryScreens),
-]
+] satisfies RouteRecordRaw[]

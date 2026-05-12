@@ -4,7 +4,7 @@ import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
 import { bankScreens } from './screens'
 import { bankWorkspace } from './workspace'
 
-export const bankRoutes: RouteRecordRaw[] = [
+export default [
   // --- Workspace (State A) ---
   {
     path: '',
@@ -15,4 +15,4 @@ export const bankRoutes: RouteRecordRaw[] = [
 
   // --- Screens (State B) ---
   ...resolveScreenRoutes(bankScreens),
-]
+] satisfies RouteRecordRaw[]

@@ -1,20 +1,11 @@
 import type { BusinessDomain } from '@/shared/types/module.types'
 import routes from './routes'
-import CashflowDashboard from './ui/CashflowDashboard.vue'
 
 export const reportingModule: BusinessDomain = {
   id: 'reporting',
-  name: 'Reporting & Analytics',
+  name: 'Reporting',
   category: 'business',
   routes,
   permissions: ['reporting:view'],
-  menuItems: [
-    {
-      label: 'Cashflow Insights',
-      route: 'reporting.dashboard',
-      icon: 'bar-chart-3',
-    },
-  ],
+  icon: 'bar-chart-3',
 }
-
-export { CashflowDashboard }

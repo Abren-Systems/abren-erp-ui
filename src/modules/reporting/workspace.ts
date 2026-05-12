@@ -1,9 +1,13 @@
-import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
+import {
+  createWorkspaceId,
+  type WorkspaceDefinition,
+} from '@/platform/navigation-runtime/workspace-definition'
 
-export const reportingWorkspace: WorkspaceContract = {
-  id: 'reporting',
+export const reportingWorkspace: WorkspaceDefinition = {
+  id: createWorkspaceId('reporting'),
   titleKey: 'Reporting',
   icon: 'bar-chart-3',
+  category: 'business',
   requiredPermissions: ['reporting:view'],
   tiles: [],
   categories: [

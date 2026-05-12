@@ -4,7 +4,7 @@ import WorkspaceView from '@/platform/navigation/WorkspaceView.vue'
 import { taxScreens } from './screens'
 import { taxWorkspace } from './workspace'
 
-export const taxRoutes: RouteRecordRaw[] = [
+export default [
   // --- Workspace (State A) ---
   {
     path: '',
@@ -15,4 +15,4 @@ export const taxRoutes: RouteRecordRaw[] = [
 
   // --- Screens (State B) ---
   ...resolveScreenRoutes(taxScreens),
-]
+] satisfies RouteRecordRaw[]

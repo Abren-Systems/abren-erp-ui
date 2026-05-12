@@ -1,10 +1,14 @@
-import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
+import {
+  createWorkspaceId,
+  type WorkspaceDefinition,
+} from '@/platform/navigation-runtime/workspace-definition'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
-export const taxWorkspace: WorkspaceContract = {
-  id: 'tax',
+export const taxWorkspace: WorkspaceDefinition = {
+  id: createWorkspaceId('tax'),
   titleKey: 'Taxes',
   icon: 'calculator',
+  category: 'business',
   requiredPermissions: ['finance:tax:view'],
   tiles: [],
   categories: [

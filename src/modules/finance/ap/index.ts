@@ -8,13 +8,6 @@ export const apModule: BusinessDomain = {
   category: 'business',
   screens: apScreens,
   routes,
-  permissions: ['ap:view'], // Consolidates ap:view
-  menuItems: [
-    { label: 'Bills and Adjustments', route: 'BillsAndAdjustmentsList', icon: 'file-text' },
-    {
-      label: 'Payment Requests',
-      route: 'PaymentRequestsList',
-      icon: 'credit-card',
-    },
-  ],
+  permissions: ['ap:view'],
+  icon: 'credit-card',
 }

@@ -1,28 +1,13 @@
 import type { BusinessDomain } from '@/shared/types/module.types'
-import { taxRoutes } from './routes'
+import routes from './routes'
 import { taxScreens } from './screens'
 
-/**
- * Tax Module Definition.
- * Handles configuration for the taxation subdomain.
- */
 export const taxModule: BusinessDomain = {
   id: 'tax',
-  name: 'Taxation',
+  name: 'Taxes',
   category: 'business',
-  routes: taxRoutes,
   screens: taxScreens,
+  routes,
   permissions: ['finance:tax:view'],
-  menuItems: [
-    {
-      label: 'Taxes',
-      route: 'TaxesList',
-      icon: 'percent',
-    },
-    {
-      label: 'Tax Groups',
-      route: 'TaxGroupsList',
-      icon: 'layout-grid',
-    },
-  ],
+  icon: 'calculator',
 }
