@@ -3,9 +3,13 @@ import { AppButton, AppSelect } from '@/shared/components/primitives'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-vue-next'
 import type { Table } from '@tanstack/vue-table'
 
+import { computed } from 'vue'
+
 const props = defineProps<{
   table: Table<unknown>
 }>()
+
+const selectedCount = computed(() => Object.keys(props.table.getState().rowSelection).length)
 
 const pageSizeOptions = [
   { label: '20', value: 20 },
@@ -17,6 +21,13 @@ const pageSizeOptions = [
 
 <template>
   <div class="pagination-controls">
+    <!-- Selection Status -->
+    <div class="flex items-center w-[150px]">
+      <span v-if="selectedCount > 0" class="text-xs font-semibold text-[var(--color-primary-600)]">
+        {{ selectedCount }} selected
+      </span>
+    </div>
+
     <!-- Page Size -->
     <div class="flex items-center gap-2">
       <span class="text-xs text-[var(--color-neutral-500)]">Rows per page</span>
@@ -30,7 +41,7 @@ const pageSizeOptions = [
 
     <!-- Info -->
     <div
-      class="flex items-center justify-center text-xs text-[var(--color-neutral-600)] font-medium"
+      class="flex items-center justify-center text-xs text-[var(--color-neutral-600)] font-medium w-[150px]"
     >
       Page {{ props.table.getState().pagination.pageIndex + 1 }} of
       {{ props.table.getPageCount() }}

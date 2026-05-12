@@ -49,90 +49,76 @@ function clear() {
 </script>
 
 <template>
-  <div class="toolbar" :class="{ 'toolbar--selection-mode': selectedCount && selectedCount > 0 }">
-    <!-- Selection mode indicator -->
-    <div
-      v-if="selectedCount && selectedCount > 0"
-      class="selection-info animate-in fade-in slide-in-from-left-2 duration-200"
-    >
-      <span class="selection-badge">
-        {{ selectedCount }}
-      </span>
-      <span class="selection-text">Records selected for bulk action</span>
+  <div class="toolbar">
+    <!-- Left: Search + Filter Selector -->
+    <div class="toolbar-left">
+      <div class="search-wrap">
+        <AppInput
+          :model-value="localValue"
+          :placeholder="placeholder ?? 'Search…'"
+          class="search-input"
+          @update:model-value="onInput"
+        >
+          <template #start>
+            <Search :size="14" class="search-icon" />
+          </template>
+          <template #end>
+            <button v-if="localValue" class="clear-btn" @click="clear">
+              <X :size="14" />
+            </button>
+          </template>
+        </AppInput>
+      </div>
+
+      <!-- Density Toggle -->
+      <div
+        class="flex items-center bg-[var(--color-neutral-100)] p-0.5 rounded border border-[var(--color-neutral-200)]"
+      >
+        <button
+          class="px-2 py-1 text-xs rounded-sm transition-colors"
+          :class="
+            props.density === 'compact'
+              ? 'bg-white shadow-sm font-medium'
+              : 'text-[var(--color-neutral-500)] hover:text-black'
+          "
+          @click="emit('update:density', 'compact')"
+          title="Compact View"
+        >
+          Compact
+        </button>
+        <button
+          class="px-2 py-1 text-xs rounded-sm transition-colors"
+          :class="
+            props.density === 'standard'
+              ? 'bg-white shadow-sm font-medium'
+              : 'text-[var(--color-neutral-500)] hover:text-black'
+          "
+          @click="emit('update:density', 'standard')"
+          title="Standard View"
+        >
+          Standard
+        </button>
+        <button
+          class="px-2 py-1 text-xs rounded-sm transition-colors"
+          :class="
+            props.density === 'relaxed'
+              ? 'bg-white shadow-sm font-medium'
+              : 'text-[var(--color-neutral-500)] hover:text-black'
+          "
+          @click="emit('update:density', 'relaxed')"
+          title="Relaxed View"
+        >
+          Relaxed
+        </button>
+      </div>
+
+      <slot />
     </div>
 
-    <!-- Normal mode: Search left, Filters right -->
-    <template v-else>
-      <!-- Left: Search + Filter Selector -->
-      <div class="toolbar-left">
-        <div class="search-wrap">
-          <AppInput
-            :model-value="localValue"
-            :placeholder="placeholder ?? 'Search…'"
-            class="search-input"
-            @update:model-value="onInput"
-          >
-            <template #start>
-              <Search :size="14" class="search-icon" />
-            </template>
-            <template #end>
-              <button v-if="localValue" class="clear-btn" @click="clear">
-                <X :size="14" />
-              </button>
-            </template>
-          </AppInput>
-        </div>
-
-        <!-- Density Toggle -->
-        <div
-          class="flex items-center bg-[var(--color-neutral-100)] p-0.5 rounded border border-[var(--color-neutral-200)]"
-        >
-          <button
-            class="px-2 py-1 text-xs rounded-sm transition-colors"
-            :class="
-              props.density === 'compact'
-                ? 'bg-white shadow-sm font-medium'
-                : 'text-[var(--color-neutral-500)] hover:text-black'
-            "
-            @click="emit('update:density', 'compact')"
-            title="Compact View"
-          >
-            Compact
-          </button>
-          <button
-            class="px-2 py-1 text-xs rounded-sm transition-colors"
-            :class="
-              props.density === 'standard'
-                ? 'bg-white shadow-sm font-medium'
-                : 'text-[var(--color-neutral-500)] hover:text-black'
-            "
-            @click="emit('update:density', 'standard')"
-            title="Standard View"
-          >
-            Standard
-          </button>
-          <button
-            class="px-2 py-1 text-xs rounded-sm transition-colors"
-            :class="
-              props.density === 'relaxed'
-                ? 'bg-white shadow-sm font-medium'
-                : 'text-[var(--color-neutral-500)] hover:text-black'
-            "
-            @click="emit('update:density', 'relaxed')"
-            title="Relaxed View"
-          >
-            Relaxed
-          </button>
-        </div>
-
-        <slot />
-      </div>
-
-      <!-- Right: Filter controls -->
-      <div class="toolbar-right">
-        <slot name="controls" />
-      </div>
-    </template>
+    <!-- Right: Filter controls -->
+    <div class="toolbar-right">
+      <slot name="controls" />
+    </div>
   </div>
 </template>
 
@@ -147,13 +133,6 @@ function clear() {
   border-bottom: 1px solid var(--color-neutral-200);
   flex-shrink: 0;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Command Mode Aesthetic — Synchronized with Search Palette and Sidebar Header */
-.toolbar--selection-mode {
-  background: var(--color-neutral-800);
-  border-bottom-color: var(--color-neutral-700);
-  color: #ffffff;
 }
 
 .toolbar-left {
@@ -192,52 +171,5 @@ function clear() {
 
 .clear-btn:hover {
   color: var(--color-danger-600);
-}
-
-.selection-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.selection-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  background: #ffffff;
-  color: var(--color-neutral-800);
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.selection-text {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0.9;
-}
-
-/* Deep override for buttons in selection mode */
-.toolbar--selection-mode :deep(.app-button) {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.toolbar--selection-mode :deep(.app-button--primary) {
-  background: #ffffff;
-  color: var(--color-neutral-800);
-}
-
-.toolbar--selection-mode :deep(.app-button--stealth) {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.toolbar--selection-mode :deep(.app-button--stealth:hover) {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
 }
 </style>

@@ -10,7 +10,14 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
 <template>
   <div class="flex h-full flex-col bg-[var(--app-canvas)]">
-    <div class="min-h-0 flex-1 p-0">
+    <div class="min-h-0 flex-1 p-0 flex flex-col">
+      <!-- Bulk Actions (Flush Row) -->
+      <PaymentRequestBulkActionBar
+        :selected-ids="ctrl.selectedIds.value"
+        :filtered-requests="ctrl.filteredRequests.value"
+        @clear-selection="ctrl.clearSelection"
+      />
+
       <DataGrid
         v-model:sorting="ctrl.gridState.sorting"
         v-model:row-selection="ctrl.gridState.rowSelection"
@@ -67,13 +74,6 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         </template>
       </DataGrid>
     </div>
-
-    <!-- Floating Bulk Action Bar & Overlay -->
-    <PaymentRequestBulkActionBar
-      :selected-ids="ctrl.selectedIds.value"
-      :filtered-requests="ctrl.filteredRequests.value"
-      @clear-selection="ctrl.clearSelection"
-    />
 
     <!-- Sidebars -->
   </div>

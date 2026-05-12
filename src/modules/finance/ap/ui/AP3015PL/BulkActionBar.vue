@@ -51,53 +51,45 @@ function handleExport() {
 
 <template>
   <div>
-    <!-- Floating Bulk Action Bar -->
-    <Transition
-      enter-active-class="transition ease-out duration-200"
-      enter-from-class="opacity-0 translate-y-4"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition ease-in duration-150"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 translate-y-4"
+    <!-- Flat Bulk Action Bar — Industrial Uniformity Refactor -->
+    <div
+      v-if="ctrl.selectedCount.value > 0"
+      class="flex items-center gap-2 px-4 py-2 bg-white border-b border-[var(--color-neutral-200)] animate-in fade-in slide-in-from-top-1 duration-200"
     >
-      <div
-        v-if="ctrl.selectedCount.value > 0"
-        class="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-2xl bg-neutral-900 px-4 py-3 shadow-[0_20px_40px_rgba(15,23,42,0.2)] text-white z-10 border border-neutral-700"
+      <span
+        class="text-[10px] font-bold uppercase tracking-wider text-[var(--color-neutral-500)] mr-2"
       >
-        <span class="text-sm font-semibold mr-2">{{ ctrl.selectedCount.value }} selected</span>
-        <AppButton
-          variant="stealth"
-          class="text-neutral-100 hover:text-white hover:bg-neutral-800"
-          size="sm"
-          :disabled="ctrl.isBulkPending.value"
-          @click="handleBulkApprove"
-        >
-          <template #start><CheckCircle :size="14" /></template>
-          Approve
-        </AppButton>
-        <AppButton
-          variant="stealth"
-          class="text-neutral-100 hover:text-white hover:bg-neutral-800"
-          size="sm"
-          :disabled="ctrl.isBulkPending.value"
-          @click="handleBulkReject"
-        >
-          <template #start><XCircle :size="14" /></template>
-          Reject
-        </AppButton>
-        <div class="w-px h-4 bg-neutral-700 mx-1"></div>
-        <AppButton
-          variant="stealth"
-          class="text-neutral-100 hover:text-white hover:bg-neutral-800"
-          size="sm"
-          title="Exports currently loaded results"
-          @click="handleExport"
-        >
-          <template #start><Download :size="14" /></template>
-          Export
-        </AppButton>
-      </div>
-    </Transition>
+        Bulk Actions ({{ ctrl.selectedCount.value }})
+      </span>
+      <AppButton
+        variant="outline"
+        size="sm"
+        :disabled="ctrl.isBulkPending.value"
+        @click="handleBulkApprove"
+      >
+        <template #start><CheckCircle :size="14" class="text-success-600" /></template>
+        Approve
+      </AppButton>
+      <AppButton
+        variant="outline"
+        size="sm"
+        :disabled="ctrl.isBulkPending.value"
+        @click="handleBulkReject"
+      >
+        <template #start><XCircle :size="14" class="text-danger-600" /></template>
+        Reject
+      </AppButton>
+      <div class="w-px h-4 bg-[var(--color-neutral-200)] mx-1"></div>
+      <AppButton
+        variant="ghost"
+        size="sm"
+        title="Exports currently loaded results"
+        @click="handleExport"
+      >
+        <template #start><Download :size="14" /></template>
+        Export
+      </AppButton>
+    </div>
 
     <!-- Bulk Processing Overlay -->
     <div
