@@ -141,7 +141,7 @@ function toggleSidebar() {
       collapsed ? 'sidebar-frame--collapsed' : '',
     ]"
   >
-    <div class="flex items-center border-b border-[color:var(--color-neutral-200)] px-3 py-2.5">
+    <div class="flex items-center border-b border-[color:var(--color-neutral-200)] px-3 py-2">
       <div class="flex min-w-0 items-center gap-2">
         <div
           class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--color-primary-600)] text-xs font-semibold text-white shadow-sm"
