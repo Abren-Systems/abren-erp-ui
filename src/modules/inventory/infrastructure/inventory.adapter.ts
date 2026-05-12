@@ -8,18 +8,12 @@ import type {
   CreateAdjustmentDTO,
   AdjustmentDTO,
 } from './api.types'
-import {
-  WarehouseSchema,
-  StockLevelSchema,
-  BatchSchema,
-  SerialNumberSchema,
-  AdjustmentListSchema,
-  ItemListSchema,
-  StockLevelListSchema,
-  OperationalAdjustmentSchema,
-} from './api.schemas'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type { WorkflowOperations } from '@/platform/workflow-runtime/models/workflows.types'
+import type {
+  Operational,
+  WorkflowOperations,
+} from '@/platform/workflow-runtime/models/workflows.types'
+import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 
 /**
  * Inventory API Adapter
@@ -43,13 +37,21 @@ export const inventoryAdapter = {
   },
 
   async getItems(query?: ListQuery): Promise<ListResponse<ItemDTO>> {
-    const raw = await apiGet<unknown>('/inventory/items', { params: query })
-    return ItemListSchema.parse(raw) as unknown as ListResponse<ItemDTO>
+    const raw = await apiGetEnvelope<unknown>('/inventory/items', { params: query })
+    const parsed = ItemListSchema.parse(raw.data)
+    return {
+      items: parsed.items,
+      totalCount: parsed.total_count,
+    }
   },
 
   async getStockLevels(query?: ListQuery): Promise<ListResponse<StockLevelDTO>> {
-    const raw = await apiGet<unknown>('/inventory/stock-positions', { params: query })
-    return StockLevelListSchema.parse(raw) as unknown as ListResponse<StockLevelDTO>
+    const raw = await apiGetEnvelope<unknown>('/inventory/stock-positions', { params: query })
+    const parsed = StockLevelListSchema.parse(raw.data)
+    return {
+      items: parsed.items,
+      totalCount: parsed.total_count,
+    }
   },
 
   async getStockByWarehouse(warehouseId: string): Promise<StockLevelDTO[]> {
@@ -72,40 +74,33 @@ export const inventoryAdapter = {
     return raw.map((item) => SerialNumberSchema.parse(item))
   },
 
-  async postAdjustment(
-    dto: CreateAdjustmentDTO,
-  ): Promise<{ data: AdjustmentDTO; operations: WorkflowOperations }> {
-    const raw = await apiPost<unknown>('/inventory/adjustments', dto)
+  async postAdjustment(dto: CreateAdjustmentDTO): Promise<Operational<AdjustmentDTO>> {
+    const raw = await apiPostEnvelope<unknown>('/inventory/adjustments', dto)
     const parsed = OperationalAdjustmentSchema.parse(raw)
     return {
-      data: parsed.data as unknown as AdjustmentDTO,
-      operations: parsed.operations as unknown as WorkflowOperations,
+      ...(parsed.data as unknown as AdjustmentDTO),
+      __operations: parsed.operations as unknown as WorkflowOperations,
     }
   },
 
-  async getAdjustmentById(
-    id: string,
-  ): Promise<{ data: AdjustmentDTO; operations: WorkflowOperations }> {
-    const raw = await apiGet<unknown>(`/inventory/adjustments/${id}`)
+  async getAdjustmentById(id: string): Promise<Operational<AdjustmentDTO>> {
+    const raw = await apiGetEnvelope<unknown>(`/inventory/adjustments/${id}`)
     const parsed = OperationalAdjustmentSchema.parse(raw)
     return {
-      data: parsed.data as unknown as AdjustmentDTO,
-      operations: parsed.operations as unknown as WorkflowOperations,
+      ...(parsed.data as unknown as AdjustmentDTO),
+      __operations: parsed.operations as unknown as WorkflowOperations,
     }
   },
 
-  async getAdjustments(
-    query?: ListQuery,
-  ): Promise<ListResponse<{ data: AdjustmentDTO; operations: WorkflowOperations }>> {
-    const raw = await apiGet<unknown>('/inventory/adjustments', { params: query })
-    const parsed = AdjustmentListSchema.parse(raw)
+  async getAdjustments(query?: ListQuery): Promise<ListResponse<Operational<AdjustmentDTO>>> {
+    const raw = await apiGetEnvelope<unknown>('/inventory/adjustments', { params: query })
+    const parsed = AdjustmentListSchema.parse(raw.data)
 
     return {
       items: parsed.items.map((item) => ({
-        data: item.data as unknown as unknown as AdjustmentDTO,
-        operations: item.operations as unknown as WorkflowOperations,
+        ...(item.data as unknown as AdjustmentDTO),
+        __operations: item.operations as unknown as WorkflowOperations,
       })),
-      nextCursor: parsed.next_cursor,
       totalCount: parsed.total_count,
     }
   },

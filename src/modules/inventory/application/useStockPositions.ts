@@ -7,6 +7,7 @@ import { inventoryKeys } from './query-keys'
 import type { StockItem } from '../models/inventory.types'
 
 import type { ListQuery } from '@/shared/domain/pagination'
+import type { StockLevelDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: View All Stock Positions (Paginated)
@@ -25,7 +26,7 @@ export function useStockLevels(query?: ListQuery) {
       const data = await inventoryAdapter.getStockLevels(query)
       return {
         ...data,
-        items: data.items.map((dto) => InventoryMapper.toStockItem(dto)),
+        items: data.items.map((dto: StockLevelDTO) => InventoryMapper.toStockItem(dto)),
       }
     },
     staleTime: 1000 * 60,
@@ -50,7 +51,7 @@ export function useStockPositions(warehouseId: Ref<string | undefined>) {
     queryFn: async () => {
       if (!warehouseId.value) return []
       const dtos = await inventoryAdapter.getStockByWarehouse(warehouseId.value)
-      return dtos.map((dto) => InventoryMapper.toStockItem(dto))
+      return dtos.map((dto: StockLevelDTO) => InventoryMapper.toStockItem(dto))
     },
     enabled: computed(() => !!warehouseId.value),
     staleTime: 1000 * 60, // 1 minute

@@ -4,6 +4,7 @@ import { InventoryMapper } from '../infrastructure/mappers'
 import { inventoryKeys } from './query-keys'
 
 import type { ListQuery } from '@/shared/domain/pagination'
+import type { ItemDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: View Inventory Items (Paginated)
@@ -22,7 +23,7 @@ export function useItems(query?: ListQuery) {
       const data = await inventoryAdapter.getItems(query)
       return {
         ...data,
-        items: data.items.map((dto) => InventoryMapper.toItem(dto)),
+        items: data.items.map((dto: ItemDTO) => InventoryMapper.toItem(dto)),
       }
     },
     staleTime: 1000 * 60 * 5,

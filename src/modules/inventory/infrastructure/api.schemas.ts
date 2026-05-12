@@ -84,10 +84,17 @@ export const AdjustmentSchema = z.object({
   lines: z.array(AdjustmentLineSchema),
 })
 
+/**
+ * Shallow schema for Grid/List views.
+ */
+export const AdjustmentListItemSchema = AdjustmentSchema.omit({
+  lines: true,
+})
+
 export const OperationalAdjustmentSchema = createOperationalResponseSchema(AdjustmentSchema)
 
 export const ItemListSchema = createPaginatedResponseSchema(ItemSchema)
 export const StockLevelListSchema = createPaginatedResponseSchema(StockLevelSchema)
 export const AdjustmentListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(AdjustmentSchema),
+  createOperationalResponseSchema(AdjustmentListItemSchema),
 )
