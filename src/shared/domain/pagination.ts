@@ -1,17 +1,15 @@
 /**
- * Shared pagination types for Keyset (Cursor-based) navigation.
- * Standardized across all list views (Phase 3).
+ * Shared pagination types for Offset-based navigation.
+ * Standardized across all ERP transactional grids.
  */
 
 export interface ListQuery {
   limit?: number
-  cursor?: string
   offset?: number
   [key: string]: string | number | boolean | undefined
 }
 
 export interface ListResponse<T> {
   items: T[]
-  nextCursor?: string | null
-  totalCount?: number | null
+  totalCount: number
 }
