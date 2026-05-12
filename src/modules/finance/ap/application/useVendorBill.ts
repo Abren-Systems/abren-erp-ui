@@ -38,8 +38,8 @@ export function useVendorBill(id: MaybeRefOrGetter<VendorBillId | null | undefin
   )
 
   return {
-    bill: computed(() => bill.value?.data),
-    operations: computed(() => bill.value?.operations),
+    vendorBill: bill,
+    operations: computed(() => bill.value?.__operations),
     isLoading,
     error,
   }

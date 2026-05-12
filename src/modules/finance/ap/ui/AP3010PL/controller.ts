@@ -13,13 +13,19 @@ import type { VendorBill } from '../../models/ap.types'
 
 export function useVendorBillsListController() {
   const router = useRouter()
-  const { bills, isLoading, error, refetch } = useVendorBills()
   const gridState = useDataGrid()
+
+  const query = computed<ListQuery>(() => ({
+    offset: gridState.pagination.value.pageIndex * gridState.pagination.value.pageSize,
+    limit: gridState.pagination.value.pageSize,
+  }))
+
+  const { vendorBills, isLoading, error, refetch } = useVendorBills(query)
 
   const base = useScreenController<VendorBill[], 'VIEW'>({
     screen: AP3010PL,
     dataSource: {
-      entity: computed(() => bills.value?.items.map((i) => i.data) ?? []),
+      entity: computed(() => vendorBills.value?.items ?? []),
       isLoading,
       error,
     },
@@ -50,9 +56,12 @@ export function useVendorBillsListController() {
     })
   }
 
+  const totalCount = computed(() => vendorBills.value?.totalCount ?? 0)
+
   return {
     ...base,
-    bills,
+    vendorBills,
+    totalCount,
     gridState,
     handleRowClick,
   }

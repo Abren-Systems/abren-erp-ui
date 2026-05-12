@@ -16,7 +16,9 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         v-model:row-selection="ctrl.gridState.rowSelection"
         v-model:column-visibility="ctrl.gridState.columnVisibility"
         v-model:global-filter="ctrl.gridState.globalFilter"
+        v-model:pagination="ctrl.gridState.pagination"
         :data="ctrl.filteredRequests.value"
+        :total-count="ctrl.totalCount.value"
         :columns="ctrl.columns"
         :loading="ctrl.isLoading.value"
         placeholder="Search requests..."
@@ -58,7 +60,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
         <template #footer>
           <DataGridFooter
-            :total-rows="ctrl.filteredRequests.value.length"
+            :total-rows="ctrl.totalCount.value"
             :selected-count="ctrl.selectedCount.value"
             :total-amount-formatted="ctrl.totalFilteredAmount.value.format()"
           />

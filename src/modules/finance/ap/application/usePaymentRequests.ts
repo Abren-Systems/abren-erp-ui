@@ -21,7 +21,7 @@ export function usePaymentRequests(query?: ListQuery) {
   } = useResourceQuery(apKeys.paymentRequests(query), () => apAdapter.listRequests(query))
 
   return {
-    requests: response, // ListResponse<{ data: PaymentRequest; operations: WorkflowOperations }>
+    paymentRequests: response,
     isLoading,
     error,
     refetch,

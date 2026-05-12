@@ -37,7 +37,7 @@ export function usePaymentRequestEntry(id: string) {
   const isNew = computed(() => id === 'new')
 
   // ── Data Sources ──
-  const { request, operations, isLoading, error } = usePaymentRequest(id as PaymentRequestId)
+  const { paymentRequest, operations, isLoading, error } = usePaymentRequest(id as PaymentRequestId)
   const { users } = useUsers()
 
   // ── Creation Form ──
@@ -53,7 +53,7 @@ export function usePaymentRequestEntry(id: string) {
         status: 'DRAFT' as PaymentRequestStatus,
       }
     }
-    return request.value
+    return paymentRequest.value
   })
 
   // ── Platform Base ──

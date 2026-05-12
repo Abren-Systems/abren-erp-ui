@@ -21,15 +21,22 @@ import { createPaymentRequestColumns } from './grids/primary.grid'
 import { PAYMENT_REQUEST_STATUS_OPTIONS, PAYMENT_REQUEST_FILTER_PRESETS } from '../AP301500/fields'
 import { AP3015PL } from './screen'
 import { CheckCircle, XCircle, Plus } from 'lucide-vue-next'
+import type { ListQuery } from '@/shared/domain/pagination'
 
 export function usePaymentRequestList() {
   const router = useRouter()
   const { hasPermission } = usePermissions()
-  const { requests, isLoading, error, refetch } = usePaymentRequests()
-  const { users } = useUsers()
-
   // ── Data Grid State ──
   const gridState = useDataGrid()
+
+  // ── Data Query ──
+  const query = computed<ListQuery>(() => ({
+    offset: gridState.pagination.value.pageIndex * gridState.pagination.value.pageSize,
+    limit: gridState.pagination.value.pageSize,
+  }))
+
+  const { paymentRequests, isLoading, error, refetch } = usePaymentRequests(query)
+  const { users } = useUsers()
 
   // ── Filter State ──
   const statusFilter = ref('all')
@@ -62,18 +69,18 @@ export function usePaymentRequestList() {
   const selectedCount = computed(() => Object.keys(gridState.rowSelection.value).length)
 
   const filteredRequests = computed(() => {
-    if (!requests.value?.items) return []
-    let data = requests.value.items
+    if (!paymentRequests.value?.items) return []
+    let data = paymentRequests.value.items
 
     if (statusFilter.value === 'needs_attention') {
-      data = data.filter((r) => ['DRAFT', 'REJECTED'].includes(r.data.status))
+      data = data.filter((r) => ['DRAFT', 'REJECTED'].includes(r.status))
     } else if (statusFilter.value === 'in_review') {
-      data = data.filter((r) => ['SUBMITTED', 'APPROVED', 'AUTHORIZED'].includes(r.data.status))
+      data = data.filter((r) => ['SUBMITTED', 'APPROVED', 'AUTHORIZED'].includes(r.status))
     }
 
     return data.map((r) => {
-      const requester = users.value?.find((u) => u.id === r.data.requesterId)
-      const beneficiary = users.value?.find((u) => u.id === r.data.beneficiaryId)
+      const requester = users.value?.find((u) => u.id === r.request.requesterId)
+      const beneficiary = users.value?.find((u) => u.id === r.request.beneficiaryId)
 
       const formatName = (user?: User, id?: string) => {
         if (!user) return id?.slice(0, 8) || 'Unknown'
@@ -99,11 +106,11 @@ export function usePaymentRequestList() {
       // accessorKeys ('status', 'totalAmount', etc.) resolve correctly.
       // Attach operations for version/bulk-action access.
       return {
-        ...r.data,
-        operations: r.operations,
-        requesterName: formatName(requester, r.data.requesterId),
-        beneficiaryName: formatName(beneficiary, r.data.beneficiaryId),
-        actionRequired: getActionRequired(r.data.status),
+        ...r,
+        operations: r.__operations,
+        requesterName: formatName(requester, r.requesterId),
+        beneficiaryName: formatName(beneficiary, r.beneficiaryId),
+        actionRequired: getActionRequired(r.status),
       }
     })
   })
@@ -115,6 +122,8 @@ export function usePaymentRequestList() {
   const selectedIds = computed(() => {
     return Object.keys(gridState.rowSelection.value) as PaymentRequestId[]
   })
+
+  const totalCount = computed(() => paymentRequests.value?.totalCount ?? 0)
 
   const selectedTargets = computed<BulkActionTarget[]>(() => {
     const selected = new Set(selectedIds.value)
@@ -159,7 +168,7 @@ export function usePaymentRequestList() {
   const base = useScreenController<PaymentRequest[], 'VIEW'>({
     screen: AP3015PL,
     dataSource: {
-      entity: computed(() => requests.value?.items.map((i) => i.data) ?? []),
+      entity: computed(() => paymentRequests.value?.items ?? []),
       isLoading,
       error,
     },
@@ -228,6 +237,7 @@ export function usePaymentRequestList() {
     selectedCount,
     filteredRequests,
     totalFilteredAmount,
+    totalCount,
     selectedIds,
     selectedTargets,
     columns,

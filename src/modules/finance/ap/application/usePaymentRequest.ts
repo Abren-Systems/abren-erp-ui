@@ -12,11 +12,11 @@ import { apKeys } from './query-keys'
  * @param id - The unique identifier (or Ref/Getter) of the payment request.
  * @returns Reactive payment request state.
  * @example
- * const { request, isLoading } = usePaymentRequest(() => props.id)
+ * const { paymentRequest, isLoading } = usePaymentRequest(() => props.id)
  */
 export function usePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
   const {
-    data: request,
+    data: paymentRequest,
     isLoading,
     error,
   } = useApiQuery(
@@ -38,8 +38,8 @@ export function usePaymentRequest(id: MaybeRefOrGetter<PaymentRequestId>) {
   )
 
   return {
-    request: computed(() => request.value?.data),
-    operations: computed(() => request.value?.operations),
+    paymentRequest,
+    operations: computed(() => paymentRequest.value?.__operations),
     isLoading,
     error,
   }
