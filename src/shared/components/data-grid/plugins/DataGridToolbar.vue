@@ -8,8 +8,9 @@
  * This matches Acumatica's Row 2: a single horizontal bar
  * with filter controls on the left and search on the right.
  */
-import { ref, watch } from 'vue'
-import { Search, X, List, LayoutGrid, LayoutList } from 'lucide-vue-next'
+import { ref, watch, computed } from 'vue'
+import { Search, X, List, LayoutGrid, LayoutList, ChevronDown } from 'lucide-vue-next'
+import { onClickOutside } from '@vueuse/core'
 import { AppInput, AppButton } from '@/shared/components/primitives'
 
 const props = defineProps<{
@@ -46,6 +47,26 @@ function clear() {
   localValue.value = ''
   emit('update:modelValue', '')
 }
+
+// ── Density Dropdown ──
+const isDensityOpen = ref(false)
+const densityRef = ref<HTMLElement | null>(null)
+onClickOutside(densityRef, () => (isDensityOpen.value = false))
+
+const DENSITY_OPTIONS = [
+  { id: 'compact', icon: List, label: 'Compact' },
+  { id: 'standard', icon: LayoutGrid, label: 'Standard' },
+  { id: 'relaxed', icon: LayoutList, label: 'Relaxed' },
+] as const
+
+const currentDensityOption = computed(() => {
+  return DENSITY_OPTIONS.find((o) => o.id === props.density) || DENSITY_OPTIONS[1]
+})
+
+function selectDensity(id: 'compact' | 'standard' | 'relaxed') {
+  emit('update:density', id)
+  isDensityOpen.value = false
+}
 </script>
 
 <template>
@@ -77,28 +98,33 @@ function clear() {
     <div class="toolbar-right">
       <slot name="controls" />
 
-      <!-- Density Gutter (Relocated from Center) -->
-      <div
-        class="flex items-center bg-[var(--color-neutral-50)] p-0.5 rounded border border-[var(--color-neutral-200)] ml-1"
-      >
-        <button
-          v-for="d in [
-            { id: 'compact', icon: List },
-            { id: 'standard', icon: LayoutGrid },
-            { id: 'relaxed', icon: LayoutList },
-          ] as const"
-          :key="d.id"
-          class="px-1.5 py-1 flex items-center justify-center rounded-sm transition-colors"
-          :class="
-            props.density === d.id
-              ? 'bg-white text-black'
-              : 'text-[var(--color-neutral-400)] hover:text-black'
-          "
-          @click="emit('update:density', d.id as any)"
-          :title="`${d.id.charAt(0).toUpperCase() + d.id.slice(1)} Density`"
+      <!-- Density Dropdown -->
+      <div class="density-selector" ref="densityRef">
+        <AppButton
+          variant="stealth"
+          size="sm"
+          class="density-trigger"
+          :title="`Current Density: ${currentDensityOption.label}`"
+          @click="isDensityOpen = !isDensityOpen"
         >
-          <component :is="d.icon" :size="14" />
-        </button>
+          <component :is="currentDensityOption.icon" :size="14" />
+          <ChevronDown :size="10" class="ml-1 opacity-50" />
+        </AppButton>
+
+        <Transition name="density-fade">
+          <div v-if="isDensityOpen" class="density-panel">
+            <button
+              v-for="opt in DENSITY_OPTIONS"
+              :key="opt.id"
+              class="density-item"
+              :class="{ 'density-item--active': props.density === opt.id }"
+              @click="selectDensity(opt.id)"
+            >
+              <component :is="opt.icon" :size="14" class="mr-2" />
+              <span>{{ opt.label }}</span>
+            </button>
+          </div>
+        </Transition>
       </div>
     </div>
   </div>
@@ -153,5 +179,68 @@ function clear() {
 
 .clear-btn:hover {
   color: var(--color-danger-600);
+}
+
+/* Density Dropdown Styles */
+.density-selector {
+  position: relative;
+  margin-left: 0.25rem;
+}
+
+.density-trigger {
+  padding: 0 0.375rem;
+  height: 1.75rem;
+  background: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-200);
+}
+
+.density-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 8rem;
+  background: white;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  z-index: 50;
+  padding: 0.25rem 0;
+}
+
+.density-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  color: var(--color-neutral-700);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.density-item:hover {
+  background: var(--color-neutral-50);
+}
+
+.density-item--active {
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+  font-weight: 500;
+}
+
+/* Transition */
+.density-fade-enter-active,
+.density-fade-leave-active {
+  transition:
+    opacity 0.1s ease,
+    transform 0.1s ease;
+}
+
+.density-fade-enter-from,
+.density-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>
