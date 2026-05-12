@@ -11,7 +11,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <div class="flex-1 p-2.5 min-h-0">
+    <div class="flex-1 p-0 min-h-0">
       <div
         v-if="!ctrl.selectedWarehouseId.value"
         class="h-full flex flex-col items-center justify-center text-[var(--color-neutral-500)] bg-white border border-[var(--color-neutral-200)] rounded-sm"

@@ -313,8 +313,8 @@ const handleRowClick = (row: Row<TData>) => {
   width: 100%;
   height: 100%;
   background: #ffffff;
-  border: 1px solid var(--color-neutral-200);
-  border-radius: 0; /* Fully sharp corners for authoritative workspace */
+  border: none;
+  border-radius: 0;
   overflow: hidden;
   font-family: var(--font-sans);
 }
@@ -345,7 +345,7 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-th {
-  padding: 0 12px;
+  padding: 0 10px;
   text-align: left;
   font-size: 11px;
   font-weight: 800; /* Extra bold for headers */
@@ -404,7 +404,7 @@ const handleRowClick = (row: Row<TData>) => {
 }
 
 .grid-td {
-  padding: 0 12px;
+  padding: 0 10px;
   border-right: 1px solid transparent;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -457,7 +457,7 @@ const handleRowClick = (row: Row<TData>) => {
   display: flex;
   align-items: center;
   height: 40px;
-  padding: 0 12px;
+  padding: 0 10px;
   border-top: 1px solid var(--color-neutral-200);
   background: var(--color-neutral-50);
   font-size: 11px;

@@ -16,7 +16,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <!-- Toolbar -->
 
     <!-- Main Content -->
-    <div class="flex-1 p-2.5 min-h-0 overflow-y-auto">
+    <div class="flex-1 p-0 min-h-0 overflow-y-auto">
       <DataGrid
         v-model:sorting="ctrl.gridState.sorting"
         v-model:row-selection="ctrl.gridState.rowSelection"

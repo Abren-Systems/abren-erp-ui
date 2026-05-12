@@ -142,7 +142,7 @@ function clear() {
   align-items: center;
   gap: 12px;
   height: 40px;
-  padding: 0 12px;
+  padding: 0 10px;
   background: #ffffff;
   border-bottom: 1px solid var(--color-neutral-200);
   flex-shrink: 0;

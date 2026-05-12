@@ -11,7 +11,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <div class="flex-1 p-2.5 min-h-0">
+    <div class="flex-1 p-0 min-h-0">
       <DataGrid
         v-model:sorting="ctrl.gridState.sorting"
         v-model:row-selection="ctrl.gridState.rowSelection"

@@ -69,7 +69,7 @@ const { hasPermission } = usePermissions()
 
         <div
           v-if="!ctrl.years.value?.length && !ctrl.isLoading.value"
-          class="p-2.5 text-center text-xs text-[var(--app-text-muted)] italic"
+          class="p-0 text-center text-xs text-[var(--app-text-muted)] italic"
         >
           No fiscal years generated yet.
         </div>
