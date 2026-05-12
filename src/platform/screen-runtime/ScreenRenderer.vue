@@ -18,6 +18,8 @@ import ListTitleBar from '@/platform/chrome/ListTitleBar.vue'
 import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
 import FormToolbar from '@/platform/chrome/FormToolbar.vue'
 import FormBanner from '@/platform/chrome/FormBanner.vue'
+import ConfirmDialog from '@/platform/chrome/ConfirmDialog.vue'
+import { AuditReasonDialog } from '@/shared/components/dialog'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenId } from './screen-id.types'
 import { ScreenControllerKey } from './injection-keys'
@@ -199,6 +201,26 @@ const sidePanelContract = computed(() => {
 
     <!-- Platform Side Panel -->
     <AppSidePane v-if="sidePanelContract" :contract="sidePanelContract" />
+
+    <!-- Platform Managed Dialogs -->
+    <AuditReasonDialog
+      v-if="controllerRef?.dialogs?.auditReason"
+      v-model:open="controllerRef.dialogs.auditReason.isOpen.value"
+      v-model="controllerRef.dialogs.auditReason.reason.value"
+      :title="controllerRef.dialogs.auditReason.title.value"
+      :description="controllerRef.dialogs.auditReason.description.value"
+      @confirm="controllerRef.dialogs.auditReason.confirm"
+    />
+
+    <ConfirmDialog
+      v-if="controllerRef?.dialogs?.confirmation"
+      v-model:open="controllerRef.dialogs.confirmation.isOpen.value"
+      :title="controllerRef.dialogs.confirmation.title.value"
+      :description="controllerRef.dialogs.confirmation.description.value"
+      :variant="controllerRef.dialogs.confirmation.variant.value"
+      :loading="controllerRef.isPending.value"
+      @confirm="controllerRef.dialogs.confirmation.confirm"
+    />
   </div>
   <div v-else class="flex items-center justify-center h-full text-danger-500 font-medium">
     Screen Definition Not Found: {{ screenId }}

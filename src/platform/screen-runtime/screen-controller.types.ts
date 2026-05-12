@@ -69,6 +69,26 @@ export interface ScreenController<T = unknown, TDomain extends string = string> 
   /** Whether any command is currently executing */
   readonly isPending: ComputedRef<boolean>
 
+  /** Platform-managed dialog states */
+  readonly dialogs: {
+    readonly auditReason: {
+      readonly isOpen: Ref<boolean>
+      readonly reason: Ref<string>
+      readonly title: Ref<string>
+      readonly description: Ref<string>
+      readonly confirm: () => void
+      readonly cancel: () => void
+    }
+    readonly confirmation: {
+      readonly isOpen: Ref<boolean>
+      readonly title: Ref<string>
+      readonly description: Ref<string>
+      readonly variant: Ref<'primary' | 'danger'>
+      readonly confirm: () => void
+      readonly cancel: () => void
+    }
+  }
+
   /** Register a command on this controller */
   registerCommand(id: string, command: ControllerCommand): void
 

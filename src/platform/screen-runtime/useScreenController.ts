@@ -1,10 +1,11 @@
-import { ref, computed, watch, onUnmounted, type ComputedRef, type Ref } from 'vue'
+import { ref, computed, watch, onUnmounted, shallowRef, type ComputedRef, type Ref } from 'vue'
 import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { BannerPolicy, ScreenStatePolicy } from './screen-state-policy.types'
 import type { WorkflowOperations } from '../workflow-runtime/models/workflows.types'
 import { resolveScreenProjection } from './resolve-screen-model'
+import type { CommandProjection } from './screen-projection.types'
 import { transitionRecorder } from '../debug/transition-recorder'
 import { ConflictError } from '@/shared/api/http-client'
 
@@ -164,52 +165,161 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
     }
   }
 
+  // ── Platform Dialogs ──
+  const auditReasonOpen = ref(false)
+  const auditReasonValue = ref('')
+  const auditReasonTitle = ref('')
+  const auditReasonDescription = ref('')
+  const pendingCommandExecution = shallowRef<{
+    id: string
+    command: ControllerCommand
+    args: unknown[]
+  } | null>(null)
+
+  const dialogs = {
+    auditReason: {
+      isOpen: auditReasonOpen,
+      reason: auditReasonValue,
+      title: auditReasonTitle,
+      description: auditReasonDescription,
+      confirm: () => {
+        if (!pendingCommandExecution.value) return
+        const { command, args } = pendingCommandExecution.value
+        // Inject reason as the last argument if required
+        void wrappedExecute(pendingCommandExecution.value.id, command, [
+          ...args,
+          auditReasonValue.value,
+        ])
+        auditReasonOpen.value = false
+        pendingCommandExecution.value = null
+      },
+      cancel: () => {
+        auditReasonOpen.value = false
+        pendingCommandExecution.value = null
+      },
+    },
+    confirmation: {
+      isOpen: ref(false),
+      title: ref(''),
+      description: ref(''),
+      variant: ref<'primary' | 'danger'>('primary'),
+      confirm: () => {
+        if (!pendingCommandExecution.value) return
+        const { id, command, args } = pendingCommandExecution.value
+        const projection = findProjection(id)
+
+        dialogs.confirmation.isOpen.value = false
+
+        if (projection?.action?.requiresReason) {
+          showAuditReason(projection)
+        } else {
+          void wrappedExecute(id, command, args)
+          pendingCommandExecution.value = null
+        }
+      },
+      cancel: () => {
+        dialogs.confirmation.isOpen.value = false
+        pendingCommandExecution.value = null
+      },
+    },
+  }
+
+  function findProjection(id: string) {
+    return (
+      model.value.ui.actions.primary.find((p) => p.command.key === id) ||
+      model.value.ui.actions.secondary.find((p) => p.command.key === id) ||
+      (model.value.ui.actions.expectedNext?.command.key === id
+        ? model.value.ui.actions.expectedNext
+        : undefined)
+    )
+  }
+
+  function showAuditReason(projection: CommandProjection) {
+    auditReasonTitle.value = projection.action?.label || projection.command.labelKey
+    auditReasonDescription.value = `Please provide a reason for the "${
+      projection.action?.label || projection.command.labelKey
+    }" action.`
+    auditReasonValue.value = ''
+    auditReasonOpen.value = true
+  }
+
+  function showConfirmation(projection: CommandProjection) {
+    dialogs.confirmation.title.value = `Confirm ${projection.command.labelKey}`
+    dialogs.confirmation.description.value =
+      projection.command.confirmationMessageKey || 'Are you sure you want to proceed?'
+    dialogs.confirmation.variant.value =
+      projection.command.variant === 'danger' ? 'danger' : 'primary'
+    dialogs.confirmation.isOpen.value = true
+  }
+
   // ── Command Registry ──
   const commands = ref<Record<string, ControllerCommand>>({})
 
+  async function wrappedExecute(id: string, command: ControllerCommand, args: unknown[]) {
+    transitionRecorder.recordTransition(
+      { type: 'command', source: `Command(${id})` },
+      {
+        operations: [
+          { op: 'replace', path: 'status', value: 'start' },
+          { op: 'replace', path: 'args', value: args },
+        ],
+      },
+      [],
+      model.value?.version ?? 0,
+    )
+    try {
+      await command.execute(...args)
+      transitionRecorder.recordTransition(
+        { type: 'command', source: `Command(${id})` },
+        { operations: [{ op: 'replace', path: 'status', value: 'end' }] },
+        [],
+        model.value?.version ?? 0,
+      )
+    } catch (error) {
+      handleCommandError(error)
+      transitionRecorder.recordTransition(
+        { type: 'command', source: `Command(${id})` },
+        {
+          operations: [
+            { op: 'replace', path: 'status', value: 'error' },
+            {
+              op: 'replace',
+              path: 'error',
+              value: error instanceof Error ? error.message : String(error),
+            },
+          ],
+        },
+        [],
+        model.value?.version ?? 0,
+      )
+      throw error
+    }
+  }
+
   function registerCommand(id: string, command: ControllerCommand) {
-    // Wrap execute() with debug instrumentation
     const wrappedCommand: ControllerCommand = {
       isPending: command.isPending,
       execute: async (...args: unknown[]) => {
-        transitionRecorder.recordTransition(
-          { type: 'command', source: `Command(${id})` },
-          {
-            operations: [
-              { op: 'replace', path: 'status', value: 'start' },
-              { op: 'replace', path: 'args', value: args },
-            ],
-          },
-          [],
-          model.value?.version ?? 0,
-        )
-        try {
-          await command.execute(...args)
-          transitionRecorder.recordTransition(
-            { type: 'command', source: `Command(${id})` },
-            { operations: [{ op: 'replace', path: 'status', value: 'end' }] },
-            [],
-            model.value?.version ?? 0,
-          )
-        } catch (error) {
-          handleCommandError(error)
-          transitionRecorder.recordTransition(
-            { type: 'command', source: `Command(${id})` },
-            {
-              operations: [
-                { op: 'replace', path: 'status', value: 'error' },
-                {
-                  op: 'replace',
-                  path: 'error',
-                  value: error instanceof Error ? error.message : String(error),
-                },
-              ],
-            },
-            [],
-            model.value?.version ?? 0,
-          )
-          throw error
+        // 1. Find the projection to check for interception requirements
+        const projection = findProjection(id)
+
+        // 2. Handle Interception Chain
+        // Priority 1: Confirmation
+        if (projection?.command.requiresConfirmation) {
+          pendingCommandExecution.value = { id, command, args }
+          showConfirmation(projection)
+          return
         }
+
+        // Priority 2: Audit Reason
+        if (projection?.action?.requiresReason) {
+          pendingCommandExecution.value = { id, command, args }
+          showAuditReason(projection)
+          return
+        }
+
+        // 3. Direct Execution (No Interception)
+        await wrappedExecute(id, command, args)
       },
     }
     commands.value[id] = wrappedCommand
@@ -294,6 +404,9 @@ export function useScreenController<T, TDomain extends string = BaseDomainState>
 
     /** Registered commands (populated by screen-specific controller) */
     commands: commands as Ref<Record<string, ControllerCommand>>,
+
+    /** Platform-managed dialog states */
+    dialogs,
 
     /** Register a command on this controller */
     registerCommand,

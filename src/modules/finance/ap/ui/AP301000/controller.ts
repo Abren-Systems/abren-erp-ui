@@ -53,9 +53,6 @@ export function useVendorBillController(id: string) {
   // UI state
   const currentLines = computed(() => vendorBill.value?.lines || [])
   const activeTab = ref('Expense Lines')
-  const isRejectDialogOpen = ref(false)
-  const auditReason = ref('')
-  const activeAuditAction = ref<'reject' | 'cancel' | null>(null)
 
   // Commands
   base.registerCommand('validate', {
@@ -64,37 +61,26 @@ export function useVendorBillController(id: string) {
   })
 
   base.registerCommand('reject', {
-    execute: async () => {
-      activeAuditAction.value = 'reject'
-      auditReason.value = ''
-      isRejectDialogOpen.value = true
+    execute: async (reason: unknown) => {
+      if (typeof reason === 'string') {
+        await reject(reason)
+      }
     },
     isPending: isRejecting,
   })
 
-  const handleRejectConfirm = async () => {
-    if (!auditReason.value.trim()) return
-    if (activeAuditAction.value === 'reject') {
-      await reject(auditReason.value)
-    } else if (activeAuditAction.value === 'cancel') {
-      await cancel(auditReason.value)
-    }
-    isRejectDialogOpen.value = false
-    activeAuditAction.value = null
-  }
+  base.registerCommand('cancel', {
+    execute: async (reason: unknown) => {
+      if (typeof reason === 'string') {
+        await cancel(reason)
+      }
+    },
+    isPending: isCancelling,
+  })
 
   base.registerCommand('create_pr', {
     execute: async () => void router.push({ name: 'PaymentRequestsList' }),
     isPending: computed(() => false),
-  })
-
-  base.registerCommand('cancel', {
-    execute: async () => {
-      activeAuditAction.value = 'cancel'
-      auditReason.value = ''
-      isRejectDialogOpen.value = true // Reuse reject dialog for cancel reason
-    },
-    isPending: isCancelling,
   })
 
   const fields = {
@@ -114,9 +100,6 @@ export function useVendorBillController(id: string) {
     fields,
     currentLines,
     activeTab,
-    isRejectDialogOpen,
-    auditReason,
-    handleRejectConfirm,
     form,
     isCreating,
     router,

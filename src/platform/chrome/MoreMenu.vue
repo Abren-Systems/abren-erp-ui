@@ -6,13 +6,11 @@
  * - Green dot (●) for the expected next action
  * - Star icon (★) for favorite-eligible commands
  * - Greyed-out rendering for commands not available in current state
- * - Confirmation trigger for destructive commands
  */
 import { ref, computed } from 'vue'
 import { AppButton } from '@/shared/components/primitives'
 import { MoreHorizontal } from 'lucide-vue-next'
 import { onClickOutside } from '@vueuse/core'
-import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
 import type { CommandProjection } from '../screen-runtime/screen-projection.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
@@ -48,32 +46,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: 'Other',
 }
 
-// ── Confirmation State ──
-const confirmState = ref<{ open: boolean; command: ScreenCommand | null }>({
-  open: false,
-  command: null,
-})
-
+// ── Execution ──
 function executeCommand(command: ScreenCommand) {
   if (props.isPending) return
-
-  if (command.requiresConfirmation) {
-    confirmState.value = { open: true, command }
-    isOpen.value = false
-  } else {
-    const executor = props.executors[command.key]
-    if (executor) void executor.execute()
-    isOpen.value = false
-  }
-}
-
-function confirmExecution() {
-  const cmd = confirmState.value.command
-  if (cmd) {
-    const executor = props.executors[cmd.key]
-    if (executor) void executor.execute()
-  }
-  confirmState.value = { open: false, command: null }
+  const executor = props.executors[command.key]
+  if (executor) void executor.execute()
+  isOpen.value = false
 }
 
 function toggleMenu() {
@@ -141,18 +119,6 @@ onClickOutside(menuRef, closeMenu)
         <div v-if="groups.size === 0" class="more-menu__empty">No actions available</div>
       </div>
     </Transition>
-
-    <!-- Confirmation Dialog -->
-    <ConfirmDialog
-      v-model:open="confirmState.open"
-      :title="confirmState.command ? `Confirm ${confirmState.command.labelKey}` : 'Confirm'"
-      :description="
-        confirmState.command?.confirmationMessageKey ?? 'Are you sure you want to proceed?'
-      "
-      :variant="confirmState.command?.variant === 'danger' ? 'danger' : 'primary'"
-      :loading="isPending"
-      @confirm="confirmExecution"
-    />
   </div>
 </template>
 

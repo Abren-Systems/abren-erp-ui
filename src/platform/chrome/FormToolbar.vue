@@ -16,7 +16,6 @@ import { computed, ref } from 'vue'
 import { AppButton } from '@/shared/components/primitives'
 import { Save, X, ChevronFirst, ChevronLeft, ChevronRight, ChevronLast } from 'lucide-vue-next'
 import MoreMenu from './MoreMenu.vue'
-import ConfirmDialog from './ConfirmDialog.vue'
 import type { ScreenCommand } from '../commands/command.types'
 import type { ScreenProjection, CommandProjection } from '../screen-runtime/screen-projection.types'
 import type { ControllerCommand } from '../screen-runtime/useScreenController'
@@ -37,30 +36,11 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-// ── Confirmation State ──
-const confirmState = ref<{ open: boolean; command: ScreenCommand | null }>({
-  open: false,
-  command: null,
-})
-
+// ── Execution ──
 function executeCommand(command: ScreenCommand) {
   if (props.isPending) return
-
-  if (command.requiresConfirmation) {
-    confirmState.value = { open: true, command }
-  } else {
-    const executor = props.executors[command.key]
-    if (executor) void executor.execute()
-  }
-}
-
-function confirmExecution() {
-  const cmd = confirmState.value.command
-  if (cmd) {
-    const executor = props.executors[cmd.key]
-    if (executor) void executor.execute()
-  }
-  confirmState.value = { open: false, command: null }
+  const executor = props.executors[command.key]
+  if (executor) void executor.execute()
 }
 
 function getButtonVariant(cmd: ScreenCommand) {
@@ -144,18 +124,6 @@ function getButtonVariant(cmd: ScreenCommand) {
       :expected-next="model.ui.actions.expectedNext"
       :executors="executors"
       :is-pending="isPending"
-    />
-
-    <!-- Confirmation Dialog for toolbar commands -->
-    <ConfirmDialog
-      v-model:open="confirmState.open"
-      :title="confirmState.command ? `Confirm ${confirmState.command.labelKey}` : 'Confirm'"
-      :description="
-        confirmState.command?.confirmationMessageKey ?? 'Are you sure you want to proceed?'
-      "
-      :variant="confirmState.command?.variant === 'danger' ? 'danger' : 'primary'"
-      :loading="isPending"
-      @confirm="confirmExecution"
     />
   </div>
 </template>
