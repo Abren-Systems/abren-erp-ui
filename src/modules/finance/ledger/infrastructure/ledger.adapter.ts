@@ -1,9 +1,7 @@
 import { apiGet, apiGetEnvelope, apiPost, apiPostEnvelope } from '@/shared/api/http-client'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type {
-  WorkflowOperations,
-  Operational,
-} from '@/platform/workflow-runtime/models/workflows.types'
+import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
+import { WorkflowOperationsSchema } from '@/platform/workflow-runtime/models/workflows.types'
 import type { JournalEntry } from '../models/journal-entry.types'
 import { LedgerMapper } from './mappers'
 import type {
@@ -82,7 +80,9 @@ export const ledgerAdapter = {
   /**
    * Fetches a paginated list of journal entries.
    */
-  async getJournalEntries(query?: ListQuery): Promise<ListResponse<Operational<JournalEntry>>> {
+  async getJournalEntries(
+    query?: ListQuery,
+  ): Promise<ListResponse<OperationalEntity<JournalEntry>>> {
     const raw = await apiGetEnvelope<unknown>('/finance/ledger/journal-entries', {
       params: query,
       headers: { 'X-Abren-Response-Profile': 'summary' },
@@ -92,7 +92,7 @@ export const ledgerAdapter = {
     return {
       items: parsed.items.map((item) => ({
         ...LedgerMapper.toJournalEntry(item.data as unknown as JournalEntryDTO),
-        __operations: item.operations as unknown as WorkflowOperations,
+        __operations: WorkflowOperationsSchema.parse(item.operations),
       })),
       totalCount: parsed.total_count ?? 0,
     }
@@ -104,14 +104,14 @@ export const ledgerAdapter = {
    * @param entryId - The UUID of the journal entry.
    * @returns A promise resolving to the validated Domain Model and Operations.
    */
-  async getJournalEntry(entryId: string): Promise<Operational<JournalEntry>> {
+  async getJournalEntry(entryId: string): Promise<OperationalEntity<JournalEntry>> {
     const raw = await apiGetEnvelope<unknown>(`/finance/ledger/journal-entries/${entryId}`, {
       headers: { 'X-Abren-Response-Profile': 'operational' },
     })
     const parsed = OperationalJournalEntrySchema.parse(raw)
     return {
       ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: parsed.operations as unknown as WorkflowOperations,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
     }
   },
 
@@ -120,14 +120,14 @@ export const ledgerAdapter = {
    *
    * @param data - The raw journal entry creation data.
    */
-  async createJournalEntry(data: CreateJournalEntryDTO): Promise<Operational<JournalEntry>> {
+  async createJournalEntry(data: CreateJournalEntryDTO): Promise<OperationalEntity<JournalEntry>> {
     const raw = await apiPostEnvelope<unknown>('/finance/ledger/journal-entries', data, {
       headers: { 'X-Abren-Response-Profile': 'operational' },
     })
     const parsed = OperationalJournalEntrySchema.parse(raw)
     return {
       ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: parsed.operations as unknown as WorkflowOperations,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
     }
   },
 
@@ -137,7 +137,10 @@ export const ledgerAdapter = {
    * @param entryId - The unique identifier of the journal entry.
    * @param version - The OCC expected version.
    */
-  async postJournalEntry(entryId: string, version: number): Promise<Operational<JournalEntry>> {
+  async postJournalEntry(
+    entryId: string,
+    version: number,
+  ): Promise<OperationalEntity<JournalEntry>> {
     const raw = await apiPostEnvelope<unknown>(
       `/finance/ledger/journal-entries/${entryId}/post`,
       { expected_version: version },
@@ -146,7 +149,7 @@ export const ledgerAdapter = {
     const parsed = OperationalJournalEntrySchema.parse(raw)
     return {
       ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: parsed.operations as unknown as WorkflowOperations,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
     }
   },
 
@@ -159,7 +162,7 @@ export const ledgerAdapter = {
   async voidJournalEntry(
     entryId: string,
     data: VoidJournalEntryDTO & { expected_version: number },
-  ): Promise<Operational<JournalEntry>> {
+  ): Promise<OperationalEntity<JournalEntry>> {
     const raw = await apiPostEnvelope<unknown>(
       `/finance/ledger/journal-entries/${entryId}/void`,
       data,
@@ -170,7 +173,7 @@ export const ledgerAdapter = {
     const parsed = OperationalJournalEntrySchema.parse(raw)
     return {
       ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: parsed.operations as unknown as WorkflowOperations,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
     }
   },
 

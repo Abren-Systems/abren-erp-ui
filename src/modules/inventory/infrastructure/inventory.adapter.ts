@@ -9,7 +9,7 @@ import type {
   AdjustmentDTO,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
+import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 import {
   mapOperational,
@@ -75,17 +75,17 @@ export const inventoryAdapter = {
     return raw.map((item) => SerialNumberSchema.parse(item))
   },
 
-  async postAdjustment(dto: CreateAdjustmentDTO): Promise<Operational<Adjustment>> {
+  async postAdjustment(dto: CreateAdjustmentDTO): Promise<OperationalEntity<Adjustment>> {
     const raw = await apiPostEnvelope<OperationalDTO<AdjustmentDTO>>('/inventory/adjustments', dto)
     return mapOperational(raw.data, (dto: AdjustmentDTO) => InventoryMapper.toAdjustment(dto))
   },
 
-  async getAdjustmentById(id: AdjustmentId): Promise<Operational<Adjustment>> {
+  async getAdjustmentById(id: AdjustmentId): Promise<OperationalEntity<Adjustment>> {
     const raw = await apiGetEnvelope<OperationalDTO<AdjustmentDTO>>(`/inventory/adjustments/${id}`)
     return mapOperational(raw.data, (dto: AdjustmentDTO) => InventoryMapper.toAdjustment(dto))
   },
 
-  async getAdjustments(query?: ListQuery): Promise<ListResponse<Operational<Adjustment>>> {
+  async getAdjustments(query?: ListQuery): Promise<ListResponse<OperationalEntity<Adjustment>>> {
     const raw = await apiGetEnvelope<OperationalListDTO<AdjustmentDTO>>('/inventory/adjustments', {
       params: query,
     })

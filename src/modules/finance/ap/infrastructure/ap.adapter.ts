@@ -8,7 +8,7 @@ import type {
   VendorBillDTO,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
+import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope } from '@/shared/api/http-client'
 import {
   mapOperational,
@@ -33,14 +33,16 @@ export const apAdapter = {
   /**
    * Fetches a paginated list of Payment Requests.
    */
-  async listRequests(query?: ListQuery): Promise<ListResponse<Operational<PaymentRequest>>> {
+  async listRequests(query?: ListQuery): Promise<ListResponse<OperationalEntity<PaymentRequest>>> {
     const raw = await apiGetEnvelope<OperationalListDTO<PaymentRequestDTO>>(REQUESTS_BASE, {
       params: query,
     })
     return mapOperationalList(raw.data, (dto) => APMapper.toPaymentRequest(dto))
   },
 
-  async getRequestsByUser(userId: UserId): Promise<ListResponse<Operational<PaymentRequest>>> {
+  async getRequestsByUser(
+    userId: UserId,
+  ): Promise<ListResponse<OperationalEntity<PaymentRequest>>> {
     const raw = await apiGetEnvelope<OperationalListDTO<PaymentRequestDTO>>(
       `${REQUESTS_BASE}/user/${userId}`,
     )
@@ -50,7 +52,7 @@ export const apAdapter = {
   /**
    * Fetches a single Payment Request by ID.
    */
-  async getRequest(id: PaymentRequestId): Promise<Operational<PaymentRequest>> {
+  async getRequest(id: PaymentRequestId): Promise<OperationalEntity<PaymentRequest>> {
     const raw = await apiGetEnvelope<OperationalDTO<PaymentRequestDTO>>(`${REQUESTS_BASE}/${id}`)
     return mapOperational(raw.data, (dto) => APMapper.toPaymentRequest(dto))
   },
@@ -133,7 +135,7 @@ export const apAdapter = {
   /**
    * Fetches a paginated list of Vendor Bills.
    */
-  async listBills(query?: ListQuery): Promise<ListResponse<Operational<VendorBill>>> {
+  async listBills(query?: ListQuery): Promise<ListResponse<OperationalEntity<VendorBill>>> {
     const raw = await apiGetEnvelope<OperationalListDTO<VendorBillDTO>>(BILLS_BASE, {
       params: query,
     })
@@ -143,7 +145,7 @@ export const apAdapter = {
   /**
    * Fetches a single Vendor Bill by ID.
    */
-  async getBill(id: VendorBillId): Promise<Operational<VendorBill>> {
+  async getBill(id: VendorBillId): Promise<OperationalEntity<VendorBill>> {
     const raw = await apiGetEnvelope<OperationalDTO<VendorBillDTO>>(`${BILLS_BASE}/${id}`)
     return mapOperational(raw.data, (dto) => APMapper.toVendorBill(dto))
   },

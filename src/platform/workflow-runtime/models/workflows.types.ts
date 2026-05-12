@@ -1,5 +1,6 @@
 import type { WorkflowInstanceId, RoleId } from '@/shared/types/brand.types'
 import type { IsoDate } from '@/shared/domain/business-date'
+import { z } from 'zod'
 
 export interface PendingApproval {
   id: WorkflowInstanceId
@@ -14,20 +15,32 @@ export interface PendingApproval {
 export type ApprovalAction = 'APPROVE' | 'REJECT'
 
 /** Semantic description of a workflow action. */
-export interface ActionDescriptor {
-  action: string
-  label: string
-  icon?: string
-  isPrimary: boolean
-  requiresReason: boolean
-}
+export const ActionDescriptorSchema = z
+  .object({
+    action: z.string(),
+    label: z.string(),
+    icon: z.string().optional(),
+    is_primary: z.boolean().default(false),
+    requires_reason: z.boolean().default(false),
+  })
+  .transform((val) => ({
+    action: val.action,
+    label: val.label,
+    icon: val.icon,
+    isPrimary: val.is_primary,
+    requiresReason: val.requires_reason,
+  }))
+
+export type ActionDescriptor = z.infer<typeof ActionDescriptorSchema>
 
 /** Authoritative projection of current operational capabilities. */
-export interface WorkflowOperations {
-  actions: ActionDescriptor[]
-  permissions: Record<string, 'editable' | 'readonly' | 'hidden'>
-  version: number
-}
+export const WorkflowOperationsSchema = z.object({
+  actions: z.array(ActionDescriptorSchema),
+  permissions: z.record(z.enum(['editable', 'readonly', 'hidden'])),
+  version: z.number().int().default(1),
+})
+
+export type WorkflowOperations = z.infer<typeof WorkflowOperationsSchema>
 
 /** Enhanced response envelope for workflow-aware entities. */
 export interface OperationalResponse<T> {
@@ -38,6 +51,6 @@ export interface OperationalResponse<T> {
 }
 
 /** Frontend runtime representation of an operational entity (flattened from envelope). */
-export type Operational<T> = T & {
-  __operations?: WorkflowOperations
+export type OperationalEntity<T> = T & {
+  __operations: WorkflowOperations
 }

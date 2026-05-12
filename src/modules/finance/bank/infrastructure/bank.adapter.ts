@@ -7,7 +7,7 @@ import type {
   CreateScheduledPaymentRequest,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type { Operational } from '@/platform/workflow-runtime/models/workflows.types'
+import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 import {
   mapOperational,
@@ -58,7 +58,7 @@ export const bankAdapter = {
    */
   async getScheduledPayments(
     query?: ListQuery,
-  ): Promise<ListResponse<Operational<ScheduledPayment>>> {
+  ): Promise<ListResponse<OperationalEntity<ScheduledPayment>>> {
     const raw = await apiGetEnvelope<OperationalListDTO<ScheduledPaymentDTO>>(
       '/finance/bank/scheduled-payments',
       { params: query },
@@ -74,7 +74,7 @@ export const bankAdapter = {
    */
   async createScheduledPayment(
     data: CreateScheduledPaymentRequest,
-  ): Promise<Operational<ScheduledPayment>> {
+  ): Promise<OperationalEntity<ScheduledPayment>> {
     const raw = await apiPostEnvelope<OperationalDTO<ScheduledPaymentDTO>>(
       '/finance/bank/scheduled-payments',
       data,
@@ -90,7 +90,7 @@ export const bankAdapter = {
    */
   async releaseScheduledPayment(
     paymentId: ScheduledPaymentId,
-  ): Promise<Operational<ScheduledPayment>> {
+  ): Promise<OperationalEntity<ScheduledPayment>> {
     const raw = await apiPostEnvelope<OperationalDTO<ScheduledPaymentDTO>>(
       `/finance/bank/scheduled-payments/${paymentId}/release`,
     )

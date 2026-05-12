@@ -59,7 +59,15 @@ describe('resolveScreenProjection', () => {
       commands: mockCommands,
       domainState: 'DRAFT',
       operations: {
-        actions: [{ action: 'RELEASE', label: 'Release', isPrimary: true, requiresReason: false }],
+        actions: [
+          {
+            action: 'RELEASE',
+            label: 'Release',
+            isPrimary: true,
+            requiresReason: false,
+            icon: undefined,
+          },
+        ],
         permissions: {},
         version: 1,
       },
@@ -121,7 +129,15 @@ describe('resolveScreenProjection', () => {
       commands: mockCommands,
       domainState: 'DRAFT',
       operations: {
-        actions: [{ action: 'RELEASE', label: 'Release', isPrimary: true, requiresReason: false }],
+        actions: [
+          {
+            action: 'RELEASE',
+            label: 'Release',
+            isPrimary: true,
+            requiresReason: false,
+            icon: undefined,
+          },
+        ],
         permissions: {},
         version: 1,
       },
@@ -143,7 +159,15 @@ describe('resolveScreenProjection', () => {
       commands: mockCommands,
       domainState: 'DRAFT', // Normally editable
       operations: {
-        actions: [{ action: 'RELEASE', label: 'Release', isPrimary: true, requiresReason: false }],
+        actions: [
+          {
+            action: 'RELEASE',
+            label: 'Release',
+            isPrimary: true,
+            requiresReason: false,
+            icon: undefined,
+          },
+        ],
         permissions: {
           vendorId: 'editable',
           totalAmount: 'readonly',
