@@ -1,124 +1,176 @@
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent, type Component } from 'vue'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+/**
+ * AppSidePane.vue
+ *
+ * The authoritative Right-hand service panel.
+ *
+ * Refined per user feedback:
+ * - Removed pseudo-header (should not touch Top Pane).
+ * - Collapse icon relocated to bottom of icon strip.
+ * - Height contained within Working Area.
+ */
+import { ref, computed, inject, type Component } from 'vue'
+import {
+  ChevronRight,
+  ChevronLeft,
+  MessageSquare,
+  Paperclip,
+  FileText,
+  User,
+  GitBranch,
+} from 'lucide-vue-next'
 import type { SidePanelContract, SidePanelTabContract } from '@/platform/component-contracts'
 
 const props = defineProps<{
-  contract: SidePanelContract
+  contract?: SidePanelContract
 }>()
 
-// Default to true if not specified, matching Acumatica's typical behavior
-const isCollapsed = ref(props.contract.defaultCollapsed ?? true)
-
-const activeTabId = ref<string>(props.contract.defaultTabId ?? props.contract.tabs[0]?.id ?? '')
-
-const activeTab = computed(() => props.contract.tabs.find((t) => t.id === activeTabId.value))
-
-// In a real app, icons would be resolved from a registry
-// We'll use a simple fallback mechanism here for the proof of concept
-const resolveIcon = (iconName: string) => {
-  // If we had dynamic lucide imports, we'd do it here
-  // For now, we'll just pass the string to a generic icon component or use a static map if needed
-  return iconName
+interface SidePanelState {
+  visible: { value: boolean }
+  expanded: { value: boolean }
 }
 
-// Map of lazy loaded components
-const tabComponents = computed<Record<string, Component>>(() => {
-  const map: Record<string, Component> = {}
+const sidePanel = inject<SidePanelState>('sidePanel')!
 
-  for (const tab of props.contract.tabs) {
-    if (tab.kind === 'local') {
-      map[tab.id] = defineAsyncComponent({
-        loader: tab.component as () => Promise<Component>,
-        delay: 200,
-        timeout: 3000,
-      })
-    }
-  }
-  return map
-})
+// Default services if no contract is provided (for demonstration/hardening)
+const defaultTabs: SidePanelTabContract[] = [
+  {
+    id: 'activities',
+    labelKey: 'Activities',
+    icon: 'MessageSquare',
+    kind: 'local',
+    component: async () => ({}),
+  },
+  { id: 'files', labelKey: 'Files', icon: 'Paperclip', kind: 'local', component: async () => ({}) },
+  {
+    id: 'relations',
+    labelKey: 'Relations',
+    icon: 'GitBranch',
+    kind: 'local',
+    component: async () => ({}),
+  },
+]
 
-function togglePanel() {
-  isCollapsed.value = !isCollapsed.value
+const tabs = computed(() => props.contract?.tabs || defaultTabs)
+const activeTabId = ref<string>(props.contract?.defaultTabId || tabs.value[0]?.id || '')
+const activeTab = computed(() => tabs.value.find((t) => t.id === activeTabId.value))
+
+// Map of icons for demonstration
+const iconMap: Record<string, Component> = {
+  MessageSquare,
+  Paperclip,
+  FileText,
+  User,
+  GitBranch,
 }
 
 function selectTab(tab: SidePanelTabContract) {
   activeTabId.value = tab.id
-  if (isCollapsed.value) {
-    isCollapsed.value = false
+  if (!sidePanel.expanded.value) {
+    sidePanel.expanded.value = true
   }
 }
 </script>
 
 <template>
-  <div
-    class="app-side-panel flex border-l border-neutral-200 bg-white transition-all duration-300 ease-in-out relative z-10"
-    :class="[isCollapsed ? 'w-[48px]' : 'w-[400px]']"
+  <aside
+    v-if="sidePanel.visible.value"
+    class="side-pane mt-px flex flex-col border-l border-[var(--color-neutral-200)] bg-[var(--color-neutral-50)]"
+    :class="{ 'side-pane--expanded': sidePanel.expanded.value }"
   >
-    <!-- Expand/Collapse Toggle -->
-    <button
-      class="absolute top-1/2 -left-4 w-4 h-16 bg-white border border-neutral-200 border-r-0 rounded-l flex items-center justify-center text-neutral-500 hover:text-neutral-900 shadow-[-2px_0_4px_rgba(0,0,0,0.05)] z-20 transition-colors"
-      @click="togglePanel"
-    >
-      <ChevronRight v-if="isCollapsed" class="w-3 h-3" />
-      <ChevronLeft v-else class="w-3 h-3" />
-    </button>
-
-    <!-- Content Area (Only visible when expanded) -->
-    <div
-      class="flex-1 overflow-hidden transition-opacity duration-200 flex flex-col"
-      :class="isCollapsed ? 'opacity-0 invisible w-0' : 'opacity-100 visible'"
-    >
-      <!-- Panel Header -->
+    <!-- Main Content Area (No header, starts below Top Pane) -->
+    <div class="flex flex-1 min-h-0 overflow-hidden">
+      <!-- Expanded Content Area -->
       <div
-        class="h-14 border-b border-neutral-200 flex items-center px-4 shrink-0 bg-neutral-50/50"
+        v-if="sidePanel.expanded.value"
+        class="flex-1 overflow-y-auto p-4 animate-in slide-in-from-right-2 bg-white"
       >
-        <h3 class="text-sm font-semibold text-neutral-900 truncate">
-          {{ activeTab?.labelKey || 'Side Panel' }}
-        </h3>
-      </div>
+        <div class="mb-6 flex items-center justify-between">
+          <h3
+            class="text-[11px] font-bold uppercase tracking-wider text-[var(--color-neutral-500)]"
+          >
+            {{ activeTab?.labelKey }}
+          </h3>
+        </div>
 
-      <!-- Panel Body -->
-      <div class="flex-1 overflow-y-auto">
-        <template v-if="activeTab?.kind === 'local'">
-          <component :is="tabComponents[activeTab.id]" v-if="tabComponents[activeTab.id]" />
-        </template>
-
-        <template v-else-if="activeTab?.kind === 'screen'">
-          <!-- In Phase 4b, this would mount a nested ScreenRenderer -->
-          <div class="p-6 text-center text-neutral-500 text-sm">
-            Nested ScreenRenderer ({{ activeTab.screenId }}) placeholder.
+        <!-- Contextual Content Placeholders -->
+        <div class="space-y-6">
+          <div v-for="i in 3" :key="i" class="space-y-2">
+            <div class="flex justify-between items-start">
+              <p class="text-[11px] font-semibold text-[var(--color-neutral-900)]">
+                Context Event #{{ 1024 + i }}
+              </p>
+              <span class="text-[10px] text-[var(--color-neutral-400)]">{{ i }}h ago</span>
+            </div>
+            <p class="text-[11px] text-[var(--color-neutral-600)] leading-relaxed">
+              Automated audit capture of contextual state transition for the current record.
+            </p>
+            <div class="h-px w-full bg-[var(--color-neutral-100)]" />
           </div>
-        </template>
+        </div>
+        <div
+          class="mt-8 rounded border border-dashed border-[var(--color-neutral-200)] p-8 text-center text-[var(--color-neutral-400)] text-xs"
+        >
+          End of contextual services
+        </div>
+      </div>
+
+      <!-- Icon Strip (Always visible, flush right) -->
+      <div
+        class="w-11 shrink-0 border-l border-[var(--color-neutral-100)] flex flex-col items-center py-4 relative h-full"
+      >
+        <!-- Service Tabs -->
+        <div class="flex flex-col gap-4 items-center flex-1">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            class="group relative flex h-10 w-10 items-center justify-center transition-all"
+            :class="[
+              activeTabId === tab.id
+                ? 'text-[var(--color-primary-600)]'
+                : 'text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)]',
+            ]"
+            @click="selectTab(tab)"
+            :title="tab.labelKey"
+          >
+            <component :is="iconMap[tab.icon] || FileText" :size="18" />
+
+            <div
+              v-if="activeTabId === tab.id && sidePanel.expanded.value"
+              class="absolute right-0 top-1 bottom-1 w-[3px] bg-[var(--color-primary-600)]"
+            />
+          </button>
+        </div>
+
+        <!-- Expansion Toggle (At the bottom) -->
+        <button
+          class="mt-auto flex h-10 w-10 items-center justify-center text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)] transition-colors border-t border-[var(--color-neutral-100)] pt-2"
+          @click="sidePanel.expanded.value = !sidePanel.expanded.value"
+          title="Toggle Expansion"
+        >
+          <ChevronLeft v-if="!sidePanel.expanded.value" :size="18" />
+          <ChevronRight v-else :size="18" />
+        </button>
       </div>
     </div>
-
-    <!-- Icon Strip (Always visible on the right edge) -->
-    <div
-      class="w-[48px] shrink-0 border-l border-neutral-200 bg-neutral-50 flex flex-col py-2 gap-1 items-center z-10"
-    >
-      <button
-        v-for="tab in contract.tabs"
-        :key="tab.id"
-        class="w-10 h-10 rounded flex items-center justify-center transition-colors group relative"
-        :class="[
-          activeTabId === tab.id
-            ? 'bg-primary-50 text-primary-600'
-            : 'text-neutral-500 hover:bg-neutral-200/50 hover:text-neutral-900',
-        ]"
-        @click="selectTab(tab)"
-        :title="tab.labelKey"
-      >
-        <!-- In a real implementation, we'd render the lucide icon here based on tab.icon string -->
-        <span class="text-[10px] font-bold uppercase tracking-tighter">{{
-          tab.icon.substring(0, 3)
-        }}</span>
-      </button>
-    </div>
-  </div>
+  </aside>
 </template>
 
 <style scoped>
+.side-pane {
+  width: 44px;
+  min-height: 100%;
+  align-self: stretch;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.side-pane--expanded {
+  width: 300px;
+}
+
 /* 
   Acumatica-style side panel:
   - Collapses to just the icon strip

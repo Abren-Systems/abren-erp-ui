@@ -203,7 +203,7 @@ const sidePanelContract = computed(() => {
     </div>
 
     <!-- Platform Side Panel -->
-    <AppSidePane v-if="sidePanelContract" :contract="sidePanelContract" />
+    <AppSidePane :contract="sidePanelContract" />
 
     <!-- Platform Managed Dialogs -->
     <AuditReasonDialog

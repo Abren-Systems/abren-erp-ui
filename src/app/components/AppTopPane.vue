@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Bell, Command, LogOut, Moon, Search, Sun } from 'lucide-vue-next'
+import { Bell, Command, LogOut, Moon, Search, Sun, PanelRight } from 'lucide-vue-next'
 
 interface Props {
   tenantName: string
@@ -14,6 +14,7 @@ const emit = defineEmits<{
   search: []
   notifications: []
   logout: []
+  'toggle-right-sidebar': []
 }>()
 
 const isDark = ref(document.documentElement.classList.contains('dark'))
@@ -57,6 +58,21 @@ function toggleDarkMode() {
 
       <!-- Right: User Tools & Identity -->
       <div class="flex items-center justify-end gap-3">
+        <button
+          v-if="$route.meta.screenId"
+          type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-100)] transition-colors"
+          title="Toggle Side Panel"
+          @click="emit('toggle-right-sidebar')"
+        >
+          <PanelRight class="h-4 w-4" />
+        </button>
+
+        <div
+          v-if="$route.meta.screenId"
+          class="hidden h-8 w-px bg-[var(--color-neutral-200)] sm:block"
+        />
+
         <button
           type="button"
           class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)]"

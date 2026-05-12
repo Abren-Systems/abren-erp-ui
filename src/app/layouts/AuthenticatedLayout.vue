@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, provide, ref } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/shared/auth/auth.store'
 import AppSidebar from '../components/AppSidebar.vue'
 import AppTopPane from '../components/AppTopPane.vue'
-import AppRightSidebar from '../components/AppRightSidebar.vue'
 import SearchPalette from '@/shared/components/search/SearchPalette.vue'
 import { useSearch } from '@/shared/search/useSearch'
 
@@ -14,6 +13,17 @@ const { togglePalette } = useSearch()
 
 const isSidebarCollapsed = ref(false)
 const isMobileSidebarOpen = ref(false)
+
+// Shared Layout State for Side Panel
+const isSidePanelVisible = ref(true)
+const isSidePanelExpanded = ref(false)
+
+provide('sidePanel', {
+  visible: isSidePanelVisible,
+  expanded: isSidePanelExpanded,
+  toggleVisibility: () => (isSidePanelVisible.value = !isSidePanelVisible.value),
+  toggleExpansion: () => (isSidePanelExpanded.value = !isSidePanelExpanded.value),
+})
 
 const tenantName = computed(() => authStore.currentTenant?.name || 'Current Tenant')
 const userEmail = computed(() => authStore.currentUser?.email || 'operator@abren.local')
@@ -56,6 +66,7 @@ async function handleLogout() {
         :user-initials="userInitials"
         @logout="handleLogout"
         @search="togglePalette"
+        @toggle-right-sidebar="isSidePanelVisible = !isSidePanelVisible"
       />
 
       <!-- Foundation 0.3/0.4: Workspace / Working Area -->
@@ -63,9 +74,5 @@ async function handleLogout() {
         <RouterView />
       </div>
     </main>
-
-    <!-- Foundation 0.5: Right Side Panel (Services) -->
-    <!-- Contextual: Only shown when an active screen (list/form) is present -->
-    <AppRightSidebar v-if="$route.meta.screenId" />
   </div>
 </template>
