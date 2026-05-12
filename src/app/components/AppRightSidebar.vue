@@ -44,17 +44,10 @@ function toggleService(id: string) {
   >
     <!-- Header/Toggle (Matching top bar alignment) -->
     <div
-      class="flex h-[53px] items-center border-b border-[var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
-      style="padding: 0 var(--layout-gutter)"
+      class="flex items-center border-b border-[var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
+      style="height: var(--chrome-header-h); padding: 0 var(--layout-gutter)"
     >
-      <button
-        class="text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)] transition-colors"
-        @click="activeService = null"
-        v-if="activeService"
-      >
-        <ChevronRight :size="16" />
-      </button>
-      <div v-else class="mx-auto h-4 w-4 rounded-full border-2 border-[var(--color-neutral-200)]" />
+      <div class="mx-auto h-4 w-4 rounded-full border-2 border-[var(--color-neutral-200)]" />
     </div>
 
     <!-- Service Icons -->
@@ -82,18 +75,41 @@ function toggleService(id: string) {
       </button>
     </div>
 
-    <!-- Expansion Panel (Placeholder for actual service content) -->
+    <!-- Expansion Panel (Contextual Service Content) -->
     <div v-if="activeService" class="service-panel animate-in slide-in-from-right-2">
       <div class="p-4">
-        <h3
-          class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-500)] mb-4"
-        >
-          {{ services.find((s) => s.id === activeService)?.label }}
-        </h3>
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-neutral-500)]">
+            {{ services.find((s) => s.id === activeService)?.label }}
+          </h3>
+          <button
+            @click="activeService = null"
+            class="text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)] transition-colors"
+          >
+            <ChevronRight :size="16" />
+          </button>
+        </div>
+
+        <!-- Demonstrative Contextual Content -->
+        <div class="space-y-6">
+          <div v-for="i in 3" :key="i" class="space-y-2">
+            <div class="flex justify-between items-start">
+              <p class="text-[11px] font-semibold text-[var(--color-neutral-900)]">
+                Record Event #{{ 1024 + i }}
+              </p>
+              <span class="text-[10px] text-[var(--color-neutral-400)]">{{ i }}h ago</span>
+            </div>
+            <p class="text-[11px] text-[var(--color-neutral-600)] leading-relaxed">
+              Automated audit capture of contextual state transition for the current record.
+            </p>
+            <div class="h-px w-full bg-[var(--color-neutral-100)]" />
+          </div>
+        </div>
+
         <div
-          class="rounded border border-dashed border-[var(--color-neutral-200)] p-8 text-center text-[var(--color-neutral-400)] text-xs"
+          class="mt-8 rounded border border-dashed border-[var(--color-neutral-200)] p-8 text-center text-[var(--color-neutral-400)] text-xs"
         >
-          Service content for {{ activeService }}...
+          End of demonstrative services for {{ activeService }}
         </div>
       </div>
     </div>

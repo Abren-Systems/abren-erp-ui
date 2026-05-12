@@ -65,6 +65,7 @@ async function handleLogout() {
     </main>
 
     <!-- Foundation 0.5: Right Side Panel (Services) -->
-    <AppRightSidebar />
+    <!-- Contextual: Only shown when an active screen (list/form) is present -->
+    <AppRightSidebar v-if="$route.meta.screenId" />
   </div>
 </template>
