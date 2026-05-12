@@ -42,9 +42,10 @@ function toggleService(id: string) {
     class="right-sidebar flex flex-col border-l border-[var(--color-neutral-200)] bg-[var(--color-neutral-50)]"
     :class="{ 'right-sidebar--active': activeService }"
   >
-    <!-- Header/Toggle (Optional, matching Acumatica's clean look) -->
+    <!-- Header/Toggle (Matching top bar alignment) -->
     <div
-      class="flex h-[53px] items-center justify-center border-b border-[var(--color-neutral-200)]"
+      class="flex h-[53px] items-center border-b border-[var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
+      style="padding: 0 var(--layout-gutter)"
     >
       <button
         class="text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-900)] transition-colors"
@@ -53,7 +54,7 @@ function toggleService(id: string) {
       >
         <ChevronRight :size="16" />
       </button>
-      <div v-else class="h-4 w-4 rounded-full border-2 border-[var(--color-neutral-200)]" />
+      <div v-else class="mx-auto h-4 w-4 rounded-full border-2 border-[var(--color-neutral-200)]" />
     </div>
 
     <!-- Service Icons -->

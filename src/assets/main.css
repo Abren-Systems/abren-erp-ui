@@ -144,6 +144,7 @@
    * ── Chrome Heights ────────────────────────────────────────
    * Controls the vertical rhythm of the platform frame.
    */
+  --chrome-header-h: 53px;
   --chrome-topbar-py: 6px;
   --chrome-titlebar-py: 6px;
   --chrome-titlebar-min-h: 2.25rem; /* 36px */

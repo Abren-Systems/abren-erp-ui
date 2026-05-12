@@ -25,7 +25,8 @@ function toggleDarkMode() {
 
 <template>
   <header
-    class="sticky top-0 z-20 border-b border-[color:var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
+    class="sticky top-0 z-20 flex w-full items-center border-b border-[color:var(--color-neutral-200)] bg-[rgba(248,249,250,0.88)] backdrop-blur"
+    style="height: var(--chrome-header-h)"
   >
     <div
       class="flex items-center gap-2 sm:gap-3"
@@ -33,7 +34,7 @@ function toggleDarkMode() {
     >
       <button
         type="button"
-        class="inline-flex items-center gap-2 rounded-md border border-[color:var(--color-neutral-200)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-600)] shadow-sm transition-colors hover:bg-[var(--color-neutral-100)]"
+        class="inline-flex items-center gap-2 rounded-md border border-[color:var(--color-neutral-200)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-600)] transition-colors hover:bg-[var(--color-neutral-100)]"
         @click="emit('search')"
       >
         <Search class="h-4 w-4" />
@@ -50,7 +51,7 @@ function toggleDarkMode() {
 
       <button
         type="button"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)] shadow-sm"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)]"
         @click="emit('notifications')"
       >
         <Bell class="h-4 w-4" />
@@ -58,7 +59,7 @@ function toggleDarkMode() {
 
       <button
         type="button"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)] shadow-sm"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-600)]"
         title="Toggle Dark Mode"
         @click="toggleDarkMode"
       >
@@ -69,7 +70,7 @@ function toggleDarkMode() {
       <div class="hidden h-8 w-px bg-[var(--color-neutral-200)] sm:block" />
 
       <div
-        class="flex items-center gap-2 rounded-md border border-[color:var(--color-neutral-200)] bg-white px-3 py-1.5 shadow-sm"
+        class="flex items-center gap-2 rounded-md border border-[color:var(--color-neutral-200)] bg-white px-3 py-1.5"
       >
         <div class="hidden text-right sm:block">
           <p class="truncate text-[13px] font-bold text-[var(--color-neutral-900)]">
