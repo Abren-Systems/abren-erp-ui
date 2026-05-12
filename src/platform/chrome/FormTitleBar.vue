@@ -62,7 +62,7 @@ function goBack() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.375rem 1rem;
+  padding: 0.375rem 0.625rem;
   border-bottom: 1px solid var(--color-neutral-200);
   background: #ffffff;
   min-height: 2.25rem;

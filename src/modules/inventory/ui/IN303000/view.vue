@@ -17,7 +17,7 @@ const valuationOptions = [
 <template>
   <div class="flex flex-col h-full bg-[var(--color-neutral-50)]">
     <template>
-      <div class="flex-1 overflow-y-auto p-8">
+      <div class="flex-1 overflow-y-auto p-2.5">
         <div class="max-w-4xl mx-auto space-y-6">
           <!-- General Info -->
           <div class="p-6 bg-white rounded-sm border border-[var(--color-neutral-200)] shadow-sm">

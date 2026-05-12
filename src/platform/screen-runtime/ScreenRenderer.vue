@@ -123,10 +123,15 @@ const sidePanelContract = computed(() => {
 
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
       <!-- Loading State (Before Controller Resolves) -->
-      <div v-if="!controllerRef" class="flex-1 p-8 text-[var(--color-neutral-500)]">Loading...</div>
+      <div v-if="!controllerRef" class="flex-1 p-2.5 text-[var(--color-neutral-500)]">
+        Loading...
+      </div>
 
       <!-- Error State (From Controller) -->
-      <div v-else-if="controllerRef.error.value" class="flex-1 p-8 text-[var(--color-danger-600)]">
+      <div
+        v-else-if="controllerRef.error.value"
+        class="flex-1 p-2.5 text-[var(--color-danger-600)]"
+      >
         <h2 class="text-lg font-bold">Error</h2>
         <p>{{ controllerRef.error.value }}</p>
       </div>
@@ -136,7 +141,7 @@ const sidePanelContract = computed(() => {
         v-else-if="
           controllerRef.isLoading.value && !controllerRef.entity.value && !controllerRef.isNew.value
         "
-        class="flex-1 p-8 text-[var(--color-neutral-500)]"
+        class="flex-1 p-2.5 text-[var(--color-neutral-500)]"
       >
         Loading data...
       </div>

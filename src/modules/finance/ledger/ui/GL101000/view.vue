@@ -28,12 +28,12 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 overflow-y-auto p-8">
+    <div class="flex-1 overflow-y-auto p-2.5">
       <div class="max-w-4xl mx-auto">
         <div
           class="bg-[var(--app-surface)] rounded-2xl border border-[var(--app-border)] shadow-sm overflow-hidden"
         >
-          <div class="p-8 space-y-8">
+          <div class="p-2.5 space-y-8">
             <!-- Warning/Info -->
             <div
               class="flex gap-4 p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-900 text-sm"

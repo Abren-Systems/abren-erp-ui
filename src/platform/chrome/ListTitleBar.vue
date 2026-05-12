@@ -29,7 +29,7 @@ defineProps<{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.625rem 1.5rem;
+  padding: 0.625rem 0.625rem;
   border-bottom: 1px solid var(--color-neutral-200);
   background: var(--color-neutral-50);
   min-height: 2.75rem;
