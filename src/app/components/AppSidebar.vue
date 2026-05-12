@@ -162,16 +162,16 @@ function toggleSidebar() {
           :key="item.id"
           :to="item.to"
           :class="[
-            'group flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-[13px] transition-colors',
+            'group relative flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-[13px] transition-colors',
             isItemActive(item)
-              ? 'bg-[var(--color-primary-600)] text-white shadow-sm'
-              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]',
-            collapsed ? 'justify-center px-0' : '',
+              ? 'bg-[var(--color-neutral-200)] text-[var(--color-primary-700)] font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:rounded-r-sm before:bg-[var(--color-primary-600)]'
+              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]/60',
+            collapsed ? 'justify-center px-0 before:hidden' : '',
           ]"
           @click="closeMobileSidebar"
         >
           <component :is="item.icon || ChevronRight" class="h-4 w-4 shrink-0" />
-          <span v-if="!collapsed" class="truncate font-medium">{{ item.label }}</span>
+          <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
         </RouterLink>
       </div>
 
@@ -184,16 +184,16 @@ function toggleSidebar() {
           :key="item.id"
           :to="item.to"
           :class="[
-            'group flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-[13px] transition-colors',
+            'group relative flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-[13px] transition-colors',
             isItemActive(item)
-              ? 'bg-[var(--color-primary-600)] text-white shadow-sm'
-              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]',
-            collapsed ? 'justify-center px-0' : '',
+              ? 'bg-[var(--color-neutral-200)] text-[var(--color-primary-700)] font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:rounded-r-sm before:bg-[var(--color-primary-600)]'
+              : 'text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]/60',
+            collapsed ? 'justify-center px-0 before:hidden' : '',
           ]"
           @click="closeMobileSidebar"
         >
           <component :is="item.icon || ChevronRight" class="h-4 w-4 shrink-0" />
-          <span v-if="!collapsed" class="truncate font-medium">{{ item.label }}</span>
+          <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
         </RouterLink>
       </div>
     </nav>
