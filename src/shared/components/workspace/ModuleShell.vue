@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import AppWorkingArea from './AppWorkingArea.vue'
+</script>
+
 <template>
-  <RouterView />
+  <AppWorkingArea>
+    <RouterView />
+  </AppWorkingArea>
 </template>

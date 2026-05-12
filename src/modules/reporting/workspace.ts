@@ -1,4 +1,3 @@
-import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
 
 export const reportingWorkspace: WorkspaceContract = {
@@ -13,9 +12,9 @@ export const reportingWorkspace: WorkspaceContract = {
       labelKey: 'Dashboards',
       links: [
         {
-          id: 'dashboard',
+          id: 'cashflow-dashboard',
           labelKey: 'Cashflow Insights',
-          screenId: createScreenId('dashboard'), // Legacy bypass
+          routeName: 'reporting.dashboard',
           requiredPermissions: ['reporting:view'],
         },
       ],

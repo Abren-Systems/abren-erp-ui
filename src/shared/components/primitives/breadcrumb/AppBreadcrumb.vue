@@ -1,25 +1,46 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import {} from 'lucide-vue-next'
+import type { RouteLocationRaw } from 'vue-router'
 
 const route = useRoute()
 
-const breadcrumbs = computed(() => {
-  const crumbs = route.matched
-    .filter((record) => record.meta && (record.meta['title'] || record.name))
-    .map((record) => {
-      const label = (record.meta['title'] as string) || (record.name as string)
-      return {
-        label: label.replace(/([A-Z])/g, ' $1').trim(),
-        path: record.path,
-        active: record.path === route.path,
-      }
-    })
+function formatNameFallback(name: string): string {
+  if (name.includes('.')) {
+    const tail = name.split('.').pop() ?? name
+    return tail
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/-/g, ' ')
+      .trim()
+  }
+  return name.replace(/([A-Z])/g, ' $1').trim()
+}
 
-  // Remove redundant crumbs with identical paths (common with nested index routes)
+const breadcrumbs = computed(() => {
+  const matched = route.matched.filter(
+    (record) => record.meta && (record.meta['title'] || record.name),
+  )
+
+  const crumbs = matched.map((record, index) => {
+    const metaTitle = record.meta['title'] as string | undefined
+    const name = record.name as string | undefined
+    const label =
+      metaTitle?.trim() || (name ? formatNameFallback(String(name)) : '') || String(record.path)
+
+    const isLast = index === matched.length - 1
+    const to: RouteLocationRaw = name ? { name } : { path: record.path || '/' }
+
+    return {
+      label,
+      to,
+      active: isLast,
+      key: `${String(name ?? '')}-${record.path}-${index}`,
+    }
+  })
+
   return crumbs.filter((crumb, index) => {
-    return index === 0 || crumb.path !== crumbs[index - 1]?.path
+    if (index === 0) return true
+    return JSON.stringify(crumb.to) !== JSON.stringify(crumbs[index - 1]?.to)
   })
 })
 </script>
@@ -27,11 +48,11 @@ const breadcrumbs = computed(() => {
 <template>
   <nav aria-label="Breadcrumb">
     <ol class="flex items-center gap-2 text-[13px] text-[var(--color-neutral-500)]">
-      <li v-for="(crumb, index) in breadcrumbs" :key="crumb.path" class="flex items-center gap-2">
-        <span v-if="index > 0" class="text-[var(--color-neutral-300)] font-medium">/</span>
+      <li v-for="(crumb, index) in breadcrumbs" :key="crumb.key" class="flex items-center gap-2">
+        <span v-if="index > 0" class="font-medium text-[var(--color-neutral-300)]">/</span>
         <RouterLink
           v-if="!crumb.active"
-          :to="crumb.path"
+          :to="crumb.to"
           class="transition-colors hover:text-[var(--color-primary-600)]"
         >
           {{ crumb.label }}

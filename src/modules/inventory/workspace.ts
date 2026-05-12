@@ -1,6 +1,7 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
+/** Hub links follow the same order as `inventoryModule.menuItems`. */
 export const inventoryWorkspace: WorkspaceContract = {
   id: 'inventory',
   titleKey: 'Inventory',
@@ -9,20 +10,8 @@ export const inventoryWorkspace: WorkspaceContract = {
   tiles: [],
   categories: [
     {
-      id: 'transactions',
-      labelKey: 'Transactions',
-      links: [
-        {
-          id: 'in3030pl',
-          labelKey: 'Issues',
-          screenId: createScreenId('IN3030PL'),
-          requiredPermissions: ['inventory:view'],
-        },
-      ],
-    },
-    {
-      id: 'profiles',
-      labelKey: 'Profiles',
+      id: 'screens',
+      labelKey: 'Screens',
       links: [
         {
           id: 'in2025pl',
@@ -32,8 +21,14 @@ export const inventoryWorkspace: WorkspaceContract = {
         },
         {
           id: 'in2040pl',
-          labelKey: 'Item Classes',
+          labelKey: 'Warehouses',
           screenId: createScreenId('IN2040PL'),
+          requiredPermissions: ['inventory:view'],
+        },
+        {
+          id: 'in3030pl',
+          labelKey: 'Adjustments',
+          screenId: createScreenId('IN3030PL'),
           requiredPermissions: ['inventory:view'],
         },
       ],

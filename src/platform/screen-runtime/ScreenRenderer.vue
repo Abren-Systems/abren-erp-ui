@@ -117,10 +117,10 @@ const sidePanelContract = computed(() => {
 
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
       <!-- Loading State (Before Controller Resolves) -->
-      <div v-if="!controllerRef" class="flex-1 p-8 text-neutral-500">Loading...</div>
+      <div v-if="!controllerRef" class="flex-1 p-8 text-[var(--color-neutral-500)]">Loading...</div>
 
       <!-- Error State (From Controller) -->
-      <div v-else-if="controllerRef.error.value" class="flex-1 p-8 text-danger-500">
+      <div v-else-if="controllerRef.error.value" class="flex-1 p-8 text-[var(--color-danger-600)]">
         <h2 class="text-lg font-bold">Error</h2>
         <p>{{ controllerRef.error.value }}</p>
       </div>
@@ -130,7 +130,7 @@ const sidePanelContract = computed(() => {
         v-else-if="
           controllerRef.isLoading.value && !controllerRef.entity.value && !controllerRef.isNew.value
         "
-        class="flex-1 p-8 text-neutral-500"
+        class="flex-1 p-8 text-[var(--color-neutral-500)]"
       >
         Loading data...
       </div>
@@ -194,7 +194,10 @@ const sidePanelContract = computed(() => {
         />
       </KeepAlive>
 
-      <div v-if="!WorkingArea" class="flex items-center justify-center h-full text-neutral-400">
+      <div
+        v-if="!WorkingArea"
+        class="flex h-full items-center justify-center text-[var(--color-neutral-400)]"
+      >
         No working area defined for {{ screen.id }}
       </div>
     </div>
@@ -222,7 +225,10 @@ const sidePanelContract = computed(() => {
       @confirm="controllerRef.dialogs.confirmation.confirm"
     />
   </div>
-  <div v-else class="flex items-center justify-center h-full text-danger-500 font-medium">
+  <div
+    v-else
+    class="flex h-full items-center justify-center font-medium text-[var(--color-danger-600)]"
+  >
     Screen Definition Not Found: {{ screenId }}
   </div>
 </template>

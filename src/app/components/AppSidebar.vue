@@ -1,32 +1,35 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import type { Component } from 'vue'
 import { businessModules, platformModules } from '@/modules'
 import type { BusinessDomain, PlatformEngine, MenuItem } from '@/shared/types/module.types'
 import { useAuthStore } from '@/shared/auth/auth.store'
 import {
+  BarChart3,
   BookOpen,
+  Box,
   Boxes,
   Building,
   Calendar,
+  CalendarDays,
+  CalendarRange,
   ChevronRight,
   CreditCard,
   FileText,
   GitBranch,
   Inbox,
   Landmark,
-  LayoutDashboard,
   LayoutGrid,
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
   Percent,
+  RefreshCw,
   Settings,
   Shield,
   Users,
   Warehouse,
-  BarChart3,
 } from 'lucide-vue-next'
 
 interface Props {
@@ -43,6 +46,7 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 
 interface NavigationItem {
@@ -58,6 +62,11 @@ interface NavigationGroup {
   items: NavigationItem[]
 }
 
+function canAccess(item: NavigationItem): boolean {
+  if (!item.permissions?.length) return true
+  return item.permissions.every((permission) => authStore.hasPermission(permission))
+}
+
 const iconMap: Record<string, Component> = {
   users: Users,
   shield: Shield,
@@ -66,6 +75,8 @@ const iconMap: Record<string, Component> = {
   'file-text': FileText,
   'book-open': BookOpen,
   calendar: Calendar,
+  'calendar-days': CalendarDays,
+  'calendar-range': CalendarRange,
   settings: Settings,
   inbox: Inbox,
   'git-branch': GitBranch,
@@ -75,6 +86,8 @@ const iconMap: Record<string, Component> = {
   'bar-chart-3': BarChart3,
   warehouse: Warehouse,
   boxes: Boxes,
+  box: Box,
+  'refresh-cw': RefreshCw,
 }
 
 function resolveIcon(icon?: string | Component): Component | undefined {
@@ -84,14 +97,27 @@ function resolveIcon(icon?: string | Component): Component | undefined {
 }
 
 function toNavigationItem(moduleId: string, item: MenuItem): NavigationItem {
+  if (item.href) {
+    return {
+      label: item.label,
+      icon: resolveIcon(item.icon),
+      permissions: item.permissions,
+      href: item.href,
+    }
+  }
+  if (item.route) {
+    return {
+      label: item.label,
+      icon: resolveIcon(item.icon),
+      permissions: item.permissions,
+      to: { name: item.route },
+    }
+  }
   return {
     label: item.label,
     icon: resolveIcon(item.icon),
     permissions: item.permissions,
-    href: item.href,
-    to: item.route
-      ? { name: item.route }
-      : { path: item.href || `/app/${moduleId}/${item.label.toLowerCase().replace(/ /g, '-')}` },
+    to: { path: `/app/${moduleId}` },
   }
 }
 
@@ -102,6 +128,12 @@ const businessGroups = computed<NavigationGroup[]>(() =>
   })),
 )
 
+const businessGroupsVisible = computed(() =>
+  businessGroups.value
+    .map((g) => ({ ...g, items: g.items.filter(canAccess) }))
+    .filter((g) => g.items.length > 0),
+)
+
 const platformGroups = computed<NavigationGroup[]>(() =>
   platformModules.map((module: PlatformEngine) => ({
     title: module.name,
@@ -109,20 +141,30 @@ const platformGroups = computed<NavigationGroup[]>(() =>
   })),
 )
 
-function canAccess(item: NavigationItem): boolean {
-  if (!item.permissions?.length) return true
-  return item.permissions.every((permission) => authStore.hasPermission(permission))
-}
+const platformGroupsVisible = computed(() =>
+  platformGroups.value
+    .map((g) => ({ ...g, items: g.items.filter(canAccess) }))
+    .filter((g) => g.items.length > 0),
+)
 
 function isItemActive(item: NavigationItem): boolean {
   if (item.href) {
     return route.path === item.href
   }
   if (item.to?.name) {
+    const resolved = router.resolve({ name: item.to.name })
+    const base = resolved.path.replace(/\/$/, '') || '/'
+    const current = route.path.replace(/\/$/, '') || '/'
+    if (current === base) return true
+    if (base.length > 1 && current.startsWith(`${base}/`)) return true
     return route.name === item.to.name
   }
   if (item.to?.path) {
-    return route.path === item.to.path
+    const normalized = item.to.path.replace(/\/$/, '') || '/'
+    const current = route.path.replace(/\/$/, '') || '/'
+    if (current === normalized) return true
+    if (normalized.length > 1 && current.startsWith(`${normalized}/`)) return true
+    return false
   }
   return false
 }
@@ -181,7 +223,7 @@ function toggleSidebar() {
 
     <nav class="flex-1 space-y-4 overflow-y-auto px-3 py-3">
       <div class="space-y-3">
-        <div v-for="group in businessGroups" :key="group.title" class="space-y-1.5">
+        <div v-for="group in businessGroupsVisible" :key="group.title" class="space-y-1.5">
           <p
             v-if="!collapsed"
             class="px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]"
@@ -189,7 +231,7 @@ function toggleSidebar() {
             {{ group.title }}
           </p>
           <RouterLink
-            v-for="item in group.items.filter(canAccess)"
+            v-for="item in group.items"
             :key="`${group.title}-${item.label}`"
             :to="item.href || item.to!"
             :class="[
@@ -207,8 +249,11 @@ function toggleSidebar() {
         </div>
       </div>
 
-      <div class="space-y-3 border-t border-[color:var(--color-neutral-200)] pt-4">
-        <div v-for="group in platformGroups" :key="group.title" class="space-y-1.5">
+      <div
+        v-if="platformGroupsVisible.length > 0"
+        class="space-y-3 border-t border-[color:var(--color-neutral-200)] pt-4"
+      >
+        <div v-for="group in platformGroupsVisible" :key="group.title" class="space-y-1.5">
           <p
             v-if="!collapsed"
             class="px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-neutral-500)]"
@@ -216,7 +261,7 @@ function toggleSidebar() {
             {{ group.title }}
           </p>
           <RouterLink
-            v-for="item in group.items.filter(canAccess)"
+            v-for="item in group.items"
             :key="`${group.title}-${item.label}`"
             :to="item.href || item.to!"
             :class="[

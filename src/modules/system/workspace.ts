@@ -1,5 +1,5 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import { createScreenId } from '@/platform/screen-runtime'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const workflowWorkspace: WorkspaceContract = {
   id: 'workflows',
@@ -13,9 +13,9 @@ export const workflowWorkspace: WorkspaceContract = {
       labelKey: 'Tasks',
       links: [
         {
-          id: 'wf301000',
-          labelKey: 'Workflow Inbox',
-          screenId: createScreenId('WF301000'),
+          id: 'ep503010',
+          labelKey: 'Approvals',
+          screenId: createScreenId('EP503010'),
           requiredPermissions: ['workflows.inbox.view'],
         },
       ],

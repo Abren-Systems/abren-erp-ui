@@ -25,7 +25,10 @@ export interface WorkspaceTileDefinition {
   id: string
   labelKey: string
   icon: string
-  screenId: string
+  /** Set when navigating via `screenRegistry` */
+  screenId?: string
+  /** Vue Router route name when the destination is not a registered screen */
+  routeName?: string
   /**
    * Evaluator for tile visibility based purely on context.
    * MUST be synchronous.
@@ -36,7 +39,8 @@ export interface WorkspaceTileDefinition {
 export interface WorkspaceLinkDefinition {
   id: string
   labelKey: string
-  screenId: string
+  screenId?: string
+  routeName?: string
   isVisible?: (context: WorkspaceRuntimeContext) => boolean
 }
 

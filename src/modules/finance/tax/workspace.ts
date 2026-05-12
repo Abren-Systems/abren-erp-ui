@@ -1,11 +1,11 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
-import { createScreenId } from '@/platform/screen-runtime'
+import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
 export const taxWorkspace: WorkspaceContract = {
   id: 'tax',
   titleKey: 'Taxes',
   icon: 'calculator',
-  requiredPermissions: ['tax:view'],
+  requiredPermissions: ['finance:tax:view'],
   tiles: [],
   categories: [
     {
@@ -13,16 +13,16 @@ export const taxWorkspace: WorkspaceContract = {
       labelKey: 'Profiles',
       links: [
         {
-          id: 'tx2010pl',
-          labelKey: 'Tax Zones',
-          screenId: createScreenId('TX2010PL'),
-          requiredPermissions: ['tax:view'],
+          id: 'tx2050pl',
+          labelKey: 'Taxes',
+          screenId: createScreenId('TX2050PL'),
+          requiredPermissions: ['finance:tax:view'],
         },
         {
-          id: 'tx2020pl',
-          labelKey: 'Tax Categories',
-          screenId: createScreenId('TX2020PL'),
-          requiredPermissions: ['tax:view'],
+          id: 'tx2055pl',
+          labelKey: 'Tax Groups',
+          screenId: createScreenId('TX2055PL'),
+          requiredPermissions: ['finance:tax:view'],
         },
       ],
     },

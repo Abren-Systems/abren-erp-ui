@@ -12,7 +12,7 @@ const ctrl = useCashflowDashboard()
   <div class="flex h-full flex-col bg-[var(--app-canvas)]">
     <!-- Page Header -->
     <div
-      class="flex shrink-0 items-center justify-between px-8 py-6 bg-white border-b border-[var(--color-neutral-200)]"
+      class="flex shrink-0 items-center justify-between border-b border-[var(--color-neutral-200)] bg-white py-6"
     >
       <div class="flex items-center gap-4">
         <div class="p-2 bg-[var(--color-primary-50)] rounded-sm">
@@ -39,7 +39,7 @@ const ctrl = useCashflowDashboard()
       </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-8 space-y-8">
+    <div class="flex-1 space-y-8 overflow-y-auto pb-8 pt-6">
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div

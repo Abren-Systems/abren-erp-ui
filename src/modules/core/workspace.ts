@@ -1,6 +1,7 @@
 import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
 import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 
+/** Hub links match `coreModule.menuItems` order (Users → Roles → Companies). */
 export const coreWorkspace: WorkspaceContract = {
   id: 'core',
   titleKey: 'Organization',
@@ -9,31 +10,25 @@ export const coreWorkspace: WorkspaceContract = {
   tiles: [],
   categories: [
     {
-      id: 'identity',
-      labelKey: 'Identity & Access',
+      id: 'screens',
+      labelKey: 'Screens',
       links: [
         {
-          id: 'cr201000',
+          id: 'sm201010',
           labelKey: 'Users',
-          screenId: createScreenId('CR201000'),
+          screenId: createScreenId('SM201010'),
           requiredPermissions: ['core:view'],
         },
         {
-          id: 'cr101000',
+          id: 'sm201100',
           labelKey: 'Roles',
-          screenId: createScreenId('CR101000'),
+          screenId: createScreenId('SM201100'),
           requiredPermissions: ['core:view'],
         },
-      ],
-    },
-    {
-      id: 'system',
-      labelKey: 'System',
-      links: [
         {
-          id: 'cr102000',
-          labelKey: 'Tenants',
-          screenId: createScreenId('CR102000'),
+          id: 'cs102000',
+          labelKey: 'Companies',
+          screenId: createScreenId('CS102000'),
           requiredPermissions: ['core:view'],
         },
       ],

@@ -4,13 +4,15 @@ export interface WorkspaceTileProjection {
   id: string
   labelKey: string
   icon: string
-  screenId: string
+  screenId?: string
+  routeName?: string
 }
 
 export interface WorkspaceLinkProjection {
   id: string
   labelKey: string
-  screenId: string
+  screenId?: string
+  routeName?: string
 }
 
 export interface WorkspaceCategoryProjection {

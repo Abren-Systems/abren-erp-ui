@@ -1,9 +1,8 @@
+import type { WorkspaceContract } from '@/platform/navigation/navigation.contract'
 import type {
   WorkspaceDefinition,
   WorkspaceRuntimeContext,
   WorkspaceTileDefinition,
-  WorkspaceCategoryDefinition,
-  WorkspaceLinkDefinition,
 } from './workspace-definition'
 import type {
   WorkspaceProjection,
@@ -16,18 +15,24 @@ import type {
  * Pure projection function.
  */
 export function resolveWorkspaceProjection(
-  definition: WorkspaceDefinition,
+  definition: WorkspaceDefinition | WorkspaceContract,
   context: WorkspaceRuntimeContext,
 ): WorkspaceProjection {
+  // `WorkspaceContract` tiles use a nested `link` shape when non-empty; all modules
+  // currently pass `tiles: []`. Cast keeps resolver compatible with both contracts.
+  const tilesIn = definition.tiles as unknown as readonly WorkspaceTileDefinition[]
+
   // Filter tiles based on visibility rules
-  const tiles: WorkspaceTileProjection[] = definition.tiles
+  const tiles: WorkspaceTileProjection[] = tilesIn
     .filter((t) => isTileVisible(t, context))
     .map((t) => ({
       id: t.id,
       labelKey: t.labelKey,
       icon: t.icon,
       screenId: t.screenId,
+      routeName: t.routeName,
     }))
+    .filter((t) => t.screenId || t.routeName)
 
   // Filter categories and their links
   const categories: WorkspaceCategoryProjection[] = []
@@ -41,7 +46,9 @@ export function resolveWorkspaceProjection(
         id: l.id,
         labelKey: l.labelKey,
         screenId: l.screenId,
+        routeName: l.routeName,
       }))
+      .filter((l) => l.screenId || l.routeName)
 
     // Only include categories that have at least one visible link
     if (links.length > 0) {
@@ -57,7 +64,7 @@ export function resolveWorkspaceProjection(
   const capabilities: Record<string, boolean> = { ...context.capabilities }
 
   return {
-    id: definition.id,
+    id: definition.id as WorkspaceProjection['id'],
     titleKey: definition.titleKey,
     icon: definition.icon,
     tiles,
@@ -66,20 +73,20 @@ export function resolveWorkspaceProjection(
   }
 }
 
-function isTileVisible(tile: WorkspaceTileDefinition, context: WorkspaceRuntimeContext): boolean {
-  if (!tile.isVisible) return true
-  return tile.isVisible(context)
+function isTileVisible(tile: unknown, context: WorkspaceRuntimeContext): boolean {
+  const t = tile as { isVisible?: (ctx: WorkspaceRuntimeContext) => boolean }
+  if (!t.isVisible) return true
+  return t.isVisible(context)
 }
 
-function isCategoryVisible(
-  category: WorkspaceCategoryDefinition,
-  context: WorkspaceRuntimeContext,
-): boolean {
-  if (!category.isVisible) return true
-  return category.isVisible(context)
+function isCategoryVisible(category: unknown, context: WorkspaceRuntimeContext): boolean {
+  const c = category as { isVisible?: (ctx: WorkspaceRuntimeContext) => boolean }
+  if (!c.isVisible) return true
+  return c.isVisible(context)
 }
 
-function isLinkVisible(link: WorkspaceLinkDefinition, context: WorkspaceRuntimeContext): boolean {
-  if (!link.isVisible) return true
-  return link.isVisible(context)
+function isLinkVisible(link: unknown, context: WorkspaceRuntimeContext): boolean {
+  const l = link as { isVisible?: (ctx: WorkspaceRuntimeContext) => boolean }
+  if (!l.isVisible) return true
+  return l.isVisible(context)
 }

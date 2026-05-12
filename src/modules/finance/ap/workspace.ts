@@ -5,62 +5,24 @@ export const apWorkspace: WorkspaceContract = {
   id: 'ap',
   titleKey: 'Payables',
   icon: 'credit-card',
-  requiredPermissions: ['ap.view'],
-  tiles: [
-    // Tiles omitted for Phase 1
-  ],
+  requiredPermissions: ['ap:view'],
+  tiles: [],
   categories: [
     {
       id: 'transactions',
       labelKey: 'Transactions',
       links: [
         {
-          id: 'ap301000',
+          id: 'ap3010pl',
           labelKey: 'Bills and Adjustments',
-          screenId: createScreenId('AP301000'),
-          requiredPermissions: ['ap.AP301000.view'],
+          screenId: createScreenId('AP3010PL'),
+          requiredPermissions: ['ap:view'],
         },
         {
-          id: 'ap302000',
-          labelKey: 'Checks and Payments',
-          screenId: createScreenId('AP302000'),
-          requiredPermissions: ['ap.AP302000.view'],
-        },
-      ],
-    },
-    {
-      id: 'profiles',
-      labelKey: 'Profiles',
-      links: [
-        {
-          id: 'ap201000',
-          labelKey: 'Vendors',
-          screenId: createScreenId('AP201000'),
-          requiredPermissions: ['ap.AP201000.view'],
-        },
-      ],
-    },
-    {
-      id: 'processes',
-      labelKey: 'Processes',
-      links: [
-        {
-          id: 'ap501000',
-          labelKey: 'Prepare Payments',
-          screenId: createScreenId('AP501000'),
-          requiredPermissions: ['ap.AP501000.view'],
-        },
-      ],
-    },
-    {
-      id: 'reports',
-      labelKey: 'Reports',
-      links: [
-        {
-          id: 'ap601000',
-          labelKey: 'AP Balance by Vendor',
-          screenId: createScreenId('AP601000'),
-          requiredPermissions: ['ap.AP601000.view'],
+          id: 'ap3015pl',
+          labelKey: 'Payment Requests',
+          screenId: createScreenId('AP3015PL'),
+          requiredPermissions: ['ap:view'],
         },
       ],
     },

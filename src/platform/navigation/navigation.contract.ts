@@ -11,7 +11,10 @@ import type { ScreenId } from '../screen-runtime/screen-id.types'
 export interface NavigationLinkContract {
   readonly id: string
   readonly labelKey: string // i18n key
-  readonly screenId?: ScreenId // If this link opens an ERP Screen
+  /** Registered screen; use with `screenRegistry` to navigate */
+  readonly screenId?: ScreenId
+  /** Vue Router named route (legacy screens not yet in the registry) */
+  readonly routeName?: string
   readonly externalUrl?: string // If this link opens an external resource
   readonly requiredPermissions: readonly string[] // RBAC keys needed to view this link
 }
