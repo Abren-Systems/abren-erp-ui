@@ -12,7 +12,6 @@ interface Props {
 defineProps<Props>()
 
 const emit = defineEmits<{
-  'open-mobile-sidebar': []
   search: []
   notifications: []
   logout: []
@@ -31,14 +30,6 @@ function toggleDarkMode() {
   >
     <div class="flex items-center justify-between gap-4 px-2.5 py-3">
       <div class="flex min-w-0 items-center gap-3">
-        <button
-          class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[color:var(--color-neutral-200)] bg-white text-[var(--color-neutral-700)] lg:hidden"
-          type="button"
-          @click="emit('open-mobile-sidebar')"
-        >
-          <Menu class="h-4 w-4" />
-        </button>
-
         <div class="hidden min-w-0 md:block">
           <AppBreadcrumb />
         </div>

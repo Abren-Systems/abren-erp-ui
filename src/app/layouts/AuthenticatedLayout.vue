@@ -47,7 +47,6 @@ async function handleLogout() {
         :tenant-name="tenantName"
         :user-email="userEmail"
         :user-initials="userInitials"
-        @open-mobile-sidebar="isMobileSidebarOpen = true"
         @logout="handleLogout"
       />
 
