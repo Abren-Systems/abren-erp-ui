@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   createPaginatedResponseSchema,
   createOperationalResponseSchema,
+  createLightweightOperationalResponseSchema,
 } from '@/shared/infrastructure/api.schemas'
 
 /**
@@ -109,13 +110,15 @@ export const LedgerSettingsSchema = z.object({
 export const OperationalJournalEntrySchema = createOperationalResponseSchema(JournalEntrySchema)
 
 export const JournalEntryListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(JournalEntryListItemSchema),
+  createLightweightOperationalResponseSchema(JournalEntryListItemSchema),
 )
 
-export const OperationalAccountSchema = createOperationalResponseSchema(AccountSchema)
+export const OperationalAccountSchema = createLightweightOperationalResponseSchema(AccountSchema)
 
-export const OperationalFiscalYearSchema = createOperationalResponseSchema(FiscalYearSchema)
+export const OperationalFiscalYearSchema =
+  createLightweightOperationalResponseSchema(FiscalYearSchema)
 
-export const OperationalFiscalPeriodSchema = createOperationalResponseSchema(FiscalPeriodSchema)
+export const OperationalFiscalPeriodSchema =
+  createLightweightOperationalResponseSchema(FiscalPeriodSchema)
 
 export const OperationalLedgerSettingsSchema = createOperationalResponseSchema(LedgerSettingsSchema)

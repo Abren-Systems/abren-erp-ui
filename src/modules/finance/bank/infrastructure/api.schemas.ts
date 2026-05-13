@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   createPaginatedResponseSchema,
   createOperationalResponseSchema,
+  createLightweightOperationalResponseSchema,
 } from '@/shared/infrastructure/api.schemas'
 
 /**
@@ -66,11 +67,11 @@ export const OperationalScheduledPaymentSchema =
   createOperationalResponseSchema(ScheduledPaymentSchema)
 
 export const BankAccountListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(BankAccountSchema),
+  createLightweightOperationalResponseSchema(BankAccountSchema),
 )
 export const BankTransactionListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(BankTransactionSchema),
+  createLightweightOperationalResponseSchema(BankTransactionSchema),
 )
 export const ScheduledPaymentListSchema = createPaginatedResponseSchema(
-  createOperationalResponseSchema(ScheduledPaymentSchema),
+  createLightweightOperationalResponseSchema(ScheduledPaymentSchema),
 )

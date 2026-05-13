@@ -1,7 +1,12 @@
 import { apiGet, apiGetEnvelope, apiPost, apiPostEnvelope } from '@/shared/api/http-client'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
 import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
-import { mapOperational, mapOperationalList } from '@/platform/workflow-runtime/utils/operational'
+import {
+  mapOperational,
+  mapLightweightOperational,
+  mapLightweightOperationalList,
+} from '@/platform/workflow-runtime/utils/operational'
+import type { LightweightOperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
 import type { JournalEntry } from '../models/journal-entry.types'
 import { LedgerMapper } from './mappers'
 import type {
@@ -38,11 +43,11 @@ export const ledgerAdapter = {
    *
    * @returns A promise resolving to an array of validated AccountDTOs.
    */
-  async getAccounts(): Promise<OperationalEntity<AccountDTO>[]> {
+  async getAccounts(): Promise<LightweightOperationalEntity<AccountDTO>[]> {
     const raw = (await apiGet<unknown[]>('/finance/ledger/accounts')) as unknown[]
     return raw.map((item) => {
       const parsed = OperationalAccountSchema.parse(item)
-      return mapOperational(parsed, (data) => data)
+      return mapLightweightOperational<AccountDTO, AccountDTO>(parsed, (data) => data)
     })
   },
 
@@ -55,7 +60,7 @@ export const ledgerAdapter = {
   async createAccount(data: CreateAccountDTO): Promise<OperationalEntity<AccountDTO>> {
     const raw = await apiPostEnvelope<unknown>('/finance/ledger/accounts', data)
     const parsed = OperationalAccountSchema.parse(raw)
-    return mapOperational(parsed, (data) => data)
+    return mapOperational<AccountDTO, AccountDTO>(parsed, (data) => data)
   },
 
   /**
@@ -67,7 +72,7 @@ export const ledgerAdapter = {
   async deactivateAccount(accountId: string): Promise<OperationalEntity<AccountDTO>> {
     const raw = await apiPostEnvelope<unknown>(`/finance/ledger/accounts/${accountId}/deactivate`)
     const parsed = OperationalAccountSchema.parse(raw)
-    return mapOperational(parsed, (data) => data)
+    return mapOperational<AccountDTO, AccountDTO>(parsed, (data) => data)
   },
 
   /**
@@ -83,7 +88,7 @@ export const ledgerAdapter = {
   ): Promise<OperationalEntity<AccountDTO>> {
     const raw = await apiPostEnvelope<unknown>(`/finance/ledger/accounts/${accountId}/rename`, data)
     const parsed = OperationalAccountSchema.parse(raw)
-    return mapOperational(parsed, (data) => data)
+    return mapOperational<AccountDTO, AccountDTO>(parsed, (data) => data)
   },
 
   /**
@@ -91,14 +96,14 @@ export const ledgerAdapter = {
    */
   async getJournalEntries(
     query?: ListQuery,
-  ): Promise<ListResponse<OperationalEntity<JournalEntry>>> {
+  ): Promise<ListResponse<LightweightOperationalEntity<JournalEntry>>> {
     const raw = await apiGetEnvelope<unknown>('/finance/ledger/journal-entries', {
       params: query,
       headers: { 'X-Abren-Response-Profile': 'summary' },
     })
     const parsed = JournalEntryListSchema.parse(raw.data)
 
-    return mapOperationalList(parsed, (item) =>
+    return mapLightweightOperationalList(parsed, (item) =>
       LedgerMapper.toJournalEntry(item as JournalEntryDTO),
     )
   },
@@ -114,7 +119,9 @@ export const ledgerAdapter = {
       headers: { 'X-Abren-Response-Profile': 'operational' },
     })
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
+    return mapOperational<JournalEntryDTO, JournalEntry>(parsed, (data) =>
+      LedgerMapper.toJournalEntry(data),
+    )
   },
 
   /**
@@ -127,7 +134,9 @@ export const ledgerAdapter = {
       headers: { 'X-Abren-Response-Profile': 'operational' },
     })
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
+    return mapOperational<JournalEntryDTO, JournalEntry>(parsed, (data) =>
+      LedgerMapper.toJournalEntry(data),
+    )
   },
 
   /**
@@ -146,7 +155,9 @@ export const ledgerAdapter = {
       { headers: { 'X-Abren-Response-Profile': 'operational' } },
     )
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
+    return mapOperational<JournalEntryDTO, JournalEntry>(parsed, (data) =>
+      LedgerMapper.toJournalEntry(data),
+    )
   },
 
   /**
@@ -167,7 +178,9 @@ export const ledgerAdapter = {
       },
     )
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
+    return mapOperational<JournalEntryDTO, JournalEntry>(parsed, (data) =>
+      LedgerMapper.toJournalEntry(data),
+    )
   },
 
   /**
@@ -175,11 +188,11 @@ export const ledgerAdapter = {
    *
    * @returns A promise resolving to an array of validated FiscalYearDTOs.
    */
-  async getFiscalYears(): Promise<OperationalEntity<FiscalYearDTO>[]> {
+  async getFiscalYears(): Promise<LightweightOperationalEntity<FiscalYearDTO>[]> {
     const raw = (await apiGet<unknown[]>('/finance/ledger/fiscal-years')) as unknown[]
     return raw.map((item) => {
       const parsed = OperationalFiscalYearSchema.parse(item)
-      return mapOperational(parsed, (data) => data)
+      return mapLightweightOperational<FiscalYearDTO, FiscalYearDTO>(parsed, (data) => data)
     })
   },
 
@@ -188,11 +201,11 @@ export const ledgerAdapter = {
    *
    * @returns A promise resolving to an array of validated FiscalPeriodDTOs.
    */
-  async getFiscalPeriods(): Promise<OperationalEntity<FiscalPeriodDTO>[]> {
+  async getFiscalPeriods(): Promise<LightweightOperationalEntity<FiscalPeriodDTO>[]> {
     const raw = (await apiGet<unknown[]>('/finance/ledger/fiscal-periods')) as unknown[]
     return raw.map((item) => {
       const parsed = OperationalFiscalPeriodSchema.parse(item)
-      return mapOperational(parsed, (data) => data)
+      return mapLightweightOperational<FiscalPeriodDTO, FiscalPeriodDTO>(parsed, (data) => data)
     })
   },
 
@@ -205,7 +218,7 @@ export const ledgerAdapter = {
   async generateFiscalYear(data: GenerateFiscalYearDTO): Promise<OperationalEntity<FiscalYearDTO>> {
     const raw = await apiPostEnvelope<unknown>('/finance/ledger/fiscal-years', data)
     const parsed = OperationalFiscalYearSchema.parse(raw)
-    return mapOperational(parsed, (data) => data)
+    return mapOperational<FiscalYearDTO, FiscalYearDTO>(parsed, (data) => data)
   },
 
   /**
@@ -216,7 +229,7 @@ export const ledgerAdapter = {
   async getLedgerSettings(): Promise<OperationalEntity<LedgerSettingsDTO>> {
     const raw = await apiGetEnvelope<unknown>('/finance/ledger/settings')
     const parsed = OperationalLedgerSettingsSchema.parse(raw)
-    return mapOperational(parsed, (data) => data)
+    return mapOperational<LedgerSettingsDTO, LedgerSettingsDTO>(parsed, (data) => data)
   },
 
   /**
@@ -232,7 +245,7 @@ export const ledgerAdapter = {
       method: 'PATCH',
     })
     const parsed = OperationalLedgerSettingsSchema.parse(raw)
-    return mapOperational(parsed, (data) => data)
+    return mapOperational<LedgerSettingsDTO, LedgerSettingsDTO>(parsed, (data) => data)
   },
 
   /**

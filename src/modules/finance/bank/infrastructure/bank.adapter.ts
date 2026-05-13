@@ -7,13 +7,17 @@ import type {
   CreateScheduledPaymentRequest,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
+import type {
+  LightweightOperationalEntity,
+  OperationalEntity,
+} from '@/platform/workflow-runtime/models/workflows.types'
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 import {
   mapOperational,
   mapOperationalList,
+  mapLightweightOperationalList,
+  type LightweightOperationalListDTO,
   type OperationalDTO,
-  type OperationalListDTO,
 } from '@/platform/workflow-runtime/utils/operational'
 import { BankMapper } from './mappers'
 
@@ -27,11 +31,18 @@ export const bankAdapter = {
   /**
    * Fetches all banking accounts for the current tenant (Paginated).
    */
-  async getBankAccounts(query?: ListQuery): Promise<ListResponse<OperationalEntity<BankAccount>>> {
-    const raw = await apiGetEnvelope<OperationalListDTO<BankAccountDTO>>('/finance/bank/accounts', {
-      params: query,
-    })
-    return mapOperationalList(raw.data, (dto: BankAccountDTO) => BankMapper.toBankAccount(dto))
+  async getBankAccounts(
+    query?: ListQuery,
+  ): Promise<ListResponse<LightweightOperationalEntity<BankAccount>>> {
+    const raw = await apiGetEnvelope<LightweightOperationalListDTO<BankAccountDTO>>(
+      '/finance/bank/accounts',
+      {
+        params: query,
+      },
+    )
+    return mapLightweightOperationalList(raw.data, (dto: BankAccountDTO) =>
+      BankMapper.toBankAccount(dto),
+    )
   },
 
   /**
@@ -43,14 +54,14 @@ export const bankAdapter = {
   async getTransactions(
     accountId: BankAccountId,
     query?: ListQuery,
-  ): Promise<ListResponse<OperationalEntity<BankTransaction>>> {
-    const raw = await apiGetEnvelope<OperationalListDTO<BankTransactionDTO>>(
+  ): Promise<ListResponse<LightweightOperationalEntity<BankTransaction>>> {
+    const raw = await apiGetEnvelope<LightweightOperationalListDTO<BankTransactionDTO>>(
       `/finance/bank/accounts/${accountId}/transactions`,
       {
         params: query,
       },
     )
-    return mapOperationalList(raw.data, (dto: BankTransactionDTO) =>
+    return mapLightweightOperationalList(raw.data, (dto: BankTransactionDTO) =>
       BankMapper.toTransaction(dto, accountId),
     )
   },
@@ -60,12 +71,12 @@ export const bankAdapter = {
    */
   async getScheduledPayments(
     query?: ListQuery,
-  ): Promise<ListResponse<OperationalEntity<ScheduledPayment>>> {
-    const raw = await apiGetEnvelope<OperationalListDTO<ScheduledPaymentDTO>>(
+  ): Promise<ListResponse<LightweightOperationalEntity<ScheduledPayment>>> {
+    const raw = await apiGetEnvelope<LightweightOperationalListDTO<ScheduledPaymentDTO>>(
       '/finance/bank/scheduled-payments',
       { params: query },
     )
-    return mapOperationalList(raw.data, (dto) => BankMapper.toScheduledPayment(dto))
+    return mapLightweightOperationalList(raw.data, (dto) => BankMapper.toScheduledPayment(dto))
   },
 
   /**
