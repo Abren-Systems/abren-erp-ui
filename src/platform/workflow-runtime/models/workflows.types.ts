@@ -19,7 +19,7 @@ export const ActionDescriptorSchema = z
   .object({
     action: z.string(),
     label: z.string(),
-    icon: z.string().optional(),
+    icon: z.string().nullable().optional(),
     is_primary: z.boolean().default(false),
     requires_reason: z.boolean().default(false),
   })

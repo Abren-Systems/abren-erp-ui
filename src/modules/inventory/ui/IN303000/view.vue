@@ -16,97 +16,96 @@ const valuationOptions = [
 
 <template>
   <div class="flex flex-col h-full bg-[var(--app-canvas)]">
-    <template>
-      <div class="flex-1 overflow-y-auto p-0">
-        <div class="w-full space-y-6">
-          <!-- General Info -->
-          <div
-            class="p-[var(--layout-gutter)] bg-[var(--app-surface)] rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
-          >
-            <FieldGroup>
-              <AppField
-                v-bind="ctrl.fields.warehouse_id"
-                :options="ctrl.warehouseOptions.value"
-                placeholder="Select Warehouse"
-              />
-              <AppField v-bind="ctrl.fields.reason" />
-            </FieldGroup>
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto p-0">
+      <div class="w-full space-y-6">
+        <!-- General Info -->
+        <div
+          class="p-[var(--layout-gutter)] bg-[var(--app-surface)] rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+        >
+          <FieldGroup>
+            <AppField
+              v-bind="ctrl.fields.warehouse_id"
+              :options="ctrl.warehouseOptions.value"
+              placeholder="Select Warehouse"
+            />
+            <AppField v-bind="ctrl.fields.reason" />
+          </FieldGroup>
+        </div>
+
+        <!-- Line Items Section -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-label">Adjustment Lines</h2>
+            <AppButton
+              v-if="ctrl.state.isEditable"
+              type="button"
+              variant="outline"
+              @click="ctrl.addLine"
+            >
+              <Plus :size="14" class="mr-2" /> Add Line
+            </AppButton>
           </div>
 
-          <!-- Line Items Section -->
           <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h2 class="text-label">Adjustment Lines</h2>
-              <AppButton
-                v-if="ctrl.state.isEditable"
-                type="button"
-                variant="outline"
-                @click="ctrl.addLine"
-              >
-                <Plus :size="14" class="mr-2" /> Add Line
-              </AppButton>
-            </div>
+            <div
+              v-for="(line, index) in ctrl.form.getFieldValue('lines')"
+              :key="index"
+              class="grid grid-cols-12 gap-[var(--layout-gutter)] items-end p-[var(--layout-gutter)] bg-[var(--app-surface)] rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
+            >
+              <div class="col-span-12 md:col-span-5">
+                <AppField
+                  :field="`line-${index}-stock-item-id`"
+                  label="Stock Item ID"
+                  type="text"
+                  mode="edit"
+                  :model-value="line.stock_item_id"
+                  @update:model-value="ctrl.updateLine(index, 'stock_item_id', $event)"
+                  :editor-attrs="{ placeholder: 'UUID...' }"
+                  :disabled="!ctrl.state.isEditable"
+                />
+              </div>
 
-            <div class="space-y-4">
-              <div
-                v-for="(line, index) in ctrl.form.getFieldValue('lines')"
-                :key="index"
-                class="grid grid-cols-12 gap-[var(--layout-gutter)] items-end p-[var(--layout-gutter)] bg-[var(--app-surface)] rounded-sm border border-[var(--color-neutral-200)] shadow-sm"
-              >
-                <div class="col-span-12 md:col-span-5">
-                  <AppField
-                    :field="`line-${index}-stock-item-id`"
-                    label="Stock Item ID"
-                    type="text"
-                    mode="edit"
-                    :model-value="line.stock_item_id"
-                    @update:model-value="ctrl.updateLine(index, 'stock_item_id', $event)"
-                    :editor-attrs="{ placeholder: 'UUID...' }"
-                    :disabled="!ctrl.state.isEditable"
-                  />
-                </div>
+              <div class="col-span-6 md:col-span-2">
+                <AppField
+                  :field="`line-${index}-quantity-delta`"
+                  label="Delta"
+                  type="number"
+                  mode="edit"
+                  :model-value="line.quantity_delta"
+                  @update:model-value="ctrl.updateLine(index, 'quantity_delta', Number($event))"
+                  :disabled="!ctrl.state.isEditable"
+                />
+              </div>
 
-                <div class="col-span-6 md:col-span-2">
-                  <AppField
-                    :field="`line-${index}-quantity-delta`"
-                    label="Delta"
-                    type="number"
-                    mode="edit"
-                    :model-value="line.quantity_delta"
-                    @update:model-value="ctrl.updateLine(index, 'quantity_delta', Number($event))"
-                    :disabled="!ctrl.state.isEditable"
-                  />
-                </div>
+              <div class="col-span-6 md:col-span-3">
+                <AppField
+                  :field="`line-${index}-valuation-strategy`"
+                  label="Valuation"
+                  type="selector"
+                  mode="edit"
+                  :model-value="line.valuation_strategy"
+                  @update:model-value="ctrl.updateLine(index, 'valuation_strategy', $event)"
+                  :editor-attrs="{ options: valuationOptions }"
+                  :disabled="!ctrl.state.isEditable"
+                />
+              </div>
 
-                <div class="col-span-6 md:col-span-3">
-                  <AppField
-                    :field="`line-${index}-valuation-strategy`"
-                    label="Valuation"
-                    type="selector"
-                    mode="edit"
-                    :model-value="line.valuation_strategy"
-                    @update:model-value="ctrl.updateLine(index, 'valuation_strategy', $event)"
-                    :editor-attrs="{ options: valuationOptions }"
-                    :disabled="!ctrl.state.isEditable"
-                  />
-                </div>
-
-                <div class="col-span-12 md:col-span-2 text-right">
-                  <AppButton
-                    v-if="ctrl.state.isEditable"
-                    type="button"
-                    variant="stealth"
-                    @click="ctrl.removeLine(index)"
-                    :disabled="ctrl.form.getFieldValue('lines').length === 1"
-                  >
-                    <Trash2 :size="16" class="text-[var(--color-danger-600)]" />
-                  </AppButton>
-                </div>
+              <div class="col-span-12 md:col-span-2 text-right">
+                <AppButton
+                  v-if="ctrl.state.isEditable"
+                  type="button"
+                  variant="stealth"
+                  @click="ctrl.removeLine(index)"
+                  :disabled="ctrl.form.getFieldValue('lines').length === 1"
+                >
+                  <Trash2 :size="16" class="text-[var(--color-danger-600)]" />
+                </AppButton>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </template>
+    </div>
   </div>
 </template>
