@@ -14,7 +14,7 @@ import { CURRENCY_OPTIONS, AP301500_FIELDS } from './fields'
 import { AP301500 } from './screen'
 import { AP301500_POLICY } from './policy'
 import { useField } from '@/platform/field-system/bindings'
-import type { PaymentRequest, PaymentRequestStatus } from '../../models/ap.types'
+import type { PaymentRequest } from '../../models/ap.types'
 
 /**
  * AP301500 — Payment Request Data Entry Controller
@@ -50,14 +50,14 @@ export function usePaymentRequestEntry(id: string) {
       // Cast form state to match the read model shape approximately
       return {
         ...(form.state.values as unknown as PaymentRequest),
-        status: 'DRAFT' as PaymentRequestStatus,
+        status: 'DRAFT',
       }
     }
     return paymentRequest.value
   })
 
   // ── Platform Base ──
-  const base = useScreenController<PaymentRequest, PaymentRequestStatus>({
+  const base = useScreenController<PaymentRequest, string>({
     screen: AP301500,
     dataSource: { entity: activeEntity, isLoading, error },
     isNew,

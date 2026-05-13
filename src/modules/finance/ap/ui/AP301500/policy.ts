@@ -1,5 +1,4 @@
 import type { ScreenStatePolicy } from '@/platform/screen-runtime'
-import type { PaymentRequestStatus } from '../../models/ap.types'
 
 // ── AP301500 Screen State Policy ──────────────────────────
 // Declares how the Payment Request Entry screen renders in each domain state.
@@ -19,10 +18,9 @@ type PRFieldKey =
   | 'currency'
   | 'totalAmount'
 
-export const AP301500_POLICY: ScreenStatePolicy<PaymentRequestStatus, PRFieldKey> = {
+export const AP301500_POLICY: ScreenStatePolicy<string, PRFieldKey> = {
   states: {
     DRAFT: {
-      editable: true,
       actionRequiredLabel: 'Submit for Approval',
       sections: {
         approval_history: { hidden: true },
@@ -38,7 +36,6 @@ export const AP301500_POLICY: ScreenStatePolicy<PaymentRequestStatus, PRFieldKey
       },
     },
     SUBMITTED: {
-      editable: false,
       actionRequiredLabel: 'Review & Approve',
       banner: {
         messageKey: 'This request is pending approval.',
@@ -46,11 +43,9 @@ export const AP301500_POLICY: ScreenStatePolicy<PaymentRequestStatus, PRFieldKey
       },
     },
     APPROVED: {
-      editable: false,
       actionRequiredLabel: 'Authorize Payment',
     },
     REJECTED: {
-      editable: true,
       actionRequiredLabel: 'Edit & Resubmit',
       banner: {
         messageKey: 'This request was rejected. Please review comments and resubmit.',
@@ -66,14 +61,8 @@ export const AP301500_POLICY: ScreenStatePolicy<PaymentRequestStatus, PRFieldKey
         currency: { required: true },
       },
     },
-    AUTHORIZED: {
-      editable: false,
-    },
-    CANCELLED: {
-      editable: false,
-    },
-    PAID: {
-      editable: false,
-    },
+    AUTHORIZED: {},
+    CANCELLED: {},
+    PAID: {},
   },
 }

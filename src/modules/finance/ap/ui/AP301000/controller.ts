@@ -12,15 +12,10 @@ import type { VendorBillId } from '@/shared/types/brand.types'
 import { AP301000 } from './screen'
 import { AP301000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings'
-import type { VendorBill, VendorBillStatus } from '../../models/ap.types'
+import type { VendorBill } from '../../models/ap.types'
 
-const AP301000_POLICY: ScreenStatePolicy<VendorBillStatus> = {
-  states: {
-    DRAFT: { editable: true },
-    VALIDATED: { editable: false },
-    PAID: { editable: false },
-    VOIDED: { editable: false },
-  },
+const AP301000_POLICY: ScreenStatePolicy<string> = {
+  states: {},
 }
 
 export function useVendorBillController(id: string) {
@@ -38,7 +33,7 @@ export function useVendorBillController(id: string) {
   const { form, isSubmitting: isCreating } = useCreateVendorBill()
   useFormPersistence(form, 'abren_draft_vendor_bill')
 
-  const base = useScreenController<VendorBill, VendorBillStatus>({
+  const base = useScreenController<VendorBill, string>({
     screen: AP301000,
     dataSource: { entity: vendorBill, isLoading, error: ref(null) },
     isNew,

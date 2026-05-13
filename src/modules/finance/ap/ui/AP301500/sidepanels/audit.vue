@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { inject, type Ref } from 'vue'
 import { AppFieldset, AppField } from '@/shared/components/field-system'
-import PaymentRequestTimeline from '../timeline.vue'
 import type { PaymentRequest } from '../../../models/ap.types'
 import { useScreenControllerContext } from '@/platform/screen-runtime'
 
@@ -18,9 +17,6 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
 <template>
   <div v-if="ctrl?.entity.value" class="space-y-8 p-4">
-    <!-- Shared Timeline -->
-    <PaymentRequestTimeline :request="ctrl.entity.value" />
-
     <!-- GL Journal Impact -->
     <AppFieldset
       v-if="ctrl.entity.value.targetLiabilityAccountId"
