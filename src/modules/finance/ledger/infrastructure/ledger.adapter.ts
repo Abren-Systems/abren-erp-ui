@@ -18,12 +18,12 @@ import type {
   UpdateLedgerSettingsDTO,
 } from './api.types'
 import {
-  AccountSchema,
+  OperationalAccountSchema,
   OperationalJournalEntrySchema,
   JournalEntryListSchema,
-  FiscalPeriodSchema,
-  FiscalYearSchema,
-  LedgerSettingsSchema,
+  OperationalFiscalPeriodSchema,
+  OperationalFiscalYearSchema,
+  OperationalLedgerSettingsSchema,
 } from './api.schemas'
 
 /**
@@ -38,9 +38,15 @@ export const ledgerAdapter = {
    *
    * @returns A promise resolving to an array of validated AccountDTOs.
    */
-  async getAccounts(): Promise<AccountDTO[]> {
-    const raw = (await apiGet<AccountDTO[]>('/finance/ledger/accounts')) as unknown[]
-    return raw.map((item) => AccountSchema.parse(item))
+  async getAccounts(): Promise<OperationalEntity<AccountDTO>[]> {
+    const raw = (await apiGet<unknown[]>('/finance/ledger/accounts')) as unknown[]
+    return raw.map((item) => {
+      const parsed = OperationalAccountSchema.parse(item)
+      return {
+        ...parsed.data,
+        __operations: WorkflowOperationsSchema.parse(parsed.operations),
+      }
+    })
   },
 
   /**
@@ -49,9 +55,13 @@ export const ledgerAdapter = {
    * @param data - The account creation data.
    * @returns A promise resolving to the validated AccountDTO.
    */
-  async createAccount(data: CreateAccountDTO): Promise<AccountDTO> {
-    const raw = await apiPost<AccountDTO>('/finance/ledger/accounts', data)
-    return AccountSchema.parse(raw)
+  async createAccount(data: CreateAccountDTO): Promise<OperationalEntity<AccountDTO>> {
+    const raw = await apiPostEnvelope<unknown>('/finance/ledger/accounts', data)
+    const parsed = OperationalAccountSchema.parse(raw)
+    return {
+      ...parsed.data,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
+    }
   },
 
   /**
@@ -60,9 +70,13 @@ export const ledgerAdapter = {
    * @param accountId - The UUID of the account to deactivate.
    * @returns A promise resolving to the validated AccountDTO.
    */
-  async deactivateAccount(accountId: string): Promise<AccountDTO> {
-    const raw = await apiPost<AccountDTO>(`/finance/ledger/accounts/${accountId}/deactivate`)
-    return AccountSchema.parse(raw)
+  async deactivateAccount(accountId: string): Promise<OperationalEntity<AccountDTO>> {
+    const raw = await apiPostEnvelope<unknown>(`/finance/ledger/accounts/${accountId}/deactivate`)
+    const parsed = OperationalAccountSchema.parse(raw)
+    return {
+      ...parsed.data,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
+    }
   },
 
   /**
@@ -72,9 +86,16 @@ export const ledgerAdapter = {
    * @param data - The rename payload.
    * @returns A promise resolving to the validated AccountDTO.
    */
-  async renameAccount(accountId: string, data: RenameAccountDTO): Promise<AccountDTO> {
-    const raw = await apiPost<AccountDTO>(`/finance/ledger/accounts/${accountId}/rename`, data)
-    return AccountSchema.parse(raw)
+  async renameAccount(
+    accountId: string,
+    data: RenameAccountDTO,
+  ): Promise<OperationalEntity<AccountDTO>> {
+    const raw = await apiPostEnvelope<unknown>(`/finance/ledger/accounts/${accountId}/rename`, data)
+    const parsed = OperationalAccountSchema.parse(raw)
+    return {
+      ...parsed.data,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
+    }
   },
 
   /**
@@ -182,9 +203,15 @@ export const ledgerAdapter = {
    *
    * @returns A promise resolving to an array of validated FiscalYearDTOs.
    */
-  async getFiscalYears(): Promise<FiscalYearDTO[]> {
-    const raw = (await apiGet<FiscalYearDTO[]>('/finance/ledger/fiscal-years')) as unknown[]
-    return raw.map((item) => FiscalYearSchema.parse(item))
+  async getFiscalYears(): Promise<OperationalEntity<FiscalYearDTO>[]> {
+    const raw = (await apiGet<unknown[]>('/finance/ledger/fiscal-years')) as unknown[]
+    return raw.map((item) => {
+      const parsed = OperationalFiscalYearSchema.parse(item)
+      return {
+        ...parsed.data,
+        __operations: WorkflowOperationsSchema.parse(parsed.operations),
+      }
+    })
   },
 
   /**
@@ -192,9 +219,15 @@ export const ledgerAdapter = {
    *
    * @returns A promise resolving to an array of validated FiscalPeriodDTOs.
    */
-  async getFiscalPeriods(): Promise<FiscalPeriodDTO[]> {
-    const raw = (await apiGet<FiscalPeriodDTO[]>('/finance/ledger/fiscal-periods')) as unknown[]
-    return raw.map((item) => FiscalPeriodSchema.parse(item))
+  async getFiscalPeriods(): Promise<OperationalEntity<FiscalPeriodDTO>[]> {
+    const raw = (await apiGet<unknown[]>('/finance/ledger/fiscal-periods')) as unknown[]
+    return raw.map((item) => {
+      const parsed = OperationalFiscalPeriodSchema.parse(item)
+      return {
+        ...parsed.data,
+        __operations: WorkflowOperationsSchema.parse(parsed.operations),
+      }
+    })
   },
 
   /**
@@ -203,9 +236,13 @@ export const ledgerAdapter = {
    * @param data - The fiscal year generation data.
    * @returns A promise resolving to the validated FiscalYearDTO.
    */
-  async generateFiscalYear(data: GenerateFiscalYearDTO): Promise<FiscalYearDTO> {
-    const raw = await apiPost<FiscalYearDTO>('/finance/ledger/fiscal-years', data)
-    return FiscalYearSchema.parse(raw)
+  async generateFiscalYear(data: GenerateFiscalYearDTO): Promise<OperationalEntity<FiscalYearDTO>> {
+    const raw = await apiPostEnvelope<unknown>('/finance/ledger/fiscal-years', data)
+    const parsed = OperationalFiscalYearSchema.parse(raw)
+    return {
+      ...parsed.data,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
+    }
   },
 
   /**
@@ -213,9 +250,13 @@ export const ledgerAdapter = {
    *
    * @returns A promise resolving to the validated LedgerSettingsDTO.
    */
-  async getLedgerSettings(): Promise<LedgerSettingsDTO> {
-    const raw = await apiGet<LedgerSettingsDTO>('/finance/ledger/settings')
-    return LedgerSettingsSchema.parse(raw)
+  async getLedgerSettings(): Promise<OperationalEntity<LedgerSettingsDTO>> {
+    const raw = await apiGetEnvelope<unknown>('/finance/ledger/settings')
+    const parsed = OperationalLedgerSettingsSchema.parse(raw)
+    return {
+      ...parsed.data,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
+    }
   },
 
   /**
@@ -224,11 +265,17 @@ export const ledgerAdapter = {
    * @param data - The configuration update data (PATCH).
    * @returns A promise resolving to the validated LedgerSettingsDTO.
    */
-  async updateLedgerSettings(data: UpdateLedgerSettingsDTO): Promise<LedgerSettingsDTO> {
-    const raw = await apiPost<LedgerSettingsDTO>('/finance/ledger/settings', data, {
+  async updateLedgerSettings(
+    data: UpdateLedgerSettingsDTO,
+  ): Promise<OperationalEntity<LedgerSettingsDTO>> {
+    const raw = await apiPostEnvelope<unknown>('/finance/ledger/settings', data, {
       method: 'PATCH',
     })
-    return LedgerSettingsSchema.parse(raw)
+    const parsed = OperationalLedgerSettingsSchema.parse(raw)
+    return {
+      ...parsed.data,
+      __operations: WorkflowOperationsSchema.parse(parsed.operations),
+    }
   },
 
   /**

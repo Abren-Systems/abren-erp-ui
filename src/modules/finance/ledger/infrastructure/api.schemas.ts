@@ -111,3 +111,11 @@ export const OperationalJournalEntrySchema = createOperationalResponseSchema(Jou
 export const JournalEntryListSchema = createPaginatedResponseSchema(
   createOperationalResponseSchema(JournalEntryListItemSchema),
 )
+
+export const OperationalAccountSchema = createOperationalResponseSchema(AccountSchema)
+
+export const OperationalFiscalYearSchema = createOperationalResponseSchema(FiscalYearSchema)
+
+export const OperationalFiscalPeriodSchema = createOperationalResponseSchema(FiscalPeriodSchema)
+
+export const OperationalLedgerSettingsSchema = createOperationalResponseSchema(LedgerSettingsSchema)
