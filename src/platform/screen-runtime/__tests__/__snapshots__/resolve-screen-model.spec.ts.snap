@@ -8,11 +8,15 @@ exports[`resolveScreenProjection > should resolve a valid model for DRAFT state 
         "actions": [
           {
             "action": "RELEASE",
+            "confirmation": undefined,
+            "icon": undefined,
             "isPrimary": true,
             "label": "Release",
             "requiresReason": false,
+            "variant": "default",
           },
         ],
+        "lifecycleStatus": "DRAFT",
         "permissions": {},
         "version": 1,
       },
@@ -38,9 +42,12 @@ exports[`resolveScreenProjection > should resolve a valid model for DRAFT state 
       "expectedNext": {
         "action": {
           "action": "RELEASE",
+          "confirmation": undefined,
+          "icon": undefined,
           "isPrimary": true,
           "label": "Release",
           "requiresReason": false,
+          "variant": "default",
         },
         "command": {
           "displayOnMainToolbar": true,
@@ -99,6 +106,7 @@ exports[`resolveScreenProjection > should resolve a valid model for RELEASED sta
     "backend": {
       "operations": {
         "actions": [],
+        "lifecycleStatus": "RELEASED",
         "permissions": {},
         "version": 1,
       },

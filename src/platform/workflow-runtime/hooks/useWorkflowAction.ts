@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { toValue, type MaybeRefOrGetter } from 'vue'
 import type { ActionDescriptor, OperationalEntity } from '../models/workflows.types'
 import { useNotifications } from '@/shared/composables/useNotifications'
 import { useDialogs } from '@/shared/composables/useDialogs'
 
 export interface WorkflowActionConfig<T> {
   id: string
-  version: number
+  version: MaybeRefOrGetter<number>
   execute: (
     id: string,
     action: string,
@@ -56,7 +57,8 @@ export function useWorkflowAction<T>(config: WorkflowActionConfig<T>) {
       }
 
       // 3. Execute
-      return await config.execute(config.id, action.action, config.version, finalPayload)
+      const currentVersion = toValue(config.version)
+      return await config.execute(config.id, action.action, currentVersion, finalPayload)
     },
     onSuccess: (data) => {
       // Rehydrate cache

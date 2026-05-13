@@ -79,7 +79,7 @@ export function usePaymentRequestEntry(id: string) {
   // ── Workflow Action Runtime (Generic Dispatcher) ──
   const { dispatch, isLoading: isExecutingAction } = useWorkflowAction({
     id,
-    version: entityVersion.value,
+    version: entityVersion,
     execute: (id, action, version, payload) =>
       apAdapter.executeRequestAction(id as PaymentRequestId, action, version, payload),
     queryKey: ['payment-request', id],

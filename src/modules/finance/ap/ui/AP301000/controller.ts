@@ -1,11 +1,10 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useScreenController, type ScreenStatePolicy } from '@/platform/screen-runtime'
+import { useWorkflowAction } from '@/platform/workflow-runtime/hooks/useWorkflowAction'
 import { useVendorBill } from '../../application/useVendorBill'
 import { useCreateVendorBill } from '../../application/useCreateVendorBill'
-import { useValidateVendorBill } from '../../application/useValidateVendorBill'
-import { useRejectVendorBill } from '../../application/useRejectVendorBill'
-import { useCancelVendorBill } from '../../application/useCancelVendorBill'
+import { apAdapter } from '../../infrastructure/ap.adapter'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
 import { toId } from '@/shared/types/brand.types'
 import type { VendorBillId } from '@/shared/types/brand.types'
@@ -25,9 +24,15 @@ export function useVendorBillController(id: string) {
 
   // Data fetching
   const { vendorBill, operations, isLoading } = useVendorBill(billId)
-  const { validate, isPending: isValidating } = useValidateVendorBill(billId)
-  const { reject, isPending: isRejecting } = useRejectVendorBill(billId)
-  const { cancel, isPending: isCancelling } = useCancelVendorBill(billId)
+
+  // Workflow Actions (Unified Runtime)
+  const { dispatch, isLoading: isExecutingAction } = useWorkflowAction<VendorBill>({
+    id,
+    version: computed(() => operations.value?.version ?? 0),
+    execute: (id, action, version, payload) =>
+      apAdapter.executeBillAction(id, action, version, payload),
+    queryKey: ['ap', 'vendor-bills', 'detail', id],
+  })
 
   // Creation form
   const { form, isSubmitting: isCreating } = useCreateVendorBill()
@@ -49,35 +54,24 @@ export function useVendorBillController(id: string) {
   const currentLines = computed(() => vendorBill.value?.lines || [])
   const activeTab = ref('Expense Lines')
 
-  // Commands
+  // Dynamic Command Registration
+  watchEffect(() => {
+    const actions = operations.value?.actions
+    if (!actions) return
+    actions.forEach((action) => {
+      base.registerCommand(action.action, {
+        execute: async (payload) => dispatch(action, payload as Record<string, unknown>),
+        isPending: isExecutingAction,
+      })
+    })
+  })
+
+  // Static Commands
   base.registerCommand('save', {
     execute: async () => {
       void form.handleSubmit()
     },
     isPending: isCreating,
-  })
-
-  base.registerCommand('validate', {
-    execute: async () => void validate(),
-    isPending: isValidating,
-  })
-
-  base.registerCommand('reject', {
-    execute: async (reason: unknown) => {
-      if (typeof reason === 'string') {
-        await reject(reason)
-      }
-    },
-    isPending: isRejecting,
-  })
-
-  base.registerCommand('cancel', {
-    execute: async (reason: unknown) => {
-      if (typeof reason === 'string') {
-        await cancel(reason)
-      }
-    },
-    isPending: isCancelling,
   })
 
   base.registerCommand('create_pr', {
