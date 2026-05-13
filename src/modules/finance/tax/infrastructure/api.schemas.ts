@@ -1,5 +1,8 @@
 import { z } from 'zod'
-import { createOperationalResponseSchema } from '@/shared/infrastructure/api.schemas'
+import {
+  createLightweightOperationalResponseSchema,
+  createOperationalResponseSchema,
+} from '@/shared/infrastructure/api.schemas'
 
 export const TaxRuleSchema = z.object({
   id: z.string().uuid(),
@@ -28,5 +31,5 @@ export const TaxCalculationResponseSchema = z.object({
   breakdown: z.record(z.string()).optional(),
 })
 
-export const OperationalTaxRuleSchema = createOperationalResponseSchema(TaxRuleSchema)
-export const OperationalTaxGroupSchema = createOperationalResponseSchema(TaxGroupSchema)
+export const OperationalTaxRuleSchema = createLightweightOperationalResponseSchema(TaxRuleSchema)
+export const OperationalTaxGroupSchema = createLightweightOperationalResponseSchema(TaxGroupSchema)
