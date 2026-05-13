@@ -46,8 +46,12 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
 
   // ── 1. Domain Constraints (backend-derived truth) ──
   const behavior = statePolicy.states[domainState]
-  const canEdit = input.forceReadonly ? false : (behavior?.editable ?? false)
-  const canDelete = input.forceReadonly ? false : (behavior?.deletable ?? false)
+  const canEdit = input.forceReadonly
+    ? false
+    : availableActions.includes('update') || (behavior?.editable ?? false)
+  const canDelete = input.forceReadonly
+    ? false
+    : availableActions.includes('delete') || (behavior?.deletable ?? false)
 
   // ── 1.5 Record Services (API boundary) ──
   const { hasNotes = false, fileCount = 0, hasActivities = false } = input.services ?? {}

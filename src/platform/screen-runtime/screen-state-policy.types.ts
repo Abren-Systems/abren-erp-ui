@@ -39,7 +39,7 @@ export interface SectionStateOverride {
  */
 export interface StateBehavior<TFieldKey extends string = string> {
   /** Is the record editable in this state? */
-  readonly editable: boolean
+  readonly editable?: boolean
 
   /** Can the record be deleted in this state? */
   readonly deletable?: boolean
