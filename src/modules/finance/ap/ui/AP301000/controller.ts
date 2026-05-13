@@ -55,6 +55,13 @@ export function useVendorBillController(id: string) {
   const activeTab = ref('Expense Lines')
 
   // Commands
+  base.registerCommand('save', {
+    execute: async () => {
+      void form.handleSubmit()
+    },
+    isPending: isCreating,
+  })
+
   base.registerCommand('validate', {
     execute: async () => void validate(),
     isPending: isValidating,

@@ -60,7 +60,7 @@ describe('APMapper', () => {
         currency: 'USD',
         justification: 'Hosting',
         status: 'VALIDATED',
-        net: '200.00',
+        net_amount: '200.00',
         tax_total: '0.00',
         wht_total: '4.00',
         total_amount: '200.00',

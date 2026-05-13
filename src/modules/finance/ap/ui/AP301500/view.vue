@@ -34,62 +34,60 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <!-- Loading State -->
 
     <!-- Main Content -->
-    <template>
-      <!-- 1. Form Title Bar -->
+    <!-- 1. Form Title Bar -->
 
-      <!-- 2. Form Toolbar -->
+    <!-- 2. Form Toolbar -->
 
-      <!-- 3. Summary Area -->
-      <div class="px-[var(--layout-gutter)] py-5">
-        <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
-          <FieldGroup>
-            <AppField v-bind="ctrl.fields.requesterId" />
-            <AppField
-              v-bind="ctrl.fields.beneficiaryId"
-              :editor-attrs="{ options: ctrl.userOptions.value }"
-            />
-            <AppField
-              v-bind="ctrl.fields.status"
-              type="status"
-              :context="{ entity: 'PaymentRequest' }"
-            />
-          </FieldGroup>
-
-          <FieldGroup>
-            <AppField v-bind="ctrl.fields.submittedAt" />
-            <AppField v-bind="ctrl.fields.justification" />
-          </FieldGroup>
-
-          <FieldGroup>
-            <AppField
-              v-bind="ctrl.fields.currency"
-              :editor-attrs="{ options: ctrl.currencyOptions.value }"
-            />
-            <AppField v-bind="ctrl.fields.totalAmount" />
-          </FieldGroup>
-        </AppTemplate>
-      </div>
-
-      <!-- 4. Tabs -->
-      <div class="px-[var(--layout-gutter)]">
-        <AppTabs :tabs="['Line Details']" v-model="ctrl.activeTab.value" />
-      </div>
-
-      <!-- 5. Details Area -->
-      <div class="px-[var(--layout-gutter)] pb-6">
-        <div
-          v-if="ctrl.activeTab.value === 'Line Details'"
-          class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-[var(--app-surface)] shadow-sm"
-        >
-          <DataGrid
-            :columns="paymentRequestLineColumns"
-            :data="ctrl.currentLines.value"
-            :loading="ctrl.isLoading.value && !ctrl.isNew.value"
-            empty-message="No line items found"
+    <!-- 3. Summary Area -->
+    <div class="px-[var(--layout-gutter)] py-5">
+      <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
+        <FieldGroup>
+          <AppField v-bind="ctrl.fields.requesterId" />
+          <AppField
+            v-bind="ctrl.fields.beneficiaryId"
+            :editor-attrs="{ options: ctrl.userOptions.value }"
           />
-        </div>
+          <AppField
+            v-bind="ctrl.fields.status"
+            type="status"
+            :context="{ entity: 'PaymentRequest' }"
+          />
+        </FieldGroup>
+
+        <FieldGroup>
+          <AppField v-bind="ctrl.fields.submittedAt" />
+          <AppField v-bind="ctrl.fields.justification" />
+        </FieldGroup>
+
+        <FieldGroup>
+          <AppField
+            v-bind="ctrl.fields.currency"
+            :editor-attrs="{ options: ctrl.currencyOptions.value }"
+          />
+          <AppField v-bind="ctrl.fields.totalAmount" />
+        </FieldGroup>
+      </AppTemplate>
+    </div>
+
+    <!-- 4. Tabs -->
+    <div class="px-[var(--layout-gutter)]">
+      <AppTabs :tabs="['Line Details']" v-model="ctrl.activeTab.value" />
+    </div>
+
+    <!-- 5. Details Area -->
+    <div class="px-[var(--layout-gutter)] pb-6">
+      <div
+        v-if="ctrl.activeTab.value === 'Line Details'"
+        class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-[var(--app-surface)] shadow-sm"
+      >
+        <DataGrid
+          :columns="paymentRequestLineColumns"
+          :data="ctrl.currentLines.value"
+          :loading="ctrl.isLoading.value && !ctrl.isNew.value"
+          empty-message="No line items found"
+        />
       </div>
-    </template>
+    </div>
 
     <!-- Dialogs -->
     <AuditReasonDialog

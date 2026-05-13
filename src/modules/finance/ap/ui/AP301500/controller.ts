@@ -101,6 +101,13 @@ export function usePaymentRequestEntry(id: string) {
   )
 
   // Register command executors — the FormToolbar reads these for dispatch
+  base.registerCommand('save', {
+    execute: async () => {
+      void form.handleSubmit()
+    },
+    isPending: isCreating,
+  })
+
   base.registerCommand('submit', {
     execute: async () => {
       await submit()

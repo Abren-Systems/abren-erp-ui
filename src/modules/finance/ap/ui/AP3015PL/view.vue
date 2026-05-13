@@ -19,11 +19,11 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
       />
 
       <DataGrid
-        v-model:sorting="ctrl.gridState.sorting"
-        v-model:row-selection="ctrl.gridState.rowSelection"
-        v-model:column-visibility="ctrl.gridState.columnVisibility"
-        v-model:global-filter="ctrl.gridState.globalFilter"
-        v-model:pagination="ctrl.gridState.pagination"
+        v-model:sorting="ctrl.gridState.sorting.value"
+        v-model:row-selection="ctrl.gridState.rowSelection.value"
+        v-model:column-visibility="ctrl.gridState.columnVisibility.value"
+        v-model:global-filter="ctrl.gridState.globalFilter.value"
+        v-model:pagination="ctrl.gridState.pagination.value"
         :data="ctrl.filteredRequests.value"
         :total-count="ctrl.totalCount.value"
         :columns="ctrl.columns"
