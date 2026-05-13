@@ -1,6 +1,6 @@
 import { computed, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
-import { useScreenController, type ScreenStatePolicy } from '@/platform/screen-runtime'
+import { useScreenController } from '@/platform/screen-runtime'
 import { useWorkflowAction } from '@/platform/workflow-runtime/hooks/useWorkflowAction'
 import { useVendorBill } from '../../application/useVendorBill'
 import { useCreateVendorBill } from '../../application/useCreateVendorBill'
@@ -12,10 +12,7 @@ import { AP301000 } from './screen'
 import { AP301000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings'
 import type { VendorBill } from '../../models/ap.types'
-
-const AP301000_POLICY: ScreenStatePolicy<string> = {
-  states: {},
-}
+import { AP301000_POLICY } from './policy'
 
 export function useVendorBillController(id: string) {
   const router = useRouter()
