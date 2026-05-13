@@ -59,11 +59,18 @@ export const ScheduledPaymentSchema = z.object({
   source_id: z.string().nullable().optional(),
 })
 
+export const OperationalBankAccountSchema = createOperationalResponseSchema(BankAccountSchema)
+export const OperationalBankTransactionSchema =
+  createOperationalResponseSchema(BankTransactionSchema)
 export const OperationalScheduledPaymentSchema =
   createOperationalResponseSchema(ScheduledPaymentSchema)
 
-export const BankAccountListSchema = createPaginatedResponseSchema(BankAccountSchema)
-export const BankTransactionListSchema = createPaginatedResponseSchema(BankTransactionSchema)
+export const BankAccountListSchema = createPaginatedResponseSchema(
+  createOperationalResponseSchema(BankAccountSchema),
+)
+export const BankTransactionListSchema = createPaginatedResponseSchema(
+  createOperationalResponseSchema(BankTransactionSchema),
+)
 export const ScheduledPaymentListSchema = createPaginatedResponseSchema(
-  OperationalScheduledPaymentSchema,
+  createOperationalResponseSchema(ScheduledPaymentSchema),
 )

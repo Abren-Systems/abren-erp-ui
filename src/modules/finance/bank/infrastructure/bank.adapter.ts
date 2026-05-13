@@ -1,5 +1,5 @@
 import type { BankAccountId, ScheduledPaymentId } from '@/shared/types/brand.types'
-import type { ScheduledPayment } from '../models/bank.types'
+import type { BankAccount, BankTransaction, ScheduledPayment } from '../models/bank.types'
 import type {
   BankAccountDTO,
   BankTransactionDTO,
@@ -27,11 +27,11 @@ export const bankAdapter = {
   /**
    * Fetches all banking accounts for the current tenant (Paginated).
    */
-  async getBankAccounts(query?: ListQuery): Promise<ListResponse<BankAccountDTO>> {
-    const raw = await apiGetEnvelope<ListResponse<BankAccountDTO>>('/finance/bank/accounts', {
+  async getBankAccounts(query?: ListQuery): Promise<ListResponse<OperationalEntity<BankAccount>>> {
+    const raw = await apiGetEnvelope<OperationalListDTO<BankAccountDTO>>('/finance/bank/accounts', {
       params: query,
     })
-    return raw.data
+    return mapOperationalList(raw.data, (dto: BankAccountDTO) => BankMapper.toBankAccount(dto))
   },
 
   /**
@@ -43,14 +43,16 @@ export const bankAdapter = {
   async getTransactions(
     accountId: BankAccountId,
     query?: ListQuery,
-  ): Promise<ListResponse<BankTransactionDTO>> {
-    const raw = await apiGetEnvelope<ListResponse<BankTransactionDTO>>(
+  ): Promise<ListResponse<OperationalEntity<BankTransaction>>> {
+    const raw = await apiGetEnvelope<OperationalListDTO<BankTransactionDTO>>(
       `/finance/bank/accounts/${accountId}/transactions`,
       {
         params: query,
       },
     )
-    return raw.data
+    return mapOperationalList(raw.data, (dto: BankTransactionDTO) =>
+      BankMapper.toTransaction(dto, accountId),
+    )
   },
 
   /**
