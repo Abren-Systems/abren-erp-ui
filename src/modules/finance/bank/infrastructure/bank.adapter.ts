@@ -14,7 +14,6 @@ import type {
 import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 import {
   mapOperational,
-  mapOperationalList,
   mapLightweightOperationalList,
   type LightweightOperationalListDTO,
   type OperationalDTO,

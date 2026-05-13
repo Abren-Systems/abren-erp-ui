@@ -11,7 +11,10 @@ export const semanticRegistry: Record<SemanticKind, SemanticRuntime> = {
     formatter: (value, _context) => {
       if (value == null) return ''
       const num = Number(value)
-      if (isNaN(num)) return typeof value === 'object' ? JSON.stringify(value) : String(value)
+      if (isNaN(num))
+        return typeof value === 'object'
+          ? JSON.stringify(value)
+          : String(value as string | number | boolean)
 
       const precision = SemanticPolicies[SemanticKind.Money].precision || 2
       const formatted = num.toFixed(precision)
@@ -32,7 +35,11 @@ export const semanticRegistry: Record<SemanticKind, SemanticRuntime> = {
 
   [SemanticKind.Status]: {
     formatter: (value) =>
-      value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value),
+      value == null
+        ? ''
+        : typeof value === 'object'
+          ? JSON.stringify(value)
+          : String(value as string | number | boolean),
     displayRendererKey: 'AppBadge',
   },
 
@@ -47,7 +54,7 @@ export const semanticRegistry: Record<SemanticKind, SemanticRuntime> = {
       return isNaN(num)
         ? typeof value === 'object'
           ? JSON.stringify(value)
-          : String(value)
+          : String(value as string | number | boolean)
         : num.toFixed(SemanticPolicies[SemanticKind.Quantity].precision || 4)
     },
     displayRendererKey: 'AppInput',
@@ -76,7 +83,9 @@ export const semanticRegistry: Record<SemanticKind, SemanticRuntime> = {
         const d = new Date(value as string | number | Date)
         return d.toLocaleDateString()
       } catch {
-        return typeof value === 'object' ? JSON.stringify(value) : String(value)
+        return typeof value === 'object'
+          ? JSON.stringify(value)
+          : String(value as string | number | boolean)
       }
     },
     displayRendererKey: 'AppInput',
