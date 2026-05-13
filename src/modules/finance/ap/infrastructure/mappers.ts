@@ -9,10 +9,8 @@ import type {
 import type {
   PaymentRequest,
   PaymentRequestLine,
-  PaymentRequestStatus,
   VendorBill,
   VendorBillLine,
-  VendorBillStatus,
 } from '../models/ap.types'
 import type {
   PaymentRequestId,
@@ -74,7 +72,7 @@ export class APMapper {
       totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
       currency: currency,
       justification: dto.justification,
-      status: dto.status as PaymentRequestStatus,
+      status: dto.status,
       lines: dto.lines.map((ln: PaymentRequestLineDTO) => this.mapPRLine(ln, currency)),
       bankAccountId: dto.bank_account_id
         ? CommonMapper.toBrandedId<BankAccountId>(dto.bank_account_id)
@@ -134,7 +132,7 @@ export class APMapper {
       dueDate: CommonMapper.toDate(dto.due_date)!,
       currency: currency,
       justification: dto.justification ?? '',
-      status: dto.status as VendorBillStatus,
+      status: dto.status,
       totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
       whtTotal: CommonMapper.toMoney(dto.wht_total || '0', currency),
       netPayable: CommonMapper.toMoney(dto.net_payable || '0', currency),

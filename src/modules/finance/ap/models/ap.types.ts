@@ -15,14 +15,7 @@ import type {
 
 // --- Payment Request Types ---
 
-export type PaymentRequestStatus =
-  | 'DRAFT'
-  | 'SUBMITTED'
-  | 'APPROVED'
-  | 'AUTHORIZED'
-  | 'REJECTED'
-  | 'CANCELLED'
-  | 'PAID'
+export type PaymentRequestStatus = string
 
 export interface PaymentRequestLine {
   id: PaymentRequestLineId // Line IDs are now branded for full type purity
@@ -57,7 +50,7 @@ export interface PaymentRequest {
 
 // --- Vendor Bill Types ---
 
-export type VendorBillStatus = 'DRAFT' | 'VALIDATED' | 'PAID' | 'VOIDED'
+export type VendorBillStatus = string
 
 export interface VendorBillLine {
   id?: VendorBillLineId | undefined

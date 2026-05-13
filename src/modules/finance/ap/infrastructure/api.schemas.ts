@@ -9,14 +9,7 @@ import {
  * These serve as the "Fail-Fast Shield" at the infrastructure boundary.
  */
 
-export const PaymentRequestStatusSchema = z.enum([
-  'DRAFT',
-  'SUBMITTED',
-  'APPROVED',
-  'AUTHORIZED',
-  'REJECTED',
-  'CANCELLED',
-])
+export const PaymentRequestStatusSchema = z.string()
 
 export const PaymentRequestLineSchema = z.object({
   id: z.string().uuid(),
@@ -91,7 +84,7 @@ export const VendorBillSchema = z.object({
   due_date: z.string().nullable().optional(), // ISO Date string
   currency: z.string().length(3),
   justification: z.string(), // Mandatory in DTO
-  status: z.enum(['DRAFT', 'VALIDATED', 'PAID', 'CANCELLED']),
+  status: z.string(),
   net_amount: z.coerce.string(),
   tax_total: z.coerce.string(),
   wht_total: z.coerce.string().default('0'),
