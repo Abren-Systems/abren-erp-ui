@@ -258,4 +258,41 @@ export default tseslint.config(
       ],
     },
   },
+  /**
+   * 7. CAPABILITY INFERENCE FIREWALL
+   *
+   * UI and Application layers MUST NOT derive operational capabilities
+   * (editability, actions, visibility) from domain state (`status`).
+   * They must consume projections from the `.operations` sidecar.
+   */
+  {
+    files: [
+      'src/modules/**/ui/**/*.ts',
+      'src/modules/**/ui/**/*.vue',
+      'src/platform/**/*.ts',
+      'src/platform/**/*.vue',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "BinaryExpression[operator=/^(===|!==|==|!=)$/]:has(MemberExpression[property.name='status'])",
+          message:
+            '[Capability Inference Firewall] Operational capability must not be inferred from domain state. Use operations.actions / operations.permissions instead. Status checks are allowed only for presentation-only UI chrome.',
+        },
+        {
+          selector:
+            "CallExpression[callee.property.name='includes']:has(MemberExpression[property.name='status'])",
+          message:
+            '[Capability Inference Firewall] Operational capability must not be inferred from domain state. Use operations.actions / operations.permissions instead. Status checks are allowed only for presentation-only UI chrome.',
+        },
+        {
+          selector: "SwitchStatement:has(MemberExpression[property.name='status'])",
+          message:
+            '[Capability Inference Firewall] Operational capability must not be inferred from domain state. Use operations.actions / operations.permissions instead. Status checks are allowed only for presentation-only UI chrome.',
+        },
+      ],
+    },
+  },
 )
