@@ -4,16 +4,14 @@ import { useScreenController } from '@/platform/screen-runtime'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
 import { usePaymentRequest } from '../../application/usePaymentRequest'
 import { useCreatePaymentRequest } from '../../application/useCreatePaymentRequest'
-import { useApprovePaymentRequest } from '../../application/useApprovePaymentRequest'
-import { useRejectPaymentRequest } from '../../application/useRejectPaymentRequest'
-import { useAuthorizePaymentRequest } from '../../application/useAuthorizePaymentRequest'
-import { useCancelPaymentRequest } from '../../application/useCancelPaymentRequest'
-import { useSubmitPaymentRequest } from '../../application/useSubmitPaymentRequest'
 import { useUsers } from '@/modules/core/application/useUsers'
 import { CURRENCY_OPTIONS, AP301500_FIELDS } from './fields'
 import { AP301500 } from './screen'
 import { AP301500_POLICY } from './policy'
 import { useField } from '@/platform/field-system/bindings'
+import { useWorkflowAction } from '@/platform/workflow-runtime/hooks/useWorkflowAction'
+import { apAdapter } from '../../infrastructure/ap.adapter'
+import { watch } from 'vue'
 import type { PaymentRequest } from '../../models/ap.types'
 
 /**
@@ -78,90 +76,37 @@ export function usePaymentRequestEntry(id: string) {
   const auditReason = ref('')
   const entityVersion = computed(() => operations.value?.version ?? 1)
 
-  // ── Workflow Action Executors ──
-  const { approve, isPending: isApproving } = useApprovePaymentRequest(
-    id as PaymentRequestId,
-    entityVersion,
-  )
-  const { reject, isPending: isRejecting } = useRejectPaymentRequest(
-    id as PaymentRequestId,
-    entityVersion,
-  )
-  const { authorize, isPending: isAuthorizing } = useAuthorizePaymentRequest(
-    id as PaymentRequestId,
-    entityVersion,
-  )
-  const { cancel, isPending: isCancelling } = useCancelPaymentRequest(
-    id as PaymentRequestId,
-    entityVersion,
-  )
-  const { submit, isPending: isSubmittingRequest } = useSubmitPaymentRequest(
-    id as PaymentRequestId,
-    entityVersion,
+  // ── Workflow Action Runtime (Generic Dispatcher) ──
+  const { dispatch, isLoading: isExecutingAction } = useWorkflowAction({
+    id,
+    version: entityVersion.value,
+    execute: (id, action, version, payload) =>
+      apAdapter.executeRequestAction(id as PaymentRequestId, action, version, payload),
+    queryKey: ['payment-request', id],
+  })
+
+  // Register commands dynamically from backend projection
+  watch(
+    () => operations.value?.actions,
+    (actions) => {
+      if (!actions) return
+      actions.forEach((action) => {
+        base.registerCommand(action.action, {
+          execute: async (payload) => dispatch(action, payload as Record<string, unknown>),
+          isPending: isExecutingAction,
+        })
+      })
+    },
+    { immediate: true },
   )
 
-  // Register command executors — the FormToolbar reads these for dispatch
+  // Register static commands
   base.registerCommand('save', {
     execute: async () => {
       void form.handleSubmit()
     },
     isPending: isCreating,
   })
-
-  base.registerCommand('submit', {
-    execute: async () => {
-      await submit()
-    },
-    isPending: isSubmittingRequest,
-  })
-  base.registerCommand('approve', {
-    execute: async () => {
-      await approve()
-    },
-    isPending: isApproving,
-  })
-  base.registerCommand('reject', {
-    execute: async () => {
-      auditReason.value = ''
-      isRejectDialogOpen.value = true
-    },
-    isPending: isRejecting,
-  })
-  base.registerCommand('authorize', {
-    execute: async () => {
-      await authorize()
-    },
-    isPending: isAuthorizing,
-  })
-  base.registerCommand('cancel', {
-    execute: async () => {
-      auditReason.value = ''
-      isCancelDialogOpen.value = true
-    },
-    isPending: isCancelling,
-  })
-
-  const handleRejectConfirm = async () => {
-    if (!auditReason.value.trim()) return
-    try {
-      await reject(auditReason.value)
-      isRejectDialogOpen.value = false
-    } catch (error) {
-      base.handleCommandError(error)
-      throw error
-    }
-  }
-
-  const handleCancelConfirm = async () => {
-    if (!auditReason.value.trim()) return
-    try {
-      await cancel(auditReason.value)
-      isCancelDialogOpen.value = false
-    } catch (error) {
-      base.handleCommandError(error)
-      throw error
-    }
-  }
 
   // ── Domain Derived State ──
   const isDraft = computed(() => isNew.value || activeEntity.value?.status === 'DRAFT')
@@ -254,8 +199,6 @@ export function usePaymentRequestEntry(id: string) {
 
     // Handlers
     handleCreate,
-    handleRejectConfirm,
-    handleCancelConfirm,
 
     // Navigation
     router,

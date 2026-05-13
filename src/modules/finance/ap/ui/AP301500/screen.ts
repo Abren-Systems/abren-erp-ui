@@ -1,7 +1,6 @@
 import { usePaymentRequestEntry } from './controller'
 import type { ScreenDefinition } from '@/platform/screen-runtime'
 import { AP_MODULE_ID, apScreenId } from '../../constants'
-import { AP301500_COMMANDS } from './commands'
 
 /**
  * AP301500 — Payment Request Data Entry (Focus)
@@ -52,7 +51,7 @@ export const AP301500: ScreenDefinition = {
       defaultCollapsed: true,
     },
   },
-  commands: AP301500_COMMANDS,
+  commands: [],
   personalization: {
     allowTabPersonalization: true,
     allowGridPersonalization: true,

@@ -36,6 +36,14 @@ export const ActionDescriptorSchema = z
     icon: z.string().nullable().optional(),
     is_primary: z.boolean().default(false),
     requires_reason: z.boolean().default(false),
+    variant: z.enum(['default', 'destructive', 'success', 'warning']).nullable().optional(),
+    confirmation: z
+      .object({
+        title: z.string(),
+        message: z.string(),
+      })
+      .nullable()
+      .optional(),
   })
   .transform((val) => ({
     action: val.action,
@@ -43,6 +51,8 @@ export const ActionDescriptorSchema = z
     icon: val.icon,
     isPrimary: val.is_primary,
     requiresReason: val.requires_reason,
+    variant: val.variant ?? 'default',
+    confirmation: val.confirmation,
   }))
 
 export type ActionDescriptor = z.infer<typeof ActionDescriptorSchema>

@@ -169,6 +169,40 @@ export const apAdapter = {
   },
 
   /**
+   * Executes a generic workflow action on a Payment Request.
+   */
+  async executeRequestAction(
+    id: string,
+    action: string,
+    version: number,
+    payload?: Record<string, unknown>,
+  ): Promise<OperationalEntity<PaymentRequest>> {
+    const raw = await apiPostEnvelope<OperationalDTO<PaymentRequestDTO>>(
+      `${REQUESTS_BASE}/${id}/${action}`,
+      payload,
+      { version },
+    )
+    return mapOperational(raw.data, (parsed) => APMapper.toPaymentRequest(parsed))
+  },
+
+  /**
+   * Executes a generic workflow action on a Vendor Bill.
+   */
+  async executeBillAction(
+    id: string,
+    action: string,
+    version: number,
+    payload?: Record<string, unknown>,
+  ): Promise<OperationalEntity<VendorBill>> {
+    const raw = await apiPostEnvelope<OperationalDTO<VendorBillDTO>>(
+      `${BILLS_BASE}/${id}/${action}`,
+      payload,
+      { version },
+    )
+    return mapOperational(raw.data, (parsed) => APMapper.toVendorBill(parsed))
+  },
+
+  /**
    * Fetches a paginated list of Vendor Bills.
    */
   async listBills(
