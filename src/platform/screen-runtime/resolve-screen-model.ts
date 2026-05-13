@@ -8,7 +8,7 @@ import type {
 } from './screen-state-policy.types'
 import { FieldPermission } from '@/shared/domain/operational'
 import type { ScreenProjection, CommandProjection } from './screen-projection.types'
-import type { WorkflowOperations } from '../workflow-runtime/models/workflows.types'
+import type { FullOperations } from '../workflow-runtime/models/workflows.types'
 
 /**
  * resolveScreenProjection
@@ -27,7 +27,7 @@ export function resolveScreenProjection<TState extends string, TFieldKey extends
   screenId: string
   commands: readonly ScreenCommand[]
   domainState: TState
-  operations?: WorkflowOperations
+  operations?: FullOperations
   statePolicy: ScreenStatePolicy<TState, TFieldKey>
   services?: {
     hasNotes: boolean

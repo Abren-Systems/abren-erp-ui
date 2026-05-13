@@ -4,10 +4,7 @@ import type {
   SectionStateOverride,
   FieldStateOverride,
 } from './screen-state-policy.types'
-import type {
-  ActionDescriptor,
-  WorkflowOperations,
-} from '../workflow-runtime/models/workflows.types'
+import type { ActionDescriptor, FullOperations } from '../workflow-runtime/models/workflows.types'
 
 export interface CommandProjection {
   readonly command: ScreenCommand
@@ -38,7 +35,7 @@ export interface ScreenProjection {
   readonly domain: {
     readonly backend: {
       readonly status?: string
-      readonly operations?: WorkflowOperations
+      readonly operations?: FullOperations
     }
     readonly capabilities: {
       readonly canEdit: boolean

@@ -8,9 +8,7 @@ import type {
   CreateTaxGroupDTO,
 } from './api.types'
 import {
-  TaxRuleSchema,
   TaxCalculationResponseSchema,
-  TaxGroupSchema,
   OperationalTaxRuleSchema,
   OperationalTaxGroupSchema,
 } from './api.schemas'
@@ -27,7 +25,7 @@ export const TaxAdapter = {
     const response = (await apiGet<unknown[]>('/finance/tax/rules')) as unknown[]
     return response.map((item) => {
       const parsed = OperationalTaxRuleSchema.parse(item)
-      return mapOperational(parsed, (dto) => TaxMapper.toTaxRule(dto))
+      return mapOperational(parsed, (dto) => TaxMapper.toTaxRule(dto as TaxRuleDTO))
     })
   },
 
@@ -36,7 +34,7 @@ export const TaxAdapter = {
    */
   async getRuleById(ruleId: string): Promise<OperationalEntity<TaxRule>> {
     const raw = await apiGetEnvelope<OperationalDTO<TaxRuleDTO>>(`/finance/tax/rules/${ruleId}`)
-    return mapOperational(raw.data, (dto) => TaxMapper.toTaxRule(dto))
+    return mapOperational(raw.data, (dto) => TaxMapper.toTaxRule(dto as TaxRuleDTO))
   },
 
   /**
@@ -53,7 +51,7 @@ export const TaxAdapter = {
    */
   async createTaxRule(dto: CreateTaxRuleDTO): Promise<OperationalEntity<TaxRule>> {
     const raw = await apiPostEnvelope<OperationalDTO<TaxRuleDTO>>('/finance/tax/rules', dto)
-    return mapOperational(raw.data, (parsedDto) => TaxMapper.toTaxRule(parsedDto))
+    return mapOperational(raw.data, (parsedDto) => TaxMapper.toTaxRule(parsedDto as TaxRuleDTO))
   },
 
   /**
@@ -63,7 +61,7 @@ export const TaxAdapter = {
     const response = (await apiGet<unknown[]>('/finance/tax/groups')) as unknown[]
     return response.map((item) => {
       const parsed = OperationalTaxGroupSchema.parse(item)
-      return mapOperational(parsed, (dto) => TaxMapper.toTaxGroup(dto))
+      return mapOperational(parsed, (dto) => TaxMapper.toTaxGroup(dto as TaxGroupDTO))
     })
   },
 
@@ -72,7 +70,7 @@ export const TaxAdapter = {
    */
   async createTaxGroup(dto: CreateTaxGroupDTO): Promise<OperationalEntity<TaxGroup>> {
     const raw = await apiPostEnvelope<OperationalDTO<TaxGroupDTO>>('/finance/tax/groups', dto)
-    return mapOperational(raw.data, (parsedDto) => TaxMapper.toTaxGroup(parsedDto))
+    return mapOperational(raw.data, (parsedDto) => TaxMapper.toTaxGroup(parsedDto as TaxGroupDTO))
   },
 
   /**
@@ -80,6 +78,6 @@ export const TaxAdapter = {
    */
   async getGroupById(groupId: string): Promise<OperationalEntity<TaxGroup>> {
     const raw = await apiGetEnvelope<OperationalDTO<TaxGroupDTO>>(`/finance/tax/groups/${groupId}`)
-    return mapOperational(raw.data, (dto) => TaxMapper.toTaxGroup(dto))
+    return mapOperational(raw.data, (dto) => TaxMapper.toTaxGroup(dto as TaxGroupDTO))
   },
 }

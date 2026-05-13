@@ -5,8 +5,6 @@ import { toValue, type MaybeRefOrGetter, computed } from 'vue'
 import { bankKeys } from './query-keys'
 
 import type { ListQuery } from '@/shared/domain/pagination'
-import { BankMapper } from '../infrastructure/mappers'
-import type { BankTransactionDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: View Bank Account Transactions (Paginated).
@@ -22,15 +20,7 @@ export function useBankTransactions(accountId: BankAccountId, query?: MaybeRefOr
     refetch,
   } = useApiQuery(
     bankKeys.transactions(accountId, query),
-    async () => {
-      const data = await bankAdapter.getTransactions(accountId, toValue(query))
-      return {
-        ...data,
-        items: data.items.map((dto: BankTransactionDTO) =>
-          BankMapper.toTransaction(dto, accountId),
-        ),
-      }
-    },
+    () => bankAdapter.getTransactions(accountId, toValue(query)),
     {
       enabled: computed(() => !!accountId),
       staleTime: 1000 * 60 * 2,

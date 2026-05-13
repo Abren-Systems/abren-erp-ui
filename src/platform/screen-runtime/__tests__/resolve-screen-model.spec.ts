@@ -70,6 +70,7 @@ describe('resolveScreenProjection', () => {
         ],
         permissions: {},
         version: 1,
+        lifecycleStatus: 'DRAFT',
       },
       statePolicy: mockPolicy,
     })
@@ -93,6 +94,7 @@ describe('resolveScreenProjection', () => {
         actions: [],
         permissions: {},
         version: 1,
+        lifecycleStatus: 'RELEASED',
       },
       statePolicy: mockPolicy,
     })
@@ -114,6 +116,7 @@ describe('resolveScreenProjection', () => {
         actions: [],
         permissions: {},
         version: 1,
+        lifecycleStatus: 'RELEASED',
       },
       statePolicy: mockPolicy,
     })
@@ -140,6 +143,7 @@ describe('resolveScreenProjection', () => {
         ],
         permissions: {},
         version: 1,
+        lifecycleStatus: 'DRAFT',
       },
       statePolicy: mockPolicy,
     })
@@ -173,6 +177,7 @@ describe('resolveScreenProjection', () => {
           totalAmount: 'readonly',
         },
         version: 1,
+        lifecycleStatus: 'DRAFT',
       },
       statePolicy: mockPolicy,
       sessionBanner: {

@@ -20,39 +20,73 @@ export const StateTransitionRequestSchema = z.object({
 })
 
 /**
- * Authoritative projection of current operational capabilities.
+ * Tier 1 — Lightweight operational sidecar for lists and grids.
  */
-export const WorkflowOperationsSchema = z.object({
-  actions: z.array(
-    z
-      .object({
-        action: z.string(),
-        label: z.string(),
-        icon: z.string().optional(),
-        is_primary: z.boolean().default(false),
-        requires_reason: z.boolean().default(false),
-      })
-      .transform((val) => ({
-        action: val.action,
-        label: val.label,
-        icon: val.icon,
-        isPrimary: val.is_primary,
-        requiresReason: val.requires_reason,
-      })),
-  ),
-  permissions: z.record(z.string(), z.enum(['editable', 'readonly', 'hidden'])),
-  version: z.number().int().default(1),
-})
+export const LightweightOperationsSchema = z
+  .object({
+    version: z.number().int().default(1),
+    lifecycle_status: z.string().nullable().optional(),
+  })
+  .transform((val) => ({
+    version: val.version,
+    lifecycleStatus: val.lifecycle_status ?? undefined,
+  }))
 
 /**
- * Creates an operational response schema for a given item schema.
+ * Tier 2 — Authoritative projection of current operational capabilities.
+ */
+export const FullOperationsSchema = z
+  .object({
+    actions: z.array(
+      z
+        .object({
+          action: z.string(),
+          label: z.string(),
+          icon: z.string().optional(),
+          is_primary: z.boolean().default(false),
+          requires_reason: z.boolean().default(false),
+        })
+        .transform((val) => ({
+          action: val.action,
+          label: val.label,
+          icon: val.icon,
+          isPrimary: val.is_primary,
+          requiresReason: val.requires_reason,
+        })),
+    ),
+    permissions: z.record(z.string(), z.enum(['editable', 'readonly', 'hidden'])),
+    version: z.number().int().default(1),
+    lifecycle_status: z.string().nullable().optional(),
+  })
+  .transform((val) => ({
+    actions: val.actions,
+    permissions: val.permissions,
+    version: val.version,
+    lifecycleStatus: val.lifecycle_status ?? undefined,
+  }))
+
+/**
+ * Creates a Tier 1 (Lightweight) operational response schema.
+ * Used for paginated list endpoints.
+ */
+export function createLightweightOperationalResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
+  return z.object({
+    success: z.boolean().default(true),
+    data: dataSchema,
+    operations: LightweightOperationsSchema,
+    meta: z.record(z.string(), z.any()).optional(),
+  })
+}
+
+/**
+ * Creates a Tier 2 (Full) operational response schema.
  * Matches OperationalResponse[T] from the backend.
  */
 export function createOperationalResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
   return z.object({
     success: z.boolean().default(true),
     data: dataSchema,
-    operations: WorkflowOperationsSchema,
+    operations: FullOperationsSchema,
     meta: z.record(z.string(), z.any()).optional(),
   })
 }

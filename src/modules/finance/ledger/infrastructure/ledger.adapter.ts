@@ -1,7 +1,7 @@
 import { apiGet, apiGetEnvelope, apiPost, apiPostEnvelope } from '@/shared/api/http-client'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
 import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
-import { WorkflowOperationsSchema } from '@/platform/workflow-runtime/models/workflows.types'
+import { mapOperational, mapOperationalList } from '@/platform/workflow-runtime/utils/operational'
 import type { JournalEntry } from '../models/journal-entry.types'
 import { LedgerMapper } from './mappers'
 import type {
@@ -42,10 +42,7 @@ export const ledgerAdapter = {
     const raw = (await apiGet<unknown[]>('/finance/ledger/accounts')) as unknown[]
     return raw.map((item) => {
       const parsed = OperationalAccountSchema.parse(item)
-      return {
-        ...parsed.data,
-        __operations: WorkflowOperationsSchema.parse(parsed.operations),
-      }
+      return mapOperational(parsed, (data) => data)
     })
   },
 
@@ -58,10 +55,7 @@ export const ledgerAdapter = {
   async createAccount(data: CreateAccountDTO): Promise<OperationalEntity<AccountDTO>> {
     const raw = await apiPostEnvelope<unknown>('/finance/ledger/accounts', data)
     const parsed = OperationalAccountSchema.parse(raw)
-    return {
-      ...parsed.data,
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => data)
   },
 
   /**
@@ -73,10 +67,7 @@ export const ledgerAdapter = {
   async deactivateAccount(accountId: string): Promise<OperationalEntity<AccountDTO>> {
     const raw = await apiPostEnvelope<unknown>(`/finance/ledger/accounts/${accountId}/deactivate`)
     const parsed = OperationalAccountSchema.parse(raw)
-    return {
-      ...parsed.data,
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => data)
   },
 
   /**
@@ -92,10 +83,7 @@ export const ledgerAdapter = {
   ): Promise<OperationalEntity<AccountDTO>> {
     const raw = await apiPostEnvelope<unknown>(`/finance/ledger/accounts/${accountId}/rename`, data)
     const parsed = OperationalAccountSchema.parse(raw)
-    return {
-      ...parsed.data,
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => data)
   },
 
   /**
@@ -110,13 +98,9 @@ export const ledgerAdapter = {
     })
     const parsed = JournalEntryListSchema.parse(raw.data)
 
-    return {
-      items: parsed.items.map((item) => ({
-        ...LedgerMapper.toJournalEntry(item.data as unknown as JournalEntryDTO),
-        __operations: WorkflowOperationsSchema.parse(item.operations),
-      })),
-      totalCount: parsed.total_count ?? 0,
-    }
+    return mapOperationalList(parsed, (item) =>
+      LedgerMapper.toJournalEntry(item as JournalEntryDTO),
+    )
   },
 
   /**
@@ -130,10 +114,7 @@ export const ledgerAdapter = {
       headers: { 'X-Abren-Response-Profile': 'operational' },
     })
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return {
-      ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
   },
 
   /**
@@ -146,10 +127,7 @@ export const ledgerAdapter = {
       headers: { 'X-Abren-Response-Profile': 'operational' },
     })
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return {
-      ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
   },
 
   /**
@@ -168,10 +146,7 @@ export const ledgerAdapter = {
       { headers: { 'X-Abren-Response-Profile': 'operational' } },
     )
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return {
-      ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
   },
 
   /**
@@ -192,10 +167,7 @@ export const ledgerAdapter = {
       },
     )
     const parsed = OperationalJournalEntrySchema.parse(raw)
-    return {
-      ...LedgerMapper.toJournalEntry(parsed.data),
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => LedgerMapper.toJournalEntry(data))
   },
 
   /**
@@ -207,10 +179,7 @@ export const ledgerAdapter = {
     const raw = (await apiGet<unknown[]>('/finance/ledger/fiscal-years')) as unknown[]
     return raw.map((item) => {
       const parsed = OperationalFiscalYearSchema.parse(item)
-      return {
-        ...parsed.data,
-        __operations: WorkflowOperationsSchema.parse(parsed.operations),
-      }
+      return mapOperational(parsed, (data) => data)
     })
   },
 
@@ -223,10 +192,7 @@ export const ledgerAdapter = {
     const raw = (await apiGet<unknown[]>('/finance/ledger/fiscal-periods')) as unknown[]
     return raw.map((item) => {
       const parsed = OperationalFiscalPeriodSchema.parse(item)
-      return {
-        ...parsed.data,
-        __operations: WorkflowOperationsSchema.parse(parsed.operations),
-      }
+      return mapOperational(parsed, (data) => data)
     })
   },
 
@@ -239,10 +205,7 @@ export const ledgerAdapter = {
   async generateFiscalYear(data: GenerateFiscalYearDTO): Promise<OperationalEntity<FiscalYearDTO>> {
     const raw = await apiPostEnvelope<unknown>('/finance/ledger/fiscal-years', data)
     const parsed = OperationalFiscalYearSchema.parse(raw)
-    return {
-      ...parsed.data,
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => data)
   },
 
   /**
@@ -253,10 +216,7 @@ export const ledgerAdapter = {
   async getLedgerSettings(): Promise<OperationalEntity<LedgerSettingsDTO>> {
     const raw = await apiGetEnvelope<unknown>('/finance/ledger/settings')
     const parsed = OperationalLedgerSettingsSchema.parse(raw)
-    return {
-      ...parsed.data,
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => data)
   },
 
   /**
@@ -272,10 +232,7 @@ export const ledgerAdapter = {
       method: 'PATCH',
     })
     const parsed = OperationalLedgerSettingsSchema.parse(raw)
-    return {
-      ...parsed.data,
-      __operations: WorkflowOperationsSchema.parse(parsed.operations),
-    }
+    return mapOperational(parsed, (data) => data)
   },
 
   /**

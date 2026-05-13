@@ -12,7 +12,7 @@ import type { ScreenDefinition } from './screen-definition.types'
 import type { ScreenData, ControllerCommand, ScreenController } from './screen-controller.types'
 import type { UIState, BaseDomainState, ScreenStateMachine } from './state-machine.types'
 import type { BannerPolicy, ScreenStatePolicy } from './screen-state-policy.types'
-import type { WorkflowOperations } from '../workflow-runtime/models/workflows.types'
+import type { FullOperations } from '../workflow-runtime/models/workflows.types'
 import { resolveScreenProjection } from './resolve-screen-model'
 import type { CommandProjection } from './screen-projection.types'
 import { transitionRecorder } from '../debug/transition-recorder'
@@ -30,7 +30,7 @@ export interface ScreenControllerDataSource<T> {
   /** Error from the data source, if any */
   readonly error: Ref<Error | null | undefined>
   /** Authoritative projection of current operational capabilities */
-  readonly operations?: Ref<WorkflowOperations | undefined>
+  readonly operations?: Ref<FullOperations | undefined>
 }
 
 export interface ScreenControllerOptions<T, TDomain extends string = BaseDomainState> {
@@ -42,7 +42,7 @@ export interface ScreenControllerOptions<T, TDomain extends string = BaseDomainS
   readonly isNew?: Ref<boolean>
   /** Function to extract the module-specific DomainState from the entity */
   readonly getDomainState: (entity: T) => TDomain
-  readonly operations?: Ref<WorkflowOperations | undefined>
+  readonly operations?: Ref<FullOperations | undefined>
   readonly statePolicy: ScreenStatePolicy<TDomain>
   /** Grid states to project into the model */
   readonly grids?: ComputedRef<Record<string, unknown>>

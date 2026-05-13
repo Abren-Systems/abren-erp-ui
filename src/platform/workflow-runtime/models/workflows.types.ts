@@ -14,6 +14,20 @@ export interface PendingApproval {
 
 export type ApprovalAction = 'APPROVE' | 'REJECT'
 
+// ---------------------------------------------------------------------------
+// Projection Tier Branding (ADR-0018)
+// ---------------------------------------------------------------------------
+declare const projectionTier: unique symbol
+
+export type ProjectionTier = 'reference' | 'lightweight' | 'full'
+
+type ProjectionBranded<TTier extends ProjectionTier> = {
+  readonly [projectionTier]: TTier
+}
+
+// ---------------------------------------------------------------------------
+// Action Descriptor
+// ---------------------------------------------------------------------------
 /** Semantic description of a workflow action. */
 export const ActionDescriptorSchema = z
   .object({
@@ -33,24 +47,79 @@ export const ActionDescriptorSchema = z
 
 export type ActionDescriptor = z.infer<typeof ActionDescriptorSchema>
 
-/** Authoritative projection of current operational capabilities. */
-export const WorkflowOperationsSchema = z.object({
-  actions: z.array(ActionDescriptorSchema),
-  permissions: z.record(z.enum(['editable', 'readonly', 'hidden'])),
+// ---------------------------------------------------------------------------
+// Tiered Operations Schemas (ADR-0018)
+// ---------------------------------------------------------------------------
+
+/** Tier 0 — Base concurrency token. */
+export const BaseOperationsSchema = z.object({
   version: z.number().int().default(1),
 })
 
-export type WorkflowOperations = z.infer<typeof WorkflowOperationsSchema>
+export type BaseOperations = z.infer<typeof BaseOperationsSchema>
 
-/** Enhanced response envelope for workflow-aware entities. */
-export interface OperationalResponse<T> {
+/** Tier 1 — Lightweight projection for lists and grids. */
+export const LightweightOperationsSchema = BaseOperationsSchema.extend({
+  lifecycle_status: z.string().nullable().optional(),
+}).transform((val) => ({
+  version: val.version,
+  lifecycleStatus: val.lifecycle_status ?? undefined,
+}))
+
+export type LightweightOperations = z.infer<typeof LightweightOperationsSchema>
+
+/** Tier 2 — Full authoritative projection with capability graph. */
+export const FullOperationsSchema = z
+  .object({
+    actions: z.array(ActionDescriptorSchema),
+    permissions: z.record(z.enum(['editable', 'readonly', 'hidden'])),
+    version: z.number().int().default(1),
+    lifecycle_status: z.string().nullable().optional(),
+  })
+  .transform((val) => ({
+    actions: val.actions,
+    permissions: val.permissions,
+    version: val.version,
+    lifecycleStatus: val.lifecycle_status ?? undefined,
+  }))
+
+export type FullOperations = z.infer<typeof FullOperationsSchema>
+
+// ---------------------------------------------------------------------------
+// Response Envelopes
+// ---------------------------------------------------------------------------
+
+/** Tier 1 response envelope for paginated lists. */
+export interface LightweightOperationalResponse<T> {
   success: boolean
   data: T
-  operations: WorkflowOperations
+  operations: LightweightOperations
   meta?: Record<string, unknown>
 }
 
-/** Frontend runtime representation of an operational entity (flattened from envelope). */
-export type OperationalEntity<T> = T & {
-  __operations: WorkflowOperations
+/** Tier 2 response envelope for workflow-aware entities. */
+export interface OperationalResponse<T> {
+  success: boolean
+  data: T
+  operations: FullOperations
+  meta?: Record<string, unknown>
 }
+
+// ---------------------------------------------------------------------------
+// Operational Entity Types (Nominally Branded)
+// ---------------------------------------------------------------------------
+
+/** Plain reference entity — Tier 0. No operational metadata. */
+export type ReferenceEntity<T> = T
+
+/** Lightweight operational entity — Tier 1. For grids and lists. */
+export type LightweightOperationalEntity<T> = T &
+  ProjectionBranded<'lightweight'> & {
+    __operations: LightweightOperations
+  }
+
+/** Full operational entity — Tier 2. For detail views and mutations. */
+export type OperationalEntity<T> = T &
+  ProjectionBranded<'full'> & {
+    __operations: FullOperations
+  }

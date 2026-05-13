@@ -77,6 +77,14 @@ Every inquiry/list grid **must** populate the footer:
 4. **Binding API** (`useField`, `useGrid`, `useCommand`)
 5. **Pure View** (`view.vue`)
 
+### Projection Tiers (ADR-0018)
+
+The runtime enforces strict capability boundaries based on operational depth:
+
+- **Tier 1 (Lightweight):** Use `LightweightOperationalEntity` for grids/lists. Contains only `version` and `lifecycleStatus`.
+- **Tier 2 (Full):** Use `OperationalEntity` for detail views and mutations. Contains full action graph and field permissions.
+- **Guard:** Always use `assertFullProjection(entity)` before accessing `__operations.actions` or `__operations.permissions`.
+
 ## Field System (Non-Negotiable)
 
 1. **field/label separation**: Stable `field` key distinct from display `label`.
@@ -89,6 +97,7 @@ Every inquiry/list grid **must** populate the footer:
 - **Legacy Terminology**: Never use "Workboard", "Queue", or "Triage" in new code. Use "Workspace View" or "Inquiry".
 - **Direct Binding**: Never bind components to raw business state (e.g., `v-model="entity.amount"`). Use `useField('amount')`.
 - **Inference in UI**: Never check `if (status === 'APPROVED')` in a component. Use the Projection's capability flags (`field.readonly`, `command.visible`).
+- **Tier Mixing**: Never put Tier 2 (`OperationalEntity`) in a list store, and never pass Tier 1 (`LightweightOperationalEntity`) to a detail view.
 - **Inline editing**: Mutate only via sanctioned Forms or Drawers.
 - **Raw HTML for data**: `<span>{{ val }}</span>` is banned in business screens. Use `AppField`.
 

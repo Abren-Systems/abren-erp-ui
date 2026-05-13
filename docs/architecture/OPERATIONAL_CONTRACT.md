@@ -7,10 +7,10 @@ tags: [frontend, backend, architecture, contract]
 
 # Operational Contract Specification
 
-> **Version:** 1.0
+> **Version:** 2.0
 > **Status:** AUTHORITATIVE
 > **Last Updated:** May 2026
-> **Companion:** [Acumatica Alignment](ACUMATICA_ALIGNMENT.md) · [Frontend Architecture (Backend)](../../abren-api/docs/architecture/core-principles/FRONTEND_ARCHITECTURE.md)
+> **Companion:** [Acumatica Alignment](ACUMATICA_ALIGNMENT.md) · [Frontend Architecture (Backend)](../../abren-api/docs/architecture/core-principles/FRONTEND_ARCHITECTURE.md) · [ADR-0018 Projection Tiers](../../abren-api/docs/architecture/adr/ADR-0018-projection-tiers.md)
 
 ---
 
@@ -105,9 +105,9 @@ Every write operation uses action-oriented endpoints. Generic `PATCH` is prohibi
 ❌ PUT /finance/ap/payment-requests/{id}
 ```
 
-### 4.2 Mutation Response Contract
+### 4.2 Mutation Response Contract (Tier 2 — Full Projection)
 
-Every mutation response returns the updated entity with operational metadata:
+Every mutation response returns the updated entity wrapped in an `OperationalResponse[T]` envelope with the **full** operational sidecar:
 
 ```python
 class FieldPermission(str, Enum):
@@ -115,24 +115,82 @@ class FieldPermission(str, Enum):
     READONLY = "readonly"
     HIDDEN = "hidden"
 
-# Every workflow-enabled entity response includes:
+# Tier 2 envelope — returned by all mutations and detail endpoints:
 {
+    "success": true,
     "data": { ... },                              # The entity DTO
-    "available_actions": ["approve", "reject"],    # What the user CAN do next
-    "field_permissions": {                         # Strict FieldPermission enum values
-        "vendor_id": "readonly",
-        "amount": "readonly",
-        "justification": "readonly"
-    },
-    "expected_next": "approve",                    # The green button (nullable)
-    "version": 3                                   # OCC version
+    "operations": {
+        "version": 3,                              # OCC concurrency token
+        "lifecycle_status": "SUBMITTED",           # Current workflow state
+        "actions": [                               # Full capability graph
+            {
+                "action": "approve",
+                "label": "Approve",
+                "icon": "check",
+                "is_primary": true,
+                "requires_reason": false
+            }
+        ],
+        "permissions": {                           # Field-level permissions
+            "vendor_id": "readonly",
+            "amount": "readonly",
+            "justification": "readonly"
+        }
+    }
 }
 ```
 
 > [!WARNING]
-> **`field_permissions` uses a strict `FieldPermission` enum.** Only three values are legal: `EDITABLE`, `READONLY`, `HIDDEN`. Any field not listed inherits the screen-level default. Presentation semantics (`highlight`, `tab`, `required`, `visible`) must NEVER appear in this contract. The backend says what is **permitted**. The frontend decides how to **render** it.
+> **`permissions` uses a strict `FieldPermission` enum.** Only three values are legal: `EDITABLE`, `READONLY`, `HIDDEN`. Any field not listed inherits the screen-level default. Presentation semantics (`highlight`, `tab`, `required`, `visible`) must NEVER appear in this contract. The backend says what is **permitted**. The frontend decides how to **render** it.
 
-### 4.3 Concurrency Protocol
+### 4.3 Projection Tiers (ADR-0018)
+
+Not all consumers require the full operational graph. The system defines three projection tiers to avoid O(N) workflow evaluations on list endpoints:
+
+| Tier                     | Envelope                            | Sidecar Shape                                         | Use Case                         |
+| ------------------------ | ----------------------------------- | ----------------------------------------------------- | -------------------------------- |
+| **Tier 0 (Reference)**   | `APIResponse[T]`                    | None                                                  | Static configuration, dropdowns  |
+| **Tier 1 (Lightweight)** | `LightweightOperationalResponse[T]` | `{ version, lifecycle_status }`                       | Paginated lists, grids           |
+| **Tier 2 (Full)**        | `OperationalResponse[T]`            | `{ version, lifecycle_status, actions, permissions }` | Detail views, mutation responses |
+
+```python
+# Tier 1 envelope — returned by all list endpoints:
+{
+    "success": true,
+    "data": { ... },
+    "operations": {
+        "version": 3,
+        "lifecycle_status": "SUBMITTED"
+    }
+}
+```
+
+#### Tier Invariants
+
+1. **Tier Downgrade Forbidden:** A `LightweightOperationalEntity<T>` must never be passed to a component that requires `OperationalEntity<T>`. Enforced by nominal branding (`ProjectionBranded<'lightweight'>` vs `ProjectionBranded<'full'>`).
+2. **Mutation Invariant:** All mutations must return **Tier 2** to force authoritative state rehydration.
+3. **Store Purity:** Grid stores must hold exclusively **Tier 1** entities. Mixing tiers in the same collection is an architectural violation.
+4. **Escalation:** If a grid row is selected for detail view, the frontend must fetch a fresh Tier 2 response — never promote a Tier 1 entity.
+
+#### Frontend Type Safety
+
+```typescript
+// Nominal branding prevents structural widening
+type LightweightOperationalEntity<T> = T &
+  ProjectionBranded<'lightweight'> & {
+    __operations: LightweightOperations // version + lifecycleStatus only
+  }
+
+type OperationalEntity<T> = T &
+  ProjectionBranded<'full'> & {
+    __operations: FullOperations // version + lifecycleStatus + actions + permissions
+  }
+
+// Runtime guard for capability boundaries
+assertFullProjection(entity) // throws if entity is Tier 1
+```
+
+### 4.4 Concurrency Protocol
 
 Every mutation on a versioned entity must include the OCC version:
 
@@ -237,9 +295,10 @@ The `DEGRADED` state is new. When backend `field_permissions` is absent or an OC
 
 ### 7.3 What the Frontend Must Never Cache
 
-- `available_actions` independently of the entity — they are part of the entity response
+- Operational metadata (`__operations`) independently of the entity — they are part of the entity envelope
 - Workflow state separately from the entity — status is always read from the entity
 - Security/permission data — always derived from the current response
+- Tier 2 projections in list/grid stores — grids must hold Tier 1 entities exclusively
 
 ---
 

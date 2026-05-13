@@ -4,8 +4,6 @@ import { bankAdapter } from '../infrastructure/bank.adapter'
 import { bankKeys } from './query-keys'
 
 import type { ListQuery } from '@/shared/domain/pagination'
-import { BankMapper } from '../infrastructure/mappers'
-import type { BankAccountDTO } from '../infrastructure/api.types'
 
 /**
  * Use Case: View Bank Accounts (Paginated).
@@ -21,10 +19,7 @@ export function useBankAccounts(query?: MaybeRefOrGetter<ListQuery>) {
   } = useResourceQuery(
     bankKeys.accounts(query),
     () => bankAdapter.getBankAccounts(toValue(query)),
-    (data) => ({
-      ...data,
-      items: data.items.map((dto: BankAccountDTO) => BankMapper.toBankAccount(dto)),
-    }),
+    undefined,
     { staleTime: 1000 * 60 * 5 },
   )
 

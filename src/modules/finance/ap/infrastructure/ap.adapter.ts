@@ -1,4 +1,4 @@
-import { apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
+import { apiGet, apiGetEnvelope, apiPostEnvelope } from '@/shared/api/http-client'
 import { PaymentRequestStatsSchema } from './api.schemas'
 import type {
   CreatePaymentRequestDTO,
@@ -8,12 +8,15 @@ import type {
   VendorBillDTO,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
-import type { OperationalEntity } from '@/platform/workflow-runtime/models/workflows.types'
+import type {
+  OperationalEntity,
+  LightweightOperationalEntity,
+} from '@/platform/workflow-runtime/models/workflows.types'
 import {
   mapOperational,
-  mapOperationalList,
+  mapLightweightOperationalList,
   type OperationalDTO,
-  type OperationalListDTO,
+  type LightweightOperationalListDTO,
 } from '@/platform/workflow-runtime/utils/operational'
 import { APMapper } from './mappers'
 import { Money } from '@/shared/domain/money'
@@ -32,20 +35,25 @@ export const apAdapter = {
   /**
    * Fetches a paginated list of Payment Requests.
    */
-  async listRequests(query?: ListQuery): Promise<ListResponse<OperationalEntity<PaymentRequest>>> {
-    const raw = await apiGetEnvelope<OperationalListDTO<PaymentRequestDTO>>(REQUESTS_BASE, {
-      params: query,
-    })
-    return mapOperationalList(raw.data, (dto) => APMapper.toPaymentRequest(dto))
+  async listRequests(
+    query?: ListQuery,
+  ): Promise<ListResponse<LightweightOperationalEntity<PaymentRequest>>> {
+    const raw = await apiGetEnvelope<LightweightOperationalListDTO<PaymentRequestDTO>>(
+      REQUESTS_BASE,
+      {
+        params: query,
+      },
+    )
+    return mapLightweightOperationalList(raw.data, (dto) => APMapper.toPaymentRequest(dto))
   },
 
   async getRequestsByUser(
     userId: UserId,
-  ): Promise<ListResponse<OperationalEntity<PaymentRequest>>> {
-    const raw = await apiGetEnvelope<OperationalListDTO<PaymentRequestDTO>>(
+  ): Promise<ListResponse<LightweightOperationalEntity<PaymentRequest>>> {
+    const raw = await apiGetEnvelope<LightweightOperationalListDTO<PaymentRequestDTO>>(
       `${REQUESTS_BASE}/user/${userId}`,
     )
-    return mapOperationalList(raw.data, (dto) => APMapper.toPaymentRequest(dto))
+    return mapLightweightOperationalList(raw.data, (dto) => APMapper.toPaymentRequest(dto))
   },
 
   /**
@@ -163,11 +171,13 @@ export const apAdapter = {
   /**
    * Fetches a paginated list of Vendor Bills.
    */
-  async listBills(query?: ListQuery): Promise<ListResponse<OperationalEntity<VendorBill>>> {
-    const raw = await apiGetEnvelope<OperationalListDTO<VendorBillDTO>>(BILLS_BASE, {
+  async listBills(
+    query?: ListQuery,
+  ): Promise<ListResponse<LightweightOperationalEntity<VendorBill>>> {
+    const raw = await apiGetEnvelope<LightweightOperationalListDTO<VendorBillDTO>>(BILLS_BASE, {
       params: query,
     })
-    return mapOperationalList(raw.data, (dto) => APMapper.toVendorBill(dto))
+    return mapLightweightOperationalList(raw.data, (dto) => APMapper.toVendorBill(dto))
   },
 
   /**
