@@ -15,7 +15,7 @@ const ctrl = inject(ScreenControllerKey, null)
 
 const services = computed(() => {
   return (
-    ctrl?.value?.model.value.domain.services ?? {
+    ctrl?.value?.model?.value?.domain?.services ?? {
       hasNotes: false,
       fileCount: 0,
       hasActivities: false,
