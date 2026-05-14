@@ -48,6 +48,7 @@ export function usePaymentRequestEntry(id: string) {
       // Cast form state to match the read model shape approximately
       return {
         ...(form.state.values as unknown as PaymentRequest),
+        id: 'new' as PaymentRequestId,
         status: 'DRAFT',
       }
     }
