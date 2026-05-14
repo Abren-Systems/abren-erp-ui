@@ -41,6 +41,7 @@ const screen = computed(
 
 // Platform-Owned Controller Lifecycle
 const controllerRef = shallowRef<ScreenController<unknown, string> | null>(null)
+const controllerError = shallowRef<Error | null>(null)
 
 // The ControllerHost is a renderless component that exists solely to provide
 // a "legit" setup() context for the screen controller. This allows the controller
@@ -60,6 +61,7 @@ const ControllerHost = defineComponent({
   },
   emits: {
     ready: (controller: ScreenController<unknown, string>) => true,
+    error: (err: Error) => true,
   },
   setup(props, { emit }) {
     const scope = effectScope()
@@ -75,6 +77,7 @@ const ControllerHost = defineComponent({
         `[ControllerHost] Controller initialization failed for screen "${props.screen.id}":`,
         err,
       )
+      emit('error', err instanceof Error ? err : new Error(String(err)))
     }
 
     if (controller) {
@@ -107,7 +110,9 @@ watch(
   () => route.fullPath,
   () => {
     controllerRef.value = null
+    controllerError.value = null
   },
+  { flush: 'sync' },
 )
 
 // Resolve the Working Area view component (currently from renderTarget,
@@ -141,6 +146,7 @@ const sidePanelContract = computed(() => {
       :screen="screen"
       :ctx="screenCtx"
       @ready="(c) => (controllerRef = c)"
+      @error="(e) => (controllerError = e)"
     />
 
     <div class="flex-1 flex flex-col min-w-0 h-full relative">
@@ -155,8 +161,8 @@ const sidePanelContract = computed(() => {
           />
           <ListToolbar
             v-if="['inquiry', 'primaryList'].includes(screen.kind)"
-            :model="controllerRef.model.value"
-            :executors="controllerRef.commands.value"
+            :model="controllerRef.model?.value"
+            :executors="controllerRef.commands?.value ?? {}"
             :is-pending="controllerRef.isPending?.value ?? false"
           />
 
@@ -167,24 +173,24 @@ const sidePanelContract = computed(() => {
             <FormTitleBar
               :form-title="screen.titleKey"
               :record-title="
-                controllerRef.isNew.value
+                controllerRef.isNew?.value
                   ? undefined
-                  : controllerRef.entity.value?.requestNumber ||
-                    controllerRef.entity.value?.documentNumber ||
-                    controllerRef.entity.value?.id
+                  : controllerRef.entity?.value?.requestNumber ||
+                    controllerRef.entity?.value?.documentNumber ||
+                    controllerRef.entity?.value?.id
               "
               :back-route="screen.pairedListRoute"
             />
             <FormToolbar
-              :model="controllerRef.model.value"
-              :executors="controllerRef.commands.value"
+              :model="controllerRef.model?.value"
+              :executors="controllerRef.commands?.value ?? {}"
               :is-pending="controllerRef.isPending?.value ?? false"
               :is-new="controllerRef.isNew?.value ?? false"
-              @save="controllerRef.commands.value['save']?.execute()"
-              @cancel="controllerRef.commands.value['cancel']?.execute()"
+              @save="controllerRef.commands?.value?.['save']?.execute()"
+              @cancel="controllerRef.commands?.value?.['cancel']?.execute()"
             />
             <FormBanner
-              v-if="controllerRef.model.value.ui.chrome.banner"
+              v-if="controllerRef.model?.value?.ui?.chrome?.banner"
               :banner="controllerRef.model.value.ui.chrome.banner"
             />
           </template>
@@ -194,9 +200,9 @@ const sidePanelContract = computed(() => {
         <SystemErrorBanner
           v-if="controllerRef?.error?.value"
           :error="controllerRef.error.value"
-          :can-retry="!!controllerRef.commands.value['refresh']"
+          :can-retry="!!controllerRef.commands?.value?.['refresh']"
           @dismiss="controllerRef.error.value = null"
-          @retry="controllerRef.commands.value['refresh']?.execute()"
+          @retry="controllerRef.commands?.value?.['refresh']?.execute()"
         />
       </div>
 
@@ -218,6 +224,21 @@ const sidePanelContract = computed(() => {
           class="flex h-full items-center justify-center text-[var(--color-neutral-400)]"
         >
           No working area defined for {{ screen.id }}
+        </div>
+
+        <!-- Controller Initialization Error (Development Aid) -->
+        <div
+          v-if="!controllerRef && controllerError"
+          class="flex h-full items-center justify-center p-8"
+        >
+          <div class="max-w-xl w-full rounded-lg border border-red-200 bg-red-50 p-6 text-sm">
+            <p class="font-semibold text-red-800 mb-2">
+              Controller failed to initialize for {{ screen?.id }}
+            </p>
+            <pre class="whitespace-pre-wrap text-red-700 font-mono text-xs"
+              >{{ controllerError.message }}\n{{ controllerError.stack }}</pre
+            >
+          </div>
         </div>
       </div>
     </div>
