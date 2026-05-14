@@ -107,6 +107,10 @@ export function useVendorBillController(id: string) {
     justification: useField(base, AP301000_FIELDS.justification),
     status: useField(base, AP301000_FIELDS.status),
     totalAmount: useField(base, AP301000_FIELDS.totalAmount),
+    whtTotal: useField(base, AP301000_FIELDS.whtTotal),
+    netPayable: useField(base, AP301000_FIELDS.netPayable),
+    totalPaid: useField(base, AP301000_FIELDS.totalPaid),
+    totalWithheld: useField(base, AP301000_FIELDS.totalWithheld),
   }
 
   return reactive({
