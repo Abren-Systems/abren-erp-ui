@@ -75,7 +75,7 @@ export function useVendorBillController(id: string) {
   })
 
   base.registerCommand('create_pr', {
-    execute: async () => void router.push({ name: 'PaymentRequestsList' }),
+    execute: async () => void router.push({ name: 'PaymentRequestList' }),
     isPending: computed(() => false),
   })
 

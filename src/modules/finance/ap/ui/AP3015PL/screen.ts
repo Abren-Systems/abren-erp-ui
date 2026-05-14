@@ -19,7 +19,7 @@ export const AP3015PL: ScreenDefinition = {
   primaryView: 'paymentRequests',
   route: {
     path: 'requests',
-    name: 'PaymentRequestsList',
+    name: 'PaymentRequestList',
   },
   permissions: [{ key: 'ap:view' }],
   views: {

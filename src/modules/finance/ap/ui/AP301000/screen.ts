@@ -14,7 +14,7 @@ export const AP301000: ScreenDefinition = {
   primaryView: 'bill',
   route: {
     path: 'vendor-bills/:id',
-    name: 'BillsAndAdjustmentsDetail',
+    name: 'VendorBillDetail',
   },
   permissions: [{ key: 'ap:view' }],
   views: {
