@@ -4,7 +4,17 @@ import type { SemanticKind } from '../semantic-runtime/contracts'
 // Pure data definitions for form inputs and display values.
 // These contracts govern how `AppField`, `AppInput`, and Cells render.
 
-export type PrimitiveType = 'string' | 'number' | 'boolean' | 'date'
+export type PrimitiveType =
+  | 'text'
+  | 'number'
+  | 'amount'
+  | 'money'
+  | 'status'
+  | 'date'
+  | 'id'
+  | 'selector'
+  | 'checkbox'
+  | 'textarea'
 
 export interface FieldOptionContract {
   readonly value: string | number

@@ -12,7 +12,8 @@ import { AP_MODULE_ID, apScreenId } from '../../constants'
 export const AP301500: ScreenDefinition = {
   id: apScreenId('AP301500'),
   moduleId: AP_MODULE_ID,
-  controller: (ctx) => usePaymentRequestEntry(ctx.params['id'] as string),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  controller: (ctx) => usePaymentRequestEntry(ctx.params['id'] as string) as any,
   kind: 'dataEntry',
   titleKey: 'Payment Requests',
   primaryView: 'paymentRequest',

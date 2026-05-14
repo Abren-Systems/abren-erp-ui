@@ -50,18 +50,18 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     </div>
 
     <div class="px-[var(--layout-gutter)]">
-      <AppTabs :tabs="['Expense Lines']" v-model="ctrl.activeTab.value" />
+      <AppTabs :tabs="['Expense Lines']" v-model="ctrl.activeTab" />
     </div>
 
     <div class="px-[var(--layout-gutter)] pb-6 flex-1 overflow-hidden">
       <div
-        v-if="ctrl.activeTab.value === 'Expense Lines'"
+        v-if="ctrl.activeTab === 'Expense Lines'"
         class="h-full rounded-lg border border-[var(--color-neutral-200)] bg-[var(--app-surface)] shadow-sm flex flex-col"
       >
         <DataGrid
           :columns="vendorBillLineColumns"
-          :data="ctrl.currentLines.value"
-          :loading="ctrl.isLoading.value"
+          :data="ctrl.currentLines"
+          :loading="ctrl.isLoading"
           empty-message="No expense lines found"
         />
       </div>

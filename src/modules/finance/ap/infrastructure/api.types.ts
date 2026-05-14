@@ -59,3 +59,13 @@ export interface CreateVendorBillDTO {
   justification: string
   lines: CreateVendorBillLineDTO[]
 }
+
+export interface VendorDTO {
+  id: string
+  name: string
+  tin?: string | null
+  trade_license_number?: string | null
+  has_tin_certificate: boolean
+  has_valid_trade_license: boolean
+  status: string
+}

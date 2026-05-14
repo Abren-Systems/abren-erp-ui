@@ -48,26 +48,26 @@ export const AP301000_FIELDS = {
   totalAmount: {
     key: 'totalAmount',
     label: 'Total Amount',
-    type: 'amount',
+    type: 'money',
   },
   whtTotal: {
     key: 'whtTotal',
     label: 'WHT Total',
-    type: 'amount',
+    type: 'money',
   },
   netPayable: {
     key: 'netPayable',
     label: 'Net Payable',
-    type: 'amount',
+    type: 'money',
   },
   totalPaid: {
     key: 'totalPaid',
     label: 'Total Paid',
-    type: 'amount',
+    type: 'money',
   },
   totalWithheld: {
     key: 'totalWithheld',
     label: 'Total Withheld',
-    type: 'amount',
+    type: 'money',
   },
 } satisfies Record<string, FieldDefinition<VendorBill>>

@@ -1,4 +1,4 @@
-import { computed, type ComputedRef } from 'vue'
+import { computed, reactive, type ComputedRef } from 'vue'
 import type { FieldDefinition } from '../field-definition.types'
 import type { ScreenController } from '@/platform/screen-runtime/screen-controller.types'
 import type { ScreenStateMachine } from '@/platform/screen-runtime/state-machine.types'
@@ -29,8 +29,22 @@ export interface FieldBinding<TValue = unknown> {
 export function useField<TEntity, TValue>(
   controller: ScreenController<TEntity, string>,
   definition: FieldDefinition<TEntity, TValue>,
+  editorAttrs?: Record<string, unknown>,
 ): FieldBinding<TValue> {
-  const value = controller.data.select(definition.key) as ComputedRef<TValue | undefined>
+  const entityValue = controller.data.select(definition.key)
+
+  const value = computed(() => {
+    // Priority 1: Form value (for new records or active edits)
+    if ('form' in controller) {
+      const form = (
+        controller as unknown as { form: { state: { values: Record<string, unknown> } } }
+      ).form
+      const formValue = form.state.values[String(definition.key)]
+      if (formValue !== undefined) return formValue
+    }
+    // Priority 2: Domain entity value
+    return entityValue.value
+  })
 
   const isReadonly = computed(() => {
     // Priority 0: Operational Projection (Backend-Derived Authority)
@@ -88,7 +102,7 @@ export function useField<TEntity, TValue>(
   const error = computed(() => {
     if (definition.validate && value.value !== undefined) {
       return definition.validate(
-        value.value,
+        value.value as TValue,
         controller.state as ScreenStateMachine,
         controller.entity.value as Partial<TEntity>,
       )
@@ -134,7 +148,7 @@ export function useField<TEntity, TValue>(
     )
   }
 
-  return {
+  return reactive({
     field: String(definition.key),
     value,
     modelValue: value,
@@ -146,5 +160,6 @@ export function useField<TEntity, TValue>(
     error,
     type: definition.type as FieldType,
     mode: computed(() => (isReadonly.value ? 'read' : 'edit')),
-  }
+    editorAttrs,
+  }) as unknown as FieldBinding<TValue>
 }

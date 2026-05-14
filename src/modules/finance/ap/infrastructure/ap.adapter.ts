@@ -6,6 +6,7 @@ import type {
   CreateVendorBillDTO,
   PaymentRequestDTO,
   VendorBillDTO,
+  VendorDTO,
 } from './api.types'
 import type { ListQuery, ListResponse } from '@/shared/domain/pagination'
 import type {
@@ -251,10 +252,23 @@ export const apAdapter = {
   /**
    * Cancels a Vendor Bill with a reason.
    */
-  async cancelBill(id: VendorBillId, reason: string): Promise<OperationalEntity<VendorBill>> {
-    const raw = await apiPostEnvelope<OperationalDTO<VendorBillDTO>>(`${BILLS_BASE}/${id}/cancel`, {
-      reason,
-    })
+  async cancelBill(
+    id: VendorBillId,
+    reason: string,
+    version: number,
+  ): Promise<OperationalEntity<VendorBill>> {
+    const raw = await apiPostEnvelope<OperationalDTO<VendorBillDTO>>(
+      `${BILLS_BASE}/${id}/cancel`,
+      { reason },
+      { version },
+    )
     return mapOperational(raw.data, (parsed) => APMapper.toVendorBill(parsed))
+  },
+
+  /**
+   * Fetches all vendors for selection.
+   */
+  async listVendors(): Promise<VendorDTO[]> {
+    return await apiGet<VendorDTO[]>('/finance/ap/vendors')
   },
 }

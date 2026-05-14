@@ -73,6 +73,6 @@ export const AP301500_FIELDS = {
   totalAmount: {
     key: 'totalAmount',
     label: 'Order Total',
-    type: 'amount',
+    type: 'money',
   } as FieldDefinition<PaymentRequest, number>,
 } as const

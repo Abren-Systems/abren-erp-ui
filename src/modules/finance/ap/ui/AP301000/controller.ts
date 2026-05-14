@@ -1,4 +1,6 @@
-import { computed, ref, watchEffect } from 'vue'
+import { computed, reactive, ref, watchEffect } from 'vue'
+import { useApiQuery } from '@/shared/composables/useApiQuery'
+import { CURRENCY_OPTIONS } from '../AP301500/fields'
 import { useRouter } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import { useWorkflowAction } from '@/platform/workflow-runtime/hooks/useWorkflowAction'
@@ -8,6 +10,7 @@ import { apAdapter } from '../../infrastructure/ap.adapter'
 import { useFormPersistence } from '@/shared/composables/useFormPersistence'
 import { toId } from '@/shared/types/brand.types'
 import type { VendorBillId } from '@/shared/types/brand.types'
+import type { VendorDTO } from '../../infrastructure/api.types'
 import { AP301000 } from './screen'
 import { AP301000_FIELDS } from './fields'
 import { useField } from '@/platform/field-system/bindings'
@@ -76,19 +79,26 @@ export function useVendorBillController(id: string) {
     isPending: computed(() => false),
   })
 
+  // Lookups
+  const { data: vendors } = useApiQuery(['ap', 'vendors'], () => apAdapter.listVendors())
+
   const fields = {
-    vendorId: useField(base, AP301000_FIELDS.vendorId),
+    vendorId: useField(base, AP301000_FIELDS.vendorId, {
+      options: computed(
+        () => vendors.value?.map((v: VendorDTO) => ({ label: v.name, value: v.id })) || [],
+      ),
+    }),
     billNumber: useField(base, AP301000_FIELDS.billNumber),
     vendorInvoiceNumber: useField(base, AP301000_FIELDS.vendorInvoiceNumber),
     issueDate: useField(base, AP301000_FIELDS.issueDate),
     dueDate: useField(base, AP301000_FIELDS.dueDate),
-    currency: useField(base, AP301000_FIELDS.currency),
+    currency: useField(base, AP301000_FIELDS.currency, { options: CURRENCY_OPTIONS }),
     justification: useField(base, AP301000_FIELDS.justification),
     status: useField(base, AP301000_FIELDS.status),
     totalAmount: useField(base, AP301000_FIELDS.totalAmount),
   }
 
-  return {
+  return reactive({
     ...base,
     fields,
     currentLines,
@@ -96,5 +106,6 @@ export function useVendorBillController(id: string) {
     form,
     isCreating,
     router,
-  }
+    isLoading,
+  })
 }

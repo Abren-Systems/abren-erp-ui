@@ -7,7 +7,8 @@ import { createScreenId } from '@/platform/screen-runtime/screen-id.types'
 export const AP301000: ScreenDefinition = {
   id: createScreenId('AP301000'),
   moduleId: 'ap' as ModuleId,
-  controller: (ctx) => useVendorBillController(ctx.params['id'] as string),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  controller: (ctx) => useVendorBillController(ctx.params['id'] as string) as any,
   kind: 'dataEntry',
   titleKey: 'Bills and Adjustments',
   primaryView: 'bill',

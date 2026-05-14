@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
@@ -155,16 +155,16 @@ export function usePaymentRequestEntry(id: string) {
   // ── Field Bindings ──────────────────────────────────────
   // This is where behavioral discipline is enforced.
   const fields = {
-    requesterId: useField(base, AP301500_FIELDS.requesterId),
-    beneficiaryId: useField(base, AP301500_FIELDS.beneficiaryId),
+    requesterId: useField(base, AP301500_FIELDS.requesterId, { options: userOptions }),
+    beneficiaryId: useField(base, AP301500_FIELDS.beneficiaryId, { options: userOptions }),
     status: useField(base, AP301500_FIELDS.status),
     submittedAt: useField(base, AP301500_FIELDS.submittedAt),
     justification: useField(base, AP301500_FIELDS.justification),
-    currency: useField(base, AP301500_FIELDS.currency),
+    currency: useField(base, AP301500_FIELDS.currency, { options: currencyOptions }),
     totalAmount: useField(base, AP301500_FIELDS.totalAmount),
   }
 
-  return {
+  return reactive({
     // Platform base (data selectors, state machine, commands)
     ...base,
 
@@ -202,5 +202,6 @@ export function usePaymentRequestEntry(id: string) {
 
     // Navigation
     router,
-  }
+    isLoading,
+  })
 }

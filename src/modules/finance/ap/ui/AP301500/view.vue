@@ -45,7 +45,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
           <AppField v-bind="ctrl.fields.requesterId" />
           <AppField
             v-bind="ctrl.fields.beneficiaryId"
-            :editor-attrs="{ options: ctrl.userOptions.value }"
+            :editor-attrs="{ options: ctrl.userOptions }"
           />
           <AppField
             v-bind="ctrl.fields.status"
@@ -62,7 +62,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         <FieldGroup>
           <AppField
             v-bind="ctrl.fields.currency"
-            :editor-attrs="{ options: ctrl.currencyOptions.value }"
+            :editor-attrs="{ options: ctrl.currencyOptions }"
           />
           <AppField v-bind="ctrl.fields.totalAmount" />
         </FieldGroup>
@@ -71,19 +71,19 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
     <!-- 4. Tabs -->
     <div class="px-[var(--layout-gutter)]">
-      <AppTabs :tabs="['Line Details']" v-model="ctrl.activeTab.value" />
+      <AppTabs :tabs="['Line Details']" v-model="ctrl.activeTab" />
     </div>
 
     <!-- 5. Details Area -->
     <div class="px-[var(--layout-gutter)] pb-6">
       <div
-        v-if="ctrl.activeTab.value === 'Line Details'"
+        v-if="ctrl.activeTab === 'Line Details'"
         class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-[var(--app-surface)] shadow-sm"
       >
         <DataGrid
           :columns="paymentRequestLineColumns"
-          :data="ctrl.currentLines.value"
-          :loading="ctrl.isLoading.value && !ctrl.isNew.value"
+          :data="ctrl.currentLines"
+          :loading="ctrl.isLoading && !ctrl.isNew"
           empty-message="No line items found"
         />
       </div>
@@ -91,8 +91,8 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
 
     <!-- Dialogs -->
     <AuditReasonDialog
-      v-model:open="ctrl.isRejectDialogOpen.value"
-      v-model="ctrl.auditReason.value"
+      v-model:open="ctrl.isRejectDialogOpen"
+      v-model="ctrl.auditReason"
       title="Reject Payment Request"
       description="Please provide a reason for rejecting this payment request. This will be visible in the audit trail."
       confirm-label="Reject Request"
@@ -101,8 +101,8 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     />
 
     <AuditReasonDialog
-      v-model:open="ctrl.isCancelDialogOpen.value"
-      v-model="ctrl.auditReason.value"
+      v-model:open="ctrl.isCancelDialogOpen"
+      v-model="ctrl.auditReason"
       title="Cancel Payment Request"
       description="Are you sure you want to cancel this request? Please provide a reason for the record."
       confirm-label="Cancel Request"

@@ -1,4 +1,5 @@
-import { type Currency } from '@/shared/domain/money'
+import { Currency } from '@/shared/domain/money'
+import { BusinessDate, type IsoDate } from '@/shared/domain/business-date'
 import { CommonMapper } from '@/shared/infrastructure/mappers'
 import type {
   PaymentRequestDTO,
@@ -63,13 +64,14 @@ export class APMapper {
    * Transforms a raw Payment Request DTO into a Domain Model.
    */
   static toPaymentRequest(dto: PaymentRequestDTO): PaymentRequest {
-    const currency = dto.currency as Currency
+    if (!dto) return {} as unknown as PaymentRequest
+    const currency = (dto.currency as Currency) || Currency.ETB
 
     return {
       id: CommonMapper.toBrandedId<PaymentRequestId>(dto.id),
       requesterId: CommonMapper.toBrandedId<UserId>(dto.requester_id),
       beneficiaryId: CommonMapper.toBrandedId<UserId>(dto.beneficiary_id),
-      totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
+      totalAmount: CommonMapper.toMoney(dto.total_amount || 0, currency),
       currency: currency,
       justification: dto.justification,
       status: dto.status,
@@ -120,20 +122,21 @@ export class APMapper {
    * Transforms a raw Vendor Bill DTO into a Domain Model.
    */
   static toVendorBill(dto: VendorBillDTO): VendorBill {
-    const currency = dto.currency as Currency
+    if (!dto) return {} as unknown as VendorBill
+    const currency = (dto.currency as Currency) || Currency.ETB
     const lines = dto.lines.map((ln: VendorBillLineDTO) => this.mapVendorBillLine(ln, currency))
 
     return {
       id: CommonMapper.toBrandedId<VendorBillId>(dto.id),
       vendorId: CommonMapper.toBrandedId<VendorId>(dto.vendor_id),
-      billNumber: dto.document_number!,
+      billNumber: dto.document_number ?? `VB-${dto.id.slice(0, 4).toUpperCase()}`,
       vendorInvoiceNumber: dto.vendor_invoice_number,
-      issueDate: CommonMapper.toDate(dto.issue_date)!,
-      dueDate: CommonMapper.toDate(dto.due_date)!,
+      issueDate: (CommonMapper.toDate(dto.issue_date) || BusinessDate.today()) as IsoDate,
+      dueDate: (CommonMapper.toDate(dto.due_date) || BusinessDate.today()) as IsoDate,
       currency: currency,
       justification: dto.justification ?? '',
       status: dto.status,
-      totalAmount: CommonMapper.toMoney(dto.total_amount, currency),
+      totalAmount: CommonMapper.toMoney(dto.total_amount || 0, currency),
       whtTotal: CommonMapper.toMoney(dto.wht_total || '0', currency),
       netPayable: CommonMapper.toMoney(dto.net_payable || '0', currency),
       totalPaid: CommonMapper.toMoney(dto.total_paid || '0', currency),
