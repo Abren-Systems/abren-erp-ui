@@ -15,7 +15,6 @@ import { useRoute } from 'vue-router'
 import { screenRegistry } from './screen-registry'
 import AppSidePane from '@/shared/components/AppSidePane.vue'
 import SystemErrorBanner from './components/SystemErrorBanner.vue'
-import { AppButton } from '@/shared/components/primitives'
 import ListTitleBar from '@/platform/chrome/ListTitleBar.vue'
 import ListToolbar from '@/platform/chrome/ListToolbar.vue'
 import FormTitleBar from '@/platform/chrome/FormTitleBar.vue'
@@ -66,13 +65,25 @@ const ControllerHost = defineComponent({
     const scope = effectScope()
     let controller: ScreenController<unknown, string> | null = null
 
-    scope.run(() => {
-      // Now we are inside a real setup() of a mounted component!
-      controller = props.screen.controller(props.ctx)
-    })
+    try {
+      scope.run(() => {
+        // Now we are inside a real setup() of a mounted component!
+        controller = props.screen.controller(props.ctx)
+      })
+    } catch (err) {
+      console.error(
+        `[ControllerHost] Controller initialization failed for screen "${props.screen.id}":`,
+        err,
+      )
+    }
 
     if (controller) {
       emit('ready', controller)
+    } else {
+      console.warn(
+        `[ControllerHost] No controller produced for screen "${props.screen.id}". ` +
+          'Chrome and working area will not render.',
+      )
     }
 
     onScopeDispose(() => {
@@ -89,6 +100,15 @@ const screenCtx = computed<ScreenContext>(() => ({
 }))
 
 provide(ScreenControllerKey, controllerRef)
+
+// Reset controller ref when route changes so stale list controllers
+// don't bleed into data entry screens (or vice versa).
+watch(
+  () => route.fullPath,
+  () => {
+    controllerRef.value = null
+  },
+)
 
 // Resolve the Working Area view component (currently from renderTarget,
 // eventually this will resolve dynamically from views contract)
