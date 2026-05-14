@@ -38,11 +38,22 @@ export function useVendorBillController(id: string) {
   const { form, isSubmitting: isCreating } = useCreateVendorBill()
   useFormPersistence(form, 'abren_draft_vendor_bill')
 
+  const activeEntity = computed(() => {
+    if (isNew.value) {
+      return {
+        ...(form.state.values as unknown as VendorBill),
+        id: 'new',
+        status: 'DRAFT',
+      } as VendorBill
+    }
+    return vendorBill.value as VendorBill
+  })
+
   const base = useScreenController<VendorBill, string>({
     screen: AP301000,
-    dataSource: { entity: vendorBill, isLoading, error: ref(null) },
+    dataSource: { entity: activeEntity, isLoading, error: ref(null) },
     isNew,
-    getDomainState: (entity) => entity.status,
+    getDomainState: (entity) => entity?.status ?? 'DRAFT',
     operations,
     statePolicy: AP301000_POLICY,
   })
