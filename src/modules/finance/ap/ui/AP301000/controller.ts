@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useApiQuery } from '@/shared/composables/useApiQuery'
 import { CURRENCY_OPTIONS } from '../AP301500/fields'
 import { useRouter } from 'vue-router'
@@ -113,7 +113,7 @@ export function useVendorBillController(id: string) {
     totalWithheld: useField(base, AP301000_FIELDS.totalWithheld),
   }
 
-  return reactive({
+  return {
     ...base,
     fields,
     currentLines,
@@ -122,5 +122,5 @@ export function useVendorBillController(id: string) {
     isCreating,
     router,
     isLoading,
-  })
+  }
 }

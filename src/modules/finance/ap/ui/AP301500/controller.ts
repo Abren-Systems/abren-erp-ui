@@ -1,4 +1,4 @@
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
@@ -165,7 +165,7 @@ export function usePaymentRequestEntry(id: string) {
     totalAmount: useField(base, AP301500_FIELDS.totalAmount),
   }
 
-  return reactive({
+  return {
     // Platform base (data selectors, state machine, commands)
     ...base,
 
@@ -204,5 +204,5 @@ export function usePaymentRequestEntry(id: string) {
     // Navigation
     router,
     isLoading,
-  })
+  }
 }
