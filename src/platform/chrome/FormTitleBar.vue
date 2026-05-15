@@ -43,11 +43,10 @@ function goBack() {
       </button>
 
       <div class="form-title-bar__titles">
-        <span class="form-title-bar__form-title">{{ formTitle }}</span>
-        <template v-if="recordTitle">
-          <span class="form-title-bar__separator">—</span>
-          <span class="form-title-bar__record-title">{{ recordTitle }}</span>
-        </template>
+        <button class="form-title-bar__breadcrumb" @click="goBack">
+          {{ formTitle }}
+        </button>
+        <span class="form-title-bar__record-title">{{ recordTitle || 'New Record' }}</span>
       </div>
     </div>
 
@@ -62,16 +61,16 @@ function goBack() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--chrome-titlebar-py) var(--layout-gutter);
+  padding: 0.5rem var(--layout-gutter);
   border-bottom: 1px solid var(--color-neutral-200);
   background: #ffffff;
-  min-height: var(--chrome-titlebar-min-h);
+  min-height: 4rem;
 }
 
 .form-title-bar__left {
   display: flex;
-  align-items: center;
-  gap: 0.625rem;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .form-title-bar__back {
@@ -80,6 +79,7 @@ function goBack() {
   justify-content: center;
   width: 2rem;
   height: 2rem;
+  margin-top: 0.25rem;
   border-radius: 0.375rem;
   border: none;
   background: transparent;
@@ -95,25 +95,31 @@ function goBack() {
 
 .form-title-bar__titles {
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
-.form-title-bar__form-title {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-neutral-900);
+.form-title-bar__breadcrumb {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary-600, #2563eb);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
 }
 
-.form-title-bar__separator {
-  color: var(--color-neutral-400);
+.form-title-bar__breadcrumb:hover {
+  text-decoration: underline;
 }
 
 .form-title-bar__record-title {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--color-neutral-600);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-neutral-900);
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 
 .form-title-bar__services {

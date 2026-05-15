@@ -148,6 +148,11 @@ export function useField<TEntity, TValue>(
     )
   }
 
+  const forceMode = computed(() => {
+    if ('form' in controller && controller.isNew.value) return 'edit'
+    return isReadonly.value ? 'read' : 'edit'
+  })
+
   return reactive({
     field: String(definition.key),
     value,
@@ -159,7 +164,7 @@ export function useField<TEntity, TValue>(
     'onUpdate:modelValue': onChange,
     error,
     type: definition.type as FieldType,
-    mode: computed(() => (isReadonly.value ? 'read' : 'edit')),
+    mode: forceMode,
     editorAttrs,
   }) as unknown as FieldBinding<TValue>
 }
