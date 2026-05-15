@@ -19,7 +19,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <!-- Loading State -->
 
     <!-- Main Content -->
-    <div class="px-[var(--layout-gutter)] py-5">
+    <div class="px-[var(--layout-gutter)] py-3">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
         <FieldGroup>
           <AppField v-bind="ctrl.fields.vendorId" />
@@ -44,8 +44,10 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         </FieldGroup>
       </AppTemplate>
 
-      <div class="mt-4 max-w-3xl">
-        <AppField v-bind="ctrl.fields.justification" />
+      <div class="mt-3">
+        <FieldGroup :columns="1">
+          <AppField v-bind="ctrl.fields.justification" />
+        </FieldGroup>
       </div>
     </div>
 

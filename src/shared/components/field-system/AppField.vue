@@ -168,3 +168,83 @@ const mergedEditorProps = computed(() => ({
     </span>
   </div>
 </template>
+
+<style scoped>
+.app-field {
+  display: grid;
+  grid-template-columns: minmax(130px, 35%) 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2rem;
+}
+
+.app-field__label {
+  font-size: 0.8125rem; /* ~13px */
+  color: var(--color-neutral-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-field__control {
+  min-width: 0; /* Prevent grid blowout from inputs */
+  width: 100%;
+}
+
+.app-field__value {
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-neutral-900);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-field__value--strong {
+  font-weight: 600;
+}
+
+.app-field__value--empty {
+  color: var(--color-neutral-400);
+  font-style: italic;
+  font-size: 0.8125rem;
+}
+
+/* Numeric variants */
+.app-field--align-right .app-field__value,
+.app-field--align-right .app-field__control {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status Badges */
+.app-field__badge {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+}
+
+.app-field__badge--success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+.app-field__badge--warning {
+  background-color: #fef08a;
+  color: #854d0e;
+}
+.app-field__badge--danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+.app-field__badge--info {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+</style>

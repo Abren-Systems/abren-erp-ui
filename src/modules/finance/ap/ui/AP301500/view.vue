@@ -39,7 +39,7 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <!-- 2. Form Toolbar -->
 
     <!-- 3. Summary Area -->
-    <div class="px-[var(--layout-gutter)] py-5">
+    <div class="px-[var(--layout-gutter)] py-3">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
         <FieldGroup>
           <AppField v-bind="ctrl.fields.requesterId" />
@@ -75,10 +75,10 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     </div>
 
     <!-- 5. Details Area -->
-    <div class="px-[var(--layout-gutter)] pb-6">
+    <div class="px-[var(--layout-gutter)] pb-6 flex-1 overflow-hidden">
       <div
         v-if="ctrl.activeTab === 'Line Details'"
-        class="rounded-lg border border-[var(--color-neutral-200)] overflow-hidden bg-[var(--app-surface)] shadow-sm"
+        class="h-full rounded-lg border border-[var(--color-neutral-200)] bg-[var(--app-surface)] shadow-sm flex flex-col"
       >
         <DataGrid
           :columns="paymentRequestLineColumns"
