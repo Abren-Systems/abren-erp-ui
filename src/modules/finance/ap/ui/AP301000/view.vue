@@ -21,26 +21,27 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <!-- Main Content -->
     <div class="px-[var(--layout-gutter)] py-3">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
+        <!-- Column 1 -->
         <FieldGroup>
           <AppField v-bind="ctrl.fields.vendorId" />
           <AppField v-bind="ctrl.fields.vendorInvoiceNumber" />
           <AppField v-bind="ctrl.fields.currency" />
-        </FieldGroup>
-        <FieldGroup>
-          <AppField v-bind="ctrl.fields.issueDate" />
-          <AppField v-bind="ctrl.fields.dueDate" />
-        </FieldGroup>
-        <FieldGroup>
-          <AppField v-bind="ctrl.fields.status" :context="{ entity: 'VendorBill' }" />
-          <AppField v-bind="ctrl.fields.totalAmount" />
-        </FieldGroup>
-        <FieldGroup>
           <AppField v-bind="ctrl.fields.whtTotal" />
           <AppField v-bind="ctrl.fields.netPayable" />
         </FieldGroup>
+
+        <!-- Column 2 -->
         <FieldGroup>
+          <AppField v-bind="ctrl.fields.issueDate" />
+          <AppField v-bind="ctrl.fields.dueDate" />
           <AppField v-bind="ctrl.fields.totalPaid" />
           <AppField v-bind="ctrl.fields.totalWithheld" />
+        </FieldGroup>
+
+        <!-- Column 3 -->
+        <FieldGroup>
+          <AppField v-bind="ctrl.fields.status" :context="{ entity: 'VendorBill' }" />
+          <AppField v-bind="ctrl.fields.totalAmount" />
         </FieldGroup>
       </AppTemplate>
 

@@ -41,32 +41,40 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
     <!-- 3. Summary Area -->
     <div class="px-[var(--layout-gutter)] py-3">
       <AppTemplate :template="ctrl.screen.layout.summaryTemplate">
+        <!-- Column 1 -->
         <FieldGroup>
           <AppField v-bind="ctrl.fields.requesterId" />
           <AppField
             v-bind="ctrl.fields.beneficiaryId"
             :editor-attrs="{ options: ctrl.userOptions }"
           />
+        </FieldGroup>
+
+        <!-- Column 2 -->
+        <FieldGroup>
+          <AppField v-bind="ctrl.fields.submittedAt" />
+          <AppField
+            v-bind="ctrl.fields.currency"
+            :editor-attrs="{ options: ctrl.currencyOptions }"
+          />
+        </FieldGroup>
+
+        <!-- Column 3 -->
+        <FieldGroup>
           <AppField
             v-bind="ctrl.fields.status"
             type="status"
             :context="{ entity: 'PaymentRequest' }"
           />
-        </FieldGroup>
-
-        <FieldGroup>
-          <AppField v-bind="ctrl.fields.submittedAt" />
-          <AppField v-bind="ctrl.fields.justification" />
-        </FieldGroup>
-
-        <FieldGroup>
-          <AppField
-            v-bind="ctrl.fields.currency"
-            :editor-attrs="{ options: ctrl.currencyOptions }"
-          />
           <AppField v-bind="ctrl.fields.totalAmount" />
         </FieldGroup>
       </AppTemplate>
+
+      <div class="mt-3">
+        <FieldGroup :columns="1">
+          <AppField v-bind="ctrl.fields.justification" />
+        </FieldGroup>
+      </div>
     </div>
 
     <!-- 4. Tabs -->
