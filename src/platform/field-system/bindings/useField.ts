@@ -149,7 +149,9 @@ export function useField<TEntity, TValue>(
   }
 
   const forceMode = computed(() => {
-    if ('form' in controller && controller.isNew.value) return 'edit'
+    if ('form' in controller && controller.isNew.value) {
+      return isReadonly.value ? 'read' : 'edit'
+    }
     return isReadonly.value ? 'read' : 'edit'
   })
 

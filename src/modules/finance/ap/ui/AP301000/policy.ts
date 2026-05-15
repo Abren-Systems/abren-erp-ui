@@ -14,6 +14,7 @@ type BillFieldKey =
 export const AP301000_POLICY: ScreenStatePolicy<string, BillFieldKey> = {
   states: {
     DRAFT: {
+      editable: true,
       actionRequiredLabel: 'Validate Bill',
       fields: {
         status: { readonly: true },

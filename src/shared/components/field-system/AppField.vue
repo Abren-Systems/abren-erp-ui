@@ -172,9 +172,9 @@ const mergedEditorProps = computed(() => ({
 <style scoped>
 .app-field {
   display: grid;
-  grid-template-columns: minmax(130px, 35%) 1fr;
+  grid-template-columns: 140px 1fr;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   min-height: 2rem;
 }
 

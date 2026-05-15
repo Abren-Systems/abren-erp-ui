@@ -27,13 +27,13 @@ const gridStyle = computed(() => {
 
 <style scoped>
 .field-group {
-  display: grid;
-  gap: 0.25rem 1.5rem; /* Tight vertical gap, wider horizontal gap if multi-column */
-  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* Tight vertical gap between fields */
   background-color: var(--app-surface, #ffffff);
   border: 1px solid var(--color-neutral-200, #e5e7eb);
   border-radius: 0.375rem; /* rounded-md */
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* subtle surface shadow */
 }
 </style>
