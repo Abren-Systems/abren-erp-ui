@@ -39,8 +39,8 @@ export const AP301000_COMMANDS: readonly ScreenCommand[] = [
     requiresConfirmation: false,
   },
   {
-    key: 'cancel',
-    labelKey: 'Cancel bill',
+    key: 'cancel_bill',
+    labelKey: 'Cancel Bill',
     variant: 'danger',
     kind: 'workflow',
     categoryKey: 'other',

@@ -1,4 +1,5 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useScreenController } from '@/platform/screen-runtime'
 import type { PaymentRequestId } from '@/shared/types/brand.types'
@@ -11,8 +12,13 @@ import { AP301500_POLICY } from './policy'
 import { useField } from '@/platform/field-system/bindings'
 import { useWorkflowAction } from '@/platform/workflow-runtime/hooks/useWorkflowAction'
 import { apAdapter } from '../../infrastructure/ap.adapter'
-import { watch } from 'vue'
 import type { PaymentRequest } from '../../models/ap.types'
+
+/**
+ * Platform-reserved command keys that must not be overwritten by dynamic
+ * workflow action registration.
+ */
+const PLATFORM_RESERVED_KEYS = new Set(['save', 'cancel'])
 
 /**
  * AP301500 — Payment Request Data Entry Controller
@@ -86,27 +92,66 @@ export function usePaymentRequestEntry(id: string) {
     queryKey: ['payment-request', id],
   })
 
-  // Register commands dynamically from backend projection
+  // Register commands dynamically from backend projection.
+  // Filter out platform-reserved keys to avoid collisions.
   watch(
     () => operations.value?.actions,
     (actions) => {
       if (!actions) return
-      actions.forEach((action) => {
+      for (const action of actions) {
+        if (PLATFORM_RESERVED_KEYS.has(action.action)) continue
         base.registerCommand(action.action, {
           execute: async (payload) => dispatch(action, payload as Record<string, unknown>),
           isPending: isExecutingAction,
         })
-      })
+      }
     },
     { immediate: true },
   )
 
-  // Register static commands
+  // ── Save Command (Acumatica-style) ────────────────────────
+  const isSaving = ref(false)
+
   base.registerCommand('save', {
     execute: async () => {
-      void form.handleSubmit()
+      if (isSaving.value || !form.state.isDirty) return
+
+      if (!form.state.canSubmit) {
+        toast.error('Validation Failed', {
+          description: 'Please correct the highlighted fields before saving.',
+        })
+        return
+      }
+
+      const toastId = toast.loading('Saving Payment Request…')
+      isSaving.value = true
+      base.state.transitionUI('SAVING')
+
+      try {
+        await form.handleSubmit()
+        toast.dismiss(toastId)
+      } catch {
+        toast.dismiss(toastId)
+        base.state.transitionUI(isNew.value ? 'NEW' : 'EDIT')
+      } finally {
+        isSaving.value = false
+      }
     },
-    isPending: isCreating,
+    isPending: computed(() => isCreating.value || isSaving.value),
+    canExecute: computed(() => !isCreating.value && !isSaving.value && form.state.isDirty),
+  })
+
+  // ── Cancel Command (Platform Navigation) ──────────────────
+  base.registerCommand('cancel', {
+    execute: async () => {
+      if (form.state.isDirty) {
+        if (!confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+          return
+        }
+      }
+      void router.push({ name: 'PaymentRequestList' })
+    },
+    isPending: computed(() => false),
   })
 
   // ── Domain Derived State ──
@@ -135,11 +180,6 @@ export function usePaymentRequestEntry(id: string) {
     () => users.value?.map((u) => ({ label: u.email, value: u.id })) || [],
   )
   const currencyOptions = computed(() => CURRENCY_OPTIONS)
-
-  // ── Action Dispatch (for creation-mode Save/Create) ──
-  function handleCreate() {
-    void form.handleSubmit()
-  }
 
   // ── Navigation Guard ──
   onBeforeRouteLeave((_to, _from, next) => {
@@ -197,9 +237,6 @@ export function usePaymentRequestEntry(id: string) {
     // Options
     userOptions,
     currencyOptions,
-
-    // Handlers
-    handleCreate,
 
     // Navigation
     router,

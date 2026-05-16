@@ -69,7 +69,5 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         />
       </div>
     </div>
-
-    <!-- Dialogs -->
   </div>
 </template>

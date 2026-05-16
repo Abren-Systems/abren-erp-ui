@@ -57,7 +57,12 @@ function getButtonVariant(cmd: ScreenCommand) {
       <AppButton
         variant="outline"
         size="sm"
-        :disabled="isPending || !model.domain.capabilities.canEdit"
+        :loading="isPending && executors.save?.isPending?.value"
+        :disabled="
+          isPending ||
+          !model.domain.capabilities.canEdit ||
+          executors.save?.canExecute?.value === false
+        "
         @click="emit('save')"
       >
         <Save :size="14" class="mr-1.5" />

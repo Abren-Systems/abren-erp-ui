@@ -19,33 +19,28 @@ const vendorBillSchema = z.object({
   issueDate: z.string().min(1, 'Issue date is required'),
   dueDate: z.string().min(1, 'Due date is required'),
   currency: z.string().length(3, 'Invalid currency code'),
-  justification: z.string().min(10, 'Justification must be at least 10 characters'),
+  justification: z.string().min(1, 'Justification is required'),
+  totalAmount: z.coerce.number().positive('Total amount must be positive'),
   lines: z
     .array(
       z.object({
         description: z.string().min(1, 'Description is required'),
-        amount: z.coerce.number().positive('Amount must be positive'),
+        amount: z.coerce.number().nonnegative('Amount must be non-negative'),
         lineType: z.enum(['GOODS', 'SERVICE']),
-        accountId: z.string(),
-        categoryId: z.string(),
+        accountId: z.string().optional(),
+        categoryId: z.string().optional(),
       }),
     )
-    .min(1, 'At least one line item is required'),
+    .optional()
+    .default([]),
 })
 
 export type VendorBillFormValues = z.infer<typeof vendorBillSchema>
 
-export type VendorBillFormLineValues = VendorBillFormValues['lines'][number]
+export type VendorBillFormLineValues = NonNullable<VendorBillFormValues['lines']>[number]
 
 /**
  * Use Case: Create a new Vendor Bill.
- *
- * Handles the multi-line form state and submission for vendor-provided invoices.
- * Uses TanStack Form for validation and Zod for schema enforcement.
- *
- * @returns TanStack Form instance and submission state.
- * @example
- * const { form, isSubmitting } = useCreateVendorBill()
  */
 export function useCreateVendorBill() {
   const router = useRouter()
@@ -57,6 +52,24 @@ export function useCreateVendorBill() {
     error,
   } = useApiMutation<VendorBill, ApiError, VendorBillFormValues>(
     async (values: VendorBillFormValues) => {
+      // If lines are empty, create a default line from totalAmount
+      let lines = values.lines || []
+      if (lines.length === 0) {
+        lines = [
+          {
+            description: 'General Expense',
+            amount: values.totalAmount,
+            lineType: 'GOODS',
+            accountId: '',
+            categoryId: '',
+          },
+        ]
+      } else if (lines.length === 1 && lines[0]!.amount === 0) {
+        // If there's one default line with 0 amount, update it with totalAmount
+        lines[0]!.amount = values.totalAmount
+        if (!lines[0]!.description) lines[0]!.description = 'General Expense'
+      }
+
       const dto: CreateVendorBillDTO = {
         vendor_id: values.vendorId,
         vendor_invoice_number: values.vendorInvoiceNumber,
@@ -64,7 +77,7 @@ export function useCreateVendorBill() {
         due_date: values.dueDate,
         currency: values.currency,
         justification: values.justification,
-        lines: values.lines.map((l) => ({
+        lines: lines.map((l) => ({
           description: l.description,
           amount: l.amount,
           line_type: l.lineType,
@@ -101,18 +114,15 @@ export function useCreateVendorBill() {
       dueDate: new Date().toISOString().split('T')[0] || '',
       currency: 'ETB',
       justification: '',
-      lines: [
-        {
-          description: '',
-          amount: 0,
-          lineType: 'GOODS' as 'GOODS' | 'SERVICE',
-          accountId: '',
-          categoryId: '',
-        },
-      ],
-    } satisfies VendorBillFormValues,
+      totalAmount: 0,
+      lines: [] as VendorBillFormLineValues[],
+    } as VendorBillFormValues,
     validators: {
-      onChange: vendorBillSchema,
+      onChange: ({ value }) => {
+        const result = vendorBillSchema.safeParse(value)
+        if (result.success) return undefined
+        return result.error.errors[0]?.message
+      },
     },
     onSubmit: async ({ value }) => {
       await createBill(value)
