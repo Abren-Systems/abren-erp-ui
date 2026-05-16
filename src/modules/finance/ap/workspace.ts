@@ -43,5 +43,17 @@ export const apWorkspace: WorkspaceDefinition = {
         },
       ],
     },
+    {
+      id: 'profiles',
+      labelKey: 'Profiles',
+      links: [
+        {
+          id: 'ap3030pl',
+          labelKey: 'Vendors',
+          screenId: createScreenId('AP3030PL'),
+          requiredPermissions: ['ap:view'],
+        },
+      ],
+    },
   ],
 }
