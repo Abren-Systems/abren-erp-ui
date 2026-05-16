@@ -5,6 +5,7 @@ import type {
   PaymentRequestStatsSchema,
   VendorBillLineSchema,
   VendorBillSchema,
+  VendorSchema,
 } from './api.schemas'
 
 /** Consolidated AP Domain DTOs (Strictly aligned to backend Pydantic models via Zod schemas) */
@@ -60,12 +61,12 @@ export interface CreateVendorBillDTO {
   lines: CreateVendorBillLineDTO[]
 }
 
-export interface VendorDTO {
-  id: string
+export interface CreateVendorDTO {
   name: string
   tin?: string | null
   trade_license_number?: string | null
   has_tin_certificate: boolean
   has_valid_trade_license: boolean
-  status: string
 }
+
+export type VendorDTO = z.infer<typeof VendorSchema>

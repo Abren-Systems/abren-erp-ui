@@ -12,4 +12,6 @@ export const apKeys = {
     [...apKeys.all, 'payment-requests', 'detail', id] as const,
   vendorBills: (query?: unknown) => [...apKeys.all, 'vendor-bills', query] as const,
   vendorBill: (id: VendorBillId) => [...apKeys.all, 'vendor-bills', 'detail', id] as const,
+  vendors: (query?: unknown) => [...apKeys.all, 'vendors', query] as const,
+  vendor: (id: string) => [...apKeys.all, 'vendors', 'detail', id] as const,
 }

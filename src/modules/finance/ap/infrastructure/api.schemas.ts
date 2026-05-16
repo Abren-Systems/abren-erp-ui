@@ -111,3 +111,17 @@ export const PaymentRequestListSchema = createPaginatedResponseSchema(
 export const VendorBillListSchema = createPaginatedResponseSchema(
   createOperationalResponseSchema(VendorBillListItemSchema),
 )
+
+// -- Vendor Schemas --
+
+export const VendorSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  tin: z.string().nullable().optional(),
+  trade_license_number: z.string().nullable().optional(),
+  has_tin_certificate: z.boolean().default(false),
+  has_valid_trade_license: z.boolean().default(false),
+  status: z.string().default('ACTIVE'),
+})
+
+export const OperationalVendorSchema = createOperationalResponseSchema(VendorSchema)

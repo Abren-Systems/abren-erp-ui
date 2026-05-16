@@ -271,4 +271,22 @@ export const apAdapter = {
   async listVendors(): Promise<VendorDTO[]> {
     return await apiGet<VendorDTO[]>('/finance/ap/vendors')
   },
+
+  /**
+   * Fetches a single Vendor by ID.
+   */
+  async getVendor(id: string): Promise<OperationalEntity<VendorDTO>> {
+    const raw = await apiGetEnvelope<OperationalDTO<VendorDTO>>(`/finance/ap/vendors/${id}`)
+    return mapOperational(raw.data, (dto) => dto) // No mapper needed yet for basic Vendor
+  },
+
+  /**
+   * Creates a new Vendor.
+   */
+  async createVendor(
+    dto: import('./api.types').CreateVendorDTO,
+  ): Promise<OperationalEntity<VendorDTO>> {
+    const raw = await apiPostEnvelope<OperationalDTO<VendorDTO>>('/finance/ap/vendors', dto)
+    return mapOperational(raw.data, (parsed) => parsed)
+  },
 }
