@@ -44,28 +44,18 @@ const ctrl = useScreenControllerContext() as any // eslint-disable-line @typescr
         <!-- Column 1 -->
         <FieldGroup>
           <AppField v-bind="ctrl.fields.requesterId" />
-          <AppField
-            v-bind="ctrl.fields.beneficiaryId"
-            :editor-attrs="{ options: ctrl.userOptions }"
-          />
+          <AppField v-bind="ctrl.fields.beneficiaryId" />
         </FieldGroup>
 
         <!-- Column 2 -->
         <FieldGroup>
           <AppField v-bind="ctrl.fields.submittedAt" />
-          <AppField
-            v-bind="ctrl.fields.currency"
-            :editor-attrs="{ options: ctrl.currencyOptions }"
-          />
+          <AppField v-bind="ctrl.fields.currency" />
         </FieldGroup>
 
         <!-- Column 3 -->
         <FieldGroup>
-          <AppField
-            v-bind="ctrl.fields.status"
-            type="status"
-            :context="{ entity: 'PaymentRequest' }"
-          />
+          <AppField v-bind="ctrl.fields.status" :context="{ entity: 'PaymentRequest' }" />
           <AppField v-bind="ctrl.fields.totalAmount" />
         </FieldGroup>
       </AppTemplate>

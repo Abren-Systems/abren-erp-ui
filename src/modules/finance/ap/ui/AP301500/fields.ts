@@ -49,7 +49,7 @@ export const AP301500_FIELDS = {
   status: {
     key: 'status',
     label: 'Status',
-    type: 'text',
+    type: 'status',
   } as FieldDefinition<PaymentRequest, string>,
 
   submittedAt: {
